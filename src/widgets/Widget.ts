@@ -46,12 +46,6 @@ export abstract class Widget extends BaseTheme {
      */
     protected _layoutDirty = true;
     /**
-     * Widget will have its background automatically cleared when painting if
-     * needsClear is true. The background fill style used is
-     * {@link BaseTheme#canvasFill}.
-     */
-    readonly needsClear: boolean;
-    /**
      * Widget will get targetted events even if the target is not itself if it
      * this is true. Useful for implementing container widgets.
      */
@@ -134,10 +128,9 @@ export abstract class Widget extends BaseTheme {
     }
 
     /** Create a new Widget. */
-    constructor(needsClear: boolean, propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
+    constructor(propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
         super(properties);
 
-        this.needsClear = needsClear;
         this.propagatesEvents = propagatesEvents;
 
         this._enabled = properties?.enabled ?? true;
@@ -170,13 +163,6 @@ export abstract class Widget extends BaseTheme {
 
     get inheritedTheme(): Theme | undefined {
         return this.fallbackTheme;
-    }
-
-    protected override onThemeUpdated(property: string | null = null): void {
-        super.onThemeUpdated(property);
-
-        if(this.needsClear && (property === null || property === 'canvasFill'))
-            this._dirty = true;
     }
 
     /**
@@ -642,8 +628,7 @@ export abstract class Widget extends BaseTheme {
 
     /**
      * Called when the Widget is dirty and the Root is being rendered. Does
-     * nothing if dirty flag is not set, else, clears the background if
-     * {@link Widget#needsClear} is true, calls the
+     * nothing if dirty flag is not set, else, calls the
      * {@link Widget#handlePainting} method and unsets the dirty flag.
      * Automatically calls {@link Widget#dryPaint} if
      * {@link Widget#dimensionless} is true. Must not be overridden.
@@ -651,6 +636,7 @@ export abstract class Widget extends BaseTheme {
      * @param force - Force re-paint even if {@link Widget#_dirty} is false
      */
     paint(force = false): void {
+        force = true; // TODO disable, this is just for testing
         if(this.dimensionless)
             return this.dryPaint();
 
@@ -658,10 +644,9 @@ export abstract class Widget extends BaseTheme {
             return;
 
         if(this._enabled) {
-            if(this.needsClear)
-                this.clear(this.x, this.y, this.width, this.height);
-
             const ctx = this.viewport.context;
+            // TODO don't save context so much. maybe require the child widget
+            // to keep the context clean
             ctx.save();
             this.handlePainting(force);
             ctx.restore();

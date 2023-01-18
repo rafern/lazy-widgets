@@ -20,7 +20,7 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
     constructor(child: W, propagateEvents: boolean, properties?: Readonly<WidgetProperties>) {
         // Containers clear their own background, have a child and may propagate
         // events
-        super(child, false, propagateEvents, properties);
+        super(child, propagateEvents, properties);
     }
 
     protected override activate(): void {

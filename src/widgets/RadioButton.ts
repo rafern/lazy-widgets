@@ -46,7 +46,7 @@ export class RadioButton<V> extends Widget {
     constructor(variable: Variable<V>, value: V, properties?: Readonly<WidgetProperties>) {
         // Radio buttons need a clear background, have no children and don't
         // propagate events
-        super(true, false, properties);
+        super(false, properties);
 
         this.tabFocusable = true;
         this.variable = variable;

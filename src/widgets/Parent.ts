@@ -36,8 +36,8 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
      * Create a new Parent. Automatically adds all widgets in the input array
      * to {@link Parent#_children}.
      */
-    constructor(children: Array<W>, needsClear: boolean, propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
-        super(needsClear, propagatesEvents, properties);
+    constructor(children: Array<W>, propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
+        super(propagatesEvents, properties);
 
         this._children = [...children];
     }

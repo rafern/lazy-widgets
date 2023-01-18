@@ -119,7 +119,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     constructor(child: W, properties?: Readonly<ViewportWidgetProperties>) {
         // Viewport clears its own background, has a single child and propagates
         // events
-        super(child, false, true, properties);
+        super(child, true, properties);
 
         this.useCanvas = properties?.useCanvas ?? false;
         if(this.useCanvas)

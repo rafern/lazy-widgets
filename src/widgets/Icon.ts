@@ -125,7 +125,7 @@ export class Icon extends Widget {
     constructor(image: HTMLImageElement | HTMLVideoElement | string, properties?: Readonly<IconProperties>) {
         // Icons need a clear background, have no children and don't propagate
         // events
-        super(true, false, properties);
+        super(false, properties);
 
         if(typeof image === 'string') {
             if(videoRegex.test(image)) {

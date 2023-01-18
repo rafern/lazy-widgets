@@ -35,7 +35,7 @@ export class Spacing extends Widget {
         };
 
         // Spacing needs clear, never has children and doesn't propagate events
-        super(true, false, properties);
+        super(false, properties);
 
         this.minWidth = properties?.minWidth ?? 0;
         this.minHeight = properties?.minHeight ?? 0;
