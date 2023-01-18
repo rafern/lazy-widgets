@@ -98,18 +98,20 @@ export abstract class BaseViewport implements Viewport {
      * @returns Returns true if the child was resized, else, false.
      */
     resolveLayout(): boolean {
-        if(!this.child.layoutDirty)
+        if(!this.child.layoutDirty) {
             return false;
+        }
 
         // Resolve child's layout
         const [oldWidth, oldHeight] = this.child.dimensions;
 
         this.child.resolveDimensionsAsTop(...this.constraints);
 
-        if(this.relativeCoordinates)
+        if(this.relativeCoordinates) {
             this.child.resolvePosition(0, 0);
-        else
+        } else {
             this.child.resolvePosition(...this.child.idealPosition);
+        }
 
         this.child.finalizeBounds();
 
@@ -128,14 +130,18 @@ export abstract class BaseViewport implements Viewport {
             const cb = ct + ch;
 
             if(event.target === null) {
-                if(event.x < cl)
+                if(event.x < cl) {
                     return null;
-                if(event.x >= cr)
+                }
+                if(event.x >= cr) {
                     return null;
-                if(event.y < ct)
+                }
+                if(event.y < ct) {
                     return null;
-                if(event.y >= cb)
+                }
+                if(event.y >= cb) {
                     return null;
+                }
             }
 
             // Correct position of pointer event if this viewport has relative
@@ -145,8 +151,9 @@ export abstract class BaseViewport implements Viewport {
                 const x = cl + ox;
                 const y = ct + oy;
 
-                if(x !== 0 || y !== 0)
+                if(x !== 0 || y !== 0) {
                     event = event.correctOffset(x, y);
+                }
             }
         }
 

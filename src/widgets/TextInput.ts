@@ -183,25 +183,21 @@ export class TextInput extends Widget {
             this._layoutDirty = true;
             this._dirty = true;
             this.cursorOffsetDirty = true;
-        }
-        else if(property === 'inputTextInnerPadding' ||
+        } else if(property === 'inputTextInnerPadding' ||
                 property === 'inputTextFont' ||
                 property === 'inputTextHeight' ||
-                property === 'inputTextSpacing')
-        {
+                property === 'inputTextSpacing') {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'inputBackgroundFill' ||
+        } else if(property === 'inputBackgroundFill' ||
                 property === 'inputTextFill' ||
                 property === 'inputTextFillInvalid' ||
                 property === 'inputTextFillDisabled' ||
-                property === 'cursorThickness')
-        {
+                property === 'cursorThickness') {
             this._dirty = true;
-        }
-        else if(property === 'inputTextAlign')
+        } else if(property === 'inputTextAlign') {
             this.cursorOffsetDirty = true;
+        }
     }
 
     /**
@@ -210,8 +206,9 @@ export class TextInput extends Widget {
      * @returns Returns true if the text cursor is shown, false if not shown but the text input is in use, or null if the text cursor is not shown due to the text input not being in use.
      */
     get blinkOn(): boolean | null {
-        if(this.blinkStart === 0)
+        if(this.blinkStart === 0) {
             return null;
+        }
 
         const blinkRate = this.blinkRate;
         return Math.trunc(((Date.now() - this.blinkStart) / (500 * blinkRate)) % 2) === 0;
@@ -274,10 +271,11 @@ export class TextInput extends Widget {
      * replaced with a black circle.
      */
     get displayedText(): string {
-        if(this.hideText)
+        if(this.hideText) {
             return '●'.repeat(this.variable.value.length);
-        else
+        } else {
             return this.variable.value;
+        }
     }
 
     /** The current line number, starting from 0. */
@@ -288,8 +286,9 @@ export class TextInput extends Widget {
     /** Auto-scroll to the caret if the {@link blinkStart | caret is shown}. */
     private autoScrollCaret(): void {
         // Auto-scroll if caret is shown
-        if(this.blinkStart !== 0)
+        if(this.blinkStart !== 0) {
             this.needsAutoScroll = true;
+        }
     }
 
     /**
@@ -304,8 +303,9 @@ export class TextInput extends Widget {
         // Update cursor position, checking for boundaries
         this.cursorPos = Math.min(Math.max(index, 0), this.text.length);
 
-        if(!select)
+        if(!select) {
             this.selectPos = this.cursorPos;
+        }
 
         // Update cursor offset
         this.cursorOffsetDirty = true;
@@ -385,8 +385,9 @@ export class TextInput extends Widget {
      * @param delta - The change in words; if a positive number, the cursor skip this amount of words, else, it will do the same, but backwards.
      */
     moveCursorWord(delta: number, select: boolean): void {
-        if(delta == 0)
+        if(delta == 0) {
             return;
+        }
 
         const wordRegex = /\w/;
         const text = this.text;
@@ -396,24 +397,25 @@ export class TextInput extends Widget {
             while(delta > 0) {
                 let insideWord = false;
                 for(; targetPos <= text.length; targetPos++) {
-                    if(targetPos < text.length && wordRegex.test(text[targetPos]))
+                    if(targetPos < text.length && wordRegex.test(text[targetPos])) {
                         insideWord = true;
-                    else if(insideWord)
+                    } else if(insideWord) {
                         break;
+                    }
                 }
 
                 delta--;
             }
-        }
-        else {
+        } else {
             while(delta < 0) {
                 targetPos--;
                 let insideWord = false;
                 for(; targetPos >= 0; targetPos--) {
-                    if(targetPos >= 0 && wordRegex.test(text[targetPos]))
+                    if(targetPos >= 0 && wordRegex.test(text[targetPos])) {
                         insideWord = true;
-                    else if(insideWord)
+                    } else if(insideWord) {
                         break;
+                    }
                 }
 
                 targetPos++;
@@ -431,8 +433,9 @@ export class TextInput extends Widget {
      * @param end - The exclusive index of the end of the text range
      */
     deleteRange(start: number, end: number): void {
-        if(start === end)
+        if(start === end) {
             return;
+        }
 
         // Delete text
         this.variable.value = this.text.substring(0, start) + this.text.substring(end);
@@ -450,8 +453,9 @@ export class TextInput extends Widget {
      * instead. Note that a delta of zero doesn't delete anything.
      */
     deleteWord(delta: number): void {
-        if(delta === 0)
+        if(delta === 0) {
             return;
+        }
 
         // Delete selection
         if(this.cursorPos !== this.selectPos) {
@@ -481,16 +485,16 @@ export class TextInput extends Widget {
      */
     insertText(str: string): void {
         // Abort if input can't be inserted
-        if(this.inputFilter !== null && !this.inputFilter(str))
+        if(this.inputFilter !== null && !this.inputFilter(str)) {
             return;
+        }
 
         if(this.selectPos === this.cursorPos) {
             // Insert string in current cursor position
             this.variable.value = this.text.substring(0, this.cursorPos) + str + this.text.substring(this.cursorPos);
             // Move cursor neccessary amount forward
             this.moveCursor(str.length, false);
-        }
-        else {
+        } else {
             const start = Math.min(this.cursorPos, this.selectPos);
             const end = Math.max(this.cursorPos, this.selectPos);
 
@@ -511,8 +515,9 @@ export class TextInput extends Widget {
      * @param delta - The amount and direction of the deletion. For example, if 5, then 5 characters are deleted after the cursor. If -5, then 5 characters are deleted before the cursor and the cursor is moved 5 indices left.
      */
     deleteText(delta: number): void {
-        if(delta === 0)
+        if(delta === 0) {
             return;
+        }
 
         if(this.cursorPos !== this.selectPos) {
             // Delete selection
@@ -520,8 +525,7 @@ export class TextInput extends Widget {
                 Math.min(this.cursorPos, this.selectPos),
                 Math.max(this.cursorPos, this.selectPos),
             );
-        }
-        else if(delta > 0) {
+        } else if(delta > 0) {
             // Delete forwards
             this.variable.value = this.text.substring(0, this.cursorPos) + this.text.substring(this.cursorPos + delta);
             // XXX normally, deleting forwards doens't require updating the
@@ -531,8 +535,7 @@ export class TextInput extends Widget {
             // line). because of this edge case, mark the cursor offset as dirty
             this.cursorOffsetDirty = true;
             this.autoScrollCaret();
-        }
-        else {
+        } else {
             // Delete backwards
             // NOTE, still checking if delta < 0 so that nothing is done if
             // delta is 0
@@ -555,8 +558,9 @@ export class TextInput extends Widget {
 
         // Grow left
         for(; pos >= 0; pos--) {
-            if(wordRegex.test(text[pos]) !== isWord)
+            if(wordRegex.test(text[pos]) !== isWord) {
                 break;
+            }
         }
 
         const startPos = pos + 1;
@@ -564,8 +568,9 @@ export class TextInput extends Widget {
         // Grow right
         pos = midPos;
         for(; pos < text.length; pos++) {
-            if(wordRegex.test(text[pos]) !== isWord)
+            if(wordRegex.test(text[pos]) !== isWord) {
                 break;
+            }
         }
 
         this.autoScrollCaret();
@@ -588,14 +593,16 @@ export class TextInput extends Widget {
     override onFocusDropped(focusType: FocusType): void {
         // Stop blinking cursor if keyboard focus lost and stop dragging if
         // pointer focus is lost
-        if(focusType === FocusType.Keyboard)
+        if(focusType === FocusType.Keyboard) {
             this.blinkStart = 0;
+        }
     }
 
     protected override handleEvent(event: Event): this | null {
         // If editing is disabled, abort
-        if(!this._editingEnabled)
+        if(!this._editingEnabled) {
             return null;
+        }
 
         const root = this.root;
 
@@ -605,12 +612,10 @@ export class TextInput extends Widget {
             this.dragging = false;
             this.lastClick = 0;
             return this;
-        }
-        else if(event instanceof PointerWheel) {
+        } else if(event instanceof PointerWheel) {
             // Don't capture wheel events
             return null;
-        }
-        else if(event instanceof PointerEvent) {
+        } else if(event instanceof PointerEvent) {
             // If this is a pointer event, set pointer style and handle clicks
             root.pointerStyle = 'text';
 
@@ -628,16 +633,17 @@ export class TextInput extends Widget {
                         this.successiveClickCount++;
                         // Wrap click counter around (there's no action above
                         // triple click)
-                        if(this.successiveClickCount > 2)
+                        if(this.successiveClickCount > 2) {
                             this.successiveClickCount = 0;
-                    }
-                    else
+                        }
+                    } else {
                         this.successiveClickCount = 0;
+                    }
 
                     this.lastClick = clickTime;
-                }
-                else if(!this.dragging)
+                } else if(!this.dragging) {
                     return this;
+                }
 
                 // Update cursor position (and offset) from click position
                 const padding = this.inputTextInnerPadding;
@@ -650,8 +656,9 @@ export class TextInput extends Widget {
                 if(isPress) {
                     // Prevent successive clicks from one cursor position to
                     // another from counting as successive clicks
-                    if(this.cursorPos !== this.dragStart)
+                    if(this.cursorPos !== this.dragStart) {
                         this.successiveClickCount = 0;
+                    }
 
                     this.dragStart = this.cursorPos;
                 }
@@ -668,8 +675,7 @@ export class TextInput extends Widget {
                         const [curStart, curEnd] = this.selectRangeAt(this.cursorPos);
                         start = Math.min(doubleStart, curStart);
                         end = Math.max(doubleEnd, curEnd);
-                    }
-                    else {
+                    } else {
                         // If triple-click dragging, select lines of text
                         const startPos = Math.min(this.cursorPos, this.dragStart);
                         const startLine = this.textHelper.getLine(startPos);
@@ -687,8 +693,7 @@ export class TextInput extends Widget {
                     if(this.cursorPos >= this.dragStart) {
                         this.selectPos = start;
                         this.cursorPos = end;
-                    }
-                    else {
+                    } else {
                         this.selectPos = end;
                         this.cursorPos = start;
                     }
@@ -698,16 +703,16 @@ export class TextInput extends Widget {
 
                 // Request focus
                 root.requestFocus(FocusType.Keyboard, this);
-            }
-            else if(event instanceof PointerRelease && event.isPrimary) {
+            } else if(event instanceof PointerRelease && event.isPrimary) {
                 // Stop dragging
                 this.dragging = false;
 
                 // Get mobile-friendly text input if available
                 if(root.hasMobileTextInput) {
                     root.getTextInput(this.text).then((newValue: string | null) => {
-                        if(newValue === null || (this.inputFilter !== null && !this.inputFilter(newValue)))
+                        if(newValue === null || (this.inputFilter !== null && !this.inputFilter(newValue))) {
                             return;
+                        }
 
                         if(this.text !== newValue) {
                             this.text = newValue;
@@ -718,49 +723,50 @@ export class TextInput extends Widget {
             }
 
             return this;
-        }
-        else if(event instanceof KeyPress) {
+        } else if(event instanceof KeyPress) {
             // Stop dragging
             this.dragging = false;
             this.lastClick = 0;
 
             // Ignore all key presses with alt modifier
-            if(event.alt)
+            if(event.alt) {
                 return this;
+            }
 
             // Ignore most key presses if control is pressed
             if(event.ctrl) {
-                if(event.key === 'Backspace')
+                if(event.key === 'Backspace') {
                     this.deleteWord(-1); // Delete word backwards
-                else if(event.key === 'Delete')
+                } else if(event.key === 'Delete') {
                     this.deleteWord(1); // Delete word forwards
-                else if(event.key === 'ArrowLeft')
+                } else if(event.key === 'ArrowLeft') {
                     this.moveCursorWord(-1, event.shift); // Back-skip a word
-                else if(event.key === 'ArrowRight')
+                } else if(event.key === 'ArrowRight') {
                     this.moveCursorWord(1, event.shift); // Skip a word
-                else if(event.key === 'c' || event.key === 'C') {
+                } else if(event.key === 'c' || event.key === 'C') {
                     // Copy selected text to clipboard, if any
-                    if(this.cursorPos === this.selectPos)
+                    if(this.cursorPos === this.selectPos) {
                         return this;
+                    }
 
                     const selectedText = this.text.slice(
                         Math.min(this.cursorPos, this.selectPos),
                         Math.max(this.cursorPos, this.selectPos),
                     );
 
-                    if(navigator.clipboard)
+                    if(navigator.clipboard) {
                         navigator.clipboard.writeText(selectedText);
-                    else
+                    } else {
                         return this;
-                }
-                else if(event.key === 'a' || event.key === 'A') {
+                    }
+                } else if(event.key === 'a' || event.key === 'A') {
                     this.cursorPos = this.text.length;
                     this.selectPos = 0;
                     this.cursorOffsetDirty = true;
                     this._dirty = true;
-                }
-                else
+                } else {
                     return this;
+                }
 
                 // Reset blink time for better feedback
                 this.blinkStart = Date.now();
@@ -768,40 +774,38 @@ export class TextInput extends Widget {
             }
 
             // Regular key presses:
-            if(event.key.length === 1)
+            if(event.key.length === 1) {
                 this.insertText(event.key); // Insert character
-            else if(event.key === 'Backspace')
+            } else if(event.key === 'Backspace') {
                 this.deleteText(-1); // Delete backwards
-            else if(event.key === 'Delete')
+            } else if(event.key === 'Delete') {
                 this.deleteText(1); // Delete forwards
-            else if(event.key === 'ArrowLeft')
+            } else if(event.key === 'ArrowLeft') {
                 this.moveCursor(-1, event.shift); // Move cursor left
-            else if(event.key === 'ArrowRight')
+            } else if(event.key === 'ArrowRight') {
                 this.moveCursor(1, event.shift); // Move cursor right
-            else if(event.key === 'ArrowUp')
+            } else if(event.key === 'ArrowUp') {
                 this.moveCursorLine(-1, event.shift); // Move cursor up
-            else if(event.key === 'ArrowDown')
+            } else if(event.key === 'ArrowDown') {
                 this.moveCursorLine(1, event.shift); // Move cursor down
-            else if(event.key === 'PageUp' || event.key === 'PageDown') {
+            } else if(event.key === 'PageUp' || event.key === 'PageDown') {
                 // Move cursor up or down by the lines in the viewport height,
                 // or a minimum of 3 lines
                 const mul = event.key === 'PageUp' ? -1 : 1;
                 const [_vpX, _vpY, _vpW, vpH] = this.viewport.rect;
                 const lines = Math.max(Math.floor(vpH / this.textHelper.fullLineHeight), 3);
                 this.moveCursorLine(lines * mul, event.shift);
-            }
-            else if(event.key === 'Home')
+            } else if(event.key === 'Home') {
                 this.moveCursorStart(event.shift); // Move cursor to beginning
-            else if(event.key === 'End')
+            } else if(event.key === 'End') {
                 this.moveCursorEnd(event.shift); // Move cursor to end
-            else if(event.key === 'Escape') {
+            } else if(event.key === 'Escape') {
                 // Return now so that blink time isn't reset.
                 // Don't capture so that focus is dropped
                 return null;
-            }
-            else if(event.key === 'Enter')
+            } else if(event.key === 'Enter') {
                 this.insertText('\n');
-            else if(event.key === 'Tab') {
+            } else if(event.key === 'Tab') {
                 if(this.typeableTab) {
                     // HACK if shift if being held, do a tab-selection but don't
                     // do reverse order. not capturing the event makes its do it
@@ -810,20 +814,19 @@ export class TextInput extends Widget {
                     if(event.shift) {
                         root.dispatchEvent(new TabSelect(this, false));
                         return this;
-                    }
-                    else
+                    } else {
                         this.insertText('\t');
-                }
-                else
+                    }
+                } else {
                     return null; // don't capture, let tab select another widget
-            }
-            else
+                }
+            } else {
                 return this; // Ignore key if it is unknown
+            }
 
             // Reset blink time for better feedback
             this.blinkStart = Date.now();
-        }
-        else if(event instanceof TextPasteEvent) {
+        } else if(event instanceof TextPasteEvent) {
             if(event.target === this) {
                 // Insert pasted text
                 this.insertText(event.text);
@@ -831,8 +834,7 @@ export class TextInput extends Widget {
                 // Reset blink time for better feedback
                 this.blinkStart = Date.now();
             }
-        }
-        else if(event.target !== this) {
+        } else if(event.target !== this) {
             // unhandled event type. don't capture
             return null;
         }
@@ -842,12 +844,14 @@ export class TextInput extends Widget {
 
     protected override handlePreLayoutUpdate(): void {
         // Drop focus if editing is disabled
-        if(!this.editingEnabled)
+        if(!this.editingEnabled) {
             this.root.dropFocus(FocusType.Keyboard, this);
+        }
 
         // Mark as dirty when a blink needs to occur
-        if(this.blinkOn !== this.blinkWasOn)
+        if(this.blinkOn !== this.blinkWasOn) {
             this._dirty = true;
+        }
 
         // Update TextHelper variables
         this.textHelper.text = this.displayedText;
@@ -874,9 +878,9 @@ export class TextInput extends Widget {
             if(this.selectPos === this.cursorPos) {
                 this.selectOffset[0] = this.cursorOffset[0];
                 this.selectOffset[1] = this.cursorOffset[1];
-            }
-            else
+            } else {
                 this.selectOffset = this.textHelper.findOffsetFromIndex(this.selectPos);
+            }
 
             this.cursorOffsetDirty = false;
         }
@@ -897,20 +901,23 @@ export class TextInput extends Widget {
             const right = candidateOffset[0] + usableWidth - deadZone;
 
             // Pan right
-            if(cursorX > right)
+            if(cursorX > right) {
                 candidateOffset[0] += cursorX - right;
+            }
 
             // Pan left
-            if(cursorX < left)
+            if(cursorX < left) {
                 candidateOffset[0] -= left - cursorX;
+            }
 
             // Clamp
-            if(candidateOffset[0] + usableWidth > innerWidth)
+            if(candidateOffset[0] + usableWidth > innerWidth) {
                 candidateOffset[0] = innerWidth - usableWidth;
-            if(candidateOffset[0] < 0)
+            }
+            if(candidateOffset[0] < 0) {
                 candidateOffset[0] = 0;
-        }
-        else {
+            }
+        } else {
             // Horizontal panning not needed
             candidateOffset[0] = 0;
         }
@@ -923,26 +930,28 @@ export class TextInput extends Widget {
                 // Edge case - TextInput is not tall enough for a single line.
                 // Pan so that at least the bottom of the line is visible
                 candidateOffset[1] = cursorY + Math.max(this.textHelper.actualLineHeight - usableHeight, 0);
-            }
-            else {
+            } else {
                 const deadZone = usableHeight < 2 * fullLineHeight ? 0 : fullLineHeight / 2;
                 const top = candidateOffset[1] + deadZone;
                 const bottom = candidateOffset[1] + usableHeight - deadZone - fullLineHeight;
 
                 // Pan up or down
-                if(cursorY < top)
+                if(cursorY < top) {
                     candidateOffset[1] -= top - cursorY;
-                if(cursorY > bottom)
+                }
+                if(cursorY > bottom) {
                     candidateOffset[1] += cursorY - bottom;
+                }
 
                 // Clamp
-                if(candidateOffset[1] + usableHeight > innerHeight)
+                if(candidateOffset[1] + usableHeight > innerHeight) {
                     candidateOffset[1] = innerHeight - usableHeight;
-                if(candidateOffset[1] < 0)
+                }
+                if(candidateOffset[1] < 0) {
                     candidateOffset[1] = 0;
+                }
             }
-        }
-        else {
+        } else {
             // Vertical panning not needed
             candidateOffset[1] = 0;
         }
@@ -960,8 +969,9 @@ export class TextInput extends Widget {
         // theme into account
         const padding = 2 * this.inputTextInnerPadding;
         this.textHelper.maxWidth = this.wrapText ? Math.max(maxWidth - padding, 0) : Infinity;
-        if(this.textHelper.dirty)
+        if(this.textHelper.dirty) {
             this._dirty = true;
+        }
 
         const effectiveMinWidth = Math.min(Math.max(this.inputTextMinWidth, minWidth), maxWidth);
         this.idealWidth = Math.min(Math.max(effectiveMinWidth, this.textHelper.width + padding), maxWidth);
@@ -1020,15 +1030,13 @@ export class TextInput extends Widget {
                     right - left,
                     this.textHelper.fullLineHeight,
                 );
-            }
-            else {
+            } else {
                 // Spans multiple lines
                 let topOffset: [number, number], bottomOffset: [number, number];
                 if(this.cursorOffset[1] < this.selectOffset[1]) {
                     topOffset = this.cursorOffset;
                     bottomOffset = this.selectOffset;
-                }
-                else {
+                } else {
                     bottomOffset = this.cursorOffset;
                     topOffset = this.selectOffset;
                 }
@@ -1073,13 +1081,14 @@ export class TextInput extends Widget {
         // Paint current text value
         let fillStyle;
         if(this._editingEnabled) {
-            if(this.variable.valid)
+            if(this.variable.valid) {
                 fillStyle = this.inputTextFill;
-            else
+            } else {
                 fillStyle = this.inputTextFillInvalid;
-        }
-        else
+            }
+        } else {
             fillStyle = this.inputTextFillDisabled;
+        }
 
         this.textHelper.paint(
             ctx, fillStyle,

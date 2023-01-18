@@ -20,8 +20,9 @@ export class CompoundClickHelper implements BaseClickHelper {
     get lastClickState(): ClickState {
         let highestState = ClickState.Released;
         for(const clickHelper of this.clickHelpers) {
-            if(clickHelper.lastClickState > highestState)
+            if(clickHelper.lastClickState > highestState) {
                 highestState = clickHelper.lastClickState;
+            }
         }
 
         return highestState;
@@ -30,8 +31,9 @@ export class CompoundClickHelper implements BaseClickHelper {
     get clickState(): ClickState {
         let highestState = ClickState.Released;
         for(const clickHelper of this.clickHelpers) {
-            if(clickHelper.clickState > highestState)
+            if(clickHelper.clickState > highestState) {
                 highestState = clickHelper.clickState;
+            }
         }
 
         return highestState;
@@ -50,8 +52,9 @@ export class CompoundClickHelper implements BaseClickHelper {
      */
     get clickStateChanged(): boolean {
         for(const clickHelper of this.clickHelpers) {
-            if(clickHelper.clickStateChanged)
+            if(clickHelper.clickStateChanged) {
                 return true;
+            }
         }
 
         return false;
@@ -64,8 +67,9 @@ export class CompoundClickHelper implements BaseClickHelper {
      */
     get wasClick(): boolean {
         for(const clickHelper of this.clickHelpers) {
-            if(clickHelper.wasClick && clickHelper.clickStateChanged)
+            if(clickHelper.wasClick && clickHelper.clickStateChanged) {
                 return true;
+            }
         }
 
         return false;
@@ -73,7 +77,8 @@ export class CompoundClickHelper implements BaseClickHelper {
 
     /** Resets each click helper instance being mixed. */
     reset(): void {
-        for(const clickHelper of this.clickHelpers)
+        for(const clickHelper of this.clickHelpers) {
             clickHelper.reset();
+        }
     }
 }

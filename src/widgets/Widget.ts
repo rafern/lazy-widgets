@@ -143,8 +143,9 @@ export abstract class Widget extends BaseTheme {
      * If getting, {@link Widget#_enabled} is returned.
      */
     set enabled(enabled: boolean) {
-        if(enabled === this._enabled)
+        if(enabled === this._enabled) {
             return;
+        }
 
         this._enabled = enabled;
         this.updateActiveState();
@@ -293,10 +294,11 @@ export abstract class Widget extends BaseTheme {
      * attempts to use tab to select another widget.
      */
     protected handleEvent(event: Event): Widget | null {
-        if(event.target === this)
+        if(event.target === this) {
             return this;
-        else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -310,39 +312,44 @@ export abstract class Widget extends BaseTheme {
      * @returns Returns the widget that captured the event or null if none captured the event.
      */
     dispatchEvent(event: Event): Widget | null {
-        if(!this._enabled)
+        if(!this._enabled) {
             return null;
+        }
 
         if(event.target === null) {
             if(event instanceof PointerEvent) {
-                if(event.x < this.x || event.y < this.y || event.x >= this.x + this.width || event.y >= this.y + this.height)
+                if(event.x < this.x || event.y < this.y || event.x >= this.x + this.width || event.y >= this.y + this.height) {
                     return null;
-            }
-            else if(event instanceof AutoScroll) {
-                if(event.originallyRelativeTo === this)
+                }
+            } else if(event instanceof AutoScroll) {
+                if(event.originallyRelativeTo === this) {
                     return this;
-                else if(!this.propagatesEvents)
+                } else if(!this.propagatesEvents) {
                     return null;
+                }
             }
-        }
-        else if(event.target !== this && !this.propagatesEvents)
+        } else if(event.target !== this && !this.propagatesEvents) {
             return null;
+        }
 
         let capturer = null;
-        if(event.reversed)
+        if(event.reversed) {
             capturer = this.handleEvent(event);
+        }
 
         if(event instanceof TabSelect) {
             if(event.reachedRelative) {
-                if(this.tabFocusable && (capturer === this || capturer === null))
+                if(this.tabFocusable && (capturer === this || capturer === null)) {
                     return this;
-            }
-            else if(event.relativeTo === this)
+                }
+            } else if(event.relativeTo === this) {
                 event.reachedRelative = true;
+            }
         }
 
-        if(!event.reversed)
+        if(!event.reversed) {
             capturer = this.handleEvent(event);
+        }
 
         return capturer;
     }
@@ -360,8 +367,9 @@ export abstract class Widget extends BaseTheme {
      * overridden.
      */
     preLayoutUpdate(): void {
-        if(this._enabled)
+        if(this._enabled) {
             this.handlePreLayoutUpdate();
+        }
     }
 
     /**
@@ -391,8 +399,9 @@ export abstract class Widget extends BaseTheme {
         }
 
         // Validate constraints
-        if(minWidth == Infinity)
+        if(minWidth == Infinity) {
             throw new Error(DynMsg.INVALID_VALUE('minWidth', minWidth));
+        }
         if(minWidth > maxWidth) {
             // Not throwing here because floating pointer precision errors
             // sometimes trigger this due to tight constraints
@@ -404,8 +413,9 @@ export abstract class Widget extends BaseTheme {
             minWidth = 0;
         }
 
-        if(minHeight == Infinity)
+        if(minHeight == Infinity) {
             throw new Error(DynMsg.INVALID_VALUE('minHeight', minHeight));
+        }
         if(minHeight > maxHeight) {
             console.warn(DynMsg.SWAPPED_MIN_MAX_DIMS(minHeight, maxHeight, 'minHeight', 'maxHeight'));
             minHeight = maxHeight;
@@ -427,34 +437,35 @@ export abstract class Widget extends BaseTheme {
         if(this.idealWidth < minWidth) {
             this.idealWidth = minWidth;
             console.error(DynMsg.BROKEN_CONSTRAINTS(this.idealWidth, minWidth, true, false));
-        }
-        else if(this.idealWidth > maxWidth) {
+        } else if(this.idealWidth > maxWidth) {
             this.idealWidth = maxWidth;
             console.error(DynMsg.BROKEN_CONSTRAINTS(this.idealWidth, maxWidth, true, true));
         }
 
-        if(this.idealWidth < 0 || !isFinite(this.idealWidth) || isNaN(this.idealWidth))
+        if(this.idealWidth < 0 || !isFinite(this.idealWidth) || isNaN(this.idealWidth)) {
             throw new Error(DynMsg.INVALID_DIMS(true, this.idealWidth));
+        }
 
         if(this.idealHeight < minHeight) {
             this.idealHeight = minHeight;
             console.error(DynMsg.BROKEN_CONSTRAINTS(this.idealHeight, minHeight, false, false));
-        }
-        else if(this.idealHeight > maxHeight) {
+        } else if(this.idealHeight > maxHeight) {
             this.idealHeight = maxHeight;
             console.error(DynMsg.BROKEN_CONSTRAINTS(this.idealHeight, maxHeight, false, true));
         }
 
-        if(this.idealHeight < 0 || !isFinite(this.idealHeight) || isNaN(this.idealHeight))
+        if(this.idealHeight < 0 || !isFinite(this.idealHeight) || isNaN(this.idealHeight)) {
             throw new Error(DynMsg.INVALID_DIMS(false, this.idealHeight));
+        }
 
         // Clear layout dirty flag
         this._layoutDirty = false;
 
         // If dimensions changed (compare with tracked old dimensions), then set
         // dirty flag
-        if(oldWidth !== this.idealWidth || oldHeight !== this.idealHeight)
+        if(oldWidth !== this.idealWidth || oldHeight !== this.idealHeight) {
             this._dirty = true;
+        }
     }
 
     /**
@@ -524,8 +535,9 @@ export abstract class Widget extends BaseTheme {
         const newHeight = Math.ceil((this.idealY + this.idealHeight) * scaleY) / scaleY - newY;
 
         // Mark as dirty if bounds have changed
-        if(newX !== this.x || newY !== this.y || newWidth !== this.width || newHeight !== this.height)
+        if(newX !== this.x || newY !== this.y || newWidth !== this.width || newHeight !== this.height) {
             this._dirty = true;
+        }
 
         // Set final bounds
         this.x = newX;
@@ -547,8 +559,9 @@ export abstract class Widget extends BaseTheme {
      * overridden.
      */
     postLayoutUpdate(): void {
-        if(this._enabled)
+        if(this._enabled) {
             this.handlePostLayoutUpdate();
+        }
     }
 
     /**
@@ -637,11 +650,13 @@ export abstract class Widget extends BaseTheme {
      */
     paint(force = false): void {
         force = true; // TODO disable, this is just for testing
-        if(this.dimensionless)
+        if(this.dimensionless) {
             return this.dryPaint();
+        }
 
-        if(!this._dirty && !force)
+        if(!this._dirty && !force) {
             return;
+        }
 
         if(this._enabled) {
             const ctx = this.viewport.context;
@@ -678,8 +693,9 @@ export abstract class Widget extends BaseTheme {
     forceDirty(markLayout = true): void {
         this._dirty = true;
 
-        if(markLayout)
+        if(markLayout) {
             this._layoutDirty = true;
+        }
     }
 
     /**
@@ -695,8 +711,9 @@ export abstract class Widget extends BaseTheme {
      * {@link Widget#attached}.
      */
     get root(): Root {
-        if(!this.attached)
+        if(!this.attached) {
             throw new Error(DynMsg.DETACHED_WIDGET('root'));
+        }
 
         // XXX attached makes sure that _root is not null, but typescript
         // doesn't detect this. force the type system to treat it as non-null
@@ -708,8 +725,9 @@ export abstract class Widget extends BaseTheme {
      * not {@link Widget#attached}.
      */
     get viewport(): Viewport {
-        if(!this.attached)
+        if(!this.attached) {
             throw new Error(DynMsg.DETACHED_WIDGET('viewport'));
+        }
 
         // XXX attached makes sure that _root is not null, but typescript
         // doesn't detect this. force the type system to treat it as non-null
@@ -721,8 +739,9 @@ export abstract class Widget extends BaseTheme {
      * not {@link Widget#attached}.
      */
     get parent(): Widget | null {
-        if(!this.attached)
+        if(!this.attached) {
             throw new Error(DynMsg.DETACHED_WIDGET('parent'));
+        }
 
         return this._parent;
     }
@@ -742,8 +761,9 @@ export abstract class Widget extends BaseTheme {
      * @param parent - The new parent of this Widget. If `null`, then this Widget has no parent and is the {@link Root#child | root Widget}
      */
     attach(root: Root, viewport: Viewport, parent: Widget | null): void {
-        if(this.attached)
+        if(this.attached) {
             throw new Error(DynMsg.INVALID_ATTACHMENT(true));
+        }
 
         this._root = root;
         this._viewport = viewport;
@@ -764,8 +784,9 @@ export abstract class Widget extends BaseTheme {
      * If the widget was not in a UI tree, then an exception is thrown.
      */
     detach(): void {
-        if(!this.attached)
+        if(!this.attached) {
             throw new Error(DynMsg.INVALID_ATTACHMENT(false));
+        }
 
         (this._root as Root).dropFoci(this);
         this._root = null;
@@ -804,21 +825,20 @@ export abstract class Widget extends BaseTheme {
                 // XXX typescript doesn't know that attached implies that _root
                 // is not null, hence the type cast
                 this._active = (this._root as Root).enabled;
-            }
-            else
+            } else {
                 this._active = this._parent.active;
+            }
         }
 
         if(!oldActive && this._active) {
             this.activate();
             return true;
-        }
-        else if(oldActive && !this._active) {
+        } else if(oldActive && !this._active) {
             this.deactivate();
             return true;
-        }
-        else
+        } else {
             return false;
+        }
     }
 
     /**
@@ -854,8 +874,9 @@ export abstract class Widget extends BaseTheme {
         this._dirty = true;
         this._layoutDirty = true;
 
-        if(this.attached)
+        if(this.attached) {
             (this._root as Root).dropFoci(this);
+        }
     }
 
     /**

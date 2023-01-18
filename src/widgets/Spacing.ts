@@ -44,14 +44,16 @@ export class Spacing extends Widget {
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
         // Try to expand each axis. If axis is not constrained (can't expand),
         // then try to use the biggest minimum length
-        if(maxWidth !== Infinity)
+        if(maxWidth !== Infinity) {
             this.idealWidth = maxWidth;
-        else
+        } else {
             this.idealWidth = Math.max(minWidth, this.minWidth);
+        }
 
-        if(maxHeight !== Infinity)
+        if(maxHeight !== Infinity) {
             this.idealHeight = maxHeight;
-        else
+        } else {
             this.idealHeight = Math.max(minHeight, this.minHeight);
+        }
     }
 }

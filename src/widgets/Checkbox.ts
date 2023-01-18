@@ -69,17 +69,14 @@ export class Checkbox extends Widget {
         if(property === null) {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'checkboxLength') {
+        } else if(property === 'checkboxLength') {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'backgroundGlowFill' ||
+        } else if(property === 'backgroundGlowFill' ||
                 property === 'backgroundFill' ||
                 property === 'accentFill' ||
                 property === 'primaryFill' ||
-                property === 'checkboxInnerPadding')
-        {
+                property === 'checkboxInnerPadding') {
             this._dirty = true;
         }
     }
@@ -94,13 +91,15 @@ export class Checkbox extends Widget {
     }
 
     override onFocusGrabbed(focusType: FocusType): void {
-        if(this.clickHelper.onFocusGrabbed(focusType))
+        if(this.clickHelper.onFocusGrabbed(focusType)) {
             this._dirty = true;
+        }
     }
 
     override onFocusDropped(focusType: FocusType): void {
-        if(this.clickHelper.onFocusDropped(focusType))
+        if(this.clickHelper.onFocusDropped(focusType)) {
             this._dirty = true;
+        }
     }
 
     protected override handleEvent(event: Event): this | null {
@@ -114,13 +113,15 @@ export class Checkbox extends Widget {
         );
 
         // Swap value if checkbox was clicked
-        if(wasClick)
+        if(wasClick) {
             this.checked = !this.checked;
+        }
 
         // Always flag as dirty if the click state changed (so glow colour takes
         // effect). Toggle value if clicked
-        if(this.clickHelper.clickStateChanged)
+        if(this.clickHelper.clickStateChanged) {
             this._dirty = true;
+        }
 
         return capture ? this : null;
     }
@@ -131,10 +132,12 @@ export class Checkbox extends Widget {
         this.idealWidth = minLength;
         this.idealHeight = minLength;
 
-        if(this.idealWidth < minWidth)
+        if(this.idealWidth < minWidth) {
             this.idealWidth = minWidth;
-        if(this.idealHeight < minHeight)
+        }
+        if(this.idealHeight < minHeight) {
             this.idealHeight = minHeight;
+        }
     }
 
     override finalizeBounds() {
@@ -153,10 +156,11 @@ export class Checkbox extends Widget {
 
         // Draw unchecked part of checkbox
         const ctx = this.viewport.context;
-        if(useGlow)
+        if(useGlow) {
             ctx.fillStyle = this.backgroundGlowFill;
-        else
+        } else {
             ctx.fillStyle = this.backgroundFill;
+        }
 
         const checkboxX = this.offsetX + this.x;
         const checkboxY = this.offsetY + this.y;
@@ -166,10 +170,11 @@ export class Checkbox extends Widget {
 
         // Draw checked part of checkbox
         if(this.checked) {
-            if(useGlow)
+            if(useGlow) {
                 ctx.fillStyle = this.accentFill;
-            else
+            } else {
                 ctx.fillStyle = this.primaryFill;
+            }
 
             const innerPadding = this.checkboxInnerPadding;
             const innerLength = this.actualLength - innerPadding * 2;
@@ -183,8 +188,7 @@ export class Checkbox extends Widget {
                     this.actualLength,
                     this.actualLength,
                 );
-            }
-            else {
+            } else {
                 ctx.fillRect(
                     checkboxX + innerPadding,
                     checkboxY + innerPadding,

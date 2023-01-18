@@ -58,8 +58,9 @@ export function measureTextDims(text: string, font: string): TextMetrics {
 
         // Mark last expired cache entry for removal. If none is found, the last
         // entry in the cache (even if not expired) is marked for removal.
-        if(measureTime - cacheVal[4] > expiryThreshold)
+        if(measureTime - cacheVal[4] > expiryThreshold) {
             removalIdx = i;
+        }
     }
 
     // If there was a cache hit, increment hits, update last hit time, bump in
@@ -71,8 +72,9 @@ export function measureTextDims(text: string, font: string): TextMetrics {
         if(cacheHitIdx > 0) {
             let candidateIdx = 0;
             for(; candidateIdx < cacheHitIdx; candidateIdx++) {
-                if(measureCache[candidateIdx][3] <= newFreq)
+                if(measureCache[candidateIdx][3] <= newFreq) {
                     break;
+                }
             }
 
             if(candidateIdx !== cacheHitIdx) {
@@ -88,8 +90,9 @@ export function measureTextDims(text: string, font: string): TextMetrics {
     if(measureContext === null) {
         const tempCanvas = document.createElement('canvas');
         measureContext = tempCanvas.getContext('2d');
-        if(measureContext === null)
+        if(measureContext === null) {
             throw new Error(Msg.CANVAS_CONTEXT);
+        }
     }
 
     // Set font
@@ -101,13 +104,15 @@ export function measureTextDims(text: string, font: string): TextMetrics {
     // Cache metrics. Remove least frequently used text entry if cache size
     // exceeded.
     if(measureCacheLimit > 0) {
-        if(measureCache.length === measureCacheLimit)
+        if(measureCache.length === measureCacheLimit) {
             measureCache.splice(removalIdx, 1);
+        }
 
         let candidateIdx = 0;
         for(; candidateIdx < measureCache.length; candidateIdx++) {
-            if(measureCache[candidateIdx][3] <= 1)
+            if(measureCache[candidateIdx][3] <= 1) {
                 break;
+            }
         }
 
         measureCache.splice(candidateIdx, 0, [font, text, metrics, 1, measureTime]);

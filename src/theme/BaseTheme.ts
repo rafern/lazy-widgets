@@ -30,13 +30,15 @@ export class BaseTheme implements ThemeProperties {
     }
 
     protected set fallbackTheme(newTheme: Theme | undefined) {
-        if(this._fallbackTheme === newTheme)
+        if(this._fallbackTheme === newTheme) {
             return;
+        }
 
         // Unsubscribe from old theme
         const oldTheme = this._fallbackTheme;
-        if(typeof oldTheme !== 'undefined' && this.listener !== null)
+        if(typeof oldTheme !== 'undefined' && this.listener !== null) {
             oldTheme.unsubscribe(this.listener);
+        }
 
         // Subscribe to new theme
         if(typeof newTheme !== 'undefined') {
@@ -65,8 +67,9 @@ export class BaseTheme implements ThemeProperties {
     constructor(properties?: ThemeProperties, fallbackTheme?: Theme) {
         this._fallbackTheme = fallbackTheme;
 
-        if(typeof properties === 'undefined')
+        if(typeof properties === 'undefined') {
             return;
+        }
 
         // XXX BASETHEME CTOR AUTO-GENERATED CODE START
         this._canvasFill = properties.canvasFill;

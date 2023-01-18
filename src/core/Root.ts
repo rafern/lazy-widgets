@@ -129,8 +129,9 @@ export class Root {
         this.child.inheritedTheme = properties?.theme ?? new Theme();
         this.child.attach(this, this.viewport, null);
 
-        if(properties?.constraints)
+        if(properties?.constraints) {
             this.viewport.constraints = properties.constraints;
+        }
     }
 
     /** The {@link Root#viewport}'s {@link Viewport#constraints | constraints} */
@@ -180,17 +181,19 @@ export class Root {
             // Call driver hooks, reset pointer style and release foci if UI
             // disabled
             if(newEnabled) {
-                for(const driver of this.drivers)
+                for(const driver of this.drivers) {
                     driver.onEnable(this);
-            }
-            else {
-                for(const driver of this.drivers)
+                }
+            } else {
+                for(const driver of this.drivers) {
                     driver.onDisable(this);
+                }
 
                 this.updatePointerStyle('default');
 
-                for(const focus of this._foci.keys())
+                for(const focus of this._foci.keys()) {
                     this.clearFocus(focus);
+                }
             }
 
             // Update active state of child widget. This will propagate to
@@ -220,8 +223,9 @@ export class Root {
      */
     resolveLayout(): boolean {
         // Don't do anything if Root is disabled
-        if(!this.enabled)
+        if(!this.enabled) {
             return false;
+        }
 
         return this.viewport.resolveLayout();
     }
@@ -238,8 +242,9 @@ export class Root {
      */
     paint(): boolean {
         // Don't do anything if Root is disabled
-        if(!this.enabled)
+        if(!this.enabled) {
             return false;
+        }
 
         return this.viewport.paintToInternal(false);
     }
@@ -260,22 +265,25 @@ export class Root {
      */
     dispatchEvent(event: Event): boolean {
         // Ignore event if Root is disabled
-        if(!this.enabled)
+        if(!this.enabled) {
             return false;
+        }
 
         // If event is focusable and is missing a target...
         if(event.focusType !== null && event.target === null) {
             // Ignore event if it needs a focus but there is no component
             // focused in the needed focus
             let focus = this._foci.get(event.focusType);
-            if(typeof focus === 'undefined')
+            if(typeof focus === 'undefined') {
                 focus = null;
+            }
 
             if(event.needsFocus && focus === null) {
                 // special case for tab key with no currently focused widget;
                 // try to do tab selection
-                if(event instanceof KeyPress && event.key === 'Tab')
+                if(event instanceof KeyPress && event.key === 'Tab') {
                     this.dispatchEvent(new TabSelect(this.getFocus(FocusType.Tab), event.shift));
+                }
 
                 return false;
             }
@@ -285,8 +293,9 @@ export class Root {
         }
 
         // Clear pointer style. This will be set by children if neccessary
-        if((event instanceof PointerEvent && !(event instanceof PointerWheel)) || event instanceof Leave)
+        if((event instanceof PointerEvent && !(event instanceof PointerWheel)) || event instanceof Leave) {
             this.pointerStyle = 'default';
+        }
 
         // Pass event down to internal Container
         let captured = this.child.dispatchEvent(event);
@@ -295,8 +304,7 @@ export class Root {
                 if(event.key === 'Tab') {
                     // special case for tab key; try to do tab selection
                     this.dispatchEvent(new TabSelect(this.getFocus(FocusType.Tab), event.shift));
-                }
-                else if(event.key === 'Escape') {
+                } else if(event.key === 'Escape') {
                     // special case for escape key; clear keyboard focus
                     this.clearFocus(FocusType.Keyboard);
                 }
@@ -332,21 +340,25 @@ export class Root {
         }
 
         // Update focus capturer if it changed
-        if(event.focusType === null)
+        if(event.focusType === null) {
             return captured !== null;
+        }
 
         const oldCapturer = this.getFocusCapturer(event.focusType);
-        if(oldCapturer === captured)
+        if(oldCapturer === captured) {
             return captured !== null;
+        }
 
         // Special case: when the pointer focus capturer changes, dispatch a
         // leave event to the last capturer
-        if(event.focusType === FocusType.Pointer && oldCapturer !== null)
+        if(event.focusType === FocusType.Pointer && oldCapturer !== null) {
             this.child.dispatchEvent(new Leave(oldCapturer));
+        }
 
         this._fociCapturers.set(event.focusType, captured);
-        for(const driver of this.drivers)
+        for(const driver of this.drivers) {
             driver.onFocusCapturerChanged(this, event.focusType, oldCapturer, captured);
+        }
 
         return captured !== null;
     }
@@ -360,12 +372,14 @@ export class Root {
      */
     preLayoutUpdate(): void {
         // Skip if UI is disabled
-        if(!this.enabled)
+        if(!this.enabled) {
             return;
+        }
 
         // Update drivers
-        for(const driver of this.drivers)
+        for(const driver of this.drivers) {
             driver.update(this);
+        }
 
         // Pre-layout update child
         this.child.preLayoutUpdate();
@@ -382,8 +396,9 @@ export class Root {
      */
     postLayoutUpdate(): void {
         // Skip if UI is disabled
-        if(!this.enabled)
+        if(!this.enabled) {
             return;
+        }
 
         // Post-layout update child
         this.child.postLayoutUpdate();
@@ -400,13 +415,15 @@ export class Root {
      * pointer style.
      */
     updatePointerStyle(newStyle: string | null = null): void {
-        if(newStyle !== null)
+        if(newStyle !== null) {
             this.pointerStyle = newStyle;
+        }
 
         if(this.pointerStyle !== this._currentPointerStyle) {
             this._currentPointerStyle = this.pointerStyle;
-            if(this.pointerStyleHandler !== null)
+            if(this.pointerStyleHandler !== null) {
                 this.pointerStyleHandler(this._currentPointerStyle);
+            }
         }
     }
 
@@ -424,25 +441,29 @@ export class Root {
                 this.clearFocus(focusType);
                 this._foci.set(focusType, widget);
                 widget.onFocusGrabbed(focusType);
-                for(const driver of this.drivers)
+                for(const driver of this.drivers) {
                     driver.onFocusChanged(this, focusType, widget);
+                }
             }
 
             // special cases for keyboard and tab foci, since they are
             // usually together. a focus that is implied by another focus is
             // called a partner focus
             let partnerFocus = null;
-            if(focusType === FocusType.Keyboard)
+            if(focusType === FocusType.Keyboard) {
                 partnerFocus = FocusType.Tab;
-            if(focusType === FocusType.Tab)
+            }
+            if(focusType === FocusType.Tab) {
                 partnerFocus = FocusType.Keyboard;
+            }
 
             if(partnerFocus !== null && widget !== this._foci.get(partnerFocus)) {
                 this.clearFocus(partnerFocus);
                 this._foci.set(partnerFocus, widget);
                 widget.onFocusGrabbed(partnerFocus);
-                for(const driver of this.drivers)
+                for(const driver of this.drivers) {
                     driver.onFocusChanged(this, partnerFocus, widget);
+                }
             }
         }
     }
@@ -456,8 +477,9 @@ export class Root {
         // NOTE: Use this instead of clearFocus if your intent is to make sure a
         // SPECIFIC COMPONENT is no longer focused, NOT ANY COMPONENT
         const currentFocus = this._foci.get(focusType);
-        if(widget === currentFocus)
+        if(widget === currentFocus) {
             this.clearFocus(focusType);
+        }
     }
 
     /**
@@ -465,8 +487,9 @@ export class Root {
      * Achieved by calling {@link Root#dropFocus}
      */
     dropFoci(widget: Widget): void {
-        for(const focusType of this._foci.keys())
+        for(const focusType of this._foci.keys()) {
             this.dropFocus(focusType, widget);
+        }
     }
 
     /**
@@ -480,8 +503,9 @@ export class Root {
             currentFocus.onFocusDropped(focusType);
 
             this._foci.set(focusType, null);
-            for(const driver of this.drivers)
+            for(const driver of this.drivers) {
                 driver.onFocusChanged(this, focusType, null);
+            }
 
             // XXX no special case for clearing keyboard/tab focus. keyboard
             // implies tab and vice-versa, but lack of keyboard does not imply
@@ -511,12 +535,14 @@ export class Root {
      */
     registerDriver(driver: Driver): void {
         // If driver is not registered, register it
-        if(this.drivers.has(driver))
+        if(this.drivers.has(driver)) {
             return;
+        }
 
         this.drivers.add(driver);
-        if(this._enabled && driver.onEnable)
+        if(this._enabled && driver.onEnable) {
             driver.onEnable(this);
+        }
     }
 
     /**
@@ -526,11 +552,13 @@ export class Root {
      */
     unregisterDriver(driver: Driver): void {
         // If driver is registered, unregister it
-        if(!this.drivers.delete(driver))
+        if(!this.drivers.delete(driver)) {
             return;
+        }
 
-        if(this._enabled && driver.onDisable)
+        if(this._enabled && driver.onDisable) {
             driver.onDisable(this);
+        }
     }
 
     /**
@@ -539,8 +567,9 @@ export class Root {
      */
     clearDrivers(): void {
         // Unregister all drivers
-        for(const driver of this.drivers)
+        for(const driver of this.drivers) {
             this.unregisterDriver(driver);
+        }
     }
 
     /**

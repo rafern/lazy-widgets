@@ -76,9 +76,9 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
     private updateBackground(): void {
         const oldProperty = this.backgroundProperty;
 
-        if(this.forced)
+        if(this.forced) {
             this.backgroundProperty = 'primaryFill';
-        else {
+        } else {
             switch(this.clickHelper.clickState) {
             case ClickState.Hold:
                 this.backgroundProperty = 'accentFill';
@@ -101,22 +101,23 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
 
     private getBackgroundFill(): FillStyle {
         switch(this.backgroundProperty) {
-            case 'primaryFill':
-                return this.primaryFill;
-            case 'accentFill':
-                return this.accentFill;
-            case 'backgroundGlowFill':
-                return this.backgroundGlowFill;
-            case 'backgroundFill':
-                return this.backgroundFill;
-            default:
-                throw new Error(DynMsg.INVALID_BACKGROUND_FILL(this.backgroundProperty));
+        case 'primaryFill':
+            return this.primaryFill;
+        case 'accentFill':
+            return this.accentFill;
+        case 'backgroundGlowFill':
+            return this.backgroundGlowFill;
+        case 'backgroundFill':
+            return this.backgroundFill;
+        default:
+            throw new Error(DynMsg.INVALID_BACKGROUND_FILL(this.backgroundProperty));
         }
     }
 
     override set inheritedTheme(theme: Theme | undefined) {
-        if(theme === this.fallbackTheme)
+        if(theme === this.fallbackTheme) {
             return;
+        }
 
         this.fallbackTheme = theme;
         this.childTheme.fallbackTheme = theme;
@@ -131,36 +132,38 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
             this._layoutDirty = true;
             this.backgroundDirty = true;
             this.childTheme.canvasFill = this.getBackgroundFill();
-        }
-        else if(property === this.backgroundProperty) {
+        } else if(property === this.backgroundProperty) {
             this.backgroundDirty = true;
             this.childTheme.canvasFill = this.getBackgroundFill();
+        } else if(property === 'containerPadding') {
+            this._layoutDirty = true;
+        } else if(property === 'containerAlignment') {
+            this._layoutDirty = true;
         }
-        else if(property === 'containerPadding')
-            this._layoutDirty = true;
-        else if(property === 'containerAlignment')
-            this._layoutDirty = true;
     }
 
     override onFocusGrabbed(focusType: FocusType): void {
         super.onFocusGrabbed(focusType);
 
-        if(focusType === FocusType.Keyboard)
+        if(focusType === FocusType.Keyboard) {
             this.updateBackground();
+        }
     }
 
     override onFocusDropped(focusType: FocusType): void {
         super.onFocusDropped(focusType);
 
-        if(focusType === FocusType.Keyboard)
+        if(focusType === FocusType.Keyboard) {
             this.updateBackground();
+        }
     }
 
     protected override handleEvent(event: Event): Widget | null {
         const capturer = super.handleEvent(event);
 
-        if(this.clickHelper.clickStateChanged)
+        if(this.clickHelper.clickStateChanged) {
             this.updateBackground();
+        }
 
         return capturer;
     }

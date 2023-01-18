@@ -44,8 +44,9 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
 
     override set inheritedTheme(theme: Theme | undefined) {
         super.inheritedTheme = theme;
-        for(const child of this.children)
+        for(const child of this.children) {
             child.inheritedTheme = theme;
+        }
     }
 
     override get inheritedTheme(): Theme | undefined {
@@ -55,15 +56,17 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
     override dryPaint(): void {
         super.dryPaint();
 
-        for(const child of this.children)
+        for(const child of this.children) {
             child.dryPaint();
+        }
     }
 
     override forceDirty(markLayout = true): void {
         super.forceDirty(markLayout);
 
-        for(const child of this.children)
+        for(const child of this.children) {
             child.forceDirty(markLayout);
+        }
     }
 
     /** Get amount of children of this parent widget. */
@@ -82,23 +85,26 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
         super.attach(root, viewport, parent);
 
-        for(const child of this.children)
+        for(const child of this.children) {
             child.attach(root, viewport, this);
+        }
     }
 
     override detach(): void {
         super.detach();
 
-        for(const child of this.children)
+        for(const child of this.children) {
             child.detach();
+        }
     }
 
     override updateActiveState(): boolean {
         const changed = super.updateActiveState();
 
         if(changed) {
-            for(const child of this._children)
+            for(const child of this._children) {
                 child.updateActiveState();
+            }
         }
 
         return changed;
@@ -107,7 +113,8 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
     override finalizeBounds() {
         super.finalizeBounds();
 
-        for(const child of this.children)
+        for(const child of this.children) {
             child.finalizeBounds();
+        }
     }
 }

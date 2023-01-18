@@ -41,11 +41,13 @@ export class ArtificialConstraint<W extends Widget = Widget> extends Passthrough
         const newMaxWidth = Math.min(Math.max(this.constraints[1], minWidth), maxWidth);
         const newMaxHeight = Math.min(Math.max(this.constraints[3], minHeight), maxHeight);
 
-        if(newMinWidth > newMaxWidth)
+        if(newMinWidth > newMaxWidth) {
             newMinWidth = newMaxWidth;
+        }
 
-        if(newMinHeight > newMaxHeight)
+        if(newMinHeight > newMaxHeight) {
             newMinHeight = newMaxHeight;
+        }
 
         // Resolve dimensions
         super.handleResolveDimensions(newMinWidth, newMaxWidth, newMinHeight, newMaxHeight);

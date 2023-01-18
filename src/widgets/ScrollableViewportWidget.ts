@@ -175,10 +175,11 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
 
     /** Get the ClickHelper of a scrollbar */
     private getClickHelper(vertical: boolean): ClickHelper {
-        if(vertical)
+        if(vertical) {
             return this.verticalClickHelper;
-        else
+        } else {
             return this.horizontalClickHelper;
+        }
     }
 
     /**
@@ -188,8 +189,9 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
      */
     private handleEventScrollbar(vertical: boolean, corner: boolean, event: Event, root: Root): boolean {
         // Abort if the other scrollbar is being dragged
-        if(this.verticalDragged !== null && this.verticalDragged !== vertical)
+        if(this.verticalDragged !== null && this.verticalDragged !== vertical) {
             return false;
+        }
 
         // Get click area of scrollbar. If in overlay mode, use the filled part
         // of the scrollbar as the click area since there is no background
@@ -209,13 +211,15 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
 
         const clickState = clickHelper.clickState;
         const stateChanged = clickHelper.clickStateChanged;
-        if(stateChanged)
+        if(stateChanged) {
             this._dirty = true;
+        }
 
         if(clickState === ClickState.Hold) {
             // Abort if state is not valid, but grab the event
-            if(clickHelper.pointerPos === null || !(event instanceof PointerEvent))
+            if(clickHelper.pointerPos === null || !(event instanceof PointerEvent)) {
                 return true;
+            }
 
             const axisIndex = vertical ? 1 : 0;
             const scroll = this.scroll;
@@ -246,9 +250,9 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
                     bgRect[1],
                     bgRect[1] + bgRect[3],
                 )[axisIndex];
-            }
-            else
+            } else {
                 thisOffset = clickHelper.pointerPos[axisIndex];
+            }
 
             if(stateChanged) {
                 // If this was outside the filled area, snap scrollbar
@@ -265,8 +269,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
                 this.startingOffset = thisOffset;
                 this.startingScroll = scroll[axisIndex];
                 this.verticalDragged = vertical;
-            }
-            else {
+            } else {
                 // Drag continue, scroll
                 const viewportLength = vertical ? this.effectiveHeight : this.effectiveWidth;
                 const childLength = this.child.idealDimensions[axisIndex];
@@ -277,10 +280,9 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             }
 
             return true;
-        }
-        else if(clickState === ClickState.Hover)
+        } else if(clickState === ClickState.Hover) {
             return true;
-        else if(stateChanged) {
+        } else if(stateChanged) {
             // Release this scrollbar
             this.verticalDragged = null;
             return true;
@@ -294,16 +296,18 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         const [childWidth, childHeight] = this.child.idealDimensions;
 
         const minX = -(childWidth - this.effectiveWidth);
-        if(minX >= 0)
+        if(minX >= 0) {
             offset[0] = 0;
-        else if(offset[0] < minX)
+        } else if(offset[0] < minX) {
             offset[0] = minX;
+        }
 
         const minY = -(childHeight - this.effectiveHeight);
-        if(minY >= 0)
+        if(minY >= 0) {
             offset[1] = 0;
-        else if(offset[1] < minY)
+        } else if(offset[1] < minY) {
             offset[1] = minY;
+        }
     }
 
     /**
@@ -329,11 +333,13 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         const now = (new Date()).getTime();
         this.lastScroll = now;
 
-        if(success)
+        if(success) {
             return true;
+        }
 
-        if(event.fromDrag)
+        if(event.fromDrag) {
             return false;
+        }
 
         const elapsed = now - last;
         return elapsed < 200;
@@ -353,23 +359,21 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         if(property === null) {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'bodyTextFont' ||
+        } else if(property === 'bodyTextFont' ||
                 property === 'bodyTextHeight' ||
-                property === 'bodyTextSpacing')
+                property === 'bodyTextSpacing') {
             this.updateScrollLineHeight();
-        else if(property === 'scrollBarThickness')
-        {
+        } else if(property === 'scrollBarThickness') {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'backgroundFill' ||
+        } else if(property === 'backgroundFill' ||
                 property === 'scrollBarMinPercent' ||
                 property === 'scrollBarMinPixels' ||
                 property === 'primaryFill' ||
                 property === 'accentFill' ||
-                property === 'backgroundGlowFill')
+                property === 'backgroundGlowFill') {
             this._dirty = true;
+        }
     }
 
     protected override handleEvent(event: Event): Widget | null {
@@ -392,18 +396,21 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             // Only handle event in scrollbar if the scrollbar is shown and
             // needed (layout mode shows unneeded scrollbars)
             if(!widthBiCoupled && (xNeeded || !overlay) &&
-               this.handleEventScrollbar(false, yNeeded || forceCorner, event, this.root))
+               this.handleEventScrollbar(false, yNeeded || forceCorner, event, this.root)) {
                 grabbedEvent = true;
+            }
 
             if(!heightBiCoupled && (yNeeded || !overlay) &&
-               this.handleEventScrollbar(true, xNeeded || forceCorner, event, this.root))
+               this.handleEventScrollbar(true, xNeeded || forceCorner, event, this.root)) {
                 grabbedEvent = true;
+            }
 
             // If the event was grabbed by either scrollbar, capture it
             if(grabbedEvent) {
                 // If this is a wheel event, handle it
-                if(event instanceof PointerWheel)
+                if(event instanceof PointerWheel) {
                     this.handleWheelEvent(event);
+                }
 
                 return this;
             }
@@ -432,10 +439,12 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
 
                 // XXX don't trim clear space if scrollbars are hidden
                 if(this._scrollbarMode !== ScrollbarMode.Hidden) {
-                    if(!reserveX && paintY)
+                    if(!reserveX && paintY) {
                         clearWidth = Math.max(0, clearWidth - thickness);
-                    if(!reserveY && paintX)
+                    }
+                    if(!reserveY && paintX) {
                         clearHeight = Math.max(0, clearHeight - thickness);
+                    }
                 }
             }
 
@@ -472,10 +481,11 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
                 const rectBiggerThanViewport = cr - cl > clearWidth;
                 const rectBeforeViewport = cl < this.idealX;
                 const alignLeft = rectBiggerThanViewport !== rectBeforeViewport;
-                if(alignLeft)
+                if(alignLeft) {
                     offsetX += this.idealX - cl;
-                else
+                } else {
                     offsetX += vpr - cr;
+                }
             }
 
             const moveY = !heightBiCoupled && !(ct >= this.idealY && cb <= vpb) && !(this.idealY >= ct && vpb <= cb);
@@ -483,14 +493,16 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
                 const rectBiggerThanViewport = cb - ct > clearHeight;
                 const rectBeforeViewport = ct < this.idealY;
                 const alignTop = rectBiggerThanViewport !== rectBeforeViewport;
-                if(alignTop)
+                if(alignTop) {
                     offsetY += this.idealY - ct;
-                else
+                } else {
                     offsetY += vpb - cb;
+                }
             }
 
-            if(moveX || moveY)
+            if(moveX || moveY) {
                 this.offset = [offsetX, offsetY];
+            }
 
             // Correct event bounds to new offset
             // XXX need to use getter instead of [offsetX, offsetY] because the
@@ -509,8 +521,9 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
 
         // If this is a wheel event and nobody captured the event, try
         // scrolling. If scrolling did indeed occur, then capture the event.
-        if(capturer === null && event instanceof PointerWheel && this.handleWheelEvent(event))
+        if(capturer === null && event instanceof PointerWheel && this.handleWheelEvent(event)) {
             return this;
+        }
 
         return capturer;
     }
@@ -556,8 +569,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             this.horizWasPainted = paintX;
             this.vertWasPainted = paintY;
             this.forceRePaint = true;
-        }
-        else if(this.scrollbarMode === ScrollbarMode.Overlay) {
+        } else if(this.scrollbarMode === ScrollbarMode.Overlay) {
             // XXX overlay mode always needs the child widget to be repainted
             // because the scrollbar could be semi-transparent. if the scrollbar
             // is semi-transparent and the child is painted, then the scrollbar
@@ -574,10 +586,12 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
                             (this.widthCoupling !== AxisCoupling.Bi
                                 && this.heightCoupling !== AxisCoupling.Bi);
 
-        if(paintX)
+        if(paintX) {
             this.paintScrollbar(false, xNeeded, yNeeded || forceCorner);
-        if(paintY)
+        }
+        if(paintY) {
             this.paintScrollbar(true, yNeeded, xNeeded || forceCorner);
+        }
 
         // Paint corner if it is forced
         if(forceCorner) {
@@ -610,8 +624,9 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         const minPixels = this.scrollBarMinPixels;
 
         let viewportLengthCorner = viewportLength;
-        if(overlay)
+        if(overlay) {
             viewportLengthCorner -= (corner ? thickness : 0);
+        }
 
         const length = Math.min(
             // Make sure scrollbar fill isn't bigger than viewport
@@ -636,8 +651,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             sY = this.idealY + offset;
             sWidth = thickness;
             sHeight = length;
-        }
-        else {
+        } else {
             sX = this.idealX + offset;
             sY = this.idealY + this.idealHeight - thickness;
             sWidth = length;
@@ -651,8 +665,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             bgY = this.idealY;
             bgWidth = thickness;
             bgHeight = viewportLengthCorner;
-        }
-        else {
+        } else {
             bgX = this.idealX;
             bgY = sY;
             bgWidth = viewportLengthCorner;
@@ -667,16 +680,19 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
 
     /** Check if a scrollbar needs to be painted */
     private scrollbarNeedsPaint(vertical: boolean, needed: boolean): boolean {
-        if(this._scrollbarMode === ScrollbarMode.Hidden)
+        if(this._scrollbarMode === ScrollbarMode.Hidden) {
             return false;
+        }
 
-        if(!needed && this._scrollbarMode === ScrollbarMode.Overlay)
+        if(!needed && this._scrollbarMode === ScrollbarMode.Overlay) {
             return false;
+        }
 
-        if(vertical)
+        if(vertical) {
             return this.heightCoupling !== AxisCoupling.Bi;
-        else
+        } else {
             return this.widthCoupling !== AxisCoupling.Bi;
+        }
     }
 
     /** Paint a scrollbar. For internal use only */
@@ -695,17 +711,17 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         if(needed) {
             const clickHelper = this.getClickHelper(vertical);
             switch(clickHelper.clickState) {
-                case ClickState.Released:
-                    ctx.fillStyle = this.primaryFill;
-                    break;
-                case ClickState.Hover:
-                case ClickState.Hold:
-                    ctx.fillStyle = this.accentFill;
-                    break;
+            case ClickState.Released:
+                ctx.fillStyle = this.primaryFill;
+                break;
+            case ClickState.Hover:
+            case ClickState.Hold:
+                ctx.fillStyle = this.accentFill;
+                break;
             }
-        }
-        else
+        } else {
             ctx.fillStyle = this.backgroundGlowFill;
+        }
 
         ctx.fillRect(...fillRect);
     }

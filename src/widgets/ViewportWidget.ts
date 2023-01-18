@@ -122,10 +122,11 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         super(child, true, properties);
 
         this.useCanvas = properties?.useCanvas ?? false;
-        if(this.useCanvas)
+        if(this.useCanvas) {
             this.internalViewport = new CanvasViewport(child);
-        else
+        } else {
             this.internalViewport = new ClippedViewport(child);
+        }
 
         this.minWidth = properties?.minWidth ?? 0;
         this.minHeight = properties?.minHeight ?? 0;
@@ -160,8 +161,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         if (constraints[0] !== this._constraints[0] ||
             constraints[1] !== this._constraints[1] ||
             constraints[2] !== this._constraints[2] ||
-            constraints[3] !== this._constraints[3])
-        {
+            constraints[3] !== this._constraints[3]) {
             // Update own constraints
             this._constraints[0] = constraints[0];
             this._constraints[1] = constraints[1];
@@ -215,9 +215,9 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         if(property === null) {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'canvasFill')
+        } else if(property === 'canvasFill') {
             this._dirty = true;
+        }
     }
 
     protected getBoundsOf(widget: Widget): Bounds {
@@ -239,12 +239,14 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         child.preLayoutUpdate();
 
         // If child's layout is dirty, set self's layout as dirty
-        if(child.layoutDirty)
+        if(child.layoutDirty) {
             this._layoutDirty = true;
+        }
 
         // Update viewport resolution if needed
-        if(this.useCanvas)
+        if(this.useCanvas) {
             (this.internalViewport as CanvasViewport).resolution = this.root.resolution;
+        }
     }
 
     protected override handlePostLayoutUpdate(): void {
@@ -256,8 +258,9 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         child.postLayoutUpdate();
 
         // If child is dirty, set self as dirty
-        if(child.dirty)
+        if(child.dirty) {
             this._dirty = true;
+        }
     }
 
     /**
@@ -280,22 +283,26 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         if(this._widthCoupling !== AxisCoupling.Bi) {
             this.idealWidth = effectiveMinWidth;
 
-            if(this._widthCoupling === AxisCoupling.Uni)
+            if(this._widthCoupling === AxisCoupling.Uni) {
                 effectiveMinWidth = this.idealWidth;
+            }
         }
 
-        if(this.idealWidth === 0 && this.minWidth === 0 && this._widthCoupling !== AxisCoupling.Bi)
+        if(this.idealWidth === 0 && this.minWidth === 0 && this._widthCoupling !== AxisCoupling.Bi) {
             console.warn(DynMsg.MAYBE_DIMENSIONLESS('width'));
+        }
 
         if(this._heightCoupling !== AxisCoupling.Bi) {
             this.idealHeight = effectiveMinHeight;
 
-            if(this._heightCoupling === AxisCoupling.Uni)
+            if(this._heightCoupling === AxisCoupling.Uni) {
                 effectiveMinHeight = this.idealHeight;
+            }
         }
 
-        if(this.idealHeight === 0 && this.minHeight === 0 && this._heightCoupling !== AxisCoupling.Bi)
+        if(this.idealHeight === 0 && this.minHeight === 0 && this._heightCoupling !== AxisCoupling.Bi) {
             console.warn(DynMsg.MAYBE_DIMENSIONLESS('height'));
+        }
 
         // Resolve child's layout and handle coupling
         const constraints: LayoutConstraints = [...this._constraints];
@@ -303,15 +310,17 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         if(this._widthCoupling !== AxisCoupling.None) {
             constraints[0] = effectiveMinWidth;
 
-            if(this._widthCoupling === AxisCoupling.Bi)
+            if(this._widthCoupling === AxisCoupling.Bi) {
                 constraints[1] = rMaxWidth;
+            }
         }
 
         if(this._heightCoupling !== AxisCoupling.None) {
             constraints[2] = effectiveMinHeight;
 
-            if(this._heightCoupling === AxisCoupling.Bi)
+            if(this._heightCoupling === AxisCoupling.Bi) {
                 constraints[3] = rMaxHeight;
+            }
         }
 
         const child = this.child;
@@ -319,11 +328,13 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         this.internalViewport.resolveLayout();
 
         // Bi-couple wanted axes. Do regular layout for non-coupled axes.
-        if(this._widthCoupling === AxisCoupling.Bi)
+        if(this._widthCoupling === AxisCoupling.Bi) {
             this.idealWidth = Math.max(0, child.idealDimensions[0]);
+        }
 
-        if(this._heightCoupling === AxisCoupling.Bi)
+        if(this._heightCoupling === AxisCoupling.Bi) {
             this.idealHeight = Math.max(0, child.idealDimensions[1]);
+        }
     }
 
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {

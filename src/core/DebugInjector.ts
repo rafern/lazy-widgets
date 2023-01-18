@@ -45,8 +45,9 @@ export function toggleDebugFeature(debugFeature: string, enabled?: boolean): voi
 
     const [wasEnabled, _description] = featureConfig;
 
-    if(enabled === undefined)
+    if(enabled === undefined) {
         enabled = !wasEnabled;
+    }
 
     if(wasEnabled !== enabled) {
         featureConfig[0] = enabled;
@@ -56,8 +57,9 @@ export function toggleDebugFeature(debugFeature: string, enabled?: boolean): voi
 
 /** List all debug features in the console. */
 export function listDebugFeatures(): void {
-    for(const [feature, featureConfig] of features)
+    for(const [feature, featureConfig] of features) {
         console.info(`[canvas-ui] "${feature}" (${featureConfig[0] ? 'en' : 'dis'}abled): ${featureConfig[1]}`);
+    }
 }
 
 /**
@@ -95,9 +97,9 @@ export function injectWatchflagFeature(classObj: any, flagKey: string): void {
                         console.groupCollapsed(msg);
                         console.trace();
                         console.groupEnd();
-                    }
-                    else
+                    } else {
                         console.debug(msg);
+                    }
                 }
             }
 
@@ -133,8 +135,9 @@ export function injectTraceFeature(classObj: any, methodKey: string, messageGene
 
     function logMsgStack(): void {
         if(traceLevel === 0) {
-            if(isDebugFeatureEnabled(featureName))
+            if(isDebugFeatureEnabled(featureName)) {
                 console.debug(`[canvas-ui ${featureName}] Trace:\n${msgStack.join('\n')}`);
+            }
 
             traceLevel = 0;
             msgStack.length = 0;
@@ -150,18 +153,20 @@ export function injectTraceFeature(classObj: any, methodKey: string, messageGene
             msgIndex = msgStack.length;
             msgIndices.set(this, msgIndex);
             let prefix;
-            if(traceLevel > 1)
+            if(traceLevel > 1) {
                 prefix = '  '.repeat(traceLevel - 2) + '> ';
-            else
+            } else {
                 prefix = '';
+            }
 
             msgStack.push(`${prefix}${this.constructor.name}`);
-        }
-        else
+        } else {
             msgStack[msgIndex] += ', recall';
+        }
 
-        if(messageGenerator !== null)
+        if(messageGenerator !== null) {
             msgStack[msgIndex] += messageGenerator.apply(this, args);
+        }
 
         const startTime = (new Date()).getTime();
 
@@ -169,12 +174,10 @@ export function injectTraceFeature(classObj: any, methodKey: string, messageGene
             const returnVal = methodOrig.apply(this, args);
             msgStack[msgIndex] += ` <${(new Date()).getTime() - startTime} ms>`;
             return returnVal;
-        }
-        catch(e) {
+        } catch(e) {
             msgStack[msgIndex] += ' <exception thrown>';
             throw e;
-        }
-        finally {
+        } finally {
             traceLevel--;
             logMsgStack();
         }
@@ -204,14 +207,16 @@ export function injectRandomFillFeature(classObj: any, themePropertyKey: string)
     const propertyOrig = Object.getOwnPropertyDescriptor(classObj.prototype, themePropertyKey);
     Object.defineProperty(classObj.prototype, themePropertyKey, {
         get() {
-            if(isDebugFeatureEnabled(featureName))
+            if(isDebugFeatureEnabled(featureName)) {
                 return '#' + Math.floor(Math.random() * 0xffffff).toString(16);
-            else if(propertyOrig?.get !== undefined)
+            } else if(propertyOrig?.get !== undefined) {
                 return propertyOrig.get.apply(this);
+            }
         },
         set(newValue) {
-            if(propertyOrig?.set !== undefined)
+            if(propertyOrig?.set !== undefined) {
                 propertyOrig.set.apply(this, [newValue]);
+            }
         },
     });
 
@@ -254,12 +259,13 @@ export function injectStackTraceFeature(classObj: any, methodKey: string): void 
  */
 function isWhole(val: number, sensitivity: number) {
     const clamped = Math.abs(val) % 1;
-    if(clamped < sensitivity)
+    if(clamped < sensitivity) {
         return true;
-    else if(clamped > 1 - sensitivity)
+    } else if(clamped > 1 - sensitivity) {
         return true;
-    else
+    } else {
         return false;
+    }
 }
 
 let injected = false;
@@ -420,19 +426,19 @@ export function injectDebugCode(): void {
             if(!group[3] && group[2] > left) {
                 const alternate = textHelperAlternate.get(this);
                 ctx.fillStyle = alternate ? 'rgba(255, 0, 0, 0.5)'
-                                          : 'rgba(0, 255, 0, 0.5)';
+                    : 'rgba(0, 255, 0, 0.5)';
                 ctx.fillRect(x, y - height, group[2] - left, fullHeight);
                 textHelperAlternate.set(this, !alternate);
                 ctx.fillStyle = origFillStyle;
-            }
-            else {
+            } else {
                 let debugWidth = group[2] - left;
                 ctx.fillStyle = debugWidth > 0 ? 'rgba(0, 0, 255, 0.5)'
-                                               : 'rgba(0, 0, 0, 0.5)';
-                if(debugWidth == 0)
+                    : 'rgba(0, 0, 0, 0.5)';
+                if(debugWidth == 0) {
                     debugWidth = 4;
-                else if(debugWidth < 0)
+                } else if(debugWidth < 0) {
                     throw new Error(Msg.NEGATIVE_TEXT_GROUP);
+                }
 
                 ctx.fillRect(x, y - height, debugWidth, fullHeight);
             }

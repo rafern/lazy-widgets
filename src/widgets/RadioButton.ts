@@ -57,8 +57,9 @@ export class RadioButton<V> extends Widget {
     }
 
     protected handleChange(): void {
-        if(this.selected !== this._wasSelected)
+        if(this.selected !== this._wasSelected) {
             this._dirty = true;
+        }
     }
 
     protected override onThemeUpdated(property: string | null = null): void {
@@ -67,17 +68,14 @@ export class RadioButton<V> extends Widget {
         if(property === null) {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'radioButtonLength') {
+        } else if(property === 'radioButtonLength') {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'backgroundGlowFill' ||
+        } else if(property === 'backgroundGlowFill' ||
                 property === 'backgroundFill' ||
                 property === 'accentFill' ||
                 property === 'primaryFill' ||
-                property === 'radioButtonInnerPadding')
-        {
+                property === 'radioButtonInnerPadding') {
             this._dirty = true;
         }
     }
@@ -100,13 +98,15 @@ export class RadioButton<V> extends Widget {
     }
 
     override onFocusGrabbed(focusType: FocusType): void {
-        if(this.clickHelper.onFocusGrabbed(focusType))
+        if(this.clickHelper.onFocusGrabbed(focusType)) {
             this._dirty = true;
+        }
     }
 
     override onFocusDropped(focusType: FocusType): void {
-        if(this.clickHelper.onFocusDropped(focusType))
+        if(this.clickHelper.onFocusDropped(focusType)) {
             this._dirty = true;
+        }
     }
 
     protected override handleEvent(event: Event): this | null {
@@ -120,13 +120,15 @@ export class RadioButton<V> extends Widget {
         );
 
         // Select radio button if button was clicked
-        if(wasClick)
+        if(wasClick) {
             this.select();
+        }
 
         // Always flag as dirty if the click state changed (so glow colour takes
         // effect). Toggle value if clicked
-        if(this.clickHelper.clickStateChanged)
+        if(this.clickHelper.clickStateChanged) {
             this._dirty = true;
+        }
 
         return capture ? this : null;
     }
@@ -137,10 +139,12 @@ export class RadioButton<V> extends Widget {
         this.idealWidth = minLength;
         this.idealHeight = minLength;
 
-        if(this.idealWidth < minWidth)
+        if(this.idealWidth < minWidth) {
             this.idealWidth = minWidth;
-        if(this.idealHeight < minHeight)
+        }
+        if(this.idealHeight < minHeight) {
             this.idealHeight = minHeight;
+        }
     }
 
     override finalizeBounds() {
@@ -161,10 +165,11 @@ export class RadioButton<V> extends Widget {
 
         // Draw unchecked part of radio button
         const ctx = this.viewport.context;
-        if(useGlow)
+        if(useGlow) {
             ctx.fillStyle = this.backgroundGlowFill;
-        else
+        } else {
             ctx.fillStyle = this.backgroundFill;
+        }
 
         const halfLength = this.actualLength / 2;
         const radioX = this.offsetX + this.x + halfLength;
@@ -173,18 +178,19 @@ export class RadioButton<V> extends Widget {
 
         // Draw checked part of checkbox
         if(this.selected) {
-            if(useGlow)
+            if(useGlow) {
                 ctx.fillStyle = this.accentFill;
-            else
+            } else {
                 ctx.fillStyle = this.primaryFill;
+            }
 
             const innerLength = this.actualLength - this.radioButtonInnerPadding * 2;
 
             // Fall back to filling entire radio button if there isn't enough
             // space for padding
-            if(innerLength <= 0)
+            if(innerLength <= 0) {
                 this.paintCircle(radioX, radioY, halfLength);
-            else {
+            } else {
                 const halfInnerLength = innerLength / 2;
                 this.paintCircle(radioX, radioY, halfInnerLength);
             }

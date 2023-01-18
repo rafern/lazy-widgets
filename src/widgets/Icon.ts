@@ -135,8 +135,7 @@ export class Icon extends Widget {
                 // element then this won't be automatically set
                 videoElem.preload = 'auto';
                 image = videoElem;
-            }
-            else {
+            } else {
                 const imgElem = document.createElement('img');
                 imgElem.src = image;
                 image = imgElem;
@@ -202,10 +201,12 @@ export class Icon extends Widget {
                 // Remove old event listeners in video. null checks aren't
                 // needed, but adding them anyways so that typescript doesn't
                 // complain
-                if(this.loadedmetadataListener !== null)
+                if(this.loadedmetadataListener !== null) {
                     this._image.removeEventListener('loadedmetadata', this.loadedmetadataListener);
-                if(this.canplayListener !== null)
+                }
+                if(this.canplayListener !== null) {
                     this._image.removeEventListener('canplay', this.canplayListener);
+                }
             }
 
             this._image = image;
@@ -227,10 +228,10 @@ export class Icon extends Widget {
         // loaded yet. If this is a playing video, icon only needs to be
         // re-drawn if video is playing
         if(this._image instanceof HTMLVideoElement) {
-            if(!this._image.paused && this.frameCallback === null)
+            if(!this._image.paused && this.frameCallback === null) {
                 this._dirty = true;
-        }
-        else if(this._image?.src !== this.lastSrc && this._image?.complete) {
+            }
+        } else if(this._image?.src !== this.lastSrc && this._image?.complete) {
             this._layoutDirty = true;
             this._dirty = true;
         }
@@ -241,13 +242,14 @@ export class Icon extends Widget {
         let wantedWidth = this.imageWidth;
         if(wantedWidth === null) {
             if(this.viewBox === null) {
-                if(this._image instanceof HTMLVideoElement)
+                if(this._image instanceof HTMLVideoElement) {
                     wantedWidth = this._image.videoWidth;
-                else
+                } else {
                     wantedWidth = this._image.naturalWidth;
-            }
-            else
+                }
+            } else {
                 wantedWidth = this.viewBox[2];
+            }
         }
 
         this.idealWidth = Math.max(Math.min(wantedWidth, maxWidth), minWidth);
@@ -255,45 +257,47 @@ export class Icon extends Widget {
         let wantedHeight = this.imageHeight;
         if(wantedHeight === null) {
             if(this.viewBox === null) {
-                if(this._image instanceof HTMLVideoElement)
+                if(this._image instanceof HTMLVideoElement) {
                     wantedHeight = this._image.videoHeight;
-                else
+                } else {
                     wantedHeight = this._image.naturalHeight;
-            }
-            else
+                }
+            } else {
                 wantedHeight = this.viewBox[3];
+            }
         }
 
         this.idealHeight = Math.max(Math.min(wantedHeight, maxHeight), minHeight);
 
         // Find offset and actual image dimensions (preserving aspect ratio)
         switch(this.fit) {
-            case IconFit.Contain:
-            case IconFit.Cover:
-            {
-                const widthRatio = this.idealWidth / wantedWidth;
-                const heightRatio = this.idealHeight / wantedHeight;
-                let scale;
+        case IconFit.Contain:
+        case IconFit.Cover:
+        {
+            const widthRatio = this.idealWidth / wantedWidth;
+            const heightRatio = this.idealHeight / wantedHeight;
+            let scale;
 
-                if(this.fit === IconFit.Contain)
-                    scale = Math.min(widthRatio, heightRatio);
-                else
-                    scale = Math.max(widthRatio, heightRatio);
-
-                this.actualWidth = wantedWidth * scale;
-                this.actualHeight = wantedHeight * scale;
-                this.offsetX = (this.idealWidth - this.actualWidth) / 2;
-                this.offsetY = (this.idealHeight - this.actualHeight) / 2;
-                break;
+            if(this.fit === IconFit.Contain) {
+                scale = Math.min(widthRatio, heightRatio);
+            } else {
+                scale = Math.max(widthRatio, heightRatio);
             }
-            case IconFit.Fill:
-                this.actualWidth = this.idealWidth;
-                this.actualHeight = this.idealHeight;
-                this.offsetX = 0;
-                this.offsetY = 0;
-                break;
-            default:
-                throw new Error(DynMsg.INVALID_ENUM(this.fit, 'IconFit', 'fit'));
+
+            this.actualWidth = wantedWidth * scale;
+            this.actualHeight = wantedHeight * scale;
+            this.offsetX = (this.idealWidth - this.actualWidth) / 2;
+            this.offsetY = (this.idealHeight - this.actualHeight) / 2;
+            break;
+        }
+        case IconFit.Fill:
+            this.actualWidth = this.idealWidth;
+            this.actualHeight = this.idealHeight;
+            this.offsetX = 0;
+            this.offsetY = 0;
+            break;
+        default:
+            throw new Error(DynMsg.INVALID_ENUM(this.fit, 'IconFit', 'fit'));
         }
     }
 
@@ -335,8 +339,7 @@ export class Icon extends Widget {
                 this._image,
                 tdx, tdy, this.actualWidth, this.actualHeight,
             );
-        }
-        else {
+        } else {
             ctx.drawImage(
                 this._image, ...this.viewBox,
                 tdx, tdy, this.actualWidth, this.actualHeight,
@@ -344,15 +347,17 @@ export class Icon extends Widget {
         }
 
         // Revert transformation
-        if(needsClip)
+        if(needsClip) {
             ctx.restore();
+        }
     }
 
     override dryPaint(): void {
-        if(this._image instanceof HTMLImageElement && this._image?.complete)
+        if(this._image instanceof HTMLImageElement && this._image?.complete) {
             this.lastSrc = this._image.src;
-        else
+        } else {
             this.lastSrc = null;
+        }
 
         super.dryPaint();
     }

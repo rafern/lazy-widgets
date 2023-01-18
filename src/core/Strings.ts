@@ -20,17 +20,19 @@ export const Msg = {
 };
 
 function propStr(name: string | symbol): string {
-    if(typeof name === 'string')
+    if(typeof name === 'string') {
         return name;
-    else
+    } else {
         return '<Symbol()>';
+    }
 }
 
 function valueStr(value: unknown): string {
-    if(typeof value === 'string')
+    if(typeof value === 'string') {
         return `"${value}"`;
-    else
+    } else {
         return String(value);
+    }
 }
 
 const fpCause = 'This may be caused by floating pointer precision errors.';

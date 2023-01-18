@@ -74,8 +74,7 @@ export class DOMPointerDriver extends PointerDriver {
         if(rootBind !== undefined) {
             console.warn(Msg.DOM_DRIVER_REBIND);
             this.removeListeners(rootBind);
-        }
-        else {
+        } else {
             rootBind = <DOMPointerDriverBind>{
                 domElem,
                 pointerListen: null,
@@ -87,8 +86,9 @@ export class DOMPointerDriver extends PointerDriver {
             domElem.style.touchAction = 'none';
         }
 
-        if(root.enabled)
+        if(root.enabled) {
             this.addListeners(root, rootBind);
+        }
     }
 
     /**
@@ -97,8 +97,9 @@ export class DOMPointerDriver extends PointerDriver {
      */
     unbindDOMElem(root: Root): void {
         const rootBind = this.domElems.get(root);
-        if(rootBind === undefined)
+        if(rootBind === undefined) {
             return;
+        }
 
         this.removeListeners(rootBind);
         this.domElems.delete(root);
@@ -113,10 +114,11 @@ export class DOMPointerDriver extends PointerDriver {
 
         if(pointerID === undefined) {
             const isMouse = event.pointerType === 'mouse';
-            if(isMouse)
+            if(isMouse) {
                 pointerID = this.mousePointerID;
-            else
+            } else {
                 pointerID = this.registerPointer(true);
+            }
 
             this.pointers.set(event.pointerId, pointerID);
         }
@@ -155,8 +157,9 @@ export class DOMPointerDriver extends PointerDriver {
         if(rootBind.wheelListen === null) {
             rootBind.wheelListen = (event: WheelEvent) => {
                 const deltaMode = parseDOMDeltaMode(event.deltaMode);
-                if(deltaMode === null)
+                if(deltaMode === null) {
                     return;
+                }
 
                 this.wheelPointer(
                     root, this.mousePointerID,
@@ -216,8 +219,9 @@ export class DOMPointerDriver extends PointerDriver {
         // Add event listeners for pointer when root is enabled, if the root is
         // bound to a DOM element
         const rootBind = this.domElems.get(root);
-        if(rootBind !== undefined)
+        if(rootBind !== undefined) {
             this.addListeners(root, rootBind);
+        }
     }
 
     /**
@@ -230,7 +234,8 @@ export class DOMPointerDriver extends PointerDriver {
         // Remove event listeners for pointer when root is disabled, if the root
         // is bound to a DOM element
         const rootBind = this.domElems.get(root);
-        if(rootBind !== undefined)
+        if(rootBind !== undefined) {
             this.removeListeners(rootBind);
+        }
     }
 }

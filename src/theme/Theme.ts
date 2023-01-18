@@ -26,8 +26,9 @@ export class Theme extends BaseTheme {
 
     protected override onThemeUpdated(property: string | null = null): void {
         // Notify all subscribers
-        for(const listener of this.subscribers)
+        for(const listener of this.subscribers) {
             listener(property);
+        }
     }
 
     /**

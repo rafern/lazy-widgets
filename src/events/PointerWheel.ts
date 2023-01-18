@@ -33,14 +33,14 @@ export enum PointerWheelMode {
  */
 export function parseDOMDeltaMode(domDeltaMode: number): PointerWheelMode | null {
     switch(domDeltaMode) {
-        case 0:
-            return PointerWheelMode.Pixel;
-        case 1:
-            return PointerWheelMode.Line;
-        case 2:
-            return PointerWheelMode.Page;
-        default:
-            return null;
+    case 0:
+        return PointerWheelMode.Pixel;
+    case 1:
+        return PointerWheelMode.Line;
+    case 2:
+        return PointerWheelMode.Page;
+    default:
+        return null;
     }
 }
 
@@ -119,29 +119,29 @@ export class PointerWheel extends PointerEvent {
         }
 
         switch(this.deltaMode) {
-            case PointerWheelMode.Pixel:
-                return [
-                    Math.min(limitX, Math.abs(this.deltaX)) * Math.sign(this.deltaX),
-                    Math.min(limitY, Math.abs(this.deltaY)) * Math.sign(this.deltaY),
-                    Math.min(limitZ, Math.abs(this.deltaZ)) * Math.sign(this.deltaZ)
-                ];
-            case PointerWheelMode.Line:
-                return [
-                    Math.min(limitX, Math.abs(this.deltaX) * lineHeight) * Math.sign(this.deltaX),
-                    Math.min(limitY, Math.abs(this.deltaY) * lineHeight) * Math.sign(this.deltaY),
-                    Math.min(limitZ, Math.abs(this.deltaZ) * lineHeight) * Math.sign(this.deltaZ)
-                ];
-            case PointerWheelMode.Page:
-            {
-                const linesError = lineHeight * PointerWheel.PageLinesError;
-                return [
-                    (Math.abs(this.deltaX) * containerWidth - Math.min(containerWidth * PointerWheel.PagePercentError, linesError)) * Math.sign(this.deltaX),
-                    (Math.abs(this.deltaY) * containerHeight - Math.min(containerHeight * PointerWheel.PagePercentError, linesError)) * Math.sign(this.deltaY),
-                    (Math.abs(this.deltaZ) * containerDepth - Math.min(containerDepth * PointerWheel.PagePercentError, linesError)) * Math.sign(this.deltaZ)
-                ];
-            }
-            default:
-                throw new Error(DynMsg.INVALID_ENUM(this.deltaMode, 'PointerWheelMode', 'deltaMode'));
+        case PointerWheelMode.Pixel:
+            return [
+                Math.min(limitX, Math.abs(this.deltaX)) * Math.sign(this.deltaX),
+                Math.min(limitY, Math.abs(this.deltaY)) * Math.sign(this.deltaY),
+                Math.min(limitZ, Math.abs(this.deltaZ)) * Math.sign(this.deltaZ)
+            ];
+        case PointerWheelMode.Line:
+            return [
+                Math.min(limitX, Math.abs(this.deltaX) * lineHeight) * Math.sign(this.deltaX),
+                Math.min(limitY, Math.abs(this.deltaY) * lineHeight) * Math.sign(this.deltaY),
+                Math.min(limitZ, Math.abs(this.deltaZ) * lineHeight) * Math.sign(this.deltaZ)
+            ];
+        case PointerWheelMode.Page:
+        {
+            const linesError = lineHeight * PointerWheel.PageLinesError;
+            return [
+                (Math.abs(this.deltaX) * containerWidth - Math.min(containerWidth * PointerWheel.PagePercentError, linesError)) * Math.sign(this.deltaX),
+                (Math.abs(this.deltaY) * containerHeight - Math.min(containerHeight * PointerWheel.PagePercentError, linesError)) * Math.sign(this.deltaY),
+                (Math.abs(this.deltaZ) * containerDepth - Math.min(containerDepth * PointerWheel.PagePercentError, linesError)) * Math.sign(this.deltaZ)
+            ];
+        }
+        default:
+            throw new Error(DynMsg.INVALID_ENUM(this.deltaMode, 'PointerWheelMode', 'deltaMode'));
         }
     }
 }

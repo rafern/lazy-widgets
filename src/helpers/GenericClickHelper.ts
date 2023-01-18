@@ -44,9 +44,9 @@ export class GenericClickHelper implements BaseClickHelper {
             // area, this was a click
             this.wasClick = inside && this.lastClickState === ClickState.Hold;
             this.clickStateChanged = true;
-        }
-        else
+        } else {
             this.clickStateChanged = false;
+        }
     }
 
     reset(): void {

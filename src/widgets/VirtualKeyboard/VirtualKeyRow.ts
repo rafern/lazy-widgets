@@ -73,15 +73,15 @@ export class VirtualKeyRow extends Row<VirtualKey> {
                 // Entry is in template function format
                 const templateFunction = entry;
                 this.add(templateFunction(keyContext, properties));
-            }
-            else if(typeof entry[0] === 'string' && typeof entry[1] === 'string') {
+            } else if(typeof entry[0] === 'string' && typeof entry[1] === 'string') {
                 // Entry is in multiple glyphs format
                 const glyphs = entry[0];
                 const altGlyphs = entry[1];
                 for(let i = 0; i < glyphs.length; i++) {
                     let altGlyph = null;
-                    if(i < altGlyphs.length)
+                    if(i < altGlyphs.length) {
                         altGlyph = altGlyphs[i];
+                    }
 
                     this.add(new GlyphVirtualKey(
                         glyphs[i],
@@ -92,8 +92,7 @@ export class VirtualKeyRow extends Row<VirtualKey> {
                         properties,
                     ));
                 }
-            }
-            else {
+            } else {
                 throw new Error(DynMsg.INVALID_KB_ROW_TEMPLATE(entry));
             }
         }

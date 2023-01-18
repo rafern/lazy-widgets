@@ -92,15 +92,14 @@ export class ButtonClickHelper extends CompoundClickHelper {
         if(event instanceof PointerWheel) {
             // Ignore wheel events
             return [false, false];
-        }
-        else if(event instanceof KeyEvent) {
+        } else if(event instanceof KeyEvent) {
             // Discard non-enter key events
 
             // don't capture non-enter presses so that tab selection works
-            if(event.key !== 'Enter')
+            if(event.key !== 'Enter') {
                 return [false, false];
-        }
-        else if(!(event instanceof PointerEvent || event instanceof Leave)) {
+            }
+        } else if(!(event instanceof PointerEvent || event instanceof Leave)) {
             // Discard unhandled events
             return [false, false];
         }
@@ -117,12 +116,10 @@ export class ButtonClickHelper extends CompoundClickHelper {
             this.pointerClickHelper.clickStateChanged = false;
             this.keyboardClickHelper.setClickState(ClickState.Hold, true);
             this.widget.autoScroll();
-        }
-        else if(event instanceof KeyRelease) {
+        } else if(event instanceof KeyRelease) {
             this.pointerClickHelper.clickStateChanged = false;
             this.keyboardClickHelper.setClickState(ClickState.Hover, true);
-        }
-        else {
+        } else {
             this.keyboardClickHelper.clickStateChanged = false;
             this.pointerClickHelper.handleClickEvent(event, root, bounds);
         }

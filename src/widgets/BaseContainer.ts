@@ -34,13 +34,13 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         if(property === null) {
             this._layoutDirty = true;
             this.backgroundDirty = true;
-        }
-        else if(property === 'canvasFill')
+        } else if(property === 'canvasFill') {
             this.backgroundDirty = true;
-        else if(property === 'containerPadding')
+        } else if(property === 'containerPadding') {
             this._layoutDirty = true;
-        else if(property === 'containerAlignment')
+        } else if(property === 'containerAlignment') {
             this._layoutDirty = true;
+        }
     }
 
     protected override handleEvent(event: Event): Widget | null {
@@ -54,8 +54,9 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         child.preLayoutUpdate();
 
         // If child's layout is dirty, set self's layout as dirty
-        if(child.layoutDirty)
+        if(child.layoutDirty) {
             this._layoutDirty = true;
+        }
     }
 
     protected override handlePostLayoutUpdate(): void {
@@ -64,12 +65,14 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         child.postLayoutUpdate();
 
         // If child is dirty, set self as dirty
-        if(child.dirty)
+        if(child.dirty) {
             this._dirty = true;
+        }
 
         // If background is dirty, set self as dirty
-        if(this.backgroundDirty)
+        if(this.backgroundDirty) {
             this._dirty = true;
+        }
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
@@ -82,10 +85,12 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
 
         // If there isn't enough space for padding, resolve child's layout with
         // a tight fit of 0 for axis with lack of space
-        if(childMaxWidth < 0)
+        if(childMaxWidth < 0) {
             childMaxWidth = 0;
-        if(childMaxHeight < 0)
+        }
+        if(childMaxHeight < 0) {
             childMaxHeight = 0;
+        }
 
         // Provide minimum constraints if using stretch alignment, correcting
         // for padding. If maximum constraints are available (not infinite), use
@@ -93,18 +98,20 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         const alignment = this.containerAlignment;
         let childMinWidth = 0;
         if(alignment.horizontal === Alignment.Stretch) {
-            if(childMaxWidth !== Infinity)
+            if(childMaxWidth !== Infinity) {
                 childMinWidth = childMaxWidth;
-            else
+            } else {
                 childMinWidth = Math.max(minWidth - hPadding, 0);
+            }
         }
 
         let childMinHeight = 0;
         if(alignment.vertical === Alignment.Stretch) {
-            if(childMaxHeight !== Infinity)
+            if(childMaxHeight !== Infinity) {
                 childMinHeight = childMaxHeight;
-            else
+            } else {
                 childMinHeight = Math.max(minHeight - vPadding, 0);
+            }
         }
 
         // Resolve child's dimensions
@@ -119,8 +126,9 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
 
         // Mark background as dirty if own size or child's size changed
         if(this.idealWidth !== oldWidth || this.idealHeight !== oldHeight ||
-           childWidth !== oldChildWidth || childHeight !== oldChildHeight)
+           childWidth !== oldChildWidth || childHeight !== oldChildHeight) {
             this.backgroundDirty = true;
+        }
     }
 
     override resolvePosition(x: number, y: number): void {
@@ -145,8 +153,9 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
             // even get the space they requested or just enough space. If there
             // is free space, distribute free space according to chosen
             // alignment ratio
-            if(freeSpace > 0)
+            if(freeSpace > 0) {
                 childX += freeSpace * alignment.horizontal;
+            }
         }
 
         // Vertical offset
@@ -155,8 +164,9 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
             // Same logic as above, but for vertical axis
             const freeSpace = this.idealHeight - usedHeight;
 
-            if(freeSpace > 0)
+            if(freeSpace > 0) {
                 childY += freeSpace * alignment.vertical;
+            }
         }
 
         // Resolve child's position
@@ -164,8 +174,9 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         this.child.resolvePosition(childX, childY);
 
         // If child's position changed, mark background as dirty
-        if(oldChildX !== childX || oldChildY !== childY)
+        if(oldChildX !== childX || oldChildY !== childY) {
             this.backgroundDirty = true;
+        }
     }
 
     /**

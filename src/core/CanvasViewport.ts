@@ -98,8 +98,9 @@ export class CanvasViewport extends BaseViewport {
 
         // Get context out of canvas
         const context = this.canvas.getContext('2d', { alpha: true });
-        if(context === null)
+        if(context === null) {
             throw new Error(Msg.CANVAS_CONTEXT);
+        }
 
         this.context = context;
         this.child.forceDirty();
@@ -136,8 +137,9 @@ export class CanvasViewport extends BaseViewport {
 
             const [realWidth, realHeight] = this.realDimensions;
 
-            if(oldRealWidth > realWidth || oldRealHeight > realHeight)
+            if(oldRealWidth > realWidth || oldRealHeight > realHeight) {
                 this.shrunk = true;
+            }
 
             // Canvas dimensions are rounded to the nearest power of 2, favoring
             // bigger powers. This is to avoid issues with mipmapping, which
@@ -154,8 +156,7 @@ export class CanvasViewport extends BaseViewport {
                     BaseViewport.dimensionlessWarned = true;
                     console.warn(Msg.DIMENSIONLESS_CANVAS);
                 }
-            }
-            else if(!isPower2(newCanvasWidth) || !isPower2(newCanvasHeight)) {
+            } else if(!isPower2(newCanvasWidth) || !isPower2(newCanvasHeight)) {
                 if(!BaseViewport.powerOf2Warned) {
                     BaseViewport.powerOf2Warned = true;
                     console.warn(Msg.NON_POW2_CANVAS);
@@ -197,8 +198,9 @@ export class CanvasViewport extends BaseViewport {
                     copyCanvas.height = oldCanvasHeight;
 
                     const copyCtx = copyCanvas.getContext('2d');
-                    if(copyCtx === null)
+                    if(copyCtx === null) {
                         throw new Error(Msg.CANVAS_CONTEXT);
+                    }
 
                     copyCtx.globalCompositeOperation = 'copy';
                     copyCtx.drawImage(
@@ -269,8 +271,9 @@ export class CanvasViewport extends BaseViewport {
 
         this.child.paint(force);
 
-        if(needsScale)
+        if(needsScale) {
             this.context.restore();
+        }
 
         // prevent bleeding by clearing out-of-bounds parts of canvas
         if(this.preventBleeding && this.shrunk) {
@@ -285,12 +288,10 @@ export class CanvasViewport extends BaseViewport {
                 // on the right and a big rectangle on the bottom
                 this.context.clearRect(realWidth, 0, rightSpace, realHeight);
                 this.context.clearRect(0, realHeight, this.maxCanvasWidth, this.maxCanvasHeight);
-            }
-            else if(rightSpace > 0) {
+            } else if(rightSpace > 0) {
                 // clear right
                 this.context.clearRect(realWidth, 0, rightSpace, this.maxCanvasHeight);
-            }
-            else if(bottomSpace > 0) {
+            } else if(bottomSpace > 0) {
                 // clear bottom
                 this.context.clearRect(0, realHeight, this.maxCanvasWidth, this.maxCanvasHeight);
             }

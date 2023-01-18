@@ -30,16 +30,17 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
                 this._children.push(child);
                 child.inheritedTheme = this.inheritedTheme;
 
-                if(isAttached)
+                if(isAttached) {
                     child.attach(this.root, this.viewport, this);
+                }
             }
-        }
-        else {
+        } else {
             this._children.push(children);
             children.inheritedTheme = this.inheritedTheme;
 
-            if(this.attached)
+            if(this.attached) {
                 children.attach(this.root, this.viewport, this);
+            }
         }
 
         this.forceDirty();
@@ -61,19 +62,22 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
             for(const child of children) {
                 const pos = this._children.indexOf(child);
 
-                if(pos !== -1)
+                if(pos !== -1) {
                     this._children.splice(pos, 1);
-                if(isAttached)
+                }
+                if(isAttached) {
                     child.detach();
+                }
             }
-        }
-        else {
+        } else {
             const pos = this._children.indexOf(children);
 
-            if(pos !== -1)
+            if(pos !== -1) {
                 this._children.splice(pos, 1);
-            if(isAttached)
+            }
+            if(isAttached) {
                 children.detach();
+            }
         }
 
         this.forceDirty();
@@ -89,8 +93,9 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
      */
     clearChildren(): this {
         if(this.attached) {
-            for(const child of this._children)
+            for(const child of this._children) {
                 child.detach();
+            }
         }
 
         this._children.length = 0;

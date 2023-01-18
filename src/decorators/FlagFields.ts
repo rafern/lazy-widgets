@@ -65,8 +65,9 @@ export const layoutField = flagField('_layoutDirty');
 export function multiFlagField(flagKeys: Array<string | symbol>): PropertyDecorator {
     // eslint-disable-next-line @typescript-eslint/ban-types
     return watchField(function(this: Object, _oldValue) {
-        for(const flagKey of flagKeys)
+        for(const flagKey of flagKeys) {
             (this as Record<string | symbol, unknown>)[flagKey] = true;
+        }
     });
 }
 
@@ -100,16 +101,17 @@ export function watchArrayField(callback: () => void, allowNonArrays = false): P
                     if(Array.isArray(curTuple)) {
                         if(value.length !== curTuple.length) {
                             curTuple.length = value.length;
-                            for(let i = 0; i < value.length; i++)
+                            for(let i = 0; i < value.length; i++) {
                                 curTuple[i] = value[i];
+                            }
 
                             callback.call(this);
-                        }
-                        else {
+                        } else {
                             for(let i = 0; i < value.length; i++) {
                                 if(curTuple[i] !== value[i]) {
-                                    for(let j = 0; j < value.length; j++)
+                                    for(let j = 0; j < value.length; j++) {
                                         curTuple[j] = value[j];
+                                    }
 
                                     callback.call(this);
 
@@ -117,25 +119,24 @@ export function watchArrayField(callback: () => void, allowNonArrays = false): P
                                 }
                             }
                         }
-                    }
-                    else {
+                    } else {
                         curValues.set(this, [...value]);
                         callback.call(this);
                     }
-                }
-                else {
+                } else {
                     if(allowNonArrays) {
                         curValues.set(this, value);
                         callback.call(this);
-                    }
-                    else
+                    } else {
                         throw new Error(DynMsg.NON_ARRAY_VALUE(propertyKey, value));
+                    }
                 }
             },
             get: function() {
                 const curTuple = curValues.get(this);
-                if(!Array.isArray(curTuple))
+                if(!Array.isArray(curTuple)) {
                     return curTuple;
+                }
 
                 return [...curTuple];
             },
@@ -189,8 +190,9 @@ export function layoutArrayField(allowNonArrays = false): PropertyDecorator {
 export function multiFlagArrayField(flagKeys: Array<string>, allowNonArrays = false): PropertyDecorator {
     // eslint-disable-next-line @typescript-eslint/ban-types
     return watchArrayField(function(this: Object) {
-        for(const flagKey of flagKeys)
+        for(const flagKey of flagKeys) {
             (this as Record<string | symbol, unknown>)[flagKey] = true;
+        }
     }, allowNonArrays);
 }
 

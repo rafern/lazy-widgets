@@ -79,18 +79,23 @@ export class Slider extends Widget {
         // events
         super(false, properties);
 
-        if(maxValue < minValue)
+        if(maxValue < minValue) {
             throw new Error(DynMsg.SWAPPED_MIN_MAX(minValue, maxValue));
-        if(!isFinite(minValue) || isNaN(minValue))
+        }
+        if(!isFinite(minValue) || isNaN(minValue)) {
             throw new Error(DynMsg.INVALID_MIN(minValue));
-        if(!isFinite(maxValue) || isNaN(maxValue))
+        }
+        if(!isFinite(maxValue) || isNaN(maxValue)) {
             throw new Error(DynMsg.INVALID_MAX(maxValue));
+        }
 
         const snapIncrement = properties?.snapIncrement ?? 0;
-        if(!isFinite(snapIncrement) || isNaN(snapIncrement))
+        if(!isFinite(snapIncrement) || isNaN(snapIncrement)) {
             throw new Error(DynMsg.INVALID_INC(maxValue));
-        if(snapIncrement < 0)
+        }
+        if(snapIncrement < 0) {
             throw new Error(DynMsg.NEGATIVE_INC(maxValue));
+        }
 
         this.clickHelper = new ClickHelper(this);
         this.minValue = minValue;
@@ -132,10 +137,11 @@ export class Slider extends Widget {
 
     /** Clamp a value to this slider's min and max values */
     protected clamp(value: number): number {
-        if(value < this.minValue)
+        if(value < this.minValue) {
             value = this.minValue;
-        else if(value > this.maxValue)
+        } else if(value > this.maxValue) {
             value = this.maxValue;
+        }
 
         return value;
     }
@@ -143,8 +149,9 @@ export class Slider extends Widget {
     /** Set the slider's value, optionally disabling callback */
     setValue(value: number, doCallback = true): void {
         // Snap to increments if needed
-        if(this.snapIncrement > 0)
+        if(this.snapIncrement > 0) {
             value = Math.round(value / this.snapIncrement) * this.snapIncrement;
+        }
 
         // Update value in variable
         this.variable.setValue(this.clamp(value), doCallback);
@@ -154,8 +161,9 @@ export class Slider extends Widget {
         // Get snap increment. If the increment is not set, default to 1% of the
         // value range
         let effectiveIncrement = this.snapIncrement;
-        if(effectiveIncrement === 0)
+        if(effectiveIncrement === 0) {
             effectiveIncrement = 0.01 * (this.maxValue - this.minValue);
+        }
 
         // Multiply increment (for holding shift)
         effectiveIncrement *= incMul;
@@ -171,47 +179,50 @@ export class Slider extends Widget {
         if(property === null) {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'sliderThickness' ||
-                property === 'sliderMinLength')
-        {
+        } else if(property === 'sliderThickness' ||
+                property === 'sliderMinLength') {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'accentFill' ||
+        } else if(property === 'accentFill' ||
                 property === 'primaryFill' ||
-                property === 'backgroundFill')
+                property === 'backgroundFill') {
             this._dirty = true;
+        }
     }
 
     override onFocusGrabbed(focusType: FocusType): void {
-        if(focusType === FocusType.Keyboard)
+        if(focusType === FocusType.Keyboard) {
             this.keyboardFocused = true;
+        }
     }
 
     override onFocusDropped(focusType: FocusType): void {
-        if(focusType === FocusType.Keyboard)
+        if(focusType === FocusType.Keyboard) {
             this.keyboardFocused = false;
+        }
     }
 
     protected override handleEvent(event: Event): this | null {
         // Ignore unhandled events
-        if(event instanceof PointerWheel || !(event instanceof PointerEvent || event instanceof KeyEvent || event instanceof Leave))
+        if(event instanceof PointerWheel || !(event instanceof PointerEvent || event instanceof KeyEvent || event instanceof Leave)) {
             return null;
+        }
 
         // Ignore tab key presses so tab selection works, and escape so widget
         // unfocusing works
-        if(event instanceof KeyPress && (event.key === 'Tab' || event.key === 'Escape'))
+        if(event instanceof KeyPress && (event.key === 'Tab' || event.key === 'Escape')) {
             return null;
+        }
 
         // Handle key presses
         if(event instanceof KeyEvent) {
             if(event instanceof KeyPress) {
                 const incMul = event.shift ? 10 : 1;
-                if(event.key === 'ArrowLeft' || event.key === 'ArrowDown')
+                if(event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
                     this.stepValue(false, incMul);
-                else if(event.key === 'ArrowRight' || event.key === 'ArrowUp')
+                } else if(event.key === 'ArrowRight' || event.key === 'ArrowUp') {
                     this.stepValue(true, incMul);
+                }
             }
 
             return this;
@@ -240,8 +251,9 @@ export class Slider extends Widget {
 
         // Always flag as dirty if the click state changed (so glow colour takes
         // effect)
-        if(this.clickHelper.clickStateChanged)
+        if(this.clickHelper.clickStateChanged) {
             this._dirty = true;
+        }
 
         return this;
     }
@@ -255,21 +267,22 @@ export class Slider extends Widget {
         // axis
         if(this.vertical) {
             // Main axis
-            if(maxHeight != Infinity)
+            if(maxHeight != Infinity) {
                 this.idealHeight = maxHeight;
-            else
+            } else {
                 this.idealHeight = Math.max(minLength, minHeight);
+            }
 
             // Cross axis
             this.idealWidth = Math.min(Math.max(thickness, minWidth), maxWidth);
 
-        }
-        else {
+        } else {
             // Main axis
-            if(maxWidth != Infinity)
+            if(maxWidth != Infinity) {
                 this.idealWidth = maxWidth;
-            else
+            } else {
                 this.idealWidth = Math.max(minLength, minWidth);
+            }
 
             // Cross axis
             this.idealHeight = Math.min(Math.max(thickness, minHeight), maxHeight);
@@ -285,8 +298,7 @@ export class Slider extends Widget {
             this.actualHeight = this.height;
             this.offsetX = (this.width - this.actualWidth) / 2;
             this.offsetY = 0;
-        }
-        else {
+        } else {
             this.actualWidth = this.width;
             this.actualHeight = Math.min(this.height, this.sliderThickness);
             this.offsetX = 0;
@@ -302,18 +314,20 @@ export class Slider extends Widget {
         // Draw filled part of slider. Use accent colour if hovering or holding
         const ctx = this.viewport.context;
         const useGlow = this.keyboardFocused || this.clickHelper.clickState === ClickState.Hover || this.clickHelper.clickState === ClickState.Hold;
-        if(useGlow)
+        if(useGlow) {
             ctx.fillStyle = this.accentFill;
-        else
+        } else {
             ctx.fillStyle = this.primaryFill;
+        }
         const fullWidth = this.actualWidth * (this.value - this.minValue) / (this.maxValue - this.minValue);
         ctx.fillRect(x, y, fullWidth, this.actualHeight);
 
         // Draw empty part of slider
-        if(useGlow)
+        if(useGlow) {
             ctx.fillStyle = this.backgroundGlowFill;
-        else
+        } else {
             ctx.fillStyle = this.backgroundFill;
+        }
         const emptyWidth = this.actualWidth - fullWidth;
         ctx.fillRect(x + fullWidth, y, emptyWidth, this.actualHeight);
     }

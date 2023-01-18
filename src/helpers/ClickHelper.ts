@@ -93,17 +93,16 @@ export class ClickHelper extends GenericClickHelper {
             root.dropFocus(FocusType.Pointer, this.widget);
             this.pointerPos = null;
             return this.setClickState(ClickState.Released, false);
-        }
-        else if(event instanceof PointerEvent) {
+        } else if(event instanceof PointerEvent) {
             // Normalise pointer coordinates in click area
             this.pointerPos = this.getNormalInRect(event.x, event.y, ...bounds);
 
             // If pointer is over the clickable rectangle, then change the
             // pointer style, else, if not targetted, drop focus
             const inside = this.isNormalInRect(...this.pointerPos);
-            if(inside)
+            if(inside) {
                 root.pointerStyle = 'pointer';
-            else if(event.target === null) {
+            } else if(event.target === null) {
                 root.dropFocus(FocusType.Pointer, this.widget);
                 return this.setClickState(ClickState.Released, false);
             }
@@ -119,20 +118,22 @@ export class ClickHelper extends GenericClickHelper {
             // If this is a release event, drop focus. Ignore if wrong button
             if(event instanceof PointerRelease && event.button === this.pointerButton) {
                 root.dropFocus(FocusType.Pointer, this.widget);
-                if(inside)
+                if(inside) {
                     return this.setClickState(ClickState.Hover, inside);
-                else
+                } else {
                     return this.setClickState(ClickState.Released, inside);
+                }
             }
 
             // If event was focused, then it's a hold, else, it's a hover
-            if(event.target === null)
+            if(event.target === null) {
                 return this.setClickState(ClickState.Hover, inside);
-            else
+            } else {
                 return this.setClickState(ClickState.Hold, inside);
-        }
-        else
+            }
+        } else {
             this.clickStateChanged = false;
+        }
     }
 
     override reset(): void {

@@ -37,12 +37,14 @@ export class KeyboardDriver implements Driver {
      * disabled, making it not present in eventQueues, then null is returned.
      */
     private getEventQueue(root: Root | null): Array<KeyEvent> | null {
-        if(root === null)
+        if(root === null) {
             return null;
+        }
 
         const eventQueue = this.eventQueues.get(root);
-        if(typeof eventQueue === 'undefined')
+        if(typeof eventQueue === 'undefined') {
             return null;
+        }
 
         return eventQueue;
     }
@@ -56,11 +58,13 @@ export class KeyboardDriver implements Driver {
      * {@link KeyboardDriver#keysDown} is cleared.
      */
     protected changeFocusedRoot(root: Root | null): void {
-        if(this.focus === root)
+        if(this.focus === root) {
             return;
+        }
 
-        if(this.focus !== null)
+        if(this.focus !== null) {
             this.focus.clearFocus(FocusType.Keyboard);
+        }
 
         this.focus = root;
         this.keysDown.clear();
@@ -82,14 +86,15 @@ export class KeyboardDriver implements Driver {
      * lastActivity is also null.
      */
     getEffectiveFocusedRoot(): Root | null {
-        if(this.focus)
+        if(this.focus) {
             return this.focus;
-        else if(this.lastActivity)
+        } else if(this.lastActivity) {
             return this.lastActivity;
-        else if(this.eventQueues.size > 0)
+        } else if(this.eventQueues.size > 0) {
             return this.eventQueues.keys().next().value;
-        else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -111,8 +116,9 @@ export class KeyboardDriver implements Driver {
     keyDown(key: string, shift: boolean, ctrl: boolean, alt: boolean): void {
         this.keysDown.add(key);
         const eventQueue = this.getEventQueue(this.getEffectiveFocusedRoot());
-        if(eventQueue !== null)
+        if(eventQueue !== null) {
             eventQueue.push(new KeyPress(key, shift, ctrl, alt, null));
+        }
     }
 
     /**
@@ -126,8 +132,9 @@ export class KeyboardDriver implements Driver {
     keyUp(key: string, shift: boolean, ctrl: boolean, alt: boolean): void {
         if(this.keysDown.delete(key)) {
             const eventQueue = this.getEventQueue(this.getEffectiveFocusedRoot());
-            if(eventQueue !== null)
+            if(eventQueue !== null) {
                 eventQueue.push(new KeyRelease(key, shift, ctrl, alt, null));
+            }
         }
     }
 
@@ -144,8 +151,9 @@ export class KeyboardDriver implements Driver {
     keyPress(key: string, shift: boolean, ctrl: boolean, alt: boolean): void {
         const wasDown = this.isKeyDown(key);
         this.keyDown(key, shift, ctrl, alt);
-        if(!wasDown)
+        if(!wasDown) {
             this.keyUp(key, shift, ctrl, alt);
+        }
     }
 
     /**
@@ -163,8 +171,9 @@ export class KeyboardDriver implements Driver {
      * Adds enabled root to {@link KeyboardDriver#eventQueues}.
      */
     onEnable(root: Root): void {
-        if(!this.eventQueues.has(root))
+        if(!this.eventQueues.has(root)) {
             this.eventQueues.set(root, []);
+        }
     }
 
     /**
@@ -175,8 +184,9 @@ export class KeyboardDriver implements Driver {
     onDisable(root: Root): void {
         if(this.eventQueues.has(root)) {
             this.eventQueues.delete(root);
-            if(root === this.focus)
+            if(root === this.focus) {
                 this.clearFocus();
+            }
         }
     }
 
@@ -186,12 +196,14 @@ export class KeyboardDriver implements Driver {
      */
     update(root: Root): void {
         const eventQueue = this.getEventQueue(root);
-        if(eventQueue === null)
+        if(eventQueue === null) {
             return;
+        }
 
         // Dispatch queued keyboard events
-        for(const event of eventQueue)
+        for(const event of eventQueue) {
             root.dispatchEvent(event);
+        }
 
         // Clear event queue
         eventQueue.length = 0;
@@ -214,14 +226,17 @@ export class KeyboardDriver implements Driver {
      * selection.
      */
     onFocusChanged(root: Root, focusType: FocusType, newFocus: Widget | null): void {
-        if(newFocus !== null)
+        if(newFocus !== null) {
             this.lastActivity = root;
+        }
 
-        if(focusType !== FocusType.Keyboard)
+        if(focusType !== FocusType.Keyboard) {
             return;
+        }
 
-        if(root !== this.focus && newFocus !== null)
+        if(root !== this.focus && newFocus !== null) {
             this.changeFocusedRoot(root);
+        }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function

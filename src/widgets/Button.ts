@@ -39,8 +39,7 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
         if(this.callback !== null) {
             try {
                 this.callback();
-            }
-            catch(e) {
+            } catch(e) {
                 console.error('Exception in Icon callback:', e);
             }
         }
@@ -64,8 +63,9 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
             event, this.root, this.callback !== null, this.bounds
         );
 
-        if(wasClick)
+        if(wasClick) {
             this.click();
+        }
 
         return capture ? this : null;
     }

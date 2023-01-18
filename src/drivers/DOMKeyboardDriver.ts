@@ -75,12 +75,13 @@ export class DOMKeyboardDriver extends KeyboardDriver {
     /** Calls preventDefault on a keyboard event if needed. */
     maybePreventDefault(event: KeyboardEvent): void {
         if(PREVENT_DEFAULT_KEYS.has(event.key) || (PREVENT_DEFAULT_CTRL_KEYS.has(event.key) && event.ctrlKey)) {
-            if(PREVENT_DEFAULT_FORCE_KEYS.has(event.key))
+            if(PREVENT_DEFAULT_FORCE_KEYS.has(event.key)) {
                 event.preventDefault();
-            else {
+            } else {
                 const currentFocus = this.getFocusedRoot()?.getFocus(FocusType.Keyboard) ?? null;
-                if(currentFocus !== null)
+                if(currentFocus !== null) {
                     event.preventDefault();
+                }
             }
         }
     }
@@ -100,8 +101,7 @@ export class DOMKeyboardDriver extends KeyboardDriver {
         if(bind !== undefined) {
             console.warn(Msg.DOM_DRIVER_REBIND);
             this.removeListeners(domElem, bind);
-        }
-        else {
+        } else {
             bind = <DOMKeyboardDriverBind>{
                 blurListen: null,
                 keydownListen: null,
@@ -119,8 +119,9 @@ export class DOMKeyboardDriver extends KeyboardDriver {
      */
     unbindDOMElem(domElem: HTMLElement): void {
         const bind = this.domElems.get(domElem);
-        if(bind === undefined)
+        if(bind === undefined) {
             return;
+        }
 
         this.removeListeners(domElem, bind);
         this.domElems.delete(domElem);
@@ -132,8 +133,9 @@ export class DOMKeyboardDriver extends KeyboardDriver {
         // clearing keyboard focus
         bind.blurListen = (event) => {
             // XXX should the HTMLElement cast be done?
-            if(this.shouldClearFocus(event.relatedTarget as HTMLElement))
+            if(this.shouldClearFocus(event.relatedTarget as HTMLElement)) {
                 this.clearFocus();
+            }
         };
 
         domElem.addEventListener('blur', bind.blurListen);

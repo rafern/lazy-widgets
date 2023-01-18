@@ -61,8 +61,9 @@ export class PointerDriver implements Driver {
     /** Unassign a pointer from a given root and its state. */
     private unassignPointer(root: Root, state: PointerDriverState) {
         // Clear pointer state
-        if(state.pointer !== null)
+        if(state.pointer !== null) {
             this.setPointerHint(state.pointer, PointerHint.None);
+        }
 
         // Clear state
         state.pointer = null;
@@ -100,8 +101,9 @@ export class PointerDriver implements Driver {
     unregisterPointer(pointer: number): void {
         for(const [root, state] of this.states) {
             // Unassign pointer if unregistered pointer was assigned to root
-            if(state.pointer === pointer)
+            if(state.pointer === pointer) {
                 this.unassignPointer(root, state);
+            }
         }
 
         this.hints.delete(pointer);
@@ -118,8 +120,9 @@ export class PointerDriver implements Driver {
     private canQueueEvent(root: Root, pointer: number, state: PointerDriverState, givingActiveInput: boolean): boolean {
         // If there is no pointer assigned, assign this one
         const firstAssign = state.pointer === null;
-        if(firstAssign)
+        if(firstAssign) {
             state.pointer = pointer;
+        }
 
         // If pointer is entering this root for the first time, then find which
         // root the pointer was assigned to and queue a leave event
@@ -127,20 +130,22 @@ export class PointerDriver implements Driver {
         if(!pointerMatches || firstAssign) {
             for(const [otherRoot, otherState] of this.states) {
                 // Ignore if its this root
-                if(otherRoot === root)
+                if(otherRoot === root) {
                     continue;
+                }
 
                 // If other root has this pointer assigned, unassign it
-                if(otherState.pointer === pointer)
+                if(otherState.pointer === pointer) {
                     this.unassignPointer(otherRoot, otherState);
+                }
             }
         }
 
         // Ignore if pointer is not the assigned one and not giving active input
         // or being pressed by the assigned pointer
-        if(!pointerMatches && (!givingActiveInput || state.pressing > 0))
+        if(!pointerMatches && (!givingActiveInput || state.pressing > 0)) {
             return false;
-        else {
+        } else {
             // Replace assigned pointer and clear old assigned pointer's hint if
             // pointer changed and giving active input
             if(givingActiveInput && state.pointer !== pointer) {
@@ -178,17 +183,20 @@ export class PointerDriver implements Driver {
      */
     movePointer(root: Root, pointer: number, xNorm: number, yNorm: number, pressing: number | null, shift: boolean, ctrl: boolean, alt: boolean): void {
         const state = this.states.get(root);
-        if(typeof state === 'undefined')
+        if(typeof state === 'undefined') {
             return;
+        }
 
         // If press state was not supplied, then it hasn't changed. Use the last
         // state
-        if(pressing === null)
+        if(pressing === null) {
             pressing = state.pressing;
+        }
 
         // Abort if this pointer can't queue an event to the target root
-        if(!this.canQueueEvent(root, pointer, state, pressing > 0))
+        if(!this.canQueueEvent(root, pointer, state, pressing > 0)) {
             return;
+        }
 
         // Update state and queue up event
         state.hovering = true;
@@ -202,25 +210,28 @@ export class PointerDriver implements Driver {
                 const wasPressed = ((state.pressing >> bit) & 0x1) === 1;
                 const isPressed = ((pressing >> bit) & 0x1) === 1;
 
-                if(wasPressed === isPressed)
+                if(wasPressed === isPressed) {
                     continue;
+                }
 
-                if(isPressed)
+                if(isPressed) {
                     state.eventQueue.push(new PointerPress(x, y, bit, shift, ctrl, alt));
-                else
+                } else {
                     state.eventQueue.push(new PointerRelease(x, y, bit, shift, ctrl, alt));
+                }
             }
 
             state.pressing = pressing;
-        }
-        else
+        } else {
             state.eventQueue.push(new PointerMove(x, y, shift, ctrl, alt));
+        }
 
         // Update pointer's hint
-        if(state.pressing > 0)
+        if(state.pressing > 0) {
             this.setPointerHint(pointer, PointerHint.Pressing);
-        else
+        } else {
             this.setPointerHint(pointer, PointerHint.Hovering);
+        }
     }
 
     /**
@@ -231,8 +242,9 @@ export class PointerDriver implements Driver {
      */
     leavePointer(root: Root, pointer: number): void {
         const state = this.states.get(root);
-        if(typeof state === 'undefined')
+        if(typeof state === 'undefined') {
             return;
+        }
 
         // Queue leave event if this is the assigned pointer and if hovering
         if(state.hovering && state.pointer == pointer) {
@@ -254,8 +266,9 @@ export class PointerDriver implements Driver {
      * @param pointer - The registered pointer ID
      */
     leaveAnyPointer(pointer: number): void {
-        for(const root of this.states.keys())
+        for(const root of this.states.keys()) {
             this.leavePointer(root, pointer);
+        }
     }
 
     /**
@@ -275,12 +288,14 @@ export class PointerDriver implements Driver {
      */
     wheelPointer(root: Root, pointer: number, xNorm: number, yNorm: number, deltaX: number, deltaY: number, deltaZ: number, deltaMode: PointerWheelMode, shift: boolean, ctrl: boolean, alt: boolean): void {
         const state = this.states.get(root);
-        if(typeof state === 'undefined')
+        if(typeof state === 'undefined') {
             return;
+        }
 
         // Abort if this pointer can't queue an event to the target root
-        if(!this.canQueueEvent(root, pointer, state, true))
+        if(!this.canQueueEvent(root, pointer, state, true)) {
             return;
+        }
 
         // Update state and queue up event
         state.hovering = true;
@@ -301,9 +316,9 @@ export class PointerDriver implements Driver {
         if(oldHint !== hint) {
             this.hints.set(pointer, hint);
             return true;
-        }
-        else
+        } else {
             return false;
+        }
     }
 
     /**
@@ -357,13 +372,14 @@ export class PointerDriver implements Driver {
      */
     update(root: Root): void {
         const state = this.states.get(root);
-        if(typeof state === 'undefined')
+        if(typeof state === 'undefined') {
             return;
+        }
 
         // Check if drag to scroll is enabled for this root
         const dragToScroll = state.pointer === null
-                                ? false
-                                : this.dragToScroll.get(state.pointer);
+            ? false
+            : this.dragToScroll.get(state.pointer);
 
         // Dispatch all queued events for this root
         for(const event of state.eventQueue) {
@@ -377,9 +393,9 @@ export class PointerDriver implements Driver {
                     PointerWheelMode.Pixel, false, false, false, true,
                 ));
 
-                if(event instanceof PointerRelease)
+                if(event instanceof PointerRelease) {
                     state.dragLast = null;
-                else {
+                } else {
                     state.dragLast[0] = event.x;
                     state.dragLast[1] = event.y;
                 }
@@ -389,9 +405,9 @@ export class PointerDriver implements Driver {
 
             // Dispatch event. If nobody captures the event, dragToScroll is
             // enabled and this is a pointer press, then start dragging
-            if(root.dispatchEvent(event))
+            if(root.dispatchEvent(event)) {
                 state.dragLast = null;
-            else if(dragToScroll && event instanceof PointerPress) {
+            } else if(dragToScroll && event instanceof PointerPress) {
                 state.dragLast = [event.x, event.y];
                 state.dragOrigin[0] = event.x;
                 state.dragOrigin[1] = event.y;

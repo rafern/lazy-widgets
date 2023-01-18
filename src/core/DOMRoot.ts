@@ -37,8 +37,9 @@ export class DOMRoot extends Root {
         this.updateDOMDims();
 
         const context = this.domElem.getContext('2d', { alpha: true });
-        if(context === null)
+        if(context === null) {
             throw new Error(Msg.REUSABLE_CANVAS_CONTEXT);
+        }
 
         this.domCanvasContext = context;
 
@@ -52,8 +53,9 @@ export class DOMRoot extends Root {
         // Listen to paste events
         this.domElem.addEventListener('paste', event => {
             event.preventDefault();
-            if(event.clipboardData !== null)
+            if(event.clipboardData !== null) {
                 this.dispatchEvent(new TextPasteEvent(event.clipboardData.getData('text')));
+            }
         });
         this.domElem.contentEditable = 'true';
 
@@ -76,9 +78,9 @@ export class DOMRoot extends Root {
         if(!this.enabled) {
             this.domElem.style.display = 'none';
             return;
-        }
-        else
+        } else {
             this.domElem.style.removeProperty('display');
+        }
 
         this.preLayoutUpdate();
         if(this.resolveLayout()) {

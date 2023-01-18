@@ -45,31 +45,34 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         if(property === null) {
             this._layoutDirty = true;
             this.backgroundDirty = true;
-        }
-        else if(property === 'canvasFill')
+        } else if(property === 'canvasFill') {
             this.backgroundDirty = true;
-        else if(property === 'multiContainerAlignment')
+        } else if(property === 'multiContainerAlignment') {
             this._layoutDirty = true;
-        else if(property === 'multiContainerSpacing')
+        } else if(property === 'multiContainerSpacing') {
             this._layoutDirty = true;
+        }
     }
 
     protected override handleEvent(event: Event): Widget | null {
         // Reverse children if necessary
         let children = this.children;
-        if(event.reversed)
+        if(event.reversed) {
             children = Array.from(children).reverse();
+        }
 
         // Find which widget the event should go to
         for(const child of children) {
             // Ignore disabled children
-            if(!child.enabled)
+            if(!child.enabled) {
                 continue;
+            }
 
             // Stop if event was captured
             const captured = child.dispatchEvent(event);
-            if(captured !== null)
+            if(captured !== null) {
                 return captured;
+            }
         }
 
         // Event wasn't dispatched to any child
@@ -82,8 +85,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             child.preLayoutUpdate();
 
             // If child's layout is dirty, set own layoutDirty flag
-            if(child.layoutDirty)
+            if(child.layoutDirty) {
                 this._layoutDirty = true;
+            }
         }
     }
 
@@ -93,8 +97,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             child.postLayoutUpdate();
 
             // If child is dirty, set own dirty flag
-            if(child.dirty)
+            if(child.dirty) {
                 this._dirty = true;
+            }
         }
     }
 
@@ -107,8 +112,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         const alignment = this.multiContainerAlignment;
         if(alignment.cross === Alignment.Stretch) {
             minCrossAxis = this.vertical ? maxWidth : maxHeight;
-            if(minCrossAxis == Infinity)
+            if(minCrossAxis == Infinity) {
                 minCrossAxis = this.vertical ? minWidth : minHeight;
+            }
         }
 
         this.enabledChildCount = 0;
@@ -124,10 +130,11 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             const [oldChildWidth, oldChildHeight] = child.idealDimensions;
 
-            if(this.vertical)
+            if(this.vertical) {
                 child.resolveDimensions(minCrossAxis, maxWidth, 0, Infinity);
-            else
+            } else {
                 child.resolveDimensions(0, Infinity, minCrossAxis, maxHeight);
+            }
 
             const [childWidth, childHeight] = child.idealDimensions;
 
@@ -135,22 +142,25 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             crossLength = Math.max(this.vertical ? childWidth : childHeight, crossLength);
 
             // Mark background as dirty if child's dimensions changed
-            if(childWidth !== oldChildWidth || childHeight !== oldChildHeight)
+            if(childWidth !== oldChildWidth || childHeight !== oldChildHeight) {
                 this.backgroundDirty = true;
+            }
         }
 
         // Clamp cross length
         const minCrossLength = this.vertical ? minWidth : minHeight;
-        if(crossLength < minCrossLength)
+        if(crossLength < minCrossLength) {
             crossLength = minCrossLength;
+        }
 
         // Get free space
         const spacing = this.multiContainerSpacing;
         let usedSpace = Math.max(this.enabledChildCount - 1, 0) * spacing;
         for(const child of this.children) {
             // Ignore disabled children
-            if(!child.enabled)
+            if(!child.enabled) {
                 continue;
+            }
 
             usedSpace += this.vertical ? child.idealDimensions[1] : child.idealDimensions[0];
         }
@@ -166,15 +176,15 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             if(this.vertical) {
                 this.idealWidth = crossLength;
                 this.idealHeight = Math.min(usedSpace, maxHeight);
-            }
-            else {
+            } else {
                 this.idealWidth = Math.min(usedSpace, maxWidth);
                 this.idealHeight = crossLength;
             }
 
             // Mark background as dirty if dimensions changed
-            if(this.idealWidth !== oldWidth || this.idealHeight !== oldHeight)
+            if(this.idealWidth !== oldWidth || this.idealHeight !== oldHeight) {
                 this.backgroundDirty = true;
+            }
 
             // Set unused space to 0; no alignment should be done
             this.unusedSpace = 0;
@@ -185,16 +195,16 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             let spaceLeft = maxLength;
             for(const child of this.children) {
                 // Ignore disabled children
-                if(!child.enabled)
+                if(!child.enabled) {
                     continue;
+                }
 
                 const [oldChildWidth, oldChildHeight] = child.idealDimensions;
 
                 if(this.vertical) {
                     const wantedLength = Math.min(spaceLeft, oldChildHeight);
                     child.resolveDimensions(minCrossAxis, maxWidth, wantedLength, wantedLength);
-                }
-                else {
+                } else {
                     const wantedLength = Math.min(spaceLeft, oldChildWidth);
                     child.resolveDimensions(wantedLength, wantedLength, minCrossAxis, maxHeight);
                 }
@@ -202,11 +212,12 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 const [childWidth, childHeight] = child.idealDimensions;
 
                 // Mark background as dirty if child's dimensions changed
-                if(childWidth !== oldChildWidth || childHeight !== oldChildHeight)
+                if(childWidth !== oldChildWidth || childHeight !== oldChildHeight) {
                     this.backgroundDirty = true;
+                }
 
                 const childLength = this.vertical ? oldChildHeight
-                                                  : oldChildWidth;
+                    : oldChildWidth;
                 spaceLeft = Math.max(0, spaceLeft - childLength - spacing);
             }
 
@@ -217,17 +228,20 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         // free space. Calculate used space after flexbox calculations.
         let usedSpaceAfter = 0;
         let freeSpacePerFlex = 0;
-        if(totalFlex > 0)
+        if(totalFlex > 0) {
             freeSpacePerFlex = freeSpace / totalFlex;
+        }
 
         for(const child of this.children) {
             // Ignore disabled children
-            if(!child.enabled)
+            if(!child.enabled) {
                 continue;
+            }
 
             // Add spacing to used space if this is not the first widget
-            if(usedSpaceAfter !== 0)
+            if(usedSpaceAfter !== 0) {
                 usedSpaceAfter += spacing;
+            }
 
             const dedicatedSpace = freeSpacePerFlex * child.flex;
             const [oldChildWidth, oldChildHeight] = child.idealDimensions;
@@ -237,8 +251,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     minCrossAxis, maxWidth,
                     wantedLength, wantedLength,
                 );
-            }
-            else {
+            } else {
                 const wantedLength = dedicatedSpace + oldChildWidth;
                 child.resolveDimensions(
                     wantedLength, wantedLength,
@@ -250,8 +263,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             usedSpaceAfter += this.vertical ? childHeight : childWidth;
 
             // Mark background as dirty if child's dimensions changed
-            if(childWidth !== oldChildWidth || childHeight !== oldChildHeight)
+            if(childWidth !== oldChildWidth || childHeight !== oldChildHeight) {
                 this.backgroundDirty = true;
+            }
         }
 
         // Resolve width and height
@@ -263,16 +277,16 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             length = maxHeight;
             this.idealWidth = crossLength;
             this.idealHeight = length;
-        }
-        else {
+        } else {
             length = maxWidth;
             this.idealWidth = length;
             this.idealHeight = crossLength;
         }
 
         // Mark background as dirty if dimensions changed
-        if(this.idealWidth !== oldWidth || this.idealHeight !== oldHeight)
+        if(this.idealWidth !== oldWidth || this.idealHeight !== oldHeight) {
             this.backgroundDirty = true;
+        }
 
         // Calculate final unused space; used for alignment. Clamp to zero just
         // in case XXX is that neccessary?
@@ -290,23 +304,27 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         const crossRatio = (alignment.cross === Alignment.Stretch ? 0 : alignment.cross);
         const effectiveChildren = this.enabledChildCount - 1 + (around ? 2 : 0);
         let extraSpacing;
-        if(effectiveChildren <= 0)
+        if(effectiveChildren <= 0) {
             extraSpacing = 0;
-        else
+        } else {
             extraSpacing = this.unusedSpace / effectiveChildren;
+        }
 
         let spacing = this.multiContainerSpacing;
-        if(between)
+        if(between) {
             spacing += extraSpacing;
+        }
 
         let mainOffset = (this.vertical ? y : x) + mainRatio * this.unusedSpace;
-        if(around)
+        if(around) {
             mainOffset += extraSpacing;
+        }
 
         for(const child of this.children) {
             // Ignore disabled children
-            if(!child.enabled)
+            if(!child.enabled) {
                 continue;
+            }
 
             const [oldChildX, oldChildY] = child.idealPosition;
             const [childWidth, childHeight] = child.idealDimensions;
@@ -314,8 +332,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             if(this.vertical) {
                 child.resolvePosition(x + crossRatio * (this.idealWidth - childWidth), mainOffset);
                 mainOffset += childHeight + spacing;
-            }
-            else {
+            } else {
                 child.resolvePosition(mainOffset, y + crossRatio * (this.idealHeight - childHeight));
                 mainOffset += childWidth + spacing;
             }
@@ -323,8 +340,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             const [childX, childY] = child.idealPosition;
 
             // Mark background as dirty if child's position changed
-            if(childX !== oldChildX || childY !== oldChildY)
+            if(childX !== oldChildX || childY !== oldChildY) {
                 this.backgroundDirty = true;
+            }
         }
     }
 
@@ -337,8 +355,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             // Add to clipping region if needed. Don't add disabled children to
             // clipping region
-            if(child.enabled && (this.backgroundDirty || forced))
+            if(child.enabled && (this.backgroundDirty || forced)) {
                 clipRects.push(child.rect);
+            }
         }
 
         // Clear background if needed
@@ -346,8 +365,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             this.clearStart();
             const ctx = this.viewport.context;
             ctx.rect(...this.rect);
-            for(const clipRect of clipRects)
+            for(const clipRect of clipRects) {
                 ctx.rect(...clipRect);
+            }
             this.clearEnd('evenodd');
         }
 

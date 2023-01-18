@@ -12,15 +12,17 @@ import { Msg } from './Strings';
  */
 export class ClippedViewport extends BaseViewport {
     get context(): CanvasRenderingContext2D {
-        if(this.parent === null)
+        if(this.parent === null) {
             throw Msg.PARENTLESS_CLIPVP;
+        }
 
         return this.parent.context;
     }
 
     get effectiveScale(): [scaleX: number, scaleY: number] {
-        if(this.parent === null)
+        if(this.parent === null) {
             throw Msg.PARENTLESS_CLIPVP;
+        }
 
         return this.parent.effectiveScale;
     }

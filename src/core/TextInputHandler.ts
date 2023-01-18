@@ -4,4 +4,4 @@
  *
  * @category Core
  */
- export type TextInputHandler = (initialInput: string) => Promise<string>;
+export type TextInputHandler = (initialInput: string) => Promise<string>;

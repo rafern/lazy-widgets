@@ -48,8 +48,9 @@ export class ValidatedVariable<V, T = V, C extends CallableFunction = ValidatedV
         this.validator = validator;
         this.validate(initialValue);
 
-        if(callback && callNow)
+        if(callback && callNow) {
             this.doCallback(callback);
+        }
     }
 
     /** If true, then the current value is valid. */
@@ -66,8 +67,9 @@ export class ValidatedVariable<V, T = V, C extends CallableFunction = ValidatedV
     }
 
     override setValue(value: V, notify = true): boolean {
-        if(this.value === value)
+        if(this.value === value) {
             return false;
+        }
 
         this.validate(value);
 
@@ -81,8 +83,9 @@ export class ValidatedVariable<V, T = V, C extends CallableFunction = ValidatedV
             // valid is true or false
             this._valid = valid;
 
-            if(valid)
+            if(valid) {
                 this._validValue = validValueCandidate;
+            }
         }
     }
 }

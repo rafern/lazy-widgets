@@ -59,17 +59,15 @@ export class Label extends Widget {
         if(property === null) {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'bodyTextFont' ||
+        } else if(property === 'bodyTextFont' ||
                 property === 'labelMinWidth' ||
                 property === 'labelMinAscent' ||
-                property === 'labelMinDescent')
-        {
+                property === 'labelMinDescent') {
             this._layoutDirty = true;
             this._dirty = true;
-        }
-        else if(property === 'bodyTextFill')
+        } else if(property === 'bodyTextFill') {
             this._dirty = true;
+        }
     }
 
     protected override handlePreLayoutUpdate(): void {
@@ -89,8 +87,9 @@ export class Label extends Widget {
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
         this.textHelper.maxWidth = maxWidth;
-        if(this.textHelper.dirty)
+        if(this.textHelper.dirty) {
             this._dirty = true;
+        }
 
         // extra spacing is added so that there is enough height to center the
         // text
@@ -117,7 +116,8 @@ export class Label extends Widget {
         this.textHelper.paint(ctx, this.bodyTextFill, this.idealX, this.idealY + yOffset);
 
         // Stop clipping if clipping was applied
-        if(needsClip)
+        if(needsClip) {
             ctx.restore();
+        }
     }
 }

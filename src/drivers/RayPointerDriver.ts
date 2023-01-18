@@ -42,10 +42,11 @@ export abstract class RayPointerDriver extends PointerDriver {
         const [root, xNorm, yNorm] = this.castRay(origin, direction);
 
         // Queue a leave event if no root intersected, else, queue a move event
-        if(root === null)
+        if(root === null) {
             this.leaveAnyPointer(pointer);
-        else
+        } else {
             this.movePointer(root, pointer, xNorm, yNorm, pressing, shift, ctrl, alt);
+        }
     }
 
     /** Add a source. Assigns itself to the given source. */
@@ -60,8 +61,9 @@ export abstract class RayPointerDriver extends PointerDriver {
         const changed = super.setPointerHint(pointer, hint);
 
         // Call onPointerHintChanged handler for each source
-        for(const source of this.sources)
+        for(const source of this.sources) {
             source.onPointerHintChanged(pointer, hint);
+        }
 
         return changed;
 

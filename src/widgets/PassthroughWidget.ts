@@ -34,8 +34,9 @@ export class PassthroughWidget<W extends Widget = Widget> extends SingleParent<W
         child.preLayoutUpdate();
 
         // If child's layout is dirty, set self's layout as dirty
-        if(child.layoutDirty)
+        if(child.layoutDirty) {
             this._layoutDirty = true;
+        }
     }
 
     protected override handlePostLayoutUpdate(): void {
@@ -44,8 +45,9 @@ export class PassthroughWidget<W extends Widget = Widget> extends SingleParent<W
         child.postLayoutUpdate();
 
         // If child is dirty, set self as dirty
-        if(child.dirty)
+        if(child.dirty) {
             this._dirty = true;
+        }
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {

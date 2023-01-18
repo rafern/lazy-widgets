@@ -33,8 +33,9 @@ export class Variable<V, C extends CallableFunction = VariableCallback<V>> {
     constructor(initialValue: V, callback?: C, callNow = true) {
         this._value = initialValue;
 
-        if(callback)
+        if(callback) {
             this.watch(callback, callNow);
+        }
     }
 
     /**
@@ -62,13 +63,15 @@ export class Variable<V, C extends CallableFunction = VariableCallback<V>> {
      * @param callNow - If true, the callback will be called once immediately after it's registered, unless the callback is already registered.
      */
     watch(callback: C, callNow = true): boolean {
-        if(this.hasCallback(callback))
+        if(this.hasCallback(callback)) {
             return false;
+        }
 
         this.callbacks.add(callback);
 
-        if(callNow)
+        if(callNow) {
             this.doCallback(callback);
+        }
 
         return true;
     }
@@ -86,14 +89,16 @@ export class Variable<V, C extends CallableFunction = VariableCallback<V>> {
      * @returns Returns true if the value was changed, false if not
      */
     setValue(value: V, notify = true): boolean {
-        if(this._value === value)
+        if(this._value === value) {
             return false;
+        }
 
         this._value = value;
 
         if(notify) {
-            for(const callback of this.callbacks)
+            for(const callback of this.callbacks) {
                 this.doCallback(callback);
+            }
         }
 
         return true;
@@ -102,8 +107,7 @@ export class Variable<V, C extends CallableFunction = VariableCallback<V>> {
     protected doCallback(callback: C): void {
         try {
             callback(this._value, this);
-        }
-        catch(e) {
+        } catch(e) {
             console.error('Exception in Variable callback:', e);
         }
     }

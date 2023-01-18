@@ -43,9 +43,10 @@ export class GlyphVirtualKey extends VirtualKey {
     }
 
     get currentGlyph() {
-        if(this.keyContext.shift)
+        if(this.keyContext.shift) {
             return this.altGlyph;
-        else
+        } else {
             return this.glyph;
+        }
     }
 }
