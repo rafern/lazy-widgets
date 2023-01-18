@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Margin, Icon, Column, Row, TextButton, DOMPointerDriver
+            } from './index.esm.js';
+
+            // Create the root
+            // full video: https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.480p.vp9.webm
+            // trailer: http://upload.wikimedia.org/wikipedia/commons/7/79/Big_Buck_Bunny_small.ogv
+            // test video: 320x240.ogg
+            const icon = new Icon('320x240.ogg');
+            const video = icon.image;
+            const button = new TextButton(
+                'Play',
+                () => video.paused ? video.play() : video.pause()
+            );
+            video.addEventListener('play', () => button.child.text = 'Pause');
+            video.addEventListener('pause', () => button.child.text = 'Play');
+
+            const root = new DOMRoot(
+                new Margin(
+                    new Column().add([
+                        icon,
+                        new Row({
+                            multiContainerAlignment: { main: 0.5, cross: 0.5 }
+                        }).add([
+                            button
+                        ])
+                    ])
+                )
+            );
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

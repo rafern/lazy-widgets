@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
+                DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
+                ValidatedVariable
+            } from './index.esm.js';
+
+            // Create the root
+            const label = new Label('Hello world!');
+            const toggleableWidget = new Margin(
+                new Column()
+                .add(label)
+                .add(
+                    new TextInput(new ValidatedVariable('', null, value => {
+                        label.text = `Text input: ${value}`;
+                    }, false))
+                )
+                .add(
+                    new Row({
+                        multiContainerAlignment: {
+                            main: FlexAlignment.Center,
+                            cross: Alignment.Stretch
+                        },
+                    }).add([
+                        new TextButton('Button 1', () => label.text = 'Button 1 clicked!'),
+                        new TextButton('Button 2', () => label.text = 'Button 2 clicked!'),
+                    ])
+                )
+            );
+
+            const root = new DOMRoot(
+                new Margin(
+                    new Column().add([
+                        toggleableWidget,
+                        new TextButton('Toggle container', () => {
+                            toggleableWidget.enabled = !toggleableWidget.enabled;
+                        })
+                    ])
+                )
+            );
+
+            // Create, bind DOM and register the keyboard driver
+            const keyboardDriver = new DOMKeyboardDriver();
+            keyboardDriver.bindDOMElem(root.domElem);
+            root.registerDriver(keyboardDriver);
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

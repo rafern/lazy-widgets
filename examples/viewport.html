@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, Row, TextButton, TextInput,
+                DOMKeyboardDriver, DOMPointerDriver, Slider, FlexAlignment,
+                ScrollableViewportWidget, ScrollbarMode, LabelledCheckbox,
+                ArtificialConstraint, Container, Alignment, ThemeScope, Theme,
+                ValidatedVariable, Variable, AxisCoupling, LabelledRadioButton,
+                CanvasViewport
+            } from './index.esm.js';
+
+            // Create viewport with its child
+            const initialMinWidth = 75;
+            const initialMinHeight = 75;
+            const label = new Label('Hello world!');
+
+            let viewport = new ScrollableViewportWidget(
+                new ThemeScope(
+                    new Margin(
+                        new Column()
+                        .add(label)
+                        .add(
+                            new TextInput(new ValidatedVariable('', null, value => {
+                                label.text = `Text input: ${value}`;
+                            }, false))
+                        )
+                        .add(
+                            new Row({
+                                multiContainerAlignment: {
+                                    main: FlexAlignment.Center,
+                                    cross: Alignment.Stretch
+                                },
+                            }).add([
+                                new TextButton('Button 1', () => label.text = 'Button 1 clicked!'),
+                                new TextButton('Button 2', () => label.text = 'Button 2 clicked!'),
+                            ])
+                        )
+                    ),
+                    new Theme({ canvasFill: 'red' }),
+                ),
+                {
+                    minWidth: initialMinWidth,
+                    minHeight: initialMinHeight
+                }
+            );
+
+            // Create the options UI
+            const widthLabel = new Label(`Minimum width: ${initialMinWidth}`);
+            const heightLabel = new Label(`Minimum height: ${initialMinHeight}`);
+            const widthCoupling = new Variable(viewport.widthCoupling, coupling => viewport.widthCoupling = coupling);
+            const heightCoupling = new Variable(viewport.heightCoupling, coupling => viewport.heightCoupling = coupling);
+            const scrollbarMode = new Variable(viewport.scrollbarMode, mode => viewport.scrollbarMode = mode);
+
+            function makeCouplingColumn(variable) {
+                return new Margin(
+                    new Column()
+                    .add(new LabelledRadioButton('None', variable, AxisCoupling.None))
+                    .add(new LabelledRadioButton('Bi-directional', variable, AxisCoupling.Bi))
+                    .add(new LabelledRadioButton('Uni-directional', variable, AxisCoupling.Uni))
+                );
+            }
+
+            const mainColumn = new Column();
+            const themeScopeTheme = new Theme({ canvasFill: 'purple' });
+            let themeScope = new ThemeScope(viewport, themeScopeTheme);
+            const controls = new Container(
+                new ArtificialConstraint(
+                    new Column()
+                    .add(new Label('Width coupling:'))
+                    .add(makeCouplingColumn(widthCoupling))
+                    .add(new Label('Height coupling:'))
+                    .add(makeCouplingColumn(heightCoupling))
+                    .add(new Label('Scrollbar mode:'))
+                    .add(new Margin(
+                        new Column()
+                        .add(new LabelledRadioButton('Overlay', scrollbarMode, ScrollbarMode.Overlay))
+                        .add(new LabelledRadioButton('Layout', scrollbarMode, ScrollbarMode.Layout))
+                        .add(new LabelledRadioButton('Hidden', scrollbarMode, ScrollbarMode.Hidden))
+                    ))
+                    .add(widthLabel)
+                    .add(new Slider(new Variable(initialMinWidth, min => {
+                        viewport.minWidth = min;
+                        widthLabel.text = `Minimum width: ${min}`;
+                    }), 0, 500, { snapIncrement: 1 }))
+                    .add(heightLabel)
+                    .add(new Slider(new Variable(initialMinHeight, min => {
+                        viewport.minHeight = min;
+                        heightLabel.text = `Minimum height: ${min}`;
+                    }), 0, 500, { snapIncrement: 1 }))
+                    .add(new LabelledCheckbox('Use canvas:', new Variable(
+                        viewport instanceof CanvasViewport,
+                        useCanvas => {
+                            const options = {
+                                minWidth: viewport.minWidth,
+                                minHeight: viewport.minHeight,
+                                widthCoupling: viewport.widthCoupling,
+                                heightCoupling: viewport.heightCoupling,
+                                scrollbarMode: viewport.scrollbarMode,
+                                useCanvas
+                            };
+                            const child = viewport.child;
+
+                            mainColumn.remove(themeScope);
+
+                            viewport = new ScrollableViewportWidget(child, options);
+                            themeScope = new ThemeScope(viewport, themeScopeTheme);
+
+                            mainColumn.add(themeScope);
+                        },
+                        false
+                    ))),
+                    [0, 175, 0, Infinity]
+                )
+            );
+
+            controls.containerAlignment = {
+                horizontal: Alignment.Start, vertical: Alignment.Start,
+            };
+
+            // Create the root
+            const root = new DOMRoot(
+                new Margin(
+                    mainColumn
+                    .add(new Label('Options:'))
+                    .add(controls)
+                    .add(new Label('Result:\n- Viewport is purple\n- Child is red'))
+                    .add(themeScope)
+                )
+            );
+
+            // Create, bind DOM and register the keyboard driver
+            const keyboardDriver = new DOMKeyboardDriver();
+            keyboardDriver.bindDOMElem(root.domElem);
+            root.registerDriver(keyboardDriver);
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

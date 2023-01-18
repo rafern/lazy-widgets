@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, LabelledRadioButton, Spacing,
+                DOMKeyboardDriver, DOMPointerDriver, Variable
+            } from './index.esm.js';
+
+            // Create the root
+            const variable = new Variable(null);
+            const label = new Label();
+            variable.watch(newValue => label.text = `Option selected: ${variable.value ?? 'none'}`);
+
+            const root = new DOMRoot(
+                new Margin(
+                    new Column()
+                    .add(new Label('Select an option:'))
+                    .add(new LabelledRadioButton('Option 1', variable, 'option_1_value'))
+                    .add(new LabelledRadioButton('Option 2', variable, 'option_2_value'))
+                    .add(new LabelledRadioButton('Option 3', variable, 'option_3_value'))
+                    .add(new LabelledRadioButton('Option 4', variable, 'option_4_value'))
+                    .add(new LabelledRadioButton('Option 5', variable, 'option_5_value'))
+                    .add(new Spacing({ flex: 0, minHeight: 8 }))
+                    .add(label)
+                )
+            );
+
+            // Create, bind DOM and register the keyboard driver
+            const keyboardDriver = new DOMKeyboardDriver();
+            keyboardDriver.bindDOMElem(root.domElem);
+            root.registerDriver(keyboardDriver);
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

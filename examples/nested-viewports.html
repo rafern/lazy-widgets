@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, Row, TextButton, ScrollbarMode,
+                DOMKeyboardDriver, DOMPointerDriver, FlexAlignment, TextInput,
+                ScrollableViewportWidget, Alignment, ValidatedVariable,
+                AxisCoupling
+            } from './index.esm.js';
+
+            // Create the root
+            const label = new Label('Hello world!');
+            const column = new Column();
+
+            const root = new DOMRoot(
+                new ScrollableViewportWidget(
+                    new Margin(
+                        column.add(
+                            new ScrollableViewportWidget(
+                                new Margin(
+                                    new Column()
+                                    .add(label)
+                                    .add(
+                                        new TextInput(new ValidatedVariable('', null, value => {
+                                            label.text = `Text input: ${value}`;
+                                        }, false))
+                                    )
+                                    .add(
+                                        new Row({
+                                            multiContainerAlignment: {
+                                                main: FlexAlignment.Center,
+                                                cross: Alignment.Stretch
+                                            },
+                                        }).add([
+                                            new TextButton('Button 1', () => label.source = 'Button 1 clicked!'),
+                                            new TextButton('Button 2', () => label.source = 'Button 2 clicked!'),
+                                        ])
+                                    )
+                                ),
+                                {
+                                    minWidth: 170,
+                                    minHeight: 50
+                                }
+                            )
+                        )
+                    ),
+                    {
+                        minWidth: 200,
+                        minHeight: 200
+                    }
+                )
+            );
+
+            for(let i = 1; i <= 20; i++)
+                column.add(new Label(`Filler label (${i})`));
+
+            // Create drivers
+            const keyboardDriver = new DOMKeyboardDriver();
+            const pointerDriver = new DOMPointerDriver();
+
+            // Register roots and bind DOM elements to drivers
+            keyboardDriver.bindDOMElem(root.domElem);
+            root.registerDriver(keyboardDriver);
+
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add roots to body
+            document.body.appendChild(root.domElem);
+
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

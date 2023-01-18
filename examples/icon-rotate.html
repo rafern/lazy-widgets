@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, Icon, TextAlignMode,
+                ArtificialConstraint,
+            } from './index.esm.js';
+
+            // Create the root
+            const icon = new Icon('banana.png');
+            const root = new DOMRoot(
+                new Margin(
+                    new Column()
+                    .add(new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }))
+                    .add(new ArtificialConstraint(icon, [0, 128, 0, 128]))
+                    .add(new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }))
+                )
+            );
+
+            // Run the update loop
+            let lastFrame = (new Date()).getTime() / 1000;
+            function updateLoop() {
+                const thisFrame = (new Date()).getTime() / 1000;
+                const dt = thisFrame - lastFrame;
+                lastFrame = thisFrame;
+                icon.rotation += dt * Math.PI * 2;
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

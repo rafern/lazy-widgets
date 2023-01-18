@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, Icon
+            } from './index.esm.js';
+
+            // Create the root
+            const root = new DOMRoot(
+                new Margin(
+                    new Column().add([
+                        new Label('Full spritesheet:'),
+                        new Icon('test-spritesheet.svg'),
+                        new Label('Top-left sprite (32x32 at 0,0):'),
+                        new Icon('test-spritesheet.svg', { viewBox: [0, 0, 32, 32] }),
+                        new Label('Top-right sprite (32x32 at 32,0):'),
+                        new Icon('test-spritesheet.svg', { viewBox: [32, 0, 32, 32] }),
+                        new Label('Bottom-left sprite (32x32 at 0,0):'),
+                        new Icon('test-spritesheet.svg', { viewBox: [0, 32, 32, 32] }),
+                        new Label('Bottom-right sprite (32x32 at 32,0):'),
+                        new Icon('test-spritesheet.svg', { viewBox: [32, 32, 32, 32] }),
+                    ])
+                )
+            );
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

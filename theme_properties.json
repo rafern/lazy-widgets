@@ -1,0 +1,195 @@
+{
+    "basetheme_path": "src/theme/BaseTheme.ts",
+    "basetheme_ctor_delimiter_start": "// XXX BASETHEME CTOR AUTO-GENERATED CODE START",
+    "basetheme_ctor_delimiter_end": "// XXX BASETHEME CTOR AUTO-GENERATED CODE END",
+    "basetheme_fields_delimiter_start": "// XXX BASETHEME AUTO-GENERATED CODE START",
+    "basetheme_fields_delimiter_end": "// XXX BASETHEME AUTO-GENERATED CODE END",
+    "themeproperties_path": "src/theme/ThemeProperties.ts",
+    "themeproperties_delimiter_start": "// XXX THEMEPROPERTIES AUTO-GENERATED CODE START",
+    "themeproperties_delimiter_end": "// XXX THEMEPROPERTIES AUTO-GENERATED CODE END",
+    "basetheme_ctor_themeproperties_arg_name": "properties",
+    "basetheme_fallback_theme_name": "_fallbackTheme",
+    "basetheme_theme_update_method_name": "onThemeUpdated",
+    "properties": {
+        "canvasFill": {
+            "type": "FillStyle",
+            "default": "'rgba(0,0,0,0.5)'",
+            "description": "The canvas background {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style}."
+        },
+        "containerPadding": {
+            "type": "Padding",
+            "default": "<Padding>{left: 4, right: 4, top: 4, bottom: 4}",
+            "description": "The {@link Padding} used in {@link Container}."
+        },
+        "containerAlignment": {
+            "type": "Alignment2D",
+            "default": "<Alignment2D>{horizontal: Alignment.Start, vertical: Alignment.Start}",
+            "description": "The alignment in {@link Container} for when there is extra space."
+        },
+        "multiContainerSpacing": {
+            "type": "number",
+            "default": "4",
+            "description": "The spacing length between widgets in {@link MultiContainer}."
+        },
+        "multiContainerAlignment": {
+            "type": "FlexAlignment2D",
+            "default": "<FlexAlignment2D>{main: FlexAlignment.SpaceBetween, cross: Alignment.Stretch}",
+            "description": "The alignment in {@link MultiContainer} for when there is unused space."
+        },
+        "primaryFill": {
+            "type": "FillStyle",
+            "default": "'rgb(0,127,255)'",
+            "description": "The primary {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style}. Usually a saturated colour used for filling boxes that need to stand out."
+        },
+        "accentFill": {
+            "type": "FillStyle",
+            "default": "'rgb(0,195,255)'",
+            "description": "The accent {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style}. Usually a saturated colour more saturated than {@link ThemeProperties#primaryFill} used for highlighting boxes which use PrimaryFill."
+        },
+        "backgroundFill": {
+            "type": "FillStyle",
+            "default": "'rgb(32,32,32)'",
+            "description": "The background {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style}. Used for widgets with a background (as in, a background above the canvas background)."
+        },
+        "backgroundGlowFill": {
+            "type": "FillStyle",
+            "default": "'rgb(48,48,48)'",
+            "description": "The background glow {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style}. Used for highlighting boxes which use {@link ThemeProperties#backgroundFill}."
+        },
+        "sliderMinLength": {
+            "type": "number",
+            "default": "100",
+            "description": "The minimum length of a {@link Slider}"
+        },
+        "sliderThickness": {
+            "type": "number",
+            "default": "10",
+            "description": "The thickness of a {@link Slider}"
+        },
+        "bodyTextFont": {
+            "type": "font",
+            "default": "'1rem sans-serif'",
+            "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font | font style} used for body text (most regular text)."
+        },
+        "bodyTextFill": {
+            "type": "FillStyle",
+            "default": "'white'",
+            "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} used for body text (most regular text)."
+        },
+        "bodyTextHeight": {
+            "type": "number | null",
+            "default": "null",
+            "description": "The height of each line of text in body text (most regular text). If null, it will be automatically detected."
+        },
+        "bodyTextSpacing": {
+            "type": "number | null",
+            "default": "null",
+            "description": "The spacing between each line of text in body text (most regular text). If null, it will be automatically detected."
+        },
+        "bodyTextAlign": {
+            "type": "TextAlignMode | number",
+            "default": "TextAlignMode.Start",
+            "description": "The default text alignment mode of body text (most regular text)."
+        },
+        "checkboxLength": {
+            "type": "number",
+            "default": "12",
+            "description": "The length in pixels used for {@link Checkbox}."
+        },
+        "checkboxInnerPadding": {
+            "type": "number",
+            "default": "2",
+            "description": "The {@link Padding} used for {@link Checkbox} between the accent box shown when ticked and the background box."
+        },
+        "inputBackgroundFill": {
+            "type": "FillStyle",
+            "default": "'white'",
+            "description": "The background {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} used for input widgets like {@link TextInput}."
+        },
+        "inputSelectBackgroundFill": {
+            "type": "FillStyle",
+            "default": "'rgb(0,195,255)'",
+            "description": "The background {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} used for input widgets like {@link TextInput} when text is selected."
+        },
+        "inputTextFont": {
+            "type": "font",
+            "default": "'1rem monospace'",
+            "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font | font style} used for text in input widgets like {@link TextInput}."
+        },
+        "inputTextFill": {
+            "type": "FillStyle",
+            "default": "'black'",
+            "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} used for text in input widgets like {@link TextInput}."
+        },
+        "inputTextFillDisabled": {
+            "type": "FillStyle",
+            "default": "'grey'",
+            "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} used for text in input widgets like {@link TextInput} when disabled."
+        },
+        "inputTextFillInvalid": {
+            "type": "FillStyle",
+            "default": "'red'",
+            "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} used for text in input widgets like {@link TextInput} when invalid."
+        },
+        "inputTextHeight": {
+            "type": "number | null",
+            "default": "null",
+            "description": "The height of each line of text in input widgets like {@link TextInput}. If null, it will be automatically detected."
+        },
+        "inputTextSpacing": {
+            "type": "number | null",
+            "default": "null",
+            "description": "The spacing between each line of text in input widgets like {@link TextInput}. If null, it will be automatically detected."
+        },
+        "inputTextInnerPadding": {
+            "type": "number",
+            "default": "2",
+            "description": "The {@link Padding} between text and border used for text input widgets like {@link TextInput}."
+        },
+        "inputTextMinWidth": {
+            "type": "number",
+            "default": "100",
+            "description": "The default minimum width of text input widgets like {@link TextInput}."
+        },
+        "inputTextAlign": {
+            "type": "TextAlignMode | number",
+            "default": "TextAlignMode.Start",
+            "description": "The default text alignment mode of text input widgets like {@link TextInput}."
+        },
+        "blinkRate": {
+            "type": "number",
+            "default": "0.8",
+            "description": "The blink rate of text cursors in text input widgets like {@link TextInput}. Value in \"blinks\" per second."
+        },
+        "cursorThickness": {
+            "type": "number",
+            "default": "1",
+            "description": "The thickness of a text cursor in pixels."
+        },
+        "scrollBarThickness": {
+            "type": "number",
+            "default": "8",
+            "description": "The thickness of a {@link ScrollableViewportWidget}'s scrollbar in pixels."
+        },
+        "scrollBarMinPercent": {
+            "type": "number",
+            "default": "0.1",
+            "description": "The minimum length of the filled part of a {@link ScrollableViewportWidget}'s scrollbar in percentage of total length."
+        },
+        "scrollBarMinPixels": {
+            "type": "number",
+            "default": "20",
+            "description": "The minimum length of the filled part of a {@link ScrollableViewportWidget}'s scrollbar in pixels."
+        },
+        "radioButtonLength": {
+            "type": "number",
+            "default": "12",
+            "description": "Similar to {@link ThemeProperties#checkboxLength}, but for {@link RadioButton}."
+        },
+        "radioButtonInnerPadding": {
+            "type": "number",
+            "default": "2",
+            "description": "Similar to {@link ThemeProperties#checkboxInnerPadding}, but for {@link RadioButton}."
+        }
+    }
+}

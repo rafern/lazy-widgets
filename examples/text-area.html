@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Margin, Column, TextArea, Label, ValidatedVariable,
+                DOMKeyboardDriver, DOMPointerDriver
+            } from './index.esm.js';
+
+            // Create the root
+            const root = new DOMRoot(
+                new Margin(
+                    new Column()
+                    .add(new Label('Text area (200x200 minimum length):'))
+                    .add(new TextArea(
+                        new ValidatedVariable('Type some text here...'),
+                        { minWidth: 200, minHeight: 200 }
+                    ))
+                )
+            );
+
+            // Create, bind DOM and register the keyboard driver
+            const keyboardDriver = new DOMKeyboardDriver();
+            keyboardDriver.bindDOMElem(root.domElem);
+            root.registerDriver(keyboardDriver);
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

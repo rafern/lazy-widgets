@@ -1,0 +1,6 @@
+*.sublime-project
+*.sublime-workspace
+node_modules/
+lazy-widgets-*.tgz
+lib/
+docs/
