@@ -6,7 +6,8 @@
   "exports": "./lib/index.esm.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint src/ --ext .ts",
+    "lint-fix": "eslint src/ --ext .ts --fix",
     "build": "tsc & esbuild --minify --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=lib/index.esm.js src/index.ts",
     "dev": "concurrently --kill-others 'http-server examples' 'esbuild --watch --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=lib/index.esm.js src/index.ts'",
     "docs": "typedoc --options typedoc.json",
