@@ -1,3 +1,4 @@
+import type { Rect } from '../helpers/Rect';
 import type { FillStyle } from '../theme/FillStyle';
 import type { Widget } from "../widgets/Widget";
 import { BaseViewport } from "./BaseViewport";
@@ -62,5 +63,10 @@ export class ClippedViewport extends BaseViewport {
         ctx.restore();
 
         return wasDirty;
+    }
+
+    override markDirtyRect(_rect: Rect): void {
+        // TODO
+        throw new Error('NIY');
     }
 }

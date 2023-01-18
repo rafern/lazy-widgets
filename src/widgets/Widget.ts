@@ -649,7 +649,6 @@ export abstract class Widget extends BaseTheme {
      * @param force - Force re-paint even if {@link Widget#_dirty} is false
      */
     paint(force = false): void {
-        force = true; // TODO disable, this is just for testing
         if(this.dimensionless) {
             return this.dryPaint();
         }

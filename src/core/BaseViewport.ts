@@ -186,4 +186,15 @@ export abstract class BaseViewport implements Viewport {
 
         return [vpX, vpY, vpW, vpH, origXDst, origYDst, xDst, yDst, wClipped, hClipped];
     }
+
+    /** Mark a rectangle relative to this viewport as dirty. */
+    abstract markDirtyRect(rect: Rect): void;
+
+    /**
+     * Similar to {@link BaseViewport#markDirtyRect}, except each component of
+     * the rectangle is supplied separately.
+     */
+    markDirty(x: number, y: number, width: number, height: number): void {
+        this.markDirtyRect([ x, y, width, height ]);
+    }
 }

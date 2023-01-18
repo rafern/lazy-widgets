@@ -11,8 +11,13 @@ import { BaseTheme } from '../theme/BaseTheme';
 import { Widget } from '../widgets/Widget';
 import { Msg } from './Strings';
 import { Root } from './Root';
+import type { RootProperties } from './Root';
+import type { CanvasViewport } from './CanvasViewport';
+import { DebuggableCanvasViewport } from './DebuggableCanvasViewport';
 
-const features: Map<string, [enabled: boolean, description: string]> = new Map();
+type ToggleCallback = (enabled: boolean) => void;
+
+const features: Map<string, [enabled: boolean, description: string] | [enabled: boolean, description: string, toggleCallback: ToggleCallback]> = new Map();
 
 /**
  * Check if a debug feature is enabled.
@@ -52,6 +57,10 @@ export function toggleDebugFeature(debugFeature: string, enabled?: boolean): voi
     if(wasEnabled !== enabled) {
         featureConfig[0] = enabled;
         console.info(`[canvas-ui] ${enabled ? 'En' : 'Dis'}abled "${debugFeature}" debug feature`);
+
+        if (featureConfig.length > 2) {
+            (featureConfig[2] as ToggleCallback)(enabled);
+        }
     }
 }
 
@@ -494,6 +503,38 @@ export function injectDebugCode(): void {
             }
         }
     };
+
+    // flashdirtyrects; special debug feature for CanvasViewport
+    const viewports: Array<DebuggableCanvasViewport> = [];
+    features.set(
+        'flashdirtyrects',
+        [
+            false,
+            'Momentarily flash rectangles that are marked as dirty for 1 second. Pushed dirty rectangles are painted in red, while merged (effective) dirty rectangles are painted in blue',
+            (enabled) => {
+                for (const viewport of viewports) {
+                    viewport.overlayEnabled = enabled;
+                }
+            }
+        ]
+    );
+
+    Root.makeViewport = function(child: Widget, properties?: Readonly<RootProperties>): CanvasViewport {
+        const viewport = new DebuggableCanvasViewport(child, properties?.resolution, properties?.preventBleeding, properties?.canvasStartingWidth, properties?.canvasStartingHeight);
+        viewports.push(viewport);
+
+        if (isDebugFeatureEnabled('flashdirtyrects')) {
+            viewport.overlayEnabled = true;
+        }
+
+        return viewport;
+    };
+
+    Object.defineProperty(Root.prototype, 'canvas', {
+        get() {
+            return this.viewport.outputCanvas;
+        },
+    });
 
     // Make debug functions available in global scope
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

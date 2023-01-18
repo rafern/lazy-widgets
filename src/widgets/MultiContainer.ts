@@ -16,8 +16,6 @@ import { MultiParent } from './MultiParent';
  * @category Widget
  */
 export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
-    /** Is the container's background dirty? */
-    private backgroundDirty = true;
     /** Is this container vertical? */
     private vertical: boolean;
     /** The unused space along the main axis after resolving dimensions */
@@ -34,22 +32,11 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         this.vertical = vertical;
     }
 
-    protected override activate(): void {
-        super.activate();
-        this.backgroundDirty = true;
-    }
-
     protected override onThemeUpdated(property: string | null = null): void {
         super.onThemeUpdated(property);
 
-        if(property === null) {
-            this._layoutDirty = true;
-            this.backgroundDirty = true;
-        } else if(property === 'canvasFill') {
-            this.backgroundDirty = true;
-        } else if(property === 'multiContainerAlignment') {
-            this._layoutDirty = true;
-        } else if(property === 'multiContainerSpacing') {
+        if(property === null || property === 'multiContainerAlignment'
+           || property === 'multiContainerSpacing') {
             this._layoutDirty = true;
         }
     }
@@ -143,7 +130,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             // Mark background as dirty if child's dimensions changed
             if(childWidth !== oldChildWidth || childHeight !== oldChildHeight) {
-                this.backgroundDirty = true;
+                // TODO send dirty rect of entire widget;
             }
         }
 
@@ -183,7 +170,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             // Mark background as dirty if dimensions changed
             if(this.idealWidth !== oldWidth || this.idealHeight !== oldHeight) {
-                this.backgroundDirty = true;
+                // TODO dirty rect;
             }
 
             // Set unused space to 0; no alignment should be done
@@ -213,7 +200,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
                 // Mark background as dirty if child's dimensions changed
                 if(childWidth !== oldChildWidth || childHeight !== oldChildHeight) {
-                    this.backgroundDirty = true;
+                    // TODO dirty rect;
                 }
 
                 const childLength = this.vertical ? oldChildHeight
@@ -264,7 +251,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             // Mark background as dirty if child's dimensions changed
             if(childWidth !== oldChildWidth || childHeight !== oldChildHeight) {
-                this.backgroundDirty = true;
+                // TODO dirty rect;
             }
         }
 
@@ -285,7 +272,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
         // Mark background as dirty if dimensions changed
         if(this.idealWidth !== oldWidth || this.idealHeight !== oldHeight) {
-            this.backgroundDirty = true;
+            // TODO dirty rect;
         }
 
         // Calculate final unused space; used for alignment. Clamp to zero just
@@ -341,46 +328,15 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             // Mark background as dirty if child's position changed
             if(childX !== oldChildX || childY !== oldChildY) {
-                this.backgroundDirty = true;
+                // TODO dirty rect;
             }
         }
     }
 
     protected override handlePainting(forced: boolean): void {
-        // Paint children and build clipping region if background is dirty
-        const clipRects: [number, number, number, number][] = [];
+        // Paint children
         for(const child of this.children) {
-            // Paint child
             child.paint(forced);
-
-            // Add to clipping region if needed. Don't add disabled children to
-            // clipping region
-            if(child.enabled && (this.backgroundDirty || forced)) {
-                clipRects.push(child.rect);
-            }
         }
-
-        // Clear background if needed
-        if(this.backgroundDirty || forced) {
-            this.clearStart();
-            const ctx = this.viewport.context;
-            ctx.rect(...this.rect);
-            for(const clipRect of clipRects) {
-                ctx.rect(...clipRect);
-            }
-            this.clearEnd('evenodd');
-        }
-
-        this.backgroundDirty = false;
-    }
-
-    override dryPaint(): void {
-        this.backgroundDirty = false;
-        super.dryPaint();
-    }
-
-    override forceDirty(markLayout = true): void {
-        super.forceDirty(markLayout);
-        this.backgroundDirty = true;
     }
 }

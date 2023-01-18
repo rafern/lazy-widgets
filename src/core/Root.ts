@@ -124,7 +124,7 @@ export class Root {
      * {@link Root#child}'s {@link Widget#inheritedTheme | inherited theme}.
      */
     constructor(child: Widget, properties?: Readonly<RootProperties>) {
-        this.viewport = new CanvasViewport(child, properties?.resolution, properties?.preventBleeding, properties?.canvasStartingWidth, properties?.canvasStartingHeight);
+        this.viewport = Root.makeViewport(child, properties);
         this.pointerStyleHandler = properties?.pointerStyleHandler ?? null;
         this.child.inheritedTheme = properties?.theme ?? new Theme();
         this.child.attach(this, this.viewport, null);
@@ -132,6 +132,19 @@ export class Root {
         if(properties?.constraints) {
             this.viewport.constraints = properties.constraints;
         }
+    }
+
+    /**
+     * Creates a new CanvasViewport instance for a new Root. Normally it
+     * wouldn't make sense to separate this from the constructor, but this makes
+     * viewport creation hookable, allowing for the creation of debug overlay
+     * viewports.
+     *
+     * @internal
+     * @returns Returns a new CanvasViewport (or child class instance) for the Root
+     */
+    static makeViewport(child: Widget, properties?: Readonly<RootProperties>): CanvasViewport {
+        return new CanvasViewport(child, properties?.resolution, properties?.preventBleeding, properties?.canvasStartingWidth, properties?.canvasStartingHeight);
     }
 
     /** The {@link Root#viewport}'s {@link Viewport#constraints | constraints} */
@@ -204,7 +217,8 @@ export class Root {
 
 
     /**
-     * The {@link Root#viewport}'s {@link CanvasViewport#canvas | canvas}
+     * The {@link Root#viewport}'s {@link CanvasViewport#canvas | canvas}. The
+     * canvas must not be modified directly; consider it output-only.
      */
     get canvas(): HTMLCanvasElement {
         return this.viewport.canvas;
@@ -246,7 +260,8 @@ export class Root {
             return false;
         }
 
-        return this.viewport.paintToInternal(false);
+        // TODO REMOVE WORKAROUND (replace true with false in force argument)
+        return this.viewport.paintToInternal(true);
     }
 
     /**

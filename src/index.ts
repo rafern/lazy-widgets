@@ -85,6 +85,7 @@ export * from './widgets/VirtualKeyboard/VirtualKeyboard';
 export * from './widgets/VirtualKeyboard/VirtualKeyRow';
 export * from './widgets/ArtificialConstraint';
 export * from './widgets/AxisCoupling';
+export * from './widgets/Background';
 export * from './widgets/BaseContainer';
 export * from './widgets/Button';
 export * from './widgets/Center';

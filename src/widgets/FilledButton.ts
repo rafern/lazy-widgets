@@ -169,6 +169,13 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
     }
 
     protected override handlePainting(forced: boolean): void {
-        this.handleBaseContainerPainting(forced, this.getBackgroundFill());
+        // Paint brackground
+        const ctx = this.viewport.context;
+        ctx.save();
+        ctx.fillStyle = this.getBackgroundFill();
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.restore();
+
+        super.handlePainting(forced);
     }
 }

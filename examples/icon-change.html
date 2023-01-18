@@ -4,8 +4,12 @@
         <script type='module'>
             import {
                 DOMRoot, Label, Margin, Column, Icon, TextButton, Row,
-                DOMPointerDriver, ArtificialConstraint
+                DOMPointerDriver, ArtificialConstraint, Background,
+                injectDebugCode, toggleDebugFeature
             } from './index.esm.js';
+
+            injectDebugCode();
+            toggleDebugFeature('flashdirtyrects');
 
             // Create the root
             let alternative = false;
@@ -55,21 +59,23 @@
             }
 
             const root = new DOMRoot(
-                new Margin(
-                    new Column().add([
-                        new ArtificialConstraint(icon, [0, 256, 0, 256]),
-                        new Label('The icon should change between a banana and an apple'),
-                        new Row().add([
-                            new TextButton('Change Icon.image.src', () => changeImage(false, false)),
-                            new TextButton('Change Icon.image', () => changeImage(false, true))
-                        ]),
-                        new Label('The video should change between a test video and the big buck bunny trailer'),
-                        new Row().add([
-                            new TextButton('Change Icon.image.src', () => changeImage(true, false)),
-                            new TextButton('Change Icon.image', () => changeImage(true, true))
-                        ]),
-                        new Label('Note that changing from an image to a video or vice versa can\'t be done by setting Icon.image.src, therefore, changing will be done with Icon.image if needed')
-                    ])
+                new Background(
+                    new Margin(
+                        new Column().add([
+                            new ArtificialConstraint(icon, [0, 256, 0, 256]),
+                            new Label('The icon should change between a banana and an apple'),
+                            new Row().add([
+                                new TextButton('Change Icon.image.src', () => changeImage(false, false)),
+                                new TextButton('Change Icon.image', () => changeImage(false, true))
+                            ]),
+                            new Label('The video should change between a test video and the big buck bunny trailer'),
+                            new Row().add([
+                                new TextButton('Change Icon.image.src', () => changeImage(true, false)),
+                                new TextButton('Change Icon.image', () => changeImage(true, true))
+                            ]),
+                            new Label('Note that changing from an image to a video or vice versa can\'t be done by setting Icon.image.src, therefore, changing will be done with Icon.image if needed')
+                        ])
+                    )
                 )
             );
 

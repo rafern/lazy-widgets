@@ -13,9 +13,6 @@ import type { Event } from '../events/Event';
  * @category Widget
  */
 export abstract class BaseContainer<W extends Widget = Widget> extends SingleParent<W> {
-    /** Does the background need to be cleared? */
-    protected backgroundDirty = true;
-
     /** Create a new BaseContainer. */
     constructor(child: W, propagateEvents: boolean, properties?: Readonly<WidgetProperties>) {
         // Containers clear their own background, have a child and may propagate
@@ -23,22 +20,11 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         super(child, propagateEvents, properties);
     }
 
-    protected override activate(): void {
-        super.activate();
-        this.backgroundDirty = true;
-    }
-
     protected override onThemeUpdated(property: string | null = null): void {
         super.onThemeUpdated(property);
 
-        if(property === null) {
-            this._layoutDirty = true;
-            this.backgroundDirty = true;
-        } else if(property === 'canvasFill') {
-            this.backgroundDirty = true;
-        } else if(property === 'containerPadding') {
-            this._layoutDirty = true;
-        } else if(property === 'containerAlignment') {
+        if(property === null || property === 'containerPadding'
+           || property === 'containerAlignment') {
             this._layoutDirty = true;
         }
     }
@@ -66,11 +52,6 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
 
         // If child is dirty, set self as dirty
         if(child.dirty) {
-            this._dirty = true;
-        }
-
-        // If background is dirty, set self as dirty
-        if(this.backgroundDirty) {
             this._dirty = true;
         }
     }
@@ -127,7 +108,7 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         // Mark background as dirty if own size or child's size changed
         if(this.idealWidth !== oldWidth || this.idealHeight !== oldHeight ||
            childWidth !== oldChildWidth || childHeight !== oldChildHeight) {
-            this.backgroundDirty = true;
+            // TODO set dirty rect to entire widget
         }
     }
 
@@ -175,41 +156,12 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
 
         // If child's position changed, mark background as dirty
         if(oldChildX !== childX || oldChildY !== childY) {
-            this.backgroundDirty = true;
+            // TODO set dirty rect to entire widget
         }
-    }
-
-    /**
-     * Implementation of handlePainting; separate from handlePainting so that
-     * the fillStyle for the background clear can be overridden.
-     */
-    protected handleBaseContainerPainting(forced: boolean, fillStyle: FillStyle | null = null): void {
-        // Clear background if needed
-        if(this.backgroundDirty || forced) {
-            this.clearStart(fillStyle);
-            const ctx = this.viewport.context;
-            ctx.rect(...this.rect);
-            ctx.rect(...this.child.rect);
-            this.clearEnd('evenodd');
-
-            this.backgroundDirty = false;
-        }
-
-        // Paint child
-        this.child.paint(forced);
     }
 
     protected override handlePainting(forced: boolean): void {
-        this.handleBaseContainerPainting(forced);
-    }
-
-    override dryPaint(): void {
-        this.backgroundDirty = false;
-        super.dryPaint();
-    }
-
-    override forceDirty(markLayout = true): void {
-        super.forceDirty(markLayout);
-        this.backgroundDirty = true;
+        // Paint child
+        this.child.paint(forced);
     }
 }

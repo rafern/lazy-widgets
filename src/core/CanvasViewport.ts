@@ -5,6 +5,8 @@ import type { Widget } from '../widgets/Widget';
 import { isPower2 } from '../helpers/isPower2';
 import { BaseViewport } from './BaseViewport';
 import { Msg } from './Strings';
+import type { Rect } from '../helpers/Rect';
+import { mergeOverlappingRects } from '../helpers/mergeOverlappingRects';
 
 /**
  * A {@link Viewport} with an internal canvas, where the rendering context used
@@ -66,6 +68,8 @@ export class CanvasViewport extends BaseViewport {
      * Will be ignored if {@link CanvasViewport#preventBleeding} is false.
      */
     private shrunk = false;
+    /** The list of dirty rectangles, relative to the internal canvas. */
+    private readonly dirtyRects: Array<Rect> = [];
 
     /**
      * Create a new CanvasViewport.
@@ -95,6 +99,7 @@ export class CanvasViewport extends BaseViewport {
         this.canvas = document.createElement('canvas');
         this.canvas.width = startingWidth;
         this.canvas.height = startingHeight;
+        this.pushDirtyRect([0, 0, startingWidth, startingHeight]);
 
         // Get context out of canvas
         const context = this.canvas.getContext('2d', { alpha: true });
@@ -212,6 +217,7 @@ export class CanvasViewport extends BaseViewport {
 
                 this.canvas.width = newCanvasWidth;
                 this.canvas.height = newCanvasHeight;
+                this.pushDirtyRect([0, 0, newCanvasWidth, newCanvasHeight]);
 
                 if(copyCanvas !== null) {
                     this.context.globalCompositeOperation = 'copy';
@@ -252,26 +258,64 @@ export class CanvasViewport extends BaseViewport {
     }
 
     /**
+     * Add a clipping rectangle to the internal canvas context.
+     */
+    private clipToRect(rect: Rect) {
+        const [left, top, width, height] = rect;
+        const right = left + width;
+        const bottom = top + height;
+        this.context.moveTo(left, top);
+        this.context.lineTo(right, top);
+        this.context.lineTo(right, bottom);
+        this.context.lineTo(left, bottom);
+        this.context.clip();
+    }
+
+    /**
+     * Merge all overlapping dirty rectangles and clear the dirty rectangle
+     * list.
+     *
+     * @returns Returns the list of merged rectangles.
+     */
+    protected mergedDirtyRects(): Array<Rect> {
+        const dirtyRects = mergeOverlappingRects(this.dirtyRects);
+        this.dirtyRects.length = 0;
+        return dirtyRects;
+    }
+
+    /**
      * Implements {@link Viewport#paint}, but only paints to the
      * {@link CanvasViewport#canvas | internal canvas}. Call this instead of
      * {@link Viewport#paint} if you are using this Viewport's canvas as the
      * output canvas (such as in the {@link Root}).
      */
     paintToInternal(force: boolean): boolean {
-        // Paint child
-        const wasDirty = this.child.dirty;
+        // check if there are any parts that need to be repainted
+        const dirtyRects = this.mergedDirtyRects();
+        const wasDirty = dirtyRects.length > 0;
 
-        // scale canvas if child dimensions exceed maximum canvas dimensions
-        const [scaleX, scaleY] = this.effectiveScale;
-        const needsScale = scaleX !== 1 || scaleY !== 1;
-        if(needsScale) {
+        if (wasDirty) {
+            // scale canvas if child dimensions exceed maximum canvas dimensions
             this.context.save();
-            this.context.scale(scaleX, scaleY);
-        }
+            const [scaleX, scaleY] = this.effectiveScale;
+            const needsScale = scaleX !== 1 || scaleY !== 1;
+            if(needsScale) {
+                this.context.scale(scaleX, scaleY);
+            }
 
-        this.child.paint(force);
+            // clip to dirty rectangles
+            this.context.beginPath();
+            for (const dirtyRect of dirtyRects) {
+                this.clipToRect(dirtyRect);
+            }
 
-        if(needsScale) {
+            // clear dirty area
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // paint child
+            this.child.paint(force);
+
+            // stop clipping/scaling
             this.context.restore();
         }
 
@@ -339,5 +383,23 @@ export class CanvasViewport extends BaseViewport {
         }
 
         return wasDirty;
+    }
+
+    protected pushDirtyRect(rect: Rect) {
+        this.dirtyRects.push(rect);
+    }
+
+    override markDirtyRect(rect: Rect) {
+        const [scaleX, scaleY] = this.effectiveScale;
+        if (scaleX !== 1 || scaleY !== 1) {
+            const [left, top, width, height] = rect;
+            const scaledLeft = Math.floor(left * scaleX);
+            const scaledTop = Math.floor(top * scaleY);
+            const scaledRight = Math.ceil((left + width) * scaleX);
+            const scaledBottom = Math.ceil((top + height) * scaleY);
+            rect = [scaledLeft, scaledTop, scaledRight - scaledLeft, scaledBottom - scaledTop];
+        }
+
+        this.pushDirtyRect(rect);
     }
 }
