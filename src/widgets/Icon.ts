@@ -1,4 +1,4 @@
-import { paintField, layoutField, paintLayoutArrayField } from '../decorators/FlagFields';
+import { damageField, layoutField, paintLayoutArrayField } from '../decorators/FlagFields';
 import { Widget, WidgetProperties } from './Widget';
 import { DynMsg, Msg } from '../core/Strings';
 import type { Rect } from '../helpers/Rect';
@@ -64,9 +64,9 @@ export class Icon extends Widget {
     /**
      * The current image rotation in radians.
      *
-     * @decorator `@paintField`
+     * @decorator `@damageField`
      */
-    @paintField
+    @damageField
     rotation = 0;
     /**
      * The view box of this Icon, useful if the image used for the icon is a
@@ -111,14 +111,14 @@ export class Icon extends Widget {
     private canplayListener: ((event: Event) => void) | null = null;
     /**
      * Used for requestVideoFrameCallback. If null, then callback is being done
-     * by setting _dirty to true every frame, which may be wasteful.
+     * by marking the whole widget as dirty, which may be wasteful.
      */
     private frameCallback: ((now: DOMHighResTimeStamp, metadata: unknown /* VideoFrameMetadata */) => void) | null = null;
     /**
      * The {@link IconFit} mode to use when the image dimensions don't match the
      * widget dimensions.
      */
-    @paintField
+    @damageField
     fit: IconFit;
 
     /** Create a new Icon. */
@@ -163,7 +163,7 @@ export class Icon extends Widget {
             this.loadedmetadataListener = _event => this._layoutDirty = true;
             this.image.addEventListener('loadedmetadata', this.loadedmetadataListener);
             // canplay is so that the first video frame is always displayed
-            this.canplayListener = _event => this._dirty = true;
+            this.canplayListener = _event => this.markWholeAsDirty();
             this.image.addEventListener('canplay', this.canplayListener);
 
             if('requestVideoFrameCallback' in this.image) {
@@ -171,18 +171,16 @@ export class Icon extends Widget {
 
                 const originalVideo = this.image;
                 this.frameCallback = (_now, _metadata) => {
-                    // Set dirty flag when a new frame is got so that it is
-                    // painted
-                    this._dirty = true;
+                    // Mark widget as dirty when there is a new frame so that it
+                    // is painted
+                    this.markWholeAsDirty();
 
                     if(this.image === originalVideo && this.frameCallback !== null) {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (this.image as any).requestVideoFrameCallback(this.frameCallback);
+                        this.image.requestVideoFrameCallback(this.frameCallback);
                     }
                 }
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (this.image as any).requestVideoFrameCallback(this.frameCallback)
+                this.image.requestVideoFrameCallback(this.frameCallback);
             }
         }
     }
@@ -229,11 +227,11 @@ export class Icon extends Widget {
         // re-drawn if video is playing
         if(this._image instanceof HTMLVideoElement) {
             if(!this._image.paused && this.frameCallback === null) {
-                this._dirty = true;
+                this.markWholeAsDirty();
             }
         } else if(this._image?.src !== this.lastSrc && this._image?.complete) {
             this._layoutDirty = true;
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -301,7 +299,7 @@ export class Icon extends Widget {
         }
     }
 
-    protected override handlePainting(_forced: boolean): void {
+    protected override handlePainting(_dirtyRects: Array<Rect>): void {
         // Abort if icon isn't ready yet
         if(this._image instanceof HTMLImageElement && !this._image?.complete) {
             this.lastSrc = null;
@@ -350,15 +348,5 @@ export class Icon extends Widget {
         if(needsClip) {
             ctx.restore();
         }
-    }
-
-    override dryPaint(): void {
-        if(this._image instanceof HTMLImageElement && this._image?.complete) {
-            this.lastSrc = this._image.src;
-        } else {
-            this.lastSrc = null;
-        }
-
-        super.dryPaint();
     }
 }

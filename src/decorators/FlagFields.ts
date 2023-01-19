@@ -1,5 +1,11 @@
 import { DynMsg } from "../core/Strings";
 
+type DamageFieldCompatible = {
+    prototype: {
+        markWholeAsDirty: () => void
+    }
+};
+
 /**
  * A decorator for a public field which sets calls a callback if the property's
  * value is changed.
@@ -43,11 +49,17 @@ export function flagField(flagKey: string | symbol): PropertyDecorator {
 }
 
 /**
- * A {@link flagField} where the flag key is `_dirty`.
+ * A {@link watchField} which calls a method named `markWholeAsDirty` with no
+ * arguments. It's recommended to only use this on {@link Widget} and its
+ * subclasses, although technically you can use it in any class so long as it
+ * has a `markWholeAsDirty` method.
  *
  * @category Decorator
  */
-export const paintField = flagField('_dirty');
+// eslint-disable-next-line @typescript-eslint/ban-types
+export const damageField = watchField(function(this: Object, _oldValue) {
+    Object.getPrototypeOf(this).markWholeAsDirty.apply(this);
+});
 
 /**
  * A {@link flagField} where the flag key is `_layoutDirty`.

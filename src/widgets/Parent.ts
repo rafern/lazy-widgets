@@ -7,11 +7,10 @@ import type { Root } from '../core/Root';
  * A class for widgets which may have children.
  *
  * Overrides the {@link Widget#inheritedTheme} accessor so that inherited themes
- * are propagated to children, and {@link Widget#dryPaint} so that dry painting
- * this parent also dry paints the children. Also provides utilities for getting
- * the amount of children, a public iterator for children and a protected child
- * list. This way, widgets that extend this class can decide if modifying the
- * list of children should be public or not.
+ * are propagated to children. Also provides utilities for getting the amount of
+ * children, a public iterator for children and a protected child list. This
+ * way, widgets that extend this class can decide if modifying the list of
+ * children should be public or not.
  *
  * Can be constrained to a specific type of children.
  *
@@ -51,14 +50,6 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
 
     override get inheritedTheme(): Theme | undefined {
         return super.inheritedTheme;
-    }
-
-    override dryPaint(): void {
-        super.dryPaint();
-
-        for(const child of this.children) {
-            child.dryPaint();
-        }
     }
 
     override forceDirty(markLayout = true): void {

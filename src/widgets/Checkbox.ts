@@ -6,6 +6,7 @@ import type { Viewport } from '../core/Viewport';
 import type { Event } from '../events/Event';
 import { Variable } from '../state/Variable';
 import type { Root } from '../core/Root';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * A checkbox widget; can be ticked or unticked.
@@ -149,7 +150,7 @@ export class Checkbox extends Widget {
         this.offsetY = (this.height - this.actualLength) / 2;
     }
 
-    protected override handlePainting(_forced: boolean): void {
+    protected override handlePainting(_dirtyRects: Array<Rect>): void {
         // Should we use glow colours? (background glow and accent)
         const useGlow = this.clickHelper.clickState === ClickState.Hover ||
                         this.clickHelper.clickState === ClickState.Hold;

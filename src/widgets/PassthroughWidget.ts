@@ -1,6 +1,7 @@
 import { Widget, WidgetProperties } from './Widget';
 import { SingleParent } from './SingleParent';
 import type { Event } from '../events/Event';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * A {@link SingleParent} which contains a single child and does nothing,
@@ -65,8 +66,8 @@ export class PassthroughWidget<W extends Widget = Widget> extends SingleParent<W
         this.child.resolvePosition(x, y);
     }
 
-    protected override handlePainting(forced: boolean): void {
+    protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Paint child
-        this.child.paint(forced);
+        this.child.paint(dirtyRects);
     }
 }

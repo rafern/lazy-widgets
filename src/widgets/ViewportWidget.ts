@@ -10,6 +10,7 @@ import { SingleParent } from './SingleParent';
 import type { Event } from '../events/Event';
 import type { Root } from '../core/Root';
 import { DynMsg } from '../core/Strings';
+import { Rect } from '../helpers/Rect';
 
 /**
  * Optional ViewportWidget constructor properties.
@@ -353,9 +354,9 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         super.detach();
     }
 
-    protected override handlePainting(forced: boolean): void {
+    protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Clear background and paint canvas
-        this.internalViewport.paint(forced || this.forceRePaint, this.canvasFill);
-        this.forceRePaint = false;
+        this.internalViewport.paint(dirtyRects, this.canvasFill);
+        this.forceRePaint = false; // TODO forceRePaint???? do we need this or is this another hack from the previous system?
     }
 }

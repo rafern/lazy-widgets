@@ -1,4 +1,4 @@
-import { flagField, paintField } from '../decorators/FlagFields';
+import { flagField, damageField } from '../decorators/FlagFields';
 import { roundToPower2 } from '../helpers/roundToPower2';
 import type { FillStyle } from '../theme/FillStyle';
 import type { Widget } from '../widgets/Widget';
@@ -31,15 +31,15 @@ export class CanvasViewport extends BaseViewport {
      * layout exceeds this width, then the content will be scaled to fit the
      * canvas
      */
-    @paintField
-    maxCanvasWidth = 16384;
+    @damageField
+    maxCanvasWidth: number;
     /**
      * The maximum height the {@link CanvasViewport#canvas} can have. If the
      * layout exceeds this height, then the content will be scaled to fit the
      * canvas
      */
-    @paintField
-    maxCanvasHeight = 16384;
+    @damageField
+    maxCanvasHeight: number;
     /**
      * The resolution of the canvas. If possible, the canvas will be scaled by
      * this amount.
@@ -99,7 +99,10 @@ export class CanvasViewport extends BaseViewport {
         this.canvas = document.createElement('canvas');
         this.canvas.width = startingWidth;
         this.canvas.height = startingHeight;
-        this.pushDirtyRect([0, 0, startingWidth, startingHeight]);
+        this.markWholeAsDirty();
+
+        this.maxCanvasWidth = 16384;
+        this.maxCanvasHeight = 16384;
 
         // Get context out of canvas
         const context = this.canvas.getContext('2d', { alpha: true });
@@ -217,7 +220,7 @@ export class CanvasViewport extends BaseViewport {
 
                 this.canvas.width = newCanvasWidth;
                 this.canvas.height = newCanvasHeight;
-                this.pushDirtyRect([0, 0, newCanvasWidth, newCanvasHeight]);
+                this.markWholeAsDirty();
 
                 if(copyCanvas !== null) {
                     this.context.globalCompositeOperation = 'copy';
@@ -289,7 +292,7 @@ export class CanvasViewport extends BaseViewport {
      * {@link Viewport#paint} if you are using this Viewport's canvas as the
      * output canvas (such as in the {@link Root}).
      */
-    paintToInternal(force: boolean): boolean {
+    paintToInternal(): boolean {
         // check if there are any parts that need to be repainted
         const dirtyRects = this.mergedDirtyRects();
         const wasDirty = dirtyRects.length > 0;
@@ -313,7 +316,7 @@ export class CanvasViewport extends BaseViewport {
             }
 
             // paint child
-            this.child.paint(force);
+            this.child.paint(dirtyRects);
 
             // stop clipping/scaling
             this.context.restore();
@@ -344,8 +347,12 @@ export class CanvasViewport extends BaseViewport {
         return wasDirty;
     }
 
-    paint(force: boolean, backgroundFillStyle: FillStyle): boolean {
-        const wasDirty = this.paintToInternal(force);
+    paint(extraDirtyRects: Array<Rect>, backgroundFillStyle: FillStyle): boolean {
+        // add extra damage regions to internally tracked damage region list
+        this.pushDirtyRects(extraDirtyRects);
+
+        // paint to internal canvas
+        const wasDirty = this.paintToInternal();
 
         // Paint to parent viewport, if any
         if(this.parent !== null) {
@@ -385,6 +392,10 @@ export class CanvasViewport extends BaseViewport {
         return wasDirty;
     }
 
+    protected pushDirtyRects(rects: Array<Rect>) {
+        this.dirtyRects.push(...rects);
+    }
+
     protected pushDirtyRect(rect: Rect) {
         this.dirtyRects.push(rect);
     }
@@ -401,5 +412,9 @@ export class CanvasViewport extends BaseViewport {
         }
 
         this.pushDirtyRect(rect);
+    }
+
+    markWholeAsDirty() {
+        this.pushDirtyRect([0, 0, this.canvas.width, this.canvas.height]);
     }
 }

@@ -1,7 +1,7 @@
 import { PointerPress } from '../events/PointerPress';
 import { PointerWheel } from '../events/PointerWheel';
 import { PointerEvent } from '../events/PointerEvent';
-import { paintField } from '../decorators/FlagFields';
+import { damageField } from '../decorators/FlagFields';
 import { ClickHelper } from '../helpers/ClickHelper';
 import { Widget, WidgetProperties } from './Widget';
 import { ClickState } from '../helpers/ClickState';
@@ -15,6 +15,7 @@ import { Variable } from '../state/Variable';
 import type { Root } from '../core/Root';
 import { DynMsg } from '../core/Strings';
 import { Leave } from '../events/Leave';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * Optional Slider constructor properties.
@@ -60,7 +61,7 @@ export class Slider extends Widget {
     /** The actual height of the slider */
     private actualHeight = 0;
     /** Is the keyboard focusing this widget? */
-    @paintField
+    @damageField
     private keyboardFocused = false;
     /** The helper for keeping track of the slider value */
     readonly variable: Variable<number>;
@@ -306,7 +307,7 @@ export class Slider extends Widget {
         }
     }
 
-    protected override handlePainting(_forced: boolean): void {
+    protected override handlePainting(_dirtyRects: Array<Rect>): void {
         // Correct position with offset
         const x = this.x + this.offsetX;
         const y = this.y + this.offsetY;

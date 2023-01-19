@@ -253,12 +253,9 @@ export abstract class Widget extends BaseTheme {
     }
 
     /**
-     * Check if the widget has zero width or height.
-     *
-     * If true, {@link Widget#paint} will do nothing and {@link Widget#dirty}
-     * will be false even if {@link Widget#_dirty} is true.
-     *
-     * Usually becomes true when containers overflow.
+     * Check if the widget has zero width or height. If true, then
+     * {@link Widget#paint} will do nothing, which usually happens when
+     * containers overflow.
      */
     get dimensionless(): boolean {
         return this.width == 0 || this.height == 0;
@@ -465,10 +462,10 @@ export abstract class Widget extends BaseTheme {
         // Clear layout dirty flag
         this._layoutDirty = false;
 
-        // If dimensions changed (compare with tracked old dimensions), then set
-        // dirty flag
+        // If dimensions changed (compare with tracked old dimensions), then
+        // mark as dirty
         if(oldWidth !== this.idealWidth || oldHeight !== this.idealHeight) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -538,9 +535,10 @@ export abstract class Widget extends BaseTheme {
         const newWidth = Math.ceil((this.idealX + this.idealWidth) * scaleX) / scaleX - newX;
         const newHeight = Math.ceil((this.idealY + this.idealHeight) * scaleY) / scaleY - newY;
 
-        // Mark as dirty if bounds have changed
-        if(newX !== this.x || newY !== this.y || newWidth !== this.width || newHeight !== this.height) {
-            this._dirty = true;
+        // Mark as dirty if bounds have changed (with old bounds)
+        const changedBounds = newX !== this.x || newY !== this.y || newWidth !== this.width || newHeight !== this.height;
+        if(changedBounds) {
+            this.markWholeAsDirty();
         }
 
         // Set final bounds
@@ -548,6 +546,11 @@ export abstract class Widget extends BaseTheme {
         this.y = newY;
         this.width = newWidth;
         this.height = newHeight;
+
+        // Mark as dirty if bounds have changed (with new bounds)
+        if (changedBounds) {
+            this.markWholeAsDirty();
+        }
     }
 
     /**
@@ -631,33 +634,74 @@ export abstract class Widget extends BaseTheme {
     }
 
     /**
-     * Widget painting callback. By default does nothing. Do painting logic here
-     * when extending Widget. Even if {@link Widget#_dirty} is false, if this
-     * method is called, then the widget must still be painted. Should be
-     * overridden.
+     * Widget painting callback. Should be overridden; does nothing by default.
+     * Do painting logic here when extending Widget.
      *
-     * @param forced - Was this widget force-painted? If calling a child's paint method, propagate this value
+     * It's safe to repaint the whole widget even if only a part of the widget
+     * is damaged, since the painting is automatically clipped to the damage
+     * regions, however, it's preferred to only repaint the damaged parts for
+     * performance reasons.
+     *
+     * All passed dirty rectangles intersect the widget, have an area greater
+     * than 0, and are clamped to the widget bounds.
+     *
+     * @param dirtyRects - The damaged regions that need to be re-painted, as a list of dirty rectangles
      */
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-    protected handlePainting(forced: boolean): void {}
+    protected handlePainting(dirtyRects: Array<Rect>): void {}
 
     /**
-     * Called when the Widget is dirty and the Root is being rendered. Does
-     * nothing if dirty flag is not set, else, calls the
-     * {@link Widget#handlePainting} method and unsets the dirty flag.
-     * Automatically calls {@link Widget#dryPaint} if
-     * {@link Widget#dimensionless} is true. Must not be overridden.
+     * Called when the Widget needs to be re-painted and the Root is being
+     * rendered. Does nothing if none of the dirty rectangles intersect the
+     * widget or the widget is {@link Widget#dimensionless}, else, calls the
+     * {@link Widget#handlePainting} method. Must not be overridden.
      *
-     * @param force - Force re-paint even if {@link Widget#_dirty} is false
+     * @param dirtyRects - The damaged regions that need to be re-painted, as a list of dirty rectangles
      */
-    paint(force = false): void {
-        if(this.dimensionless) {
-            return this.dryPaint();
+    paint(dirtyRects: Array<Rect>): void {
+        // TODO in-place clamping to reduce GC?
+        if(this.dimensionless || dirtyRects.length === 0) {
+            return;
         }
 
-        if(!this._dirty && !force) {
+        const widgetRight = this.x + this.width;
+        const widgetBottom = this.y + this.height;
+
+        const effectiveDirtyRects: Array<Rect> = [];
+        for (const rect of dirtyRects) {
+            // check if damage intersects widget
+            const origLeft = rect[0];
+            if (origLeft >= widgetRight) {
+                continue;
+            }
+
+            const origRight = origLeft + rect[2];
+            if (origRight <= this.x) {
+                continue;
+            }
+
+            const origTop = rect[1];
+            if (origTop >= widgetBottom) {
+                continue;
+            }
+
+            const origBottom = origTop + rect[3];
+            if (origBottom <= this.y) {
+                continue;
+            }
+
+            // clamp damage region
+            const left = Math.max(origLeft, this.x);
+            const top = Math.max(origTop, this.y);
+            const right = Math.min(origRight, widgetRight);
+            const bottom = Math.min(origBottom, widgetBottom);
+
+            effectiveDirtyRects.push([ left, top, right - left, bottom - top ]);
+        }
+
+        if (effectiveDirtyRects.length === 0) {
             return;
         }
 
@@ -666,21 +710,9 @@ export abstract class Widget extends BaseTheme {
             // TODO don't save context so much. maybe require the child widget
             // to keep the context clean
             ctx.save();
-            this.handlePainting(force);
+            this.handlePainting(effectiveDirtyRects);
             ctx.restore();
         }
-
-        this._dirty = false;
-    }
-
-    /**
-     * Unset this widget's dirty flag. Call this when painting a child that you
-     * know will not be visible, such as if clipping and the child is out of
-     * bounds. If implementing a container widget, override this so that each
-     * child widget's dryPaint method is called.
-     */
-    dryPaint(): void {
-        this._dirty = false;
     }
 
     /**
@@ -694,6 +726,8 @@ export abstract class Widget extends BaseTheme {
      * but `super.forceDirty` must be called.
      */
     forceDirty(markLayout = true): void {
+        // TODO what do i do with this? this feels like a hack that should have
+        // never existed in the first place
         this._dirty = true;
 
         if(markLayout) {
@@ -855,10 +889,11 @@ export abstract class Widget extends BaseTheme {
      * Must not be propagated to children by container Widgets. This is already
      * done automatically by {@link Widget#updateActiveState}.
      *
-     * Marks {@link Widget#dirty} and {@link Widget#layoutDirty} as true.
+     * Marks {@link Widget#layoutDirty} as true, and marks the whole widget as
+     * dirty.
      */
     protected activate(): void {
-        this._dirty = true;
+        this.markWholeAsDirty();
         this._layoutDirty = true;
     }
 
@@ -870,11 +905,10 @@ export abstract class Widget extends BaseTheme {
      * Must not be propagated to children by container Widgets. This is already
      * done automatically by {@link Widget#updateActiveState}.
      *
-     * Marks {@link Widget#dirty} and {@link Widget#layoutDirty} as true, and
-     * drops all foci set to this Widget if the Widget is attached.
+     * Marks {@link Widget#layoutDirty} as true and drops all foci set to this
+     * Widget if the Widget is attached.
      */
     protected deactivate(): void {
-        this._dirty = true;
         this._layoutDirty = true;
 
         if(this.attached) {

@@ -6,6 +6,7 @@ import type { Variable } from '../state/Variable';
 import type { Viewport } from '../core/Viewport';
 import type { Event } from '../events/Event';
 import type { Root } from '../core/Root';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * A radio button widget; used for selecting one of many options. Uses a shared
@@ -156,7 +157,7 @@ export class RadioButton<V> extends Widget {
         this.offsetY = (this.height - this.actualLength) / 2;
     }
 
-    protected override handlePainting(_forced: boolean): void {
+    protected override handlePainting(_dirtyRects: Array<Rect>): void {
         this._wasSelected = this.selected;
 
         // Should we use glow colours? (background glow and accent)

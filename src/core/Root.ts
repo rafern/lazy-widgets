@@ -260,8 +260,7 @@ export class Root {
             return false;
         }
 
-        // TODO REMOVE WORKAROUND (replace true with false in force argument)
-        return this.viewport.paintToInternal(true);
+        return this.viewport.paintToInternal();
     }
 
     /**

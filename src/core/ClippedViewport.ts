@@ -32,9 +32,8 @@ export class ClippedViewport extends BaseViewport {
         super(child, false);
     }
 
-    paint(force: boolean, backgroundFillStyle: FillStyle): boolean {
-        const wasDirty = this.child.dirty;
-
+    paint(extraDirtyRects: Array<Rect>, backgroundFillStyle: FillStyle): boolean {
+        const wasDirty = extraDirtyRects.length > 0;
         const [vpX, vpY, vpW, vpH, _origXDst, _origYDst, xDst, yDst, wClipped, hClipped] = this.getClippedViewport();
         const ctx = this.context;
 
@@ -51,7 +50,6 @@ export class ClippedViewport extends BaseViewport {
 
         // Abort if outside of bounds
         if(wClipped === 0 || hClipped === 0) {
-            this.child.dryPaint();
             return wasDirty;
         }
 
@@ -59,7 +57,7 @@ export class ClippedViewport extends BaseViewport {
         ctx.beginPath();
         ctx.rect(vpX, vpY, vpW, vpH);
         ctx.clip();
-        this.child.paint(force);
+        this.child.paint(extraDirtyRects);
         ctx.restore();
 
         return wasDirty;

@@ -1,3 +1,4 @@
+import type { Rect } from '../helpers/Rect';
 import { BaseContainer } from './BaseContainer';
 import type { Widget, WidgetProperties } from './Widget';
 
@@ -16,7 +17,7 @@ export class Background<W extends Widget = Widget> extends BaseContainer<W> {
         }
     }
 
-    protected override handlePainting(forced: boolean): void {
+    protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Paint brackground
         const ctx = this.viewport.context;
         ctx.save();
@@ -24,6 +25,6 @@ export class Background<W extends Widget = Widget> extends BaseContainer<W> {
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.restore();
 
-        super.handlePainting(forced);
+        super.handlePainting(dirtyRects);
     }
 }

@@ -1,6 +1,7 @@
 import { TextHelper, WrapMode } from '../helpers/TextHelper';
 import { layoutField } from '../decorators/FlagFields';
 import { Widget, WidgetProperties } from './Widget';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * Optional TextInput constructor properties.
@@ -97,7 +98,7 @@ export class Label extends Widget {
         this.idealHeight = Math.max(Math.min(this.textHelper.height + this.textHelper.actualLineSpacing, maxHeight), minHeight);
     }
 
-    protected override handlePainting(_forced: boolean): void {
+    protected override handlePainting(_dirtyRects: Array<Rect>): void {
         // Start clipping if text wrapping is disabled or the text vertically
         // overflows
         const spacedHeight = this.textHelper.height + this.textHelper.actualLineSpacing;

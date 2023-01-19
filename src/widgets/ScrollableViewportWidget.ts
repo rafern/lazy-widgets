@@ -11,6 +11,7 @@ import type { Event } from '../events/Event';
 import { Leave } from '../events/Leave';
 import type { Widget } from './Widget';
 import { Root } from '../core/Root';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * The mode for how a scrollbar is shown in a {@link ScrollableViewportWidget}.
@@ -557,7 +558,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         this.offset = offset;
     }
 
-    protected override handlePainting(forced: boolean): void {
+    protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Check which scrollbars need painting and update forceRePaint flag
         const [childWidth, childHeight] = this.child.idealDimensions;
         const xNeeded = childWidth > this.effectiveWidth;
@@ -579,7 +580,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         }
 
         // Paint viewport
-        super.handlePainting(forced);
+        super.handlePainting(dirtyRects);
 
         // Paint scrollbars
         const forceCorner = this._scrollbarMode === ScrollbarMode.Layout &&

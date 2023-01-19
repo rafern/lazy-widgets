@@ -3,6 +3,7 @@ import { Widget, WidgetProperties } from './Widget';
 import { Alignment } from '../theme/Alignment';
 import type { Event } from '../events/Event';
 import { MultiParent } from './MultiParent';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * A {@link MultiParent} which automatically paints children, adds spacing,
@@ -333,10 +334,10 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         }
     }
 
-    protected override handlePainting(forced: boolean): void {
+    protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Paint children
         for(const child of this.children) {
-            child.paint(forced);
+            child.paint(dirtyRects);
         }
     }
 }

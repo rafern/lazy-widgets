@@ -1004,7 +1004,7 @@ export class TextInput extends Widget {
         return [x, x + w, y, y + h];
     }
 
-    protected override handlePainting(_forced: boolean): void {
+    protected override handlePainting(_dirtyRects: Array<Rect>): void {
         // Paint background
         const ctx = this.viewport.context;
         ctx.fillStyle = this.inputBackgroundFill;

@@ -119,7 +119,7 @@ export abstract class BaseViewport implements Viewport {
         return newWidth !== oldWidth || newHeight !== oldHeight;
     }
 
-    abstract paint(force: boolean, backgroundFillStyle: FillStyle): boolean;
+    abstract paint(extraDirtyRects: Array<Rect>, backgroundFillStyle: FillStyle): boolean;
 
     dispatchEvent(event: Event): Widget | null {
         // Drop event if it is a positional event with no target outside the

@@ -2,6 +2,7 @@ import { Widget, WidgetProperties } from './Widget';
 import { Alignment } from '../theme/Alignment';
 import { SingleParent } from './SingleParent';
 import type { Event } from '../events/Event';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * A {@link SingleParent} which contains a single child and automatically paints
@@ -159,8 +160,8 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         }
     }
 
-    protected override handlePainting(forced: boolean): void {
+    protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Paint child
-        this.child.paint(forced);
+        this.child.paint(dirtyRects);
     }
 }

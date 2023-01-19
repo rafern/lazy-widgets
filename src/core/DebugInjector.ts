@@ -373,8 +373,6 @@ export function injectDebugCode(): void {
     injectStackTraceFeature(Widget, 'handlePainting');
     // stacktrace.Widget.paint
     injectStackTraceFeature(Widget, 'paint');
-    // stacktrace.Widget.dryPaint
-    injectStackTraceFeature(Widget, 'dryPaint');
     // stacktrace.Widget.forceDirty
     injectStackTraceFeature(Widget, 'forceDirty');
     // stacktrace.Widget.scaleFont
@@ -504,10 +502,10 @@ export function injectDebugCode(): void {
         }
     };
 
-    // flashdirtyrects; special debug feature for CanvasViewport
+    // flashdamage; special debug feature for CanvasViewport
     const viewports: Array<DebuggableCanvasViewport> = [];
     features.set(
-        'flashdirtyrects',
+        'flashdamage',
         [
             false,
             'Momentarily flash rectangles that are marked as dirty for 1 second. Pushed dirty rectangles are painted in red, while merged (effective) dirty rectangles are painted in blue',
@@ -523,7 +521,7 @@ export function injectDebugCode(): void {
         const viewport = new DebuggableCanvasViewport(child, properties?.resolution, properties?.preventBleeding, properties?.canvasStartingWidth, properties?.canvasStartingHeight);
         viewports.push(viewport);
 
-        if (isDebugFeatureEnabled('flashdirtyrects')) {
+        if (isDebugFeatureEnabled('flashdamage')) {
             viewport.overlayEnabled = true;
         }
 

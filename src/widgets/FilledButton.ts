@@ -8,6 +8,7 @@ import type { Event } from '../events/Event';
 import { DynMsg } from '../core/Strings';
 import { Theme } from '../theme/Theme';
 import { Button } from './Button';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * Optional FilledButton constructor properties.
@@ -94,7 +95,7 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
 
         // Update canvasFill property of child's theme
         if(oldProperty !== this.backgroundProperty) {
-            this.backgroundDirty = true;
+            this.markWholeAsDirty();
             this.childTheme.canvasFill = this.getBackgroundFill();
         }
     }
@@ -130,10 +131,10 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
     protected override onThemeUpdated(property: string | null = null): void {
         if(property === null) {
             this._layoutDirty = true;
-            this.backgroundDirty = true;
+            this.markWholeAsDirty();
             this.childTheme.canvasFill = this.getBackgroundFill();
         } else if(property === this.backgroundProperty) {
-            this.backgroundDirty = true;
+            this.markWholeAsDirty();
             this.childTheme.canvasFill = this.getBackgroundFill();
         } else if(property === 'containerPadding') {
             this._layoutDirty = true;
@@ -168,7 +169,7 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
         return capturer;
     }
 
-    protected override handlePainting(forced: boolean): void {
+    protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Paint brackground
         const ctx = this.viewport.context;
         ctx.save();
@@ -176,6 +177,6 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.restore();
 
-        super.handlePainting(forced);
+        super.handlePainting(dirtyRects);
     }
 }

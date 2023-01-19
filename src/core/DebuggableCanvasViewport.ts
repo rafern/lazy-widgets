@@ -19,6 +19,14 @@ export class DebuggableCanvasViewport extends CanvasViewport {
     readonly events = new Set<DebugEvent>();
     /** Is the overlay enabled? Disabled by default */
     private _overlayEnabled = false;
+    /** Does the overlay need to be updated? */
+    private _overlayDirty = false;
+    /** When was the last time the PPS was measured? */
+    private _lastPPSMeasurement = 0;
+    /** Current PPS text value */
+    private _ppsText = 'PPS: measuring...';
+    /** Paints since last measurement */
+    private _paintCounter = 0;
 
     constructor(child: Widget, resolution = 1, preventBleeding = false, startingWidth = 64, startingHeight = 64) {
         super(child, resolution, preventBleeding, startingWidth, startingHeight);
@@ -80,6 +88,7 @@ export class DebuggableCanvasViewport extends CanvasViewport {
 
         // generate overlay
         if (this._overlayEnabled) {
+            // draw damage
             this.overlayContext.clearRect(0, 0, width, height);
             this.overlayContext.globalCompositeOperation = 'lighter';
 
@@ -100,6 +109,9 @@ export class DebuggableCanvasViewport extends CanvasViewport {
             for (const event of expired) {
                 this.events.delete(event);
             }
+
+            // update overlay dirty flag
+            this._overlayDirty = this.events.size > 0;
         }
 
         // merge internal canvas and overlay
@@ -108,9 +120,23 @@ export class DebuggableCanvasViewport extends CanvasViewport {
         this.outputContext.drawImage(this.canvas, 0, 0);
 
         if (this._overlayEnabled) {
+            // apply overlay
             this.outputContext.globalAlpha = 0.5;
             this.outputContext.globalCompositeOperation = 'source-over';
             this.outputContext.drawImage(this.overlayCanvas, 0, 0);
+
+            // paint PPS text
+            this.outputContext.save();
+            this.outputContext.globalAlpha = 1;
+            this.outputContext.globalCompositeOperation = 'source-over';
+            this.outputContext.lineWidth = 4;
+            this.outputContext.textBaseline = 'top';
+            this.outputContext.font = '16px sans-serif';
+            this.outputContext.strokeStyle = 'black';
+            this.outputContext.fillStyle = 'white';
+            this.outputContext.strokeText(this._ppsText, 8, 8);
+            this.outputContext.fillText(this._ppsText, 8, 8);
+            this.outputContext.restore();
         }
     }
 
@@ -120,11 +146,23 @@ export class DebuggableCanvasViewport extends CanvasViewport {
 
         if (this.events) {
             this.events.add(event);
+            this._overlayDirty = true;
         } else {
             // HACK CanvasViewport calls pushDirtyRect in the constructor, so we
             // might not be ready when this method is called. queue it up with a
             // setTimeout
-            setTimeout(() => this.events.add(event), 0);
+            setTimeout(() => {
+                this.events.add(event);
+                this._overlayDirty = true;
+            }, 0);
+        }
+    }
+
+    protected override pushDirtyRects(rects: Array<Rect>) {
+        super.pushDirtyRects(rects);
+
+        for (const rect of rects) {
+            this.addDebugEvent(rect, false);
         }
     }
 
@@ -151,12 +189,32 @@ export class DebuggableCanvasViewport extends CanvasViewport {
         return wasResized;
     }
 
-    override paintToInternal(force: boolean): boolean {
-        const wasDirty = super.paintToInternal(force);
+    override paintToInternal(): boolean {
+        const wasDirty = super.paintToInternal();
+
+        if (wasDirty) {
+            this._paintCounter++;
+        }
 
         if (this._overlayEnabled) {
-            this.updateOutputCanvas();
-            return true;
+            // update PPS text
+            const now = Date.now();
+            const elapsed = now - this._lastPPSMeasurement;
+            if (elapsed > 1000) {
+                const pps = this._paintCounter / elapsed;
+                this._lastPPSMeasurement = now;
+                this._ppsText = `PPS: ${pps.toFixed(4)} (${this._paintCounter} since last)`;
+                this._overlayDirty = true;
+                this._paintCounter = 0;
+            }
+
+            // paint overlay
+            if (wasDirty || this._overlayDirty) {
+                this.updateOutputCanvas();
+                return true;
+            } else {
+                return false;
+            }
         } else {
             if (wasDirty) {
                 this.updateOutputCanvas();

@@ -102,10 +102,10 @@ export interface Viewport {
      *
      * Nothing is done if the child was not dirty.
      *
-     * @param force - Force re-paint even if child.{@link Widget#dirty} is false
+     * @param extraDirtyRects - Extra damage regions (not tracked internally) that need to be repainted. Can be an empty list if this is a root viewport.
      * @returns Returns true if the child was dirty, else, false.
      */
-    paint(force: boolean, backgroundFillStyle: FillStyle): boolean;
+    paint(extraDirtyRects: Array<Rect>, backgroundFillStyle: FillStyle): boolean;
     /**
      * Dispatch an event to the Viewport's {@link Viewport#child}.
      *
