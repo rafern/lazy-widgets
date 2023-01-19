@@ -3,20 +3,22 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Icon, IconFit
+                DOMRoot, Label, Margin, Column, Icon, IconFit, Background
             } from './index.esm.js';
 
             // Create the root
             const root = new DOMRoot(
-                new Margin(
-                    new Column().add([
-                        new Label('"Contain" icon fit mode (default):'),
-                        new Icon('test-image.png', {fit: IconFit.Contain}),
-                        new Label('"Cover" icon fit mode:'),
-                        new Icon('test-image.png', {fit: IconFit.Cover}),
-                        new Label('"Fill" icon fit mode:'),
-                        new Icon('test-image.png', {fit: IconFit.Fill}),
-                    ])
+                new Background(
+                    new Margin(
+                        new Column().add([
+                            new Label('"Contain" icon fit mode (default):'),
+                            new Icon('test-image.png', {fit: IconFit.Contain}),
+                            new Label('"Cover" icon fit mode:'),
+                            new Icon('test-image.png', {fit: IconFit.Cover}),
+                            new Label('"Fill" icon fit mode:'),
+                            new Icon('test-image.png', {fit: IconFit.Fill}),
+                        ])
+                    )
                 )
             );
 

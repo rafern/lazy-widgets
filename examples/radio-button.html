@@ -4,7 +4,7 @@
         <script type='module'>
             import {
                 DOMRoot, Label, Margin, Column, LabelledRadioButton, Spacing,
-                DOMKeyboardDriver, DOMPointerDriver, Variable
+                DOMKeyboardDriver, DOMPointerDriver, Variable, Background
             } from './index.esm.js';
 
             // Create the root
@@ -13,16 +13,18 @@
             variable.watch(newValue => label.text = `Option selected: ${variable.value ?? 'none'}`);
 
             const root = new DOMRoot(
-                new Margin(
-                    new Column()
-                    .add(new Label('Select an option:'))
-                    .add(new LabelledRadioButton('Option 1', variable, 'option_1_value'))
-                    .add(new LabelledRadioButton('Option 2', variable, 'option_2_value'))
-                    .add(new LabelledRadioButton('Option 3', variable, 'option_3_value'))
-                    .add(new LabelledRadioButton('Option 4', variable, 'option_4_value'))
-                    .add(new LabelledRadioButton('Option 5', variable, 'option_5_value'))
-                    .add(new Spacing({ flex: 0, minHeight: 8 }))
-                    .add(label)
+                new Background(
+                    new Margin(
+                        new Column()
+                        .add(new Label('Select an option:'))
+                        .add(new LabelledRadioButton('Option 1', variable, 'option_1_value'))
+                        .add(new LabelledRadioButton('Option 2', variable, 'option_2_value'))
+                        .add(new LabelledRadioButton('Option 3', variable, 'option_3_value'))
+                        .add(new LabelledRadioButton('Option 4', variable, 'option_4_value'))
+                        .add(new LabelledRadioButton('Option 5', variable, 'option_5_value'))
+                        .add(new Spacing({ flex: 0, minHeight: 8 }))
+                        .add(label)
+                    )
                 )
             );
 

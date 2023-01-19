@@ -5,7 +5,7 @@
             import {
                 DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
                 DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
-                ValidatedVariable
+                ValidatedVariable, Background
             } from './index.esm.js';
 
             // Create the root
@@ -32,13 +32,15 @@
             );
 
             const root = new DOMRoot(
-                new Margin(
-                    new Column().add([
-                        toggleableWidget,
-                        new TextButton('Toggle container', () => {
-                            toggleableWidget.enabled = !toggleableWidget.enabled;
-                        })
-                    ])
+                new Background(
+                    new Margin(
+                        new Column().add([
+                            toggleableWidget,
+                            new TextButton('Toggle container', () => {
+                                toggleableWidget.enabled = !toggleableWidget.enabled;
+                            })
+                        ])
+                    )
                 )
             );
 

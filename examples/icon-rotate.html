@@ -4,17 +4,19 @@
         <script type='module'>
             import {
                 DOMRoot, Label, Margin, Column, Icon, TextAlignMode,
-                ArtificialConstraint,
+                ArtificialConstraint, Background
             } from './index.esm.js';
 
             // Create the root
             const icon = new Icon('banana.png');
             const root = new DOMRoot(
-                new Margin(
-                    new Column()
-                    .add(new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }))
-                    .add(new ArtificialConstraint(icon, [0, 128, 0, 128]))
-                    .add(new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }))
+                new Background(
+                    new Margin(
+                        new Column()
+                        .add(new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }))
+                        .add(new ArtificialConstraint(icon, [0, 128, 0, 128]))
+                        .add(new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }))
+                    )
                 )
             );
 

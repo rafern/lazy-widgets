@@ -3,24 +3,26 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Icon
+                DOMRoot, Label, Margin, Column, Icon, Background
             } from './index.esm.js';
 
             // Create the root
             const root = new DOMRoot(
-                new Margin(
-                    new Column().add([
-                        new Label('Full spritesheet:'),
-                        new Icon('test-spritesheet.svg'),
-                        new Label('Top-left sprite (32x32 at 0,0):'),
-                        new Icon('test-spritesheet.svg', { viewBox: [0, 0, 32, 32] }),
-                        new Label('Top-right sprite (32x32 at 32,0):'),
-                        new Icon('test-spritesheet.svg', { viewBox: [32, 0, 32, 32] }),
-                        new Label('Bottom-left sprite (32x32 at 0,0):'),
-                        new Icon('test-spritesheet.svg', { viewBox: [0, 32, 32, 32] }),
-                        new Label('Bottom-right sprite (32x32 at 32,0):'),
-                        new Icon('test-spritesheet.svg', { viewBox: [32, 32, 32, 32] }),
-                    ])
+                new Background(
+                    new Margin(
+                        new Column().add([
+                            new Label('Full spritesheet:'),
+                            new Icon('test-spritesheet.svg'),
+                            new Label('Top-left sprite (32x32 at 0,0):'),
+                            new Icon('test-spritesheet.svg', { viewBox: [0, 0, 32, 32] }),
+                            new Label('Top-right sprite (32x32 at 32,0):'),
+                            new Icon('test-spritesheet.svg', { viewBox: [32, 0, 32, 32] }),
+                            new Label('Bottom-left sprite (32x32 at 0,0):'),
+                            new Icon('test-spritesheet.svg', { viewBox: [0, 32, 32, 32] }),
+                            new Label('Bottom-right sprite (32x32 at 32,0):'),
+                            new Icon('test-spritesheet.svg', { viewBox: [32, 32, 32, 32] }),
+                        ])
+                    )
                 )
             );
 

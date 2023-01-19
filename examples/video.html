@@ -3,7 +3,8 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Margin, Icon, Column, Row, TextButton, DOMPointerDriver
+                DOMRoot, Margin, Icon, Column, Row, TextButton,
+                DOMPointerDriver, Background
             } from './index.esm.js';
 
             // Create the root
@@ -20,15 +21,17 @@
             video.addEventListener('pause', () => button.child.text = 'Play');
 
             const root = new DOMRoot(
-                new Margin(
-                    new Column().add([
-                        icon,
-                        new Row({
-                            multiContainerAlignment: { main: 0.5, cross: 0.5 }
-                        }).add([
-                            button
+                new Background(
+                    new Margin(
+                        new Column().add([
+                            icon,
+                            new Row({
+                                multiContainerAlignment: { main: 0.5, cross: 0.5 }
+                            }).add([
+                                button
+                            ])
                         ])
-                    ])
+                    )
                 )
             );
 

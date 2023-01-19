@@ -6,7 +6,7 @@
                 DOMRoot, Label, Margin, Column, Row, TextButton, ScrollbarMode,
                 DOMKeyboardDriver, DOMPointerDriver, FlexAlignment, TextInput,
                 ScrollableViewportWidget, Alignment, ValidatedVariable,
-                AxisCoupling
+                AxisCoupling, Background
             } from './index.esm.js';
 
             // Create the root
@@ -14,41 +14,43 @@
             const column = new Column();
 
             const root = new DOMRoot(
-                new ScrollableViewportWidget(
-                    new Margin(
-                        column.add(
-                            new ScrollableViewportWidget(
-                                new Margin(
-                                    new Column()
-                                    .add(label)
-                                    .add(
-                                        new TextInput(new ValidatedVariable('', null, value => {
-                                            label.text = `Text input: ${value}`;
-                                        }, false))
-                                    )
-                                    .add(
-                                        new Row({
-                                            multiContainerAlignment: {
-                                                main: FlexAlignment.Center,
-                                                cross: Alignment.Stretch
-                                            },
-                                        }).add([
-                                            new TextButton('Button 1', () => label.source = 'Button 1 clicked!'),
-                                            new TextButton('Button 2', () => label.source = 'Button 2 clicked!'),
-                                        ])
-                                    )
-                                ),
-                                {
-                                    minWidth: 170,
-                                    minHeight: 50
-                                }
+                new Background (
+                    new ScrollableViewportWidget(
+                        new Margin(
+                            column.add(
+                                new ScrollableViewportWidget(
+                                    new Margin(
+                                        new Column()
+                                        .add(label)
+                                        .add(
+                                            new TextInput(new ValidatedVariable('', null, value => {
+                                                label.text = `Text input: ${value}`;
+                                            }, false))
+                                        )
+                                        .add(
+                                            new Row({
+                                                multiContainerAlignment: {
+                                                    main: FlexAlignment.Center,
+                                                    cross: Alignment.Stretch
+                                                },
+                                            }).add([
+                                                new TextButton('Button 1', () => label.source = 'Button 1 clicked!'),
+                                                new TextButton('Button 2', () => label.source = 'Button 2 clicked!'),
+                                            ])
+                                        )
+                                    ),
+                                    {
+                                        minWidth: 170,
+                                        minHeight: 50
+                                    }
+                                )
                             )
-                        )
-                    ),
-                    {
-                        minWidth: 200,
-                        minHeight: 200
-                    }
+                        ),
+                        {
+                            minWidth: 200,
+                            minHeight: 200
+                        }
+                    )
                 )
             );
 

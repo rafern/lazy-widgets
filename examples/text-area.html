@@ -4,18 +4,20 @@
         <script type='module'>
             import {
                 DOMRoot, Margin, Column, TextArea, Label, ValidatedVariable,
-                DOMKeyboardDriver, DOMPointerDriver
+                DOMKeyboardDriver, DOMPointerDriver, Background
             } from './index.esm.js';
 
             // Create the root
             const root = new DOMRoot(
-                new Margin(
-                    new Column()
-                    .add(new Label('Text area (200x200 minimum length):'))
-                    .add(new TextArea(
-                        new ValidatedVariable('Type some text here...'),
-                        { minWidth: 200, minHeight: 200 }
-                    ))
+                new Background(
+                    new Margin(
+                        new Column()
+                        .add(new Label('Text area (200x200 minimum length):'))
+                        .add(new TextArea(
+                            new ValidatedVariable('Type some text here...'),
+                            { minWidth: 200, minHeight: 200 }
+                        ))
+                    )
                 )
             );
 
