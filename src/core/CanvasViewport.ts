@@ -389,7 +389,7 @@ export class CanvasViewport extends BaseViewport {
         this.dirtyRects.push(rect);
     }
 
-    override markDirtyRect(rect: Rect) {
+    override propagateDirtyRect(rect: Rect) {
         const [scaleX, scaleY] = this.effectiveScale;
         if (scaleX !== 1 || scaleY !== 1) {
             const [left, top, width, height] = rect;

@@ -109,7 +109,16 @@ export interface Viewport {
     /**
      * Dispatch an event to the Viewport's {@link Viewport#child}.
      *
+     * @param event - The event to dispatch down the UI tree
      * @returns Returns the widget that captured the event or null if none captured the event.
      */
     dispatchEvent(event: Event): Widget | null;
+
+    /**
+     * Mark a rectangle relative to this viewport as dirty. Propagates up the
+     * UI tree, not down. Similar to {@link Widget#propagateDirtyRect}.
+     *
+     * @param rect - A rectangle with the area that was marked as dirty
+     */
+    propagateDirtyRect(rect: Rect): void;
 }

@@ -38,7 +38,10 @@ export abstract class Widget extends BaseTheme {
      * but will still be present in the UI tree.
      */
     private _enabled;
-    /** Widget will only be painted if dirty is true. */
+    /**
+     * Widget will only be painted if dirty is true.
+     * @deprecated {@link Widget#_dirty} is now ignored. use {@link Widget#markAsDirty} or {@link Widget#markWholeAsDirty}.
+     */
     protected _dirty = true;
     /**
      * If this is true, widget needs their layout resolved. If implementing a
@@ -235,6 +238,7 @@ export abstract class Widget extends BaseTheme {
     /**
      * Check if the widget is dirty. Returns {@link Widget#_dirty}, as long as
      * {@link Widget#dimensionless} is not true.
+     * @deprecated {@link Widget#dirty} is no longer used. There is no way to check if a widget needs to be re-painted without catching dirty rectangles.
      */
     get dirty(): boolean {
         return this._dirty && !this.dimensionless;
@@ -884,5 +888,46 @@ export abstract class Widget extends BaseTheme {
      */
     autoScroll(): void {
         this.root.dispatchEvent(new AutoScroll(this, [0, this.idealWidth, 0, this.idealHeight]));
+    }
+
+    /**
+     * Propagate a dirty rectangle from a child widget to the parent.
+     *
+     * Should be overridden by Widgets that transform their children, to correct
+     * the position and dimensions of the dirty rectangle.
+     */
+    propagateDirtyRect(rect: Rect): void {
+        this.markAsDirty(rect);
+    }
+
+    /**
+     * Mark a part of this widget as dirty. The dirty rectangle will be
+     * propagated via ascendant widgets until it reaches a CanvasViewport.
+     *
+     * If the widget is not active, then this method call is ignored.
+     *
+     * Must not be overridden; you probably want to override
+     * {@link Widget#propagateDirtyRect} instead.
+     */
+    protected markAsDirty(rect: Rect): void {
+        if (!this._active) {
+            return;
+        }
+
+        if (this._parent) {
+            this._parent.propagateDirtyRect(rect);
+        } else if (this._viewport) {
+            this._viewport.propagateDirtyRect(rect);
+        } else {
+            console.warn('Could not mark rectangle as dirty; Widget is in invalid state (_active is true, but _parent and _viewport are null)');
+        }
+    }
+
+    /**
+     * Mark the entire widget as dirty. Conveniance method that calls
+     * {@link Widget#markAsDirty}.
+     */
+    protected markWholeAsDirty(): void {
+        this.markAsDirty([this.x, this.y, this.width, this.height]);
     }
 }

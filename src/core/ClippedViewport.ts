@@ -65,7 +65,7 @@ export class ClippedViewport extends BaseViewport {
         return wasDirty;
     }
 
-    override markDirtyRect(_rect: Rect): void {
+    override propagateDirtyRect(_rect: Rect): void {
         // TODO
         throw new Error('NIY');
     }
