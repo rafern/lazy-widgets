@@ -271,7 +271,6 @@ export class CanvasViewport extends BaseViewport {
         this.context.lineTo(right, top);
         this.context.lineTo(right, bottom);
         this.context.lineTo(left, bottom);
-        this.context.clip();
     }
 
     /**
@@ -304,6 +303,8 @@ export class CanvasViewport extends BaseViewport {
             for (const dirtyRect of dirtyRects) {
                 this.clipToRect(dirtyRect);
             }
+
+            this.context.clip();
 
             // clear dirty area
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
