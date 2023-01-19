@@ -1,5 +1,4 @@
 import { Widget, WidgetProperties } from './Widget';
-import { FillStyle } from '../theme/FillStyle';
 import { Alignment } from '../theme/Alignment';
 import { SingleParent } from './SingleParent';
 import type { Event } from '../events/Event';

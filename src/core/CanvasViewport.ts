@@ -295,15 +295,8 @@ export class CanvasViewport extends BaseViewport {
         const wasDirty = dirtyRects.length > 0;
 
         if (wasDirty) {
-            // scale canvas if child dimensions exceed maximum canvas dimensions
-            this.context.save();
-            const [scaleX, scaleY] = this.effectiveScale;
-            const needsScale = scaleX !== 1 || scaleY !== 1;
-            if(needsScale) {
-                this.context.scale(scaleX, scaleY);
-            }
-
             // clip to dirty rectangles
+            this.context.save();
             this.context.beginPath();
             for (const dirtyRect of dirtyRects) {
                 this.clipToRect(dirtyRect);
@@ -311,6 +304,13 @@ export class CanvasViewport extends BaseViewport {
 
             // clear dirty area
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // scale canvas if child dimensions exceed maximum canvas dimensions
+            const [scaleX, scaleY] = this.effectiveScale;
+            const needsScale = scaleX !== 1 || scaleY !== 1;
+            if(needsScale) {
+                this.context.scale(scaleX, scaleY);
+            }
 
             // paint child
             this.child.paint(force);
