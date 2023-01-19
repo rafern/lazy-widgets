@@ -3,6 +3,7 @@ import type { VirtualKeyboardTemplate } from '../widgets/VirtualKeyboard/Virtual
 import type { KeyboardDriver } from '../drivers/KeyboardDriver';
 import { Root, RootProperties } from './Root';
 import { Margin } from '../widgets/Margin';
+import { Background } from '../widgets/Background';
 
 /**
  * Optional VirtualKeyboardRoot constructor properties.
@@ -41,10 +42,12 @@ export class VirtualKeyboardRoot extends Root {
      */
     constructor(keyboardDriver: KeyboardDriver, properties?: VirtualKeyboardRootProperties) {
         super(
-            new Margin(
-                new VirtualKeyboard(
-                    keyboardDriver,
-                    properties?.keyboardTemplate ?? defaultVirtualKeyboardTemplate
+            new Background(
+                new Margin(
+                    new VirtualKeyboard(
+                        keyboardDriver,
+                        properties?.keyboardTemplate ?? defaultVirtualKeyboardTemplate
+                    ),
                 ),
             ),
             properties

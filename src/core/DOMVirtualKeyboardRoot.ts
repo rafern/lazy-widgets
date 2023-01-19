@@ -3,6 +3,7 @@ import type { VirtualKeyboardRootProperties } from './VirtualKeyboardRoot';
 import type { KeyboardDriver } from '../drivers/KeyboardDriver';
 import { Margin } from '../widgets/Margin';
 import { DOMRoot } from './DOMRoot';
+import { Background } from '../widgets/Background';
 
 /**
  * A {@link DOMRoot} with similar functionality to {@link VirtualKeyboardRoot}.
@@ -28,10 +29,12 @@ export class DOMVirtualKeyboardRoot extends DOMRoot {
      */
     constructor(keyboardDriver: KeyboardDriver, properties?: VirtualKeyboardRootProperties) {
         super(
-            new Margin(
-                new VirtualKeyboard(
-                    keyboardDriver,
-                    properties?.keyboardTemplate ?? defaultVirtualKeyboardTemplate
+            new Background(
+                new Margin(
+                    new VirtualKeyboard(
+                        keyboardDriver,
+                        properties?.keyboardTemplate ?? defaultVirtualKeyboardTemplate
+                    ),
                 ),
             ),
             properties
