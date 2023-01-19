@@ -10,10 +10,8 @@ export class Background<W extends Widget = Widget> extends BaseContainer<W> {
     protected override onThemeUpdated(property: string | null = null): void {
         super.onThemeUpdated(property);
 
-        if(property === null) {
-            // TODO send dirty rect to entire widget space
-        } else if(property === 'canvasFill') {
-            // TODO send dirty rect to entire widget space
+        if(property === null || property === 'canvasFill') {
+            this.markWholeAsDirty();
         }
     }
 

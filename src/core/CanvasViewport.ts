@@ -1,4 +1,4 @@
-import { flagField, damageField } from '../decorators/FlagFields';
+import { flagField } from '../decorators/FlagFields';
 import { roundToPower2 } from '../helpers/roundToPower2';
 import type { FillStyle } from '../theme/FillStyle';
 import type { Widget } from '../widgets/Widget';
@@ -31,14 +31,14 @@ export class CanvasViewport extends BaseViewport {
      * layout exceeds this width, then the content will be scaled to fit the
      * canvas
      */
-    @damageField
+    @flagField('_forceResize')
     maxCanvasWidth: number;
     /**
      * The maximum height the {@link CanvasViewport#canvas} can have. If the
      * layout exceeds this height, then the content will be scaled to fit the
      * canvas
      */
-    @damageField
+    @flagField('_forceResize')
     maxCanvasHeight: number;
     /**
      * The resolution of the canvas. If possible, the canvas will be scaled by
@@ -99,7 +99,6 @@ export class CanvasViewport extends BaseViewport {
         this.canvas = document.createElement('canvas');
         this.canvas.width = startingWidth;
         this.canvas.height = startingHeight;
-        this.markWholeAsDirty();
 
         this.maxCanvasWidth = 16384;
         this.maxCanvasHeight = 16384;
@@ -111,7 +110,6 @@ export class CanvasViewport extends BaseViewport {
         }
 
         this.context = context;
-        this.child.forceDirty();
     }
 
     /**
@@ -171,9 +169,9 @@ export class CanvasViewport extends BaseViewport {
                 }
             }
 
-            // XXX force-mark child as dirty if the canvas was resized with a
-            // new scale. when copying using different scales, some artifacts
-            // are introduced. fix this by re-painting everything. since we're
+            // XXX repaint whole canvas if the canvas was resized with a new
+            // scale. when copying using different scales, some artifacts are
+            // introduced. fix this by re-painting everything. since we're
             // re-painting, theres no need to copy the old canvas contents
             const oldCanvasWidth = this.canvas.width;
             const oldCanvasHeight = this.canvas.height;
@@ -184,10 +182,10 @@ export class CanvasViewport extends BaseViewport {
                 this._prevESY = newESY;
                 needsCopying = false;
                 wasResized = true;
-                this.child.forceDirty(false);
                 // bounds need to be finalized again because the scale just
                 // changed and so the ideal dimensions need to be re-rounded
                 this.child.finalizeBounds();
+                this.markWholeAsDirty();
             }
 
             if(newCanvasWidth !== oldCanvasWidth || newCanvasHeight !== oldCanvasHeight) {

@@ -109,7 +109,7 @@ export class Slider extends Widget {
     }
 
     protected handleChange(): void {
-        this._dirty = true;
+        this.markWholeAsDirty();
     }
 
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
@@ -177,17 +177,14 @@ export class Slider extends Widget {
     protected override onThemeUpdated(property: string | null = null): void {
         super.onThemeUpdated(property);
 
-        if(property === null) {
+        if(property === null || property === 'sliderThickness' ||
+           property === 'sliderMinLength') {
             this._layoutDirty = true;
-            this._dirty = true;
-        } else if(property === 'sliderThickness' ||
-                property === 'sliderMinLength') {
-            this._layoutDirty = true;
-            this._dirty = true;
+            this.markWholeAsDirty();
         } else if(property === 'accentFill' ||
                 property === 'primaryFill' ||
                 property === 'backgroundFill') {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -253,7 +250,7 @@ export class Slider extends Widget {
         // Always flag as dirty if the click state changed (so glow colour takes
         // effect)
         if(this.clickHelper.clickStateChanged) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
 
         return this;

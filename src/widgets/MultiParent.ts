@@ -13,11 +13,11 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
     /**
      * Add child(ren) to this widget.
      *
-     * {@link Widget#_layoutDirty} and {@link Widget#_dirty} are set to true and
-     * each child's {@link Widget#inheritedTheme} is set so that new children
-     * inherit this widget's theme.
+     * {@link Widget#_layoutDirty} is set to true and each child's
+     * {@link Widget#inheritedTheme} is set so that new children inherit this
+     * widget's theme.
      *
-     * Calls {@link Widget#forceDirty}.
+     * Calls {@link Widget#markWholeAsDirty}.
      *
      * @param children - If this is a widget, then it is pushed to {@link Parent#_children}. If this is an array of widgets, then each widget is pushed to {@link Parent#_children}.
      * @returns Returns this so that the method is chainable.
@@ -43,14 +43,16 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
             }
         }
 
-        this.forceDirty();
+        this._layoutDirty = true;
+        this.markWholeAsDirty();
         return this;
     }
 
     /**
      * Remove child(ren) from this widget.
      *
-     * Calls {@link Widget#forceDirty}.
+     * Calls {@link Widget#markWholeAsDirty} and sets
+     * {@link Widget#_layoutDirty} to true.
      *
      * @param children - If this is a widget, then it is removed from {@link Parent#_children}. If this is an array of widgets, then each widget is removed from {@link Parent#_children}.
      * @returns Returns this so that the method is chainable.
@@ -80,14 +82,16 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
             }
         }
 
-        this.forceDirty();
+        this._layoutDirty = true;
+        this.markWholeAsDirty();
         return this;
     }
 
     /**
      * Remove all children from this widget.
      *
-     * Calls {@link Widget#forceDirty}.
+     * Calls {@link Widget#markWholeAsDirty} and sets
+     * {@link Widget#_layoutDirty} to true.
      *
      * @returns Returns this so that the method is chainable.
      */
@@ -99,7 +103,8 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
         }
 
         this._children.length = 0;
-        this.forceDirty();
+        this._layoutDirty = true;
+        this.markWholeAsDirty();
         return this;
     }
 }

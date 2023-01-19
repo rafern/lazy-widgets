@@ -59,25 +59,22 @@ export class RadioButton<V> extends Widget {
 
     protected handleChange(): void {
         if(this.selected !== this._wasSelected) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
     protected override onThemeUpdated(property: string | null = null): void {
         super.onThemeUpdated(property);
 
-        if(property === null) {
+        if(property === null || property === 'radioButtonLength') {
             this._layoutDirty = true;
-            this._dirty = true;
-        } else if(property === 'radioButtonLength') {
-            this._layoutDirty = true;
-            this._dirty = true;
+            this.markWholeAsDirty();
         } else if(property === 'backgroundGlowFill' ||
                 property === 'backgroundFill' ||
                 property === 'accentFill' ||
                 property === 'primaryFill' ||
                 property === 'radioButtonInnerPadding') {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -100,13 +97,13 @@ export class RadioButton<V> extends Widget {
 
     override onFocusGrabbed(focusType: FocusType): void {
         if(this.clickHelper.onFocusGrabbed(focusType)) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
     override onFocusDropped(focusType: FocusType): void {
         if(this.clickHelper.onFocusDropped(focusType)) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -125,10 +122,10 @@ export class RadioButton<V> extends Widget {
             this.select();
         }
 
-        // Always flag as dirty if the click state changed (so glow colour takes
+        // Always mark as dirty if the click state changed (so glow colour takes
         // effect). Toggle value if clicked
         if(this.clickHelper.clickStateChanged) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
 
         return capture ? this : null;

@@ -57,17 +57,15 @@ export class Label extends Widget {
     protected override onThemeUpdated(property: string | null = null): void {
         super.onThemeUpdated(property);
 
-        if(property === null) {
+        if(property === null ||
+           property === 'bodyTextFont' ||
+           property === 'labelMinWidth' ||
+           property === 'labelMinAscent' ||
+           property === 'labelMinDescent') {
             this._layoutDirty = true;
-            this._dirty = true;
-        } else if(property === 'bodyTextFont' ||
-                property === 'labelMinWidth' ||
-                property === 'labelMinAscent' ||
-                property === 'labelMinDescent') {
-            this._layoutDirty = true;
-            this._dirty = true;
+            this.markWholeAsDirty();
         } else if(property === 'bodyTextFill') {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -81,7 +79,7 @@ export class Label extends Widget {
 
         // Mark as dirty if text helper is dirty
         if(this.textHelper.dirty) {
-            this._dirty = true;
+            this.markWholeAsDirty();
             this._layoutDirty = true;
         }
     }
@@ -89,7 +87,7 @@ export class Label extends Widget {
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
         this.textHelper.maxWidth = maxWidth;
         if(this.textHelper.dirty) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
 
         // extra spacing is added so that there is enough height to center the

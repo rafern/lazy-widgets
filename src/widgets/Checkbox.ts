@@ -46,7 +46,7 @@ export class Checkbox extends Widget {
     }
 
     protected handleChange(): void {
-        this._dirty = true;
+        this.markWholeAsDirty();
     }
 
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
@@ -67,18 +67,15 @@ export class Checkbox extends Widget {
     protected override onThemeUpdated(property: string | null = null): void {
         super.onThemeUpdated(property);
 
-        if(property === null) {
+        if(property === null || property === 'checkboxLength') {
             this._layoutDirty = true;
-            this._dirty = true;
-        } else if(property === 'checkboxLength') {
-            this._layoutDirty = true;
-            this._dirty = true;
+            this.markWholeAsDirty();
         } else if(property === 'backgroundGlowFill' ||
                 property === 'backgroundFill' ||
                 property === 'accentFill' ||
                 property === 'primaryFill' ||
                 property === 'checkboxInnerPadding') {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -93,13 +90,13 @@ export class Checkbox extends Widget {
 
     override onFocusGrabbed(focusType: FocusType): void {
         if(this.clickHelper.onFocusGrabbed(focusType)) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
     override onFocusDropped(focusType: FocusType): void {
         if(this.clickHelper.onFocusDropped(focusType)) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -118,10 +115,10 @@ export class Checkbox extends Widget {
             this.checked = !this.checked;
         }
 
-        // Always flag as dirty if the click state changed (so glow colour takes
+        // Always mark as dirty if the click state changed (so glow colour takes
         // effect). Toggle value if clicked
         if(this.clickHelper.clickStateChanged) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
 
         return capture ? this : null;
@@ -215,6 +212,6 @@ export class Checkbox extends Widget {
 
         this._clickable = clickable;
         this.clickHelper.reset();
-        this._dirty = true;
+        this.markWholeAsDirty();
     }
 }

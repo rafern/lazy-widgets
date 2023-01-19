@@ -47,13 +47,7 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
 
     protected override handlePostLayoutUpdate(): void {
         // Post-layout update child
-        const child = this.child;
-        child.postLayoutUpdate();
-
-        // If child is dirty, set self as dirty
-        if(child.dirty) {
-            this._dirty = true;
-        }
+        this.child.postLayoutUpdate();
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
@@ -96,20 +90,12 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         }
 
         // Resolve child's dimensions
-        const [oldChildWidth, oldChildHeight] = this.child.idealDimensions;
         this.child.resolveDimensions(childMinWidth, childMaxWidth, childMinHeight, childMaxHeight);
         const [childWidth, childHeight] = this.child.idealDimensions;
 
         // Resolve own dimensions
-        const [oldWidth, oldHeight] = [this.idealWidth, this.idealHeight];
         this.idealWidth = Math.max(minWidth, childWidth + hPadding);
         this.idealHeight = Math.max(minHeight, childHeight + vPadding);
-
-        // Mark background as dirty if own size or child's size changed
-        if(this.idealWidth !== oldWidth || this.idealHeight !== oldHeight ||
-           childWidth !== oldChildWidth || childHeight !== oldChildHeight) {
-            // TODO set dirty rect to entire widget
-        }
     }
 
     override resolvePosition(x: number, y: number): void {
@@ -151,13 +137,7 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         }
 
         // Resolve child's position
-        const [oldChildX, oldChildY] = this.child.idealPosition;
         this.child.resolvePosition(childX, childY);
-
-        // If child's position changed, mark background as dirty
-        if(oldChildX !== childX || oldChildY !== childY) {
-            // TODO set dirty rect to entire widget
-        }
     }
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {

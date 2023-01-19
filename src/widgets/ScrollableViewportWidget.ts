@@ -108,7 +108,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             this._scrollbarMode = scrollbarMode;
             this.scroll = oldScroll;
             this._layoutDirty = true;
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -213,7 +213,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         const clickState = clickHelper.clickState;
         const stateChanged = clickHelper.clickStateChanged;
         if(stateChanged) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
 
         if(clickState === ClickState.Hold) {
@@ -357,23 +357,20 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
     protected override onThemeUpdated(property: string | null = null): void {
         super.onThemeUpdated(property);
 
-        if(property === null) {
+        if(property === null || property === 'scrollBarThickness') {
             this._layoutDirty = true;
-            this._dirty = true;
+            this.markWholeAsDirty();
         } else if(property === 'bodyTextFont' ||
                 property === 'bodyTextHeight' ||
                 property === 'bodyTextSpacing') {
             this.updateScrollLineHeight();
-        } else if(property === 'scrollBarThickness') {
-            this._layoutDirty = true;
-            this._dirty = true;
         } else if(property === 'backgroundFill' ||
                 property === 'scrollBarMinPercent' ||
                 property === 'scrollBarMinPixels' ||
                 property === 'primaryFill' ||
                 property === 'accentFill' ||
                 property === 'backgroundGlowFill') {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 

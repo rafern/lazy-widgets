@@ -252,7 +252,7 @@ export class Root {
      *
      * Call this after calling {@link Root#postLayoutUpdate}.
      *
-     * @returns Returns whether the child was dirty or not. Use this to tell an external 3D library whether to update a mesh's texture or not.
+     * @returns Returns whether the child was re-painted or not. Use this to tell an external 3D library whether to update a mesh's texture or not.
      */
     paint(): boolean {
         // Don't do anything if Root is disabled

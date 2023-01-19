@@ -39,11 +39,6 @@ export abstract class Widget extends BaseTheme {
      */
     private _enabled;
     /**
-     * Widget will only be painted if dirty is true.
-     * @deprecated {@link Widget#_dirty} is now ignored. use {@link Widget#markAsDirty} or {@link Widget#markWholeAsDirty}.
-     */
-    protected _dirty = true;
-    /**
      * If this is true, widget needs their layout resolved. If implementing a
      * container, propagate this up.
      */
@@ -233,15 +228,6 @@ export abstract class Widget extends BaseTheme {
     /** Similar to {@link Widget#rect}, but uses ideal values */
     get idealRect(): Rect {
         return [this.idealX, this.idealY, this.idealWidth, this.idealHeight];
-    }
-
-    /**
-     * Check if the widget is dirty. Returns {@link Widget#_dirty}, as long as
-     * {@link Widget#dimensionless} is not true.
-     * @deprecated {@link Widget#dirty} is no longer used. There is no way to check if a widget needs to be re-painted without catching dirty rectangles.
-     */
-    get dirty(): boolean {
-        return this._dirty && !this.dimensionless;
     }
 
     /**
@@ -511,8 +497,8 @@ export abstract class Widget extends BaseTheme {
      * Sets {@link Widget#x}, {@link Widget#y}, {@link Widget#width} and
      * {@link Widget#y} from {@link Widget#idealX}, {@link Widget#idealY},
      * {@link Widget#idealWidth} and {@link Widget#idealHeight} by rounding
-     * them. If the final values have changed, {@link Widget#_dirty} is set to
-     * true.
+     * them. If the final values have changed, {@link Widget#markWholeAsDirty}
+     * is called.
      *
      * Can be overridden, but `super.finalizeBounds` must still be called; if
      * you have parts of the widget that can be pre-calculated when the layout
@@ -712,26 +698,6 @@ export abstract class Widget extends BaseTheme {
             ctx.save();
             this.handlePainting(effectiveDirtyRects);
             ctx.restore();
-        }
-    }
-
-    /**
-     * Force the widget to be fully re-painted and (by default) have layout
-     * resolved. For internal use only or for use by {@link Parent} widgets so
-     * that children get properly marked as dirty when added to a new container
-     * after reuse.
-     *
-     * Should be overridden if the derived Widget has more dirty flags other
-     * than the default ones (such as {@link MultiContainer#backgroundDirty}),
-     * but `super.forceDirty` must be called.
-     */
-    forceDirty(markLayout = true): void {
-        // TODO what do i do with this? this feels like a hack that should have
-        // never existed in the first place
-        this._dirty = true;
-
-        if(markLayout) {
-            this._layoutDirty = true;
         }
     }
 

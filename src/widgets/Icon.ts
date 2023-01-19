@@ -1,4 +1,4 @@
-import { damageField, layoutField, paintLayoutArrayField } from '../decorators/FlagFields';
+import { damageField, layoutField, damageLayoutArrayField } from '../decorators/FlagFields';
 import { Widget, WidgetProperties } from './Widget';
 import { DynMsg, Msg } from '../core/Strings';
 import type { Rect } from '../helpers/Rect';
@@ -72,9 +72,9 @@ export class Icon extends Widget {
      * The view box of this Icon, useful if the image used for the icon is a
      * spritesheet. If null, the entire image will be used.
      *
-     * @decorator `@paintLayoutArrayField(true)`
+     * @decorator `@damageLayoutArrayField(true)`
      */
-    @paintLayoutArrayField(true)
+    @damageLayoutArrayField(true)
     viewBox: Rect | null;
     /**
      * The wanted width. If null, the image's width will be used, taking

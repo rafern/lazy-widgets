@@ -52,14 +52,6 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
         return super.inheritedTheme;
     }
 
-    override forceDirty(markLayout = true): void {
-        super.forceDirty(markLayout);
-
-        for(const child of this.children) {
-            child.forceDirty(markLayout);
-        }
-    }
-
     /** Get amount of children of this parent widget. */
     get childCount(): number {
         return this._children.length;

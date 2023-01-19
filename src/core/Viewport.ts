@@ -100,10 +100,10 @@ export interface Viewport {
      * it makes sense to do so, paint to the {@link Viewport#parent} Viewport's
      * context.
      *
-     * Nothing is done if the child was not dirty.
+     * Nothing is done if the child was not re-painted.
      *
      * @param extraDirtyRects - Extra damage regions (not tracked internally) that need to be repainted. Can be an empty list if this is a root viewport.
-     * @returns Returns true if the child was dirty, else, false.
+     * @returns Returns true if the child was re-painted, else, false.
      */
     paint(extraDirtyRects: Array<Rect>, backgroundFillStyle: FillStyle): boolean;
     /**

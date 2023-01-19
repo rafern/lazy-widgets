@@ -1,4 +1,4 @@
-import { layoutField, multiFlagField, paintArrayField } from '../decorators/FlagFields';
+import { layoutField, damageArrayField, watchField } from '../decorators/FlagFields';
 import { ValidatedVariable } from '../state/ValidatedVariable';
 import { PointerRelease } from '../events/PointerRelease';
 import { TextPasteEvent } from '../events/TextPasteEvent';
@@ -75,18 +75,18 @@ export class TextInput extends Widget {
     /**
      * Is the text hidden?
      *
-     * @decorator `@multiFlagField(['cursorOffsetDirty', '_dirty'])`
+     * @decorator `@watchField(TextInput.prototype.hideTextWatchCallback)`
      */
-    @multiFlagField(['cursorOffsetDirty', '_dirty'])
+    @watchField(TextInput.prototype.hideTextWatchCallback)
     hideText: boolean;
     /** The helper for measuring/painting text */
     protected textHelper: TextHelper;
     /**
      * Current offset of the text in the text box. Used on overflow.
      *
-     * @decorator `@paintArrayField()`
+     * @decorator `@damageArrayField()`
      */
-    @paintArrayField()
+    @damageArrayField()
     private offset = [0, 0];
     /**
      * Is text wrapping enabled? If not, text will be panned if needed
@@ -156,8 +156,17 @@ export class TextInput extends Widget {
         this._editingEnabled = properties?.editingEnabled ?? true;
     }
 
+    /**
+     * {@link TextInput#hideText} watcher callback method. Sets
+     * {@link TextInput#cursorOffsetDirty} and marks the whole widget as dirty.
+     */
+    private hideTextWatchCallback(): void {
+        this.cursorOffsetDirty = true;
+        this.markWholeAsDirty();
+    }
+
     protected handleChange(): void {
-        this._dirty = true;
+        this.markWholeAsDirty();
     }
 
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
@@ -181,20 +190,20 @@ export class TextInput extends Widget {
 
         if(property === null) {
             this._layoutDirty = true;
-            this._dirty = true;
+            this.markWholeAsDirty();
             this.cursorOffsetDirty = true;
         } else if(property === 'inputTextInnerPadding' ||
                 property === 'inputTextFont' ||
                 property === 'inputTextHeight' ||
                 property === 'inputTextSpacing') {
             this._layoutDirty = true;
-            this._dirty = true;
+            this.markWholeAsDirty();
         } else if(property === 'inputBackgroundFill' ||
                 property === 'inputTextFill' ||
                 property === 'inputTextFillInvalid' ||
                 property === 'inputTextFillDisabled' ||
                 property === 'cursorThickness') {
-            this._dirty = true;
+            this.markWholeAsDirty();
         } else if(property === 'inputTextAlign') {
             this.cursorOffsetDirty = true;
         }
@@ -217,9 +226,9 @@ export class TextInput extends Widget {
     /**
      * Is editing enabled?
      *
-     * Tied to {@link TextInput#_editingEnabled}. If changed,
-     * {@link Widget#_dirty} is set to true. If disabled, blinking stops and the
-     * cursor position is reset to the beginning.
+     * Tied to {@link TextInput#_editingEnabled}. If changed, the whole widget
+     * is marked as dirty. If disabled, blinking stops and the cursor position
+     * is reset to the beginning.
      */
     get editingEnabled(): boolean {
         return this._editingEnabled;
@@ -236,7 +245,7 @@ export class TextInput extends Widget {
             }
 
             // Mark as dirty; the text color changes
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -294,7 +303,7 @@ export class TextInput extends Widget {
     /**
      * Move the cursor to a given index.
      *
-     * Sets {@link Widget#_dirty} and {@link TextInput#cursorOffsetDirty} to
+     * Marks the widget as dirty and sets {@link TextInput#cursorOffsetDirty} to
      * true.
      *
      * @param select - Should this do text selection?
@@ -309,7 +318,7 @@ export class TextInput extends Widget {
 
         // Update cursor offset
         this.cursorOffsetDirty = true;
-        this._dirty = true;
+        this.markWholeAsDirty();
         this.autoScrollCaret();
     }
 
@@ -340,11 +349,10 @@ export class TextInput extends Widget {
             this.selectOffset = this.cursorOffset;
         }
 
-        // Start blinking cursor and mark component as dirty, to
-        // make sure that cursor blink always resets for better
-        // feedback
+        // Start blinking cursor and mark component as dirty, to make sure that
+        // the cursor blink always resets for better feedback
         this.blinkStart = Date.now();
-        this._dirty = true;
+        this.markWholeAsDirty();
         this.autoScrollCaret();
     }
 
@@ -763,7 +771,7 @@ export class TextInput extends Widget {
                     this.cursorPos = this.text.length;
                     this.selectPos = 0;
                     this.cursorOffsetDirty = true;
-                    this._dirty = true;
+                    this.markWholeAsDirty();
                 } else {
                     return this;
                 }
@@ -850,7 +858,7 @@ export class TextInput extends Widget {
 
         // Mark as dirty when a blink needs to occur
         if(this.blinkOn !== this.blinkWasOn) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
 
         // Update TextHelper variables
@@ -862,7 +870,7 @@ export class TextInput extends Widget {
 
         // Mark as dirty if text helper is dirty
         if(this.textHelper.dirty) {
-            this._dirty = true;
+            this.markWholeAsDirty();
             this._layoutDirty = true;
         }
     }
@@ -970,7 +978,7 @@ export class TextInput extends Widget {
         const padding = 2 * this.inputTextInnerPadding;
         this.textHelper.maxWidth = this.wrapText ? Math.max(maxWidth - padding, 0) : Infinity;
         if(this.textHelper.dirty) {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
 
         const effectiveMinWidth = Math.min(Math.max(this.inputTextMinWidth, minWidth), maxWidth);

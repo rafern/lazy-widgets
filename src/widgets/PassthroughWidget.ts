@@ -42,13 +42,7 @@ export class PassthroughWidget<W extends Widget = Widget> extends SingleParent<W
 
     protected override handlePostLayoutUpdate(): void {
         // Post-layout update child
-        const child = this.child;
-        child.postLayoutUpdate();
-
-        // If child is dirty, set self as dirty
-        if(child.dirty) {
-            this._dirty = true;
-        }
+        this.child.postLayoutUpdate();
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {

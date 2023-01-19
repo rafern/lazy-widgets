@@ -145,10 +145,10 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     }
 
     set offset(offset: [number, number]) {
-        // Not using @paintArrayField so that accessor can be overridden
+        // Not using @damageArrayField so that accessor can be overridden
         if(this.internalViewport.offset[0] !== offset[0] || this.internalViewport.offset[1] !== offset[1]) {
             this.internalViewport.offset = [offset[0], offset[1]];
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -187,7 +187,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     }
 
     set widthCoupling(widthCoupling: AxisCoupling) {
-        // Not using @paintArrayField so that accessor can be overridden
+        // Not using @damageArrayField so that accessor can be overridden
         if(this._widthCoupling !== widthCoupling) {
             this._widthCoupling = widthCoupling;
             this._layoutDirty = true;
@@ -203,7 +203,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     }
 
     set heightCoupling(heightCoupling: AxisCoupling) {
-        // Not using @paintArrayField so that accessor can be overridden
+        // Not using @damageArrayField so that accessor can be overridden
         if(this._heightCoupling !== heightCoupling) {
             this._heightCoupling = heightCoupling;
             this._layoutDirty = true;
@@ -215,9 +215,9 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
 
         if(property === null) {
             this._layoutDirty = true;
-            this._dirty = true;
+            this.markWholeAsDirty();
         } else if(property === 'canvasFill') {
-            this._dirty = true;
+            this.markWholeAsDirty();
         }
     }
 
@@ -239,11 +239,6 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         const child = this.child;
         child.preLayoutUpdate();
 
-        // If child's layout is dirty, set self's layout as dirty
-        if(child.layoutDirty) {
-            this._layoutDirty = true;
-        }
-
         // Update viewport resolution if needed
         if(this.useCanvas) {
             (this.internalViewport as CanvasViewport).resolution = this.root.resolution;
@@ -257,11 +252,6 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         // Post-layout update child
         const child = this.child;
         child.postLayoutUpdate();
-
-        // If child is dirty, set self as dirty
-        if(child.dirty) {
-            this._dirty = true;
-        }
     }
 
     /**

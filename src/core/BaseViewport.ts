@@ -1,5 +1,5 @@
 import type { LayoutConstraints } from "./LayoutConstraints";
-import { watchArrayField } from "../decorators/FlagFields";
+import { watchArrayField, flagArrayField } from "../decorators/FlagFields";
 import { PointerEvent } from "../events/PointerEvent";
 import type { FillStyle } from "../theme/FillStyle";
 import type { Widget } from "../widgets/Widget";
@@ -17,9 +17,9 @@ export abstract class BaseViewport implements Viewport {
     readonly relativeCoordinates: boolean;
     readonly child: Widget;
     abstract readonly context: CanvasRenderingContext2D;
-    @watchArrayField(BaseViewport.prototype.forceLayoutDirty)
+    @watchArrayField(BaseViewport.prototype.relayoutAndReposition)
     constraints: LayoutConstraints;
-    @watchArrayField(BaseViewport.prototype.updateEverything)
+    @flagArrayField('forceRelayout')
     rect: Rect;
     abstract get effectiveScale(): [scaleX: number, scaleY: number];
     parent: Viewport | null = null;
@@ -37,6 +37,11 @@ export abstract class BaseViewport implements Viewport {
      * maxRelayout is 4, then the 5th retry will be discarded.
      */
     protected static maxRelayout = 4;
+    /**
+     * Should the layout be resolved, even if the child widget doesn't have a
+     * dirty layout?
+     */
+    protected forceRelayout = true;
 
     protected constructor(child: Widget, relativeCoordinates: boolean) {
         this.child = child;
@@ -47,23 +52,13 @@ export abstract class BaseViewport implements Viewport {
     }
 
     /**
-     * Force-marks all flags as dirty in {@link BaseViewport#child} and calls
-     * {@link BaseViewport#updateChildPos}. Used as a callback for the
-     * {@link BaseViewport#rect} field watcher.
+     * Forces re-layout and calls {@link BaseViewport#updateChildPos}. Used as a
+     * callback for the {@link BaseViewport#rect} field watcher.
      */
-    private updateEverything() {
-        this.child.forceDirty();
+    private relayoutAndReposition() {
+        this.forceRelayout = true;
         this.updateChildPos();
     }
-
-    /**
-     * Force-marks all flags as dirty in {@link BaseViewport#child}. Used as a
-     * callback for the {@link BaseViewport#constraints} field watcher.
-     */
-    private forceLayoutDirty() {
-        this.child.forceDirty();
-    }
-
 
     /**
      * Resolves the position of the child and finalizes its bounds. This
@@ -98,9 +93,11 @@ export abstract class BaseViewport implements Viewport {
      * @returns Returns true if the child was resized, else, false.
      */
     resolveLayout(): boolean {
-        if(!this.child.layoutDirty) {
+        if(!(this.child.layoutDirty || this.forceRelayout)) {
             return false;
         }
+
+        this.forceRelayout = false;
 
         // Resolve child's layout
         const [oldWidth, oldHeight] = this.child.dimensions;

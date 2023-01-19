@@ -1,11 +1,5 @@
 import { DynMsg } from "../core/Strings";
 
-type DamageFieldCompatible = {
-    prototype: {
-        markWholeAsDirty: () => void
-    }
-};
-
 /**
  * A decorator for a public field which sets calls a callback if the property's
  * value is changed.
@@ -82,13 +76,6 @@ export function multiFlagField(flagKeys: Array<string | symbol>): PropertyDecora
         }
     });
 }
-
-/**
- * A {@link multiFlagField} where the flag keys are `_dirty` and `_layoutDirty`.
- *
- * @category Decorator
- */
-export const paintLayoutField = multiFlagField(['_dirty', '_layoutDirty']);
 
 /**
  * Similar to {@link watchField}, but for array fields, like tuples. Getting the
@@ -173,13 +160,16 @@ export function flagArrayField(flagKey: string, allowNonArrays = false): Propert
 }
 
 /**
- * A {@link flagArrayField} where the flag key is `_dirty`.
+ * A mix between {@link damageField} and {@link watchArrayField}.
  *
  * @param allowNonArrays - Allow values which are not arrays to be used?
  * @category Decorator
  */
-export function paintArrayField(allowNonArrays = false): PropertyDecorator {
-    return flagArrayField('_dirty', allowNonArrays);
+export function damageArrayField(allowNonArrays = false): PropertyDecorator {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    return watchArrayField(function(this: Object) {
+        Object.getPrototypeOf(this).markWholeAsDirty.apply(this);
+    }, allowNonArrays);
 }
 
 /**
@@ -209,12 +199,16 @@ export function multiFlagArrayField(flagKeys: Array<string>, allowNonArrays = fa
 }
 
 /**
- * A {@link multiFlagArrayField} where the flag keys are `_dirty` and
- * `_layoutDirty`.
+ * A {@link watchArrayField} where the '_layoutDirty' flag is set, and a damage
+ * method is called in the same way as {@link damageField}.
  *
  * @param allowNonArrays - Allow values which are not arrays to be used?
  * @category Decorator
  */
-export function paintLayoutArrayField(allowNonArrays = false): PropertyDecorator {
-    return multiFlagArrayField(['_dirty', '_layoutDirty'], allowNonArrays);
+export function damageLayoutArrayField(allowNonArrays = false): PropertyDecorator {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    return watchArrayField(function(this: Object) {
+        (this as Record<string | symbol, unknown>)._layoutDirty = true;
+        Object.getPrototypeOf(this).markWholeAsDirty.apply(this);
+    }, allowNonArrays);
 }

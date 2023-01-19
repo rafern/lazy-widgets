@@ -22,7 +22,7 @@ const features: Map<string, [enabled: boolean, description: string] | [enabled: 
 /**
  * Check if a debug feature is enabled.
  *
- * @param debugFeature - The debug feature name, for example, "watchflag.Widget._dirty"
+ * @param debugFeature - The debug feature name, for example, "watchflag.Widget._layoutDirty"
  * @returns Returns true if the debug feature is enabled. If the feature doesn't exist or ins't enabled, returns false.
  */
 export function isDebugFeatureEnabled(debugFeature: string): boolean {
@@ -38,7 +38,7 @@ export function isDebugFeatureEnabled(debugFeature: string): boolean {
 /**
  * Enable or disable a debug feature.
  *
- * @param debugFeature - The debug feature name, for example, "watchflag.Widget._dirty"
+ * @param debugFeature - The debug feature name, for example, "watchflag.Widget._layoutDirty"
  * @param enabled - Should the feature be enabled or disabled? If undefined, toggles the feature
  */
 export function toggleDebugFeature(debugFeature: string, enabled?: boolean): void {
@@ -76,7 +76,7 @@ export function listDebugFeatures(): void {
  * set to true and prints to the console.
  *
  * @param classObj - The class. Widget for example
- * @param flagKey - The key of the property to watch. "_dirty" for example
+ * @param flagKey - The key of the property to watch. "_layoutDirty" for example
  */
 export function injectWatchflagFeature(classObj: any, flagKey: string): void {
     const propertyPath = `${classObj.name}.${flagKey}`;
@@ -373,12 +373,8 @@ export function injectDebugCode(): void {
     injectStackTraceFeature(Widget, 'handlePainting');
     // stacktrace.Widget.paint
     injectStackTraceFeature(Widget, 'paint');
-    // stacktrace.Widget.forceDirty
-    injectStackTraceFeature(Widget, 'forceDirty');
     // stacktrace.Widget.scaleFont
     injectStackTraceFeature(Widget, 'scaleFont');
-    // watchflag.Widget._dirty
-    injectWatchflagFeature(Widget, '_dirty');
     // watchflag.Widget._layoutDirty
     injectWatchflagFeature(Widget, '_layoutDirty');
     // watchflag.BaseContainer.backgroundDirty
@@ -508,7 +504,7 @@ export function injectDebugCode(): void {
         'flashdamage',
         [
             false,
-            'Momentarily flash rectangles that are marked as dirty for 1 second. Pushed dirty rectangles are painted in red, while merged (effective) dirty rectangles are painted in blue',
+            'Debug damage regions; momentarily flash rectangles that are marked as dirty for 1 second. Pushed dirty rectangles are painted in red, while merged (effective) dirty rectangles are painted in blue',
             (enabled) => {
                 for (const viewport of viewports) {
                     viewport.overlayEnabled = enabled;
