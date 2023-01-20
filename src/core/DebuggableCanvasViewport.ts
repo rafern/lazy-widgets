@@ -142,7 +142,7 @@ export class DebuggableCanvasViewport extends CanvasViewport {
 
     private addDebugEvent(rect: Rect, isMerged: boolean) {
         // intercept dirty rectangles
-        const event: DebugEvent = [ rect, Date.now(), isMerged ];
+        const event: DebugEvent = [ [...rect], Date.now(), isMerged ];
 
         if (this.events) {
             this.events.add(event);
@@ -159,16 +159,17 @@ export class DebuggableCanvasViewport extends CanvasViewport {
     }
 
     protected override pushDirtyRects(rects: Array<Rect>) {
-        super.pushDirtyRects(rects);
-
         for (const rect of rects) {
             this.addDebugEvent(rect, false);
         }
+
+        super.pushDirtyRects(rects);
     }
 
     protected override pushDirtyRect(rect: Rect) {
-        super.pushDirtyRect(rect);
         this.addDebugEvent(rect, false);
+
+        super.pushDirtyRect(rect);
     }
 
     override resolveLayout(): boolean {

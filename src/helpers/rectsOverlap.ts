@@ -11,13 +11,13 @@ export function rectsOverlap(first: Rect, second: Rect) {
     const firstRight = firstLeft + first[2];
     const secondLeft = second[0];
 
-    if (firstRight < secondLeft) {
+    if (firstRight <= secondLeft) {
         return false;
     }
 
     const secondRight = secondLeft + second[2];
 
-    if (secondRight < secondLeft) {
+    if (secondRight <= firstLeft) {
         return false;
     }
 
@@ -26,13 +26,13 @@ export function rectsOverlap(first: Rect, second: Rect) {
     const firstBottom = firstTop + first[3];
     const secondTop = second[1];
 
-    if (firstBottom < secondTop) {
+    if (firstBottom <= secondTop) {
         return false;
     }
 
     const secondBottom = secondTop + second[3];
 
-    if (secondBottom < secondTop) {
+    if (secondBottom <= firstTop) {
         return false;
     }
 
