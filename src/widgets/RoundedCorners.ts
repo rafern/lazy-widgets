@@ -10,6 +10,14 @@ export class RoundedCorners<W extends Widget = Widget> extends PassthroughWidget
         super(child, properties);
     }
 
+    protected override onThemeUpdated(property: string | null = null): void {
+        super.onThemeUpdated(property);
+
+        if(property === null || property === 'roundedCornersRadii') {
+            this.markWholeAsDirty();
+        }
+    }
+
     protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Paint brackground
         const ctx = this.viewport.context;
