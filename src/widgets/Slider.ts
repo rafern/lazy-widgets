@@ -317,16 +317,19 @@ export class Slider extends Widget {
         } else {
             ctx.fillStyle = this.primaryFill;
         }
-        const fullWidth = this.actualWidth * (this.value - this.minValue) / (this.maxValue - this.minValue);
+        const fullWidth = this.actualWidth * Math.max(0, Math.min(1, (this.value - this.minValue) / (this.maxValue - this.minValue)));
         ctx.fillRect(x, y, fullWidth, this.actualHeight);
 
         // Draw empty part of slider
-        if(useGlow) {
-            ctx.fillStyle = this.backgroundGlowFill;
-        } else {
-            ctx.fillStyle = this.backgroundFill;
-        }
         const emptyWidth = this.actualWidth - fullWidth;
-        ctx.fillRect(x + fullWidth, y, emptyWidth, this.actualHeight);
+        if (emptyWidth > 0) {
+            if(useGlow) {
+                ctx.fillStyle = this.backgroundGlowFill;
+            } else {
+                ctx.fillStyle = this.backgroundFill;
+            }
+
+            ctx.fillRect(x + fullWidth, y, emptyWidth, this.actualHeight);
+        }
     }
 }
