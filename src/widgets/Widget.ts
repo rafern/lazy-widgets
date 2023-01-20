@@ -561,56 +561,6 @@ export abstract class Widget extends BaseTheme {
     }
 
     /**
-     * Paiting utility: clears background of widget. Should not be overridden.
-     *
-     * Rounds to nearest pixels; no subpixel clearing.
-     *
-     * The background fill style used is {@link ThemeProperties#canvasFill}.
-     *
-     * @param fillStyle - The fill style to use for clearing. If null (default), then the value of {@link ThemeProperties#canvasFill} is used
-     */
-    protected clear(x: number, y: number, width: number, height: number, fillStyle: string | CanvasGradient | CanvasPattern | null = null): void {
-        const ctx = this.viewport.context;
-        ctx.save();
-        ctx.globalCompositeOperation = 'copy';
-        ctx.fillStyle = fillStyle ?? this.canvasFill;
-        ctx.beginPath();
-        // These are rounded because clipping and filling doesn't
-        // work properly with decimal points
-        ctx.rect(x, y, width, height);
-        ctx.clip();
-        ctx.fill();
-        ctx.restore();
-    }
-
-    /**
-     * Paiting utility: start a clear operation with no clipping path, the user
-     * has to add their own paths to the context. Should not be overridden.
-     *
-     * @param fillStyle - The fill style to use for clearing. If null (default), then the value of {@link ThemeProperties#canvasFill} is used
-     */
-    protected clearStart(fillStyle: string | CanvasGradient | CanvasPattern | null = null): void {
-        const ctx = this.viewport.context;
-        ctx.save();
-        ctx.globalCompositeOperation = 'copy';
-        ctx.fillStyle = fillStyle ?? this.canvasFill;
-        ctx.beginPath();
-    }
-
-    /**
-     * Paiting utility: end a clear operation (from {@link Widget#clearStart}). Should
-     * not be overridden.
-     *
-     * @param fillRule - The canvas fill rule for clipping. See the {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/clip#parameters | canvas clip documentation}
-     */
-    protected clearEnd(fillRule: CanvasFillRule = 'nonzero'): void {
-        const ctx = this.viewport.context;
-        ctx.clip(fillRule);
-        ctx.fill();
-        ctx.restore();
-    }
-
-    /**
      * Painting utility: paints a circle. Should not be overridden. Coordinates
      * are relative to the center of the circle. Uses ctx's current fillStyle.
      * Does not restore the context state after finishing.
