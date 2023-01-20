@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Background, RoundedCorners
+            } from './index.esm.js';
+
+            // Create the root
+            const root = new DOMRoot(
+                new RoundedCorners(
+                    new Background(
+                        new Margin(
+                            new Label('Hello world!')
+                        )
+                    )
+                )
+            );
+
+            // Update once; this is a static UI
+            root.update();
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

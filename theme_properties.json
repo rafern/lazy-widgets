@@ -190,6 +190,11 @@
             "type": "number",
             "default": "2",
             "description": "Similar to {@link ThemeProperties#checkboxInnerPadding}, but for {@link RadioButton}."
+        },
+        "roundedCornersRadii": {
+            "type": "CornerRadii",
+            "default": "8",
+            "description": "The radii to be used for rounding corners in {@link RoundedCorners}."
         }
     }
 }

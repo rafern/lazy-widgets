@@ -3,6 +3,7 @@ import type { FlexAlignment2D } from './FlexAlignment2D';
 import type { Alignment2D } from './Alignment2D';
 import type { FillStyle } from './FillStyle';
 import type { Padding } from './Padding';
+import type { CornerRadii } from '../widgets/CornerRadii';
 
 /**
  * Something which contains all properties of a theme. Use this interface for
@@ -84,5 +85,7 @@ export interface ThemeProperties {
     radioButtonLength?: number;
     /** Similar to {@link ThemeProperties#checkboxInnerPadding}, but for {@link RadioButton}. */
     radioButtonInnerPadding?: number;
+    /** The radii to be used for rounding corners in {@link RoundedCorners}. */
+    roundedCornersRadii?: CornerRadii;
     // XXX THEMEPROPERTIES AUTO-GENERATED CODE END
 }

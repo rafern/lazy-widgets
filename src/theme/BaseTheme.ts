@@ -7,6 +7,7 @@ import type { FillStyle } from './FillStyle';
 import type { Padding } from './Padding';
 import { Alignment } from './Alignment';
 import type { Theme } from './Theme';
+import type { CornerRadii } from '../widgets/CornerRadii';
 
 /**
  * The base class for {@link Widget} and {@link Theme}. The backbone of the
@@ -108,6 +109,7 @@ export class BaseTheme implements ThemeProperties {
         this._scrollBarMinPixels = properties.scrollBarMinPixels;
         this._radioButtonLength = properties.radioButtonLength;
         this._radioButtonInnerPadding = properties.radioButtonInnerPadding;
+        this._roundedCornersRadii = properties.roundedCornersRadii;
         // XXX BASETHEME CTOR AUTO-GENERATED CODE END
     }
 
@@ -613,6 +615,20 @@ export class BaseTheme implements ThemeProperties {
         if(this._radioButtonInnerPadding !== value) {
             this._radioButtonInnerPadding = value;
             this.onThemeUpdated('radioButtonInnerPadding');
+        }
+    }
+
+    /** See {@link BaseTheme#roundedCornersRadii}. For internal use only. */
+    private _roundedCornersRadii?: CornerRadii;
+
+    get roundedCornersRadii(): CornerRadii {
+        return this._roundedCornersRadii ?? this._fallbackTheme?.roundedCornersRadii ?? 8;
+    }
+
+    set roundedCornersRadii(value: CornerRadii | undefined) {
+        if(this._roundedCornersRadii !== value) {
+            this._roundedCornersRadii = value;
+            this.onThemeUpdated('roundedCornersRadii');
         }
     }
 
