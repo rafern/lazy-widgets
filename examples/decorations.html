@@ -3,22 +3,95 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Background, RoundedCorners
+                DOMRoot, Label, Margin, Background, RoundedCorners, Decoration,
+                Column, Row, Slider, Variable, DOMKeyboardDriver, Separator,
+                DOMPointerDriver, injectDebugCode, toggleDebugFeature,
+                TextAlignMode
             } from './index.esm.js';
 
+            injectDebugCode();
+            toggleDebugFeature('flashdamage');
+
             // Create the root
+            const corners = new RoundedCorners(
+                new Background(
+                    new Margin(
+                        new Label('Hello world!')
+                    )
+                )
+            );
+            const decoration = new Decoration(corners);
+
+            const radiiLabel = new Label();
+
             const root = new DOMRoot(
-                new RoundedCorners(
+                new Margin(
                     new Background(
-                        new Margin(
-                            new Label('Hello world!')
-                        )
+                        new Column().add([
+                            new Row().add([
+                                new Column().add([
+                                    new Label('Original widget', {
+                                        bodyTextAlign: TextAlignMode.Center
+                                    }),
+                                    new Margin(
+                                        new Background(
+                                            new Margin(
+                                                new Label('Hello world!')
+                                            )
+                                        ),
+                                        { containerPadding: { left: 64, right: 64, top: 64, bottom: 64 } }
+                                    )
+                                ]),
+                                new Separator(),
+                                new Column().add([
+                                    new Label('Decorated widget', {
+                                        bodyTextAlign: TextAlignMode.Center
+                                    }),
+                                    new Margin(
+                                        decoration,
+                                        { containerPadding: { left: 64, right: 64, top: 64, bottom: 64 } }
+                                    )
+                                ]),
+                            ]),
+                            new Label('Decoration controls'),
+                            new Background(
+                                new Column().add([
+                                    radiiLabel,
+                                    new Slider(
+                                        new Variable(
+                                            8,
+                                            (newVal) => {
+                                                corners.roundedCornersRadii = newVal;
+                                                radiiLabel.text = `Corner radii (${newVal.toFixed(2)}):`;
+                                            }
+                                        ),
+                                        0,
+                                        18,
+                                    ),
+                                ])
+                            )
+                        ])
                     )
                 )
             );
 
-            // Update once; this is a static UI
-            root.update();
+            // Create, bind DOM and register the keyboard driver
+            const keyboardDriver = new DOMKeyboardDriver();
+            keyboardDriver.bindDOMElem(root.domElem);
+            root.registerDriver(keyboardDriver);
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
 
             // Add root to body
             document.body.appendChild(root.domElem);

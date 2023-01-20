@@ -345,11 +345,16 @@ export class CanvasViewport extends BaseViewport {
         return wasDirty;
     }
 
-    paint(extraDirtyRects: Array<Rect>): boolean {
-        const [vpX, vpY, vpW, vpH, origXDst, origYDst, xDst, yDst, wClipped, hClipped] = this.getClippedViewport();
+    /**
+     * Add damage to the children of this viewport as if it were coming from a
+     * parent of the viewport.
+     */
+    receiveTopDamage(dirtyRects: Array<Rect>) {
+        const [xOffset, yOffset] = this.offset;
+        const origXDst = this.rect[0] + xOffset;
+        const origYDst = this.rect[1] + yOffset;
 
-        // add extra damage regions to internally tracked damage region list
-        for (const absRect of extraDirtyRects) {
+        for (const absRect of dirtyRects) {
             const left = Math.floor(absRect[0] - origXDst);
             const top = Math.floor(absRect[1] - origYDst);
             const right = Math.ceil(absRect[0] + absRect[2] - origXDst);
@@ -359,33 +364,41 @@ export class CanvasViewport extends BaseViewport {
 
             this.pushDirtyRect([ left, top, width, height ]);
         }
+    }
+
+    paint(extraDirtyRects: Array<Rect>): boolean {
+        // add extra damage regions to internally tracked damage region list
+        this.receiveTopDamage(extraDirtyRects);
 
         // paint to internal canvas
         const wasDirty = this.paintToInternal();
 
         // Paint to parent viewport, if any, and if inside bounds
-        if(this.parent !== null && wClipped !== 0 && hClipped !== 0) {
-            const [esx, esy] = this.effectiveScale;
-            const ctx = this.parent.context;
+        if(this.parent !== null) {
+            const [vpX, vpY, vpW, vpH, origXDst, origYDst, xDst, yDst, wClipped, hClipped] = this.getClippedViewport();
+            if (wClipped !== 0 && hClipped !== 0) {
+                const [esx, esy] = this.effectiveScale;
+                const ctx = this.parent.context;
 
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(vpX, vpY, vpW, vpH);
-            ctx.clip();
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(vpX, vpY, vpW, vpH);
+                ctx.clip();
 
-            ctx.drawImage(
-                this.canvas,
-                (xDst - origXDst) * esx,
-                (yDst - origYDst) * esy,
-                wClipped * esx,
-                hClipped * esy,
-                xDst,
-                yDst,
-                wClipped,
-                hClipped,
-            );
+                ctx.drawImage(
+                    this.canvas,
+                    (xDst - origXDst) * esx,
+                    (yDst - origYDst) * esy,
+                    wClipped * esx,
+                    hClipped * esy,
+                    xDst,
+                    yDst,
+                    wClipped,
+                    hClipped,
+                );
 
-            ctx.restore();
+                ctx.restore();
+            }
         }
 
         return wasDirty;

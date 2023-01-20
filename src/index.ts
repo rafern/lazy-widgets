@@ -93,6 +93,7 @@ export * from './widgets/Checkbox';
 export * from './widgets/Column';
 export * from './widgets/Container';
 export * from './widgets/CornerRadii';
+export * from './widgets/Decoration';
 export * from './widgets/FilledButton';
 export * from './widgets/Icon';
 export * from './widgets/IconButton';
