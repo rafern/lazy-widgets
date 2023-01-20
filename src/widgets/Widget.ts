@@ -451,6 +451,9 @@ export abstract class Widget extends BaseTheme {
         // If dimensions changed (compare with tracked old dimensions), then
         // mark as dirty
         if(oldWidth !== this.idealWidth || oldHeight !== this.idealHeight) {
+            // FIXME this is being called too much, investigate why. my guess is
+            // that this gets called too much because layout resolution is done
+            // in 2 stages to measure the minimum space requirements
             this.markWholeAsDirty();
         }
     }
@@ -897,7 +900,6 @@ export abstract class Widget extends BaseTheme {
      * the position and dimensions of the dirty rectangle.
      */
     propagateDirtyRect(rect: Rect): void {
-        // console.debug('propagateDirtyRect (Widget)', this.constructor.name);
         this.markAsDirty(rect);
     }
 

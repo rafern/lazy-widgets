@@ -1,5 +1,4 @@
 import type { LayoutConstraints } from "./LayoutConstraints";
-import type { FillStyle } from "../theme/FillStyle";
 import type { Widget } from "../widgets/Widget";
 import type { Event } from "../events/Event";
 import type { Rect } from "../helpers/Rect";
@@ -105,7 +104,7 @@ export interface Viewport {
      * @param extraDirtyRects - Extra damage regions (not tracked internally) that need to be repainted. Can be an empty list if this is a root viewport.
      * @returns Returns true if the child was re-painted, else, false.
      */
-    paint(extraDirtyRects: Array<Rect>, backgroundFillStyle: FillStyle): boolean;
+    paint(extraDirtyRects: Array<Rect>): boolean;
     /**
      * Dispatch an event to the Viewport's {@link Viewport#child}.
      *

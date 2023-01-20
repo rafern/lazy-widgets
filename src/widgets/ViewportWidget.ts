@@ -208,17 +208,6 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         }
     }
 
-    protected override onThemeUpdated(property: string | null = null): void {
-        super.onThemeUpdated(property);
-
-        if(property === null) {
-            this._layoutDirty = true;
-            this.markWholeAsDirty();
-        } else if(property === 'canvasFill') {
-            this.markWholeAsDirty();
-        }
-    }
-
     protected getBoundsOf(widget: Widget): Bounds {
         const [width, height] = widget.idealDimensions;
         const [x, y] = widget.idealPosition;
@@ -236,6 +225,11 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         // Pre-layout update child
         const child = this.child;
         child.preLayoutUpdate();
+
+        // If child's layout is dirty, set self's layout as dirty
+        if (child.layoutDirty) {
+            this._layoutDirty = true;
+        }
 
         // Update viewport resolution if needed
         if(this.useCanvas) {
@@ -344,11 +338,26 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Clear background and paint canvas
-        this.internalViewport.paint(dirtyRects, this.canvasFill);
+        this.internalViewport.paint(dirtyRects);
     }
 
     override propagateDirtyRect(rect: Rect): void {
-        this.markWholeAsDirty();
+        // convert damage region from relative coordinates to absolute
+        // coordinates if necessary
+        if (this.internalViewport.relativeCoordinates) {
+            const vpX = this.internalViewport.rect[0] + this.internalViewport.offset[0];
+            const vpY = this.internalViewport.rect[1] + this.internalViewport.offset[1];
+
+            const left = Math.floor(rect[0] + vpX);
+            const top = Math.floor(rect[1] + vpY);
+            const right = Math.ceil(rect[0] + rect[2] + vpX);
+            const bottom = Math.ceil(rect[1] + rect[3] + vpY);
+            const width = right - left;
+            const height = bottom - top;
+
+            rect = [ left, top, width, height ];
+        }
+
         super.propagateDirtyRect(rect);
     }
 }

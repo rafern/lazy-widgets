@@ -1,5 +1,4 @@
 import type { Rect } from '../helpers/Rect';
-import type { FillStyle } from '../theme/FillStyle';
 import type { Widget } from "../widgets/Widget";
 import { BaseViewport } from "./BaseViewport";
 import { Msg } from './Strings';
@@ -32,27 +31,16 @@ export class ClippedViewport extends BaseViewport {
         super(child, false);
     }
 
-    paint(extraDirtyRects: Array<Rect>, backgroundFillStyle: FillStyle): boolean {
+    paint(extraDirtyRects: Array<Rect>): boolean {
         const wasDirty = extraDirtyRects.length > 0;
-        const [vpX, vpY, vpW, vpH, _origXDst, _origYDst, xDst, yDst, wClipped, hClipped] = this.getClippedViewport();
-        const ctx = this.context;
-
-        ctx.save();
-        ctx.globalCompositeOperation = 'copy';
-        ctx.fillStyle = backgroundFillStyle;
-        ctx.beginPath();
-        ctx.rect(vpX, vpY, vpW, vpH);
-        ctx.clip();
-        ctx.rect(xDst, yDst, wClipped, hClipped);
-        ctx.clip('evenodd');
-        ctx.fill();
-        ctx.restore();
+        const [vpX, vpY, vpW, vpH, _origXDst, _origYDst, _xDst, _yDst, wClipped, hClipped] = this.getClippedViewport();
 
         // Abort if outside of bounds
         if(wClipped === 0 || hClipped === 0) {
             return wasDirty;
         }
 
+        const ctx = this.context;
         ctx.save();
         ctx.beginPath();
         ctx.rect(vpX, vpY, vpW, vpH);

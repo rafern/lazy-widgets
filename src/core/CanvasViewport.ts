@@ -1,6 +1,5 @@
 import { flagField } from '../decorators/FlagFields';
 import { roundToPower2 } from '../helpers/roundToPower2';
-import type { FillStyle } from '../theme/FillStyle';
 import type { Widget } from '../widgets/Widget';
 import { isPower2 } from '../helpers/isPower2';
 import { BaseViewport } from './BaseViewport';
@@ -346,45 +345,46 @@ export class CanvasViewport extends BaseViewport {
         return wasDirty;
     }
 
-    paint(extraDirtyRects: Array<Rect>, backgroundFillStyle: FillStyle): boolean {
+    paint(extraDirtyRects: Array<Rect>): boolean {
+        const [vpX, vpY, vpW, vpH, origXDst, origYDst, xDst, yDst, wClipped, hClipped] = this.getClippedViewport();
+
         // add extra damage regions to internally tracked damage region list
-        this.pushDirtyRects(extraDirtyRects);
+        for (const absRect of extraDirtyRects) {
+            const left = Math.floor(absRect[0] - origXDst);
+            const top = Math.floor(absRect[1] - origYDst);
+            const right = Math.ceil(absRect[0] + absRect[2] - origXDst);
+            const bottom = Math.ceil(absRect[1] + absRect[3] - origYDst);
+            const width = right - left;
+            const height = bottom - top;
+
+            this.pushDirtyRect([ left, top, width, height ]);
+        }
 
         // paint to internal canvas
         const wasDirty = this.paintToInternal();
 
-        // Paint to parent viewport, if any
-        if(this.parent !== null) {
-            const [vpX, vpY, vpW, vpH, origXDst, origYDst, xDst, yDst, wClipped, hClipped] = this.getClippedViewport();
+        // Paint to parent viewport, if any, and if inside bounds
+        if(this.parent !== null && wClipped !== 0 && hClipped !== 0) {
+            const [esx, esy] = this.effectiveScale;
             const ctx = this.parent.context;
 
             ctx.save();
-            ctx.globalCompositeOperation = 'copy';
-            ctx.fillStyle = backgroundFillStyle;
             ctx.beginPath();
             ctx.rect(vpX, vpY, vpW, vpH);
             ctx.clip();
 
-            // Don't paint if outside of bounds
-            if(wClipped !== 0 && hClipped !== 0) {
-                const [esx, esy] = this.effectiveScale;
+            ctx.drawImage(
+                this.canvas,
+                (xDst - origXDst) * esx,
+                (yDst - origYDst) * esy,
+                wClipped * esx,
+                hClipped * esy,
+                xDst,
+                yDst,
+                wClipped,
+                hClipped,
+            );
 
-                ctx.drawImage(
-                    this.canvas,
-                    (xDst - origXDst) * esx,
-                    (yDst - origYDst) * esy,
-                    wClipped * esx,
-                    hClipped * esy,
-                    xDst,
-                    yDst,
-                    wClipped,
-                    hClipped,
-                );
-            }
-
-            ctx.rect(xDst, yDst, wClipped, hClipped);
-            ctx.clip('evenodd');
-            ctx.fill();
             ctx.restore();
         }
 

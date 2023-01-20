@@ -1,7 +1,6 @@
 import type { LayoutConstraints } from "./LayoutConstraints";
-import { watchArrayField, flagArrayField } from "../decorators/FlagFields";
+import { watchArrayField } from "../decorators/FlagFields";
 import { PointerEvent } from "../events/PointerEvent";
-import type { FillStyle } from "../theme/FillStyle";
 import type { Widget } from "../widgets/Widget";
 import type { Event } from "../events/Event";
 import type { Rect } from "../helpers/Rect";
@@ -19,7 +18,7 @@ export abstract class BaseViewport implements Viewport {
     abstract readonly context: CanvasRenderingContext2D;
     @watchArrayField(BaseViewport.prototype.relayoutAndReposition)
     constraints: LayoutConstraints;
-    @flagArrayField('forceRelayout')
+    @watchArrayField(BaseViewport.prototype.relayoutAndReposition)
     rect: Rect;
     abstract get effectiveScale(): [scaleX: number, scaleY: number];
     parent: Viewport | null = null;
@@ -116,7 +115,7 @@ export abstract class BaseViewport implements Viewport {
         return newWidth !== oldWidth || newHeight !== oldHeight;
     }
 
-    abstract paint(extraDirtyRects: Array<Rect>, backgroundFillStyle: FillStyle): boolean;
+    abstract paint(extraDirtyRects: Array<Rect>): boolean;
 
     dispatchEvent(event: Event): Widget | null {
         // Drop event if it is a positional event with no target outside the
