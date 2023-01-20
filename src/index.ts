@@ -108,6 +108,7 @@ export * from './widgets/RadioButton';
 export * from './widgets/RoundedCorners';
 export * from './widgets/Row';
 export * from './widgets/ScrollableViewportWidget';
+export * from './widgets/Separator';
 export * from './widgets/SingleParent';
 export * from './widgets/Slider';
 export * from './widgets/Spacing';
