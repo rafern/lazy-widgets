@@ -634,6 +634,15 @@ export abstract class Widget extends BaseTheme {
      * All passed dirty rectangles intersect the widget, have an area greater
      * than 0, and are clamped to the widget bounds.
      *
+     * The painting logic of this widget can modify the rendering context in a
+     * way that changes rendering for its children, however, the context must be
+     * kept clean for the parent of this widget; operations like clipping for
+     * children are OK, but make sure to restore the context to a state with no
+     * clipping when the painting logic is finished. This does not apply to some
+     * basic context properties such as fillStyle or strokeStyle; you are
+     * expected to set these on every handlePainting, do not assume the state of
+     * these properties.
+     *
      * @param dirtyRects - The damaged regions that need to be re-painted, as a list of dirty rectangles
      */
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -695,12 +704,7 @@ export abstract class Widget extends BaseTheme {
         }
 
         if(this._enabled) {
-            const ctx = this.viewport.context;
-            // TODO don't save context so much. maybe require the child widget
-            // to keep the context clean
-            ctx.save();
             this.handlePainting(effectiveDirtyRects);
-            ctx.restore();
         }
     }
 
