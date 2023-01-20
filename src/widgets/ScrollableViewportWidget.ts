@@ -556,7 +556,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
     }
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {
-        // Check which scrollbars need painting and update forceRePaint flag
+        // Check which scrollbars need painting
         const [childWidth, childHeight] = this.child.idealDimensions;
         const xNeeded = childWidth > this.effectiveWidth;
         const yNeeded = childHeight > this.effectiveHeight;
@@ -566,14 +566,6 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         if(this.horizWasPainted !== paintX || this.vertWasPainted !== paintY) {
             this.horizWasPainted = paintX;
             this.vertWasPainted = paintY;
-            this.forceRePaint = true;
-        } else if(this.scrollbarMode === ScrollbarMode.Overlay) {
-            // XXX overlay mode always needs the child widget to be repainted
-            // because the scrollbar could be semi-transparent. if the scrollbar
-            // is semi-transparent and the child is painted, then the scrollbar
-            // will also be painted, but it will be overpainted, resulting in
-            // accumulation of alpha, getting rid of the transparency over time
-            this.forceRePaint = true;
         }
 
         // Paint viewport

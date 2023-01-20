@@ -63,8 +63,9 @@ export class ClippedViewport extends BaseViewport {
         return wasDirty;
     }
 
-    override propagateDirtyRect(_rect: Rect): void {
-        // TODO
-        throw new Error('NIY');
-    }
+    // XXX clipped viewports don't care whether a rectangle was marked as dirty
+    // or not, since they are always used in a viewport widget, which already
+    // passes it along to the parent
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    override markDirtyRect(_rect: Rect): void {}
 }

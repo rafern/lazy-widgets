@@ -184,5 +184,5 @@ export abstract class BaseViewport implements Viewport {
         return [vpX, vpY, vpW, vpH, origXDst, origYDst, xDst, yDst, wClipped, hClipped];
     }
 
-    abstract propagateDirtyRect(rect: Rect): void;
+    abstract markDirtyRect(rect: Rect): void;
 }

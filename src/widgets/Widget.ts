@@ -897,6 +897,7 @@ export abstract class Widget extends BaseTheme {
      * the position and dimensions of the dirty rectangle.
      */
     propagateDirtyRect(rect: Rect): void {
+        // console.debug('propagateDirtyRect (Widget)', this.constructor.name);
         this.markAsDirty(rect);
     }
 
@@ -917,7 +918,7 @@ export abstract class Widget extends BaseTheme {
         if (this._parent) {
             this._parent.propagateDirtyRect(rect);
         } else if (this._viewport) {
-            this._viewport.propagateDirtyRect(rect);
+            this._viewport.markDirtyRect(rect);
         } else {
             console.warn('Could not mark rectangle as dirty; Widget is in invalid state (_active is true, but _parent and _viewport are null)');
         }

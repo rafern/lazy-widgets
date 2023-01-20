@@ -99,8 +99,6 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
      * resolution.
      */
     private _constraints: LayoutConstraints = [0, Infinity, 0, Infinity];
-    /** Force child re-paint? Only used when not using a Viewport */
-    protected forceRePaint = true;
     /**
      * The amount of horizontal space to reserve. By default, no space is
      * reserved. Useful for situations where additional parts are needed around
@@ -333,7 +331,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         // we want to use this.internalViewport
         Widget.prototype.attach.call(this, root, viewport, parent);
         this.internalViewport.parent = viewport;
-        this.child.attach(root, this.internalViewport, parent);
+        this.child.attach(root, this.internalViewport, this);
     }
 
     override detach(): void {
@@ -347,6 +345,10 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Clear background and paint canvas
         this.internalViewport.paint(dirtyRects, this.canvasFill);
-        this.forceRePaint = false; // TODO forceRePaint???? do we need this or is this another hack from the previous system?
+    }
+
+    override propagateDirtyRect(rect: Rect): void {
+        this.markWholeAsDirty();
+        super.propagateDirtyRect(rect);
     }
 }

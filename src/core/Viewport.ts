@@ -115,10 +115,9 @@ export interface Viewport {
     dispatchEvent(event: Event): Widget | null;
 
     /**
-     * Mark a rectangle relative to this viewport as dirty. Propagates up the
-     * UI tree, not down. Similar to {@link Widget#propagateDirtyRect}.
+     * Mark a rectangle relative to this viewport as dirty.
      *
      * @param rect - A rectangle with the area that was marked as dirty
      */
-    propagateDirtyRect(rect: Rect): void;
+    markDirtyRect(rect: Rect): void;
 }
