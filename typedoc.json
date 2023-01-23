@@ -2,32 +2,5 @@
     "$schema": "https://typedoc.org/schema.json",
     "entryPoints": [ "./src/index.ts" ],
     "out": "./docs/",
-    "media": "./assets/",
-    "name": "@rafern/canvas-ui",
-    "pluginPages": {
-        "pages": [
-            {
-                "title": "@rafern/canvas-ui",
-                "moduleRoot": true,
-                "children": [
-                    {
-                        "title": "Debugging",
-                        "source": "debugging.md"
-                    },
-                    {
-                        "title": "UI trees",
-                        "source": "ui-trees.md"
-                    },
-                    {
-                        "title": "Decisions",
-                        "source": "decisions.md"
-                    },
-                    {
-                        "title": "UI phases overview",
-                        "source": "overview.md"
-                    }
-                ]
-            }
-        ]
-    }
+    "name": "lazy-widgets"
 }
