@@ -13,8 +13,7 @@
     "docs": "typedoc --options typedoc.json",
     "generate_theme": "node generate_theme.mjs",
     "test": "echo Dummy test - TODO implement tests",
-    "clean": "rimraf dist/*",
-    "publish": "npm run lint && npm run clean && npm run build && npm run test && echo dummy publish"
+    "clean": "rimraf dist/*"
   },
   "files": [
     "dist"
