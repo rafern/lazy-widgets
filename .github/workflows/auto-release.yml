@@ -16,12 +16,13 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
+      - run: tar -czf artifact-dist-folder.tar.gz dist/
       - uses: actions/upload-artifact@v3
         with:
-          name: build-artifact
-          path: dist/
+          name: build
+          path: artifact-dist-folder.tar.gz
 
-  deploy-docs:
+  generate-docs:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -32,6 +33,32 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run docs
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+      - run: tar -xf artifact-dist-folder.tar.gz dist/
+      - run: mkdir docs/dist
+      - run: mv dist/index.esm.js docs/dist/index.esm.js
+      - run: mv dist/index.esm.js.map docs/dist/index.esm.js.map
+      - run: mv examples docs/examples
+      - uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'docs/'
+
+  deploy-docs:
+    needs: generate-docs
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
 
   publish-npm:
     needs: deploy-docs
