@@ -1,29 +1,18 @@
-# NOTICE
-
-This is a reboot of the `canvas-ui` library, and is heavily work-in-progress; do
-not use this in a production environment... yet. It was started due to the
-following reasons:
-- There was a name clash with `canvas-ui` - the new name might not be the final name
-- `canvas-ui` has very volatile versioning due to a premature release. This library will not have a version 1.0.0 anytime soon
-- Lack of events in `canvas-ui`, making more complex UI hard to do without custom widgets
-- Lack of layering and decoration systems in `canvas-ui`, leading to a very blocky appearance and more complex code when handling background clearing
-- Awkward flexbox system (remaining space is distributed, instead of final space)
-- No testing
-- No CI (which also polluted the repo with a docs folder)
-
-Even if there wasn't a name clash, a reboot would probably be done at some point
-to prevent having a version 20 of `canvas-ui`.
-
-The first release will prioritise the following features:
-- Layering system
-- Decoration system
-
-Other things that would be nice to fix:
-- Get rid of ugly theme generation system; replace it with just code
-
 # lazy-widgets
 
-Typescript retained mode GUI for the HTML canvas API.
+Typescript retained mode GUI for the HTML canvas API - a reboot of the
+[@rafern/canvas-ui](https://www.npmjs.com/package/@rafern/canvas-ui) library.
+
+This library's API is not stable and is expected to heavily change in the
+future. Planned features/changes:
+- Rewrite flexbox system to distribute final space instead of remaining space
+- Rewrite layout system to no longer use 2 stages, or to not unnecessarily mark widgets as dirty
+- Add layer system
+- Add decoration system
+- Immediately-dispatched input events
+- Replace callbacks with events
+- Add widget output events (hover-start, hover-end, etc...)
+- Rich text
 
 ## Contributing
 

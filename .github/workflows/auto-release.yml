@@ -1,0 +1,49 @@
+name: Auto-generate docs and auto-publish
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: dist/
+      - run: npm ci
+      - run: npm lint
+      - run: npm run build
+
+  deploy-docs:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run docs
+
+  publish-npm:
+    needs: deploy-docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: 'echo Dummy release with dummy NPM token ($NODE_AUTH_TOKEN)'
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.dummy_npm_token}}

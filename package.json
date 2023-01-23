@@ -1,21 +1,23 @@
 {
   "name": "lazy-widgets",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Typescript retained mode GUI for the HTML canvas API",
-  "main": "./lib/index.esm.js",
-  "exports": "./lib/index.esm.js",
-  "types": "./lib/index.d.ts",
+  "main": "./dist/index.esm.js",
+  "exports": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "lint": "eslint src/ --ext .ts",
     "lint-fix": "eslint src/ --ext .ts --fix",
-    "build": "tsc & esbuild --minify --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=lib/index.esm.js src/index.ts",
-    "dev": "concurrently --kill-others 'http-server -c-1 examples' 'esbuild --watch --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=lib/index.esm.js src/index.ts'",
+    "build": "tsc & esbuild --minify --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=dist/index.esm.js src/index.ts",
+    "dev": "concurrently --kill-others 'http-server -c-1 examples' 'esbuild --watch --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=dist/index.esm.js src/index.ts'",
     "docs": "typedoc --options typedoc.json",
     "generate_theme": "node generate_theme.mjs",
-    "clean": "rimraf lib/*"
+    "test": "echo Dummy test - TODO implement tests",
+    "clean": "rimraf dist/*",
+    "publish": "npm run lint && npm run clean && npm run build && npm run test && echo dummy publish"
   },
   "files": [
-    "lib",
+    "dist",
     "package.json"
   ],
   "keywords": [

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "lib",
+    "outDir": "dist",
     "target": "es6",
     "module": "es6",
     "lib": ["ESNext", "dom"],
@@ -23,5 +23,5 @@
     "emitDeclarationOnly": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", "lib", "**/*.test.ts"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
