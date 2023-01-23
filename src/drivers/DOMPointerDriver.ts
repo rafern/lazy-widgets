@@ -40,7 +40,7 @@ function unpackModifiers(event: MouseEvent): [shift: boolean, ctrl: boolean, alt
 export class DOMPointerDriver extends PointerDriver {
     /** The HTML DOM element and listeners that each root is bound to */
     private domElems: WeakMap<Root, DOMPointerDriverBind> = new WeakMap();
-    /** The mapping between each DOM pointer ID and canvas-ui pointer ID */
+    /** The mapping between each DOM pointer ID and internal pointer ID */
     private pointers: Map<number, number> = new Map();
     /**
      * The pointer ID of the mouse. Registered in constructor. This is needed
@@ -106,7 +106,7 @@ export class DOMPointerDriver extends PointerDriver {
     }
 
     /**
-     * Get the canvas-ui pointer ID of a given event. If the event has a pointer
+     * Get the internal pointer ID of a given event. If the event has a pointer
      * which hasn't been registered yet, then it is registered automatically
      */
     private getPointerID(event: PointerEvent): number {

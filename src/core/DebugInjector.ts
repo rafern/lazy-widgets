@@ -56,7 +56,7 @@ export function toggleDebugFeature(debugFeature: string, enabled?: boolean): voi
 
     if(wasEnabled !== enabled) {
         featureConfig[0] = enabled;
-        console.info(`[canvas-ui] ${enabled ? 'En' : 'Dis'}abled "${debugFeature}" debug feature`);
+        console.info(`[lazy-widgets] ${enabled ? 'En' : 'Dis'}abled "${debugFeature}" debug feature`);
 
         if (featureConfig.length > 2) {
             (featureConfig[2] as ToggleCallback)(enabled);
@@ -67,7 +67,7 @@ export function toggleDebugFeature(debugFeature: string, enabled?: boolean): voi
 /** List all debug features in the console. */
 export function listDebugFeatures(): void {
     for(const [feature, featureConfig] of features) {
-        console.info(`[canvas-ui] "${feature}" (${featureConfig[0] ? 'en' : 'dis'}abled): ${featureConfig[1]}`);
+        console.info(`[lazy-widgets] "${feature}" (${featureConfig[0] ? 'en' : 'dis'}abled): ${featureConfig[1]}`);
     }
 }
 
@@ -82,13 +82,13 @@ export function injectWatchflagFeature(classObj: any, flagKey: string): void {
     const propertyPath = `${classObj.name}.${flagKey}`;
     const featureName = `watchflag.${propertyPath}`;
     if(features.has(featureName)) {
-        console.warn(`[canvas-ui] Already injected debug feature with name ${featureName}; ignored`);
+        console.warn(`[lazy-widgets] Already injected debug feature with name ${featureName}; ignored`);
         return;
     }
 
     const featureNameStrace = `watchflag.${propertyPath}.strace`;
     if(features.has(featureNameStrace)) {
-        console.warn(`[canvas-ui] Already injected debug feature with name ${featureNameStrace}; ignored`);
+        console.warn(`[lazy-widgets] Already injected debug feature with name ${featureNameStrace}; ignored`);
         return;
     }
 
@@ -101,7 +101,7 @@ export function injectWatchflagFeature(classObj: any, flagKey: string): void {
             if(isDebugFeatureEnabled(featureName)) {
                 const oldVal = valueMap.get(this);
                 if(!oldVal && newValue) {
-                    const msg = `[canvas-ui ${featureName}] ${this.constructor.name}.${flagKey} set to true`;
+                    const msg = `[lazy-widgets ${featureName}] ${this.constructor.name}.${flagKey} set to true`;
                     if(isDebugFeatureEnabled(featureNameStrace)) {
                         console.groupCollapsed(msg);
                         console.trace();
@@ -133,7 +133,7 @@ export function injectTraceFeature(classObj: any, methodKey: string, messageGene
     const methodPath = `${classObj.name}.${methodKey}`;
     const featureName = `trace.${methodPath}`;
     if(features.has(featureName)) {
-        console.warn(`[canvas-ui] Already injected debug feature with name ${featureName}; ignored`);
+        console.warn(`[lazy-widgets] Already injected debug feature with name ${featureName}; ignored`);
         return;
     }
 
@@ -145,7 +145,7 @@ export function injectTraceFeature(classObj: any, methodKey: string, messageGene
     function logMsgStack(): void {
         if(traceLevel === 0) {
             if(isDebugFeatureEnabled(featureName)) {
-                console.debug(`[canvas-ui ${featureName}] Trace:\n${msgStack.join('\n')}`);
+                console.debug(`[lazy-widgets ${featureName}] Trace:\n${msgStack.join('\n')}`);
             }
 
             traceLevel = 0;
@@ -209,7 +209,7 @@ export function injectRandomFillFeature(classObj: any, themePropertyKey: string)
     const propertyPath = `${classObj.name}.${themePropertyKey}`;
     const featureName = `randomfill.${propertyPath}`;
     if(features.has(featureName)) {
-        console.warn(`[canvas-ui] Already injected debug feature with name ${featureName}; ignored`);
+        console.warn(`[lazy-widgets] Already injected debug feature with name ${featureName}; ignored`);
         return;
     }
 
@@ -243,14 +243,14 @@ export function injectStackTraceFeature(classObj: any, methodKey: string): void 
     const methodPath = `${classObj.name}.${methodKey}`;
     const featureName = `stacktrace.${methodPath}`;
     if(features.has(featureName)) {
-        console.warn(`[canvas-ui] Already injected debug feature with name ${featureName}; ignored`);
+        console.warn(`[lazy-widgets] Already injected debug feature with name ${featureName}; ignored`);
         return;
     }
 
     const methodOrig = classObj.prototype[methodKey];
     classObj.prototype[methodKey] = function(...args: any[]) {
         if(isDebugFeatureEnabled(featureName)) {
-            console.groupCollapsed(`[canvas-ui ${featureName}] ${classObj.name}.${methodKey} called`);
+            console.groupCollapsed(`[lazy-widgets ${featureName}] ${classObj.name}.${methodKey} called`);
             console.trace();
             console.groupEnd();
         }
@@ -285,7 +285,7 @@ let injected = false;
  */
 export function injectDebugCode(): void {
     if(injected) {
-        console.warn('[canvas-ui] Already injected debug code; ignored');
+        console.warn('[lazy-widgets] Already injected debug code; ignored');
         return;
     }
 
@@ -463,7 +463,7 @@ export function injectDebugCode(): void {
     const warnedSubY: Set<string> = new Set();
     const warnedSubWidth: Set<string> = new Set();
     const warnedSubHeight: Set<string> = new Set();
-    const msgLeft = '[canvas-ui warnsubpixels] Widget type "';
+    const msgLeft = '[lazy-widgets warnsubpixels] Widget type "';
     const msgMid = '" has a non-integer ';
     const msgRight = ', which will create clipping issues due to subpixels. This message won\'t be shown again for this widget type';
 
@@ -538,8 +538,8 @@ export function injectDebugCode(): void {
         list: listDebugFeatures,
     };
 
-    console.info('[canvas-ui] Injected debug code; the library will be slower');
-    console.info('[canvas-ui] Check if a debug feature is enabled in the console with canvasDebug.enabled(debugFeature: string)');
-    console.info('[canvas-ui] Enable a debug feature in the console with canvasDebug.toggle(debugFeature: string, enabled?: boolean)');
-    console.info('[canvas-ui] List debug features in the console with canvasDebug.list()');
+    console.info('[lazy-widgets] Injected debug code; the library will be slower');
+    console.info('[lazy-widgets] Check if a debug feature is enabled in the console with canvasDebug.enabled(debugFeature: string)');
+    console.info('[lazy-widgets] Enable a debug feature in the console with canvasDebug.toggle(debugFeature: string, enabled?: boolean)');
+    console.info('[lazy-widgets] List debug features in the console with canvasDebug.list()');
 }
