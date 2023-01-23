@@ -377,10 +377,6 @@ export function injectDebugCode(): void {
     injectStackTraceFeature(Widget, 'scaleFont');
     // watchflag.Widget._layoutDirty
     injectWatchflagFeature(Widget, '_layoutDirty');
-    // watchflag.BaseContainer.backgroundDirty
-    injectWatchflagFeature(BaseContainer, 'backgroundDirty');
-    // watchflag.MultiContainer.backgroundDirty
-    injectWatchflagFeature(MultiContainer, 'backgroundDirty');
     // randomfill.BaseTheme.canvasFill
     injectRandomFillFeature(BaseTheme, 'canvasFill');
     // randomfill.BaseTheme.primaryFill

@@ -71,8 +71,8 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
      *
      * Sets {@link FilledButton#backgroundProperty} depending on
      * {@link FilledButton#forced} and {@link ButtonClickHelper#clickState},
-     * sets {@link FilledButton#childTheme}.{@link Theme#canvasFill} and flags
-     * {@link FilledButton#backgroundDirty} as true.
+     * sets {@link FilledButton#childTheme}.{@link Theme#canvasFill} and marks
+     * the widget as dirty.
      */
     private updateBackground(): void {
         const oldProperty = this.backgroundProperty;

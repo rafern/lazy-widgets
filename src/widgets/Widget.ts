@@ -505,8 +505,7 @@ export abstract class Widget extends BaseTheme {
      *
      * Can be overridden, but `super.finalizeBounds` must still be called; if
      * you have parts of the widget that can be pre-calculated when the layout
-     * is known, such as the length and offset of a {@link Checkbox}, or
-     * non-default dirty flags, such as {@link MultiContainer#backgroundDirty},
+     * is known, such as the length and offset of a {@link Checkbox},
      * then this is the perfect method to override, since it's only called after
      * the layout is resolved to final (non-ideal) values, is only called if
      * needed (unlike {@link postLayoutUpdate}, which is always called after the
