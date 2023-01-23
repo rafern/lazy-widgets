@@ -3,8 +3,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { TextRenderGroup } from '../helpers/TextHelper';
-import { MultiContainer } from '../widgets/MultiContainer';
-import { BaseContainer } from '../widgets/BaseContainer';
 import type { FillStyle } from '../theme/FillStyle';
 import { TextHelper } from '../helpers/TextHelper';
 import { BaseTheme } from '../theme/BaseTheme';
