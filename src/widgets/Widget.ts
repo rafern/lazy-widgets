@@ -368,8 +368,8 @@ export abstract class Widget extends BaseTheme {
     /**
      * Wrapper for {@link Widget#handleResolveDimensions}. Does nothing if
      * {@link Widget#_enabled} is false. If the resolved dimensions change,
-     * {@link Widget#_dirty} is set to true. {@link Widget#_layoutDirty} is set
-     * to false. If the widget is not loose and the layout has non-infinite max
+     * the widget is marked as dirty. {@link Widget#_layoutDirty} is set to
+     * false. If the widget is not loose and the layout has non-infinite max
      * constraints, then the widget is stretched to fit max constraints. Must
      * not be overridden.
      */
