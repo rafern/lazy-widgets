@@ -16,11 +16,11 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run build
-      - run: tar -czf artifact-dist-folder.tar.gz dist/
+      - run: tar -czf build.tar.gz dist/
       - uses: actions/upload-artifact@v3
         with:
           name: build
-          path: artifact-dist-folder.tar.gz
+          path: build.tar.gz
 
   generate-docs:
     needs: build
@@ -37,7 +37,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-      - run: tar -xf artifact-dist-folder.tar.gz dist/
+      - run: tar -xf build.tar.gz dist/
       - run: mkdir docs/dist
       - run: mv dist/index.esm.js docs/dist/index.esm.js
       - run: mv dist/index.esm.js.map docs/dist/index.esm.js.map
@@ -70,7 +70,12 @@ jobs:
           node-version: 18
           cache: 'npm'
           registry-url: https://registry.npmjs.org/
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+      - run: tar -xf build.tar.gz dist/
       - run: npm ci
-      - run: 'echo Dummy release with dummy NPM token ($NODE_AUTH_TOKEN)'
+      - run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.dummy_npm_token}}
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
