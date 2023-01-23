@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <title>Examples</title>
+    <style type="text/css">
+      .example-cards {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+
+      .example-cards > a {
+        flex-grow: 1;
+        margin: 0 16px 16px 0;
+        border: 1px solid grey;
+        border-radius: 16px;
+        padding: 0 16px;
+        box-shadow: 1px 1px 4px grey;
+        text-decoration: none;
+        color: black;
+        transition: transform 0.25s;
+      }
+
+      .example-cards > a:hover:nth-child(5n) {
+        transform: rotate(0.25deg);
+      }
+
+      .example-cards > a:hover:nth-child(3n) {
+        transform: rotate(0.5deg);
+      }
+
+      .example-cards > a:hover:nth-child(2n) {
+        transform: rotate(-0.5deg);
+      }
+
+      .example-cards > a:hover {
+        transform: rotate(-0.25deg);
+      }
+
+      .example-cards > a > p:first-child {
+        font-weight: bold;
+      }
+
+      h1 {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Examples</h1>
+    <div class="example-cards">
+      <a href="decorations.html">
+        <p>Decorations</p>
+        <p>How to wrap widgets with decorations. Currently only RoundedCorners are supported</p>
+      </a>
+      <a href="icon-change.html">
+        <p>Icon changing</p>
+        <p>How to update the source image/video of an icon widget</p>
+      </a>
+      <a href="icon-fit.html">
+        <p>Icon fitting modes</p>
+        <p>Showcase of all the icon fitting modes</p>
+      </a>
+      <a href="icon-rotate.html">
+        <p>Icon rotation</p>
+        <p>How to rotate an icon</p>
+      </a>
+      <a href="nested-viewports.html">
+        <p>Nested viewports</p>
+        <p>Showcase of nested scrollable viewport widgets, especially useful for testing scrolling</p>
+      </a>
+      <a href="radio-button.html">
+        <p>Radio buttons</p>
+        <p>How to use radio button widgets (LabelledRadioButton)</p>
+      </a>
+      <a href="simple.html">
+        <p>Simple example</p>
+        <p>Example usage for the library, with a dynamic UI</p>
+      </a>
+      <a href="spritesheet-icons.html">
+        <p>Spritesheets</p>
+        <p>How to use spritesheets in icon widgets</p>
+      </a>
+      <a href="text-area.html">
+        <p>Text areas</p>
+        <p>TextArea widget showcase</p>
+      </a>
+      <a href="text-input-handler.html">
+        <p>Text input handlers</p>
+        <p>How to use Root.textInputHandler for mobile support</p>
+      </a>
+      <a href="video.html">
+        <p>Video</p>
+        <p>Showcase of a video in an icon widget, with a play/pause button</p>
+      </a>
+      <a href="viewport.html">
+        <p>Configurable viewports</p>
+        <p>Interactive showcase of viewport widgets and their options</p>
+      </a>
+      <a href="virtual-keyboard.html">
+        <p>Virtual keyboard</p>
+        <p>How to use virtual keyboards</p>
+      </a>
+      <a href="widget-toggling.html">
+        <p>Widget toggling</p>
+        <p>How to use toggle widgets with Widget.enabled</p>
+      </a>
+    </div>
+  </body>
+</html>
