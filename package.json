@@ -9,7 +9,7 @@
     "lint": "eslint src/ --ext .ts",
     "lint-fix": "eslint src/ --ext .ts --fix",
     "build": "tsc & esbuild --minify --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=dist/index.esm.js src/index.ts",
-    "dev": "concurrently --kill-others 'http-server -c-1 examples' 'esbuild --watch --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=dist/index.esm.js src/index.ts'",
+    "dev": "concurrently --kill-others 'http-server -c-1 .' 'esbuild --watch --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=dist/index.esm.js src/index.ts'",
     "docs": "typedoc --options typedoc.json",
     "generate_theme": "node generate_theme.mjs",
     "test": "echo Dummy test - TODO implement tests",
@@ -17,8 +17,7 @@
     "publish": "npm run lint && npm run clean && npm run build && npm run test && echo dummy publish"
   },
   "files": [
-    "dist",
-    "package.json"
+    "dist"
   ],
   "keywords": [
     "ui",
