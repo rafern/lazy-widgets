@@ -16,20 +16,25 @@ future. Planned features/changes:
 
 ## Contributing
 
-To check for linter errors, run `npm run lint`
+To build this project, run `npm run build`. To build in watch mode and with
+unminified output run `npm run dev`; the `http-server` package must be
+installed.
 
-To build this project, run `npm run build`
-
-To build this project in watch mode and with unminified output run `npm run dev`
-
-To re-generate the documentation, run `npm run docs`
+To check for linter errors, run `npm run lint`.
 
 To add/modify theme properties, modify the `theme_properties.json` file and run
-`npm run generate_theme`
+`npm run generate_theme`.
+
+## Documentation
+
+Documentation can be generated locally with the command `npm run docs`. Output
+will be in a new `docs` folder. The documentation is also server on
+[Github Pages](https://rafern.github.io/lazy-widgets).
 
 ## Example
 
-Examples can be found in the `examples` folder
+Examples can be found in the `examples` folder, which are also served on
+[Github Pages](https://rafern.github.io/lazy-widgets/examples).
 
 ## Special thanks
 
@@ -42,13 +47,15 @@ currently being developed at.
 This project is licensed under the MIT license (see the LICENSE file)
 
 This project uses the following open-source projects:
-- [@knodes/typedoc-plugin-pages](https://github.com/KnodesCommunity/typedoc-plugins) licensed under the MIT license
 - [@typescript-eslint/eslint-plugin](https://github.com/typescript-eslint/typescript-eslint) licensed under the MIT license
 - [@typescript-eslint/parser](https://github.com/typescript-eslint/typescript-eslint) licensed under the BSD 2-Clause license
+- [canvas-roundrect-polyfill](https://github.com/Kaiido/roundRect) licensed under the MIT license
+- [concurrently](https://github.com/open-cli-tools/concurrently) licensed under the MIT license
 - [esbuild](https://github.com/evanw/esbuild) licensed under the MIT license
 - [eslint](https://github.com/eslint/eslint) licensed under the MIT license
 - [eslint-plugin-tsdoc](https://github.com/microsoft/tsdoc) licensed under the MIT license
-- [local-web-server](https://github.com/lwsjs/local-web-server) licensed under the MIT license
 - [rimraf](https://github.com/isaacs/rimraf) licensed under the ISC license
 - [typedoc](https://github.com/TypeStrong/TypeDoc) licensed under the Apache 2.0 license
 - [typescript](https://github.com/Microsoft/TypeScript) licensed under the Apache 2.0 license
+- [tslib](https://github.com/Microsoft/tslib) licensed under the BSD Zero Clause License
+- [http-server](https://github.com/http-party/http-server) licensed under the MIT license
