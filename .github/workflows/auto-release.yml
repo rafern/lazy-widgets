@@ -2,7 +2,7 @@ name: Auto-generate docs and auto-publish
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   build:
