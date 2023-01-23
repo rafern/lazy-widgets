@@ -13,13 +13,13 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
       - uses: actions/upload-artifact@v3
         with:
           name: build-artifact
           path: dist/
-      - run: npm ci
-      - run: npm lint
-      - run: npm run build
 
   deploy-docs:
     needs: build
