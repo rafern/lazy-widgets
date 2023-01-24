@@ -28,7 +28,7 @@ To add/modify theme properties, modify the `theme_properties.json` file and run
 ## Documentation
 
 Documentation can be generated locally with the command `npm run docs`. Output
-will be in a new `docs` folder. The documentation is also server on
+will be in a new `docs` folder. The documentation is also served on
 [Github Pages](https://rafern.github.io/lazy-widgets).
 
 ## Example
