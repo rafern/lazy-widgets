@@ -1,6 +1,5 @@
 node_modules
-lib
-rollup.config.js
-esbuild.mjs
-generate_theme.mjs
+dist
 docs
+examples
+generate_theme.mjs
