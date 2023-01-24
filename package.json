@@ -1,6 +1,6 @@
 {
   "name": "lazy-widgets",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Typescript retained mode GUI for the HTML canvas API",
   "main": "./dist/index.esm.js",
   "exports": "./dist/index.esm.js",
@@ -32,7 +32,6 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
-    "canvas-roundrect-polyfill": "^0.0.1",
     "concurrently": "^7.6.0",
     "esbuild": "^0.17.3",
     "eslint": "^8.32.0",
