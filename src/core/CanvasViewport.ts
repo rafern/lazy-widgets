@@ -449,22 +449,46 @@ export class CanvasViewport extends BaseViewport {
         // prevent bleeding by clearing out-of-bounds parts of canvas
         if(this.preventBleeding && this.shrunk) {
             this.shrunk = false;
-
+            const canvasWidth = this.canvas.width;
+            const canvasHeight = this.canvas.height;
             const [realWidth, realHeight] = this.realDimensions;
-            const rightSpace = this.maxCanvasWidth - realWidth;
-            const bottomSpace = this.maxCanvasHeight - realHeight;
 
-            if(rightSpace > 0 && bottomSpace > 0) {
-                // clear right and bottom. do this by clearing a small rectangle
-                // on the right and a big rectangle on the bottom
-                this.context.clearRect(realWidth, 0, rightSpace, realHeight);
-                this.context.clearRect(0, realHeight, this.maxCanvasWidth, this.maxCanvasHeight);
-            } else if(rightSpace > 0) {
-                // clear right
-                this.context.clearRect(realWidth, 0, rightSpace, this.maxCanvasHeight);
-            } else if(bottomSpace > 0) {
-                // clear bottom
-                this.context.clearRect(0, realHeight, this.maxCanvasWidth, this.maxCanvasHeight);
+            if (this.preventAtlasBleeding) {
+                // clear top and left borders
+                this.context.clearRect(0, 0, canvasWidth, 1);
+                this.context.clearRect(0, 1, 1, canvasHeight - 1);
+
+                // clear rest
+                const rightSpace = canvasWidth - realWidth - 1;
+                const bottomSpace = canvasHeight - realHeight - 1;
+
+                if(rightSpace > 0 && bottomSpace > 0) {
+                    // clear right and bottom. do this by clearing a small
+                    // rectangle on the right and a big rectangle on the bottom
+                    this.context.clearRect(realWidth + 1, 1, rightSpace, realHeight);
+                    this.context.clearRect(1, realHeight + 1, canvasWidth - 1, bottomSpace);
+                } else if(rightSpace > 0) {
+                    // clear right
+                    this.context.clearRect(realWidth + 1, 1, rightSpace, canvasHeight - 1);
+                } else if(bottomSpace > 0) {
+                    // clear bottom
+                    this.context.clearRect(1, realHeight + 1, canvasWidth - 1, bottomSpace);
+                }
+            } else {
+                const rightSpace = canvasWidth - realWidth;
+                const bottomSpace = canvasHeight - realHeight;
+
+                if(rightSpace > 0 && bottomSpace > 0) {
+                    // clear right and bottom. same approach as before
+                    this.context.clearRect(realWidth, 0, rightSpace, realHeight);
+                    this.context.clearRect(0, realHeight, canvasWidth, bottomSpace);
+                } else if(rightSpace > 0) {
+                    // clear right
+                    this.context.clearRect(realWidth, 0, rightSpace, canvasHeight);
+                } else if(bottomSpace > 0) {
+                    // clear bottom
+                    this.context.clearRect(0, realHeight, canvasWidth, bottomSpace);
+                }
             }
         }
 
