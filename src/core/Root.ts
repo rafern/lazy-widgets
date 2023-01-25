@@ -28,6 +28,11 @@ export interface RootProperties {
     resolution?: number;
     /** Sets {@link Root#preventBleeding}. */
     preventBleeding?: boolean;
+    /**
+     * Sets {@link CanvasViewport#preventAtlasBleeding} in the internal viewport
+     * ({@link Root#viewport}).
+     */
+    preventAtlasBleeding?: boolean;
     /** The starting width of the {@link Root#viewport}'s canvas. */
     canvasStartingWidth?: number;
     /** The starting height of the {@link Root#viewport}'s canvas. */
@@ -144,7 +149,7 @@ export class Root {
      * @returns Returns a new CanvasViewport (or child class instance) for the Root
      */
     static makeViewport(child: Widget, properties?: Readonly<RootProperties>): CanvasViewport {
-        return new CanvasViewport(child, properties?.resolution, properties?.preventBleeding, properties?.canvasStartingWidth, properties?.canvasStartingHeight);
+        return new CanvasViewport(child, properties?.resolution, properties?.preventBleeding, properties?.preventAtlasBleeding, properties?.canvasStartingWidth, properties?.canvasStartingHeight);
     }
 
     /** The {@link Root#viewport}'s {@link Viewport#constraints | constraints} */
@@ -661,6 +666,14 @@ export class Root {
 
     set preventBleeding(preventBleeding: boolean) {
         this.viewport.preventBleeding = preventBleeding;
+    }
+
+    /**
+     * Shortcut for {@link Root#viewport}'s
+     * {@link CanvasViewport#preventAtlasBleeding} property.
+     */
+    get preventAtlasBleeding(): boolean {
+        return this.viewport.preventAtlasBleeding;
     }
 
     /**

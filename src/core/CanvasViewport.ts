@@ -61,6 +61,15 @@ export class CanvasViewport extends BaseViewport {
      */
     preventBleeding: boolean;
     /**
+     * Is texture atlas bleeding prevention enabled? If true, then a 1 pixel
+     * fully transparent black border will be added around the canvas,
+     * effectively reducing the usable canvas by 2 pixels horizontally and
+     * vertically.
+     *
+     * Can only be set on CanvasViewport creation.
+     */
+    readonly preventAtlasBleeding: boolean;
+    /**
      * Has the "real" size of the child Widget in the canvas shrunk? Used for
      * texture bleeding prevention. For internal use only.
      *
@@ -88,11 +97,16 @@ export class CanvasViewport extends BaseViewport {
      * issues in nested Viewports; it technically can be enabled, but it would
      * be a waste of resources.
      */
-    constructor(child: Widget, resolution = 1, preventBleeding = false, startingWidth = 64, startingHeight = 64) {
+    constructor(child: Widget, resolution = 1, preventBleeding = false, preventAtlasBleeding = false, startingWidth = 64, startingHeight = 64) {
         super(child, true);
 
         this.resolution = resolution;
         this.preventBleeding = preventBleeding;
+        this.preventAtlasBleeding = preventAtlasBleeding;
+
+        if (preventAtlasBleeding) {
+            console.debug('atlas bleeding prevention enabled');
+        }
 
         // Create internal canvas
         this.canvas = document.createElement('canvas');

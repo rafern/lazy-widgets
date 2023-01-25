@@ -28,8 +28,8 @@ export class DebuggableCanvasViewport extends CanvasViewport {
     /** Paints since last measurement */
     private _paintCounter = 0;
 
-    constructor(child: Widget, resolution = 1, preventBleeding = false, startingWidth = 64, startingHeight = 64) {
-        super(child, resolution, preventBleeding, startingWidth, startingHeight);
+    constructor(child: Widget, resolution = 1, preventBleeding = false, preventAtlasBleeding = false, startingWidth = 64, startingHeight = 64) {
+        super(child, resolution, preventBleeding, preventAtlasBleeding, startingWidth, startingHeight);
 
         // make overlay canvas
         this.overlayCanvas = document.createElement('canvas');

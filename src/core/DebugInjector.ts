@@ -508,7 +508,7 @@ export function injectDebugCode(): void {
     );
 
     Root.makeViewport = function(child: Widget, properties?: Readonly<RootProperties>): CanvasViewport {
-        const viewport = new DebuggableCanvasViewport(child, properties?.resolution, properties?.preventBleeding, properties?.canvasStartingWidth, properties?.canvasStartingHeight);
+        const viewport = new DebuggableCanvasViewport(child, properties?.resolution, properties?.preventBleeding, properties?.preventAtlasBleeding, properties?.canvasStartingWidth, properties?.canvasStartingHeight);
         viewports.push(viewport);
 
         if (isDebugFeatureEnabled('flashdamage')) {
