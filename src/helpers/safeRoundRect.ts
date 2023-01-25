@@ -1,8 +1,14 @@
 import { CornerRadii, NonUniformCornerRadius } from '../widgets/CornerRadii';
 
-function safeRoundRectFallback(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radii: CornerRadii) {
+/**
+ * CanvasRenderingContext2D.roundRect, but safe to use in browsers without
+ * support, like Firefox.
+ */
+export function safeRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radii: CornerRadii) {
     // XXX implemented by following the spec:
     // https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-roundrect
+    // note that the implementation deviates slightly from the spec; no subpath
+    // with point (x, y) is created at the end
 
     // 1. validate x, y, w, h
     if (!isFinite(x) || isNaN(x) || !isFinite(y) || isNaN(y)
@@ -90,7 +96,7 @@ function safeRoundRectFallback(ctx: CanvasRenderingContext2D, x: number, y: numb
         lowerRight.y *= scale;
     }
 
-    // 12-14. create subpath
+    // 12-13. create subpath
     const xw = x + w;
     const yh = y + h;
 
@@ -104,24 +110,6 @@ function safeRoundRectFallback(ctx: CanvasRenderingContext2D, x: number, y: numb
     ctx.lineTo(x, y + upperLeft.y);
     ctx.quadraticCurveTo(x, y, x + upperLeft.x, y);
     ctx.closePath();
-}
 
-let safeRoundRectImpl = function(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radii: CornerRadii) {
-    // first time running. check if roundRect is supported
-    if ('roundRect' in globalThis.CanvasRenderingContext2D.prototype) {
-        safeRoundRectImpl = () => ctx.roundRect(x, y, w, h, radii);
-    } else {
-        console.warn('CanvasRenderingContext2D.roundRect is not supported, using fallback method for lazy-widgets');
-        safeRoundRectImpl = safeRoundRectFallback;
-    }
-
-    safeRoundRectImpl(ctx, x, y, w, h, radii);
-}
-
-/**
- * CanvasRenderingContext2D.roundRect, but safe to use in browsers without
- * support, like Firefox.
- */
-export function safeRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radii: CornerRadii) {
-    safeRoundRectImpl(ctx, x, y, w, h, radii);
+    // XXX step 14 skipped; no subpath with (x, y) is created
 }
