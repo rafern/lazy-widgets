@@ -25,20 +25,10 @@ export class CanvasViewport extends BaseViewport {
 
     /** The internal canvas. Widgets are painted to this */
     readonly canvas: HTMLCanvasElement;
-    /**
-     * The maximum width the {@link CanvasViewport#canvas} can have. If the
-     * layout exceeds this width, then the content will be scaled to fit the
-     * canvas
-     */
-    @flagField('_forceResize')
-    maxCanvasWidth: number;
-    /**
-     * The maximum height the {@link CanvasViewport#canvas} can have. If the
-     * layout exceeds this height, then the content will be scaled to fit the
-     * canvas
-     */
-    @flagField('_forceResize')
-    maxCanvasHeight: number;
+    /** Current maximum canvas width. For internal use only. */
+    private _maxCanvasWidth: number;
+    /** Current maximum canvas height. For internal use only. */
+    private _maxCanvasHeight: number;
     /**
      * The resolution of the canvas. If possible, the canvas will be scaled by
      * this amount.
@@ -104,17 +94,13 @@ export class CanvasViewport extends BaseViewport {
         this.preventBleeding = preventBleeding;
         this.preventAtlasBleeding = preventAtlasBleeding;
 
-        if (preventAtlasBleeding) {
-            console.debug('atlas bleeding prevention enabled');
-        }
-
         // Create internal canvas
         this.canvas = document.createElement('canvas');
         this.canvas.width = startingWidth;
         this.canvas.height = startingHeight;
 
-        this.maxCanvasWidth = 16384;
-        this.maxCanvasHeight = 16384;
+        this._maxCanvasWidth = 16384;
+        this._maxCanvasHeight = 16384;
 
         // Get context out of canvas
         const context = this.canvas.getContext('2d', { alpha: true });
@@ -126,11 +112,109 @@ export class CanvasViewport extends BaseViewport {
     }
 
     /**
+     * The maximum width the {@link CanvasViewport#canvas} can have. If the
+     * layout exceeds this width, then the content will be scaled to fit the
+     * canvas.
+     *
+     * Non-integer numbers will be rounded.
+     */
+    get maxCanvasWidth(): number {
+        return this._maxCanvasWidth;
+    }
+
+    set maxCanvasWidth(maxCanvasWidth: number) {
+        let autoRounded = false;
+        if (!Number.isInteger(maxCanvasWidth)) {
+            maxCanvasWidth = Math.round(maxCanvasWidth);
+            autoRounded = true;
+        }
+
+        if (maxCanvasWidth !== this._maxCanvasWidth) {
+            this._maxCanvasWidth = maxCanvasWidth;
+            this._forceResize = true;
+
+            if (autoRounded) {
+                console.warn('maxCanvasWidth is not whole. Auto-rounded');
+            }
+        }
+    }
+
+    /**
+     * The maximum height the {@link CanvasViewport#canvas} can have. If the
+     * layout exceeds this height, then the content will be scaled to fit the
+     * canvas.
+     *
+     * Non-integer numbers will be rounded.
+     */
+    get maxCanvasHeight(): number {
+        return this._maxCanvasHeight;
+    }
+
+    set maxCanvasHeight(maxCanvasHeight: number) {
+        let autoRounded = false;
+        if (!Number.isInteger(maxCanvasHeight)) {
+            maxCanvasHeight = Math.round(maxCanvasHeight);
+            autoRounded = true;
+        }
+
+        if (maxCanvasHeight !== this._maxCanvasHeight) {
+            this._maxCanvasHeight = maxCanvasHeight;
+            this._forceResize = true;
+
+            if (autoRounded) {
+                console.warn('maxCanvasHeight is not whole. Auto-rounded');
+            }
+        }
+    }
+
+    /**
      * The current dimensions of the
      * {@link CanvasViewport#canvas | internal canvas}
      */
     get canvasDimensions(): [number, number] {
         return [this.canvas.width, this.canvas.height];
+    }
+
+    /**
+     * The current usable dimensions of the
+     * {@link CanvasViewport#canvas | internal canvas}. If
+     * {@link CanvasViewport#preventAtlasBleeding} is false, then this will be
+     * equivalent to {@link CanvasViewport#canvasDimensions}.
+     */
+    get usableCanvasDimensions(): [number, number] {
+        if (this.preventAtlasBleeding) {
+            return [this.canvas.width - 2, this.canvas.height - 2];
+        } else {
+            return this.canvasDimensions;
+        }
+    }
+
+    /**
+     * The usable maximum width of the
+     * {@link CanvasViewport#canvas | internal canvas}. If
+     * {@link CanvasViewport#preventAtlasBleeding} is false, then this will be
+     * equivalent to {@link CanvasViewport#maxCanvasWidth}.
+     */
+    get usableMaxCanvasWidth(): number {
+        if (this.preventAtlasBleeding) {
+            return this.maxCanvasWidth - 2;
+        } else {
+            return this.maxCanvasWidth;
+        }
+    }
+
+    /**
+     * The usable maximum height of the
+     * {@link CanvasViewport#canvas | internal canvas}. If
+     * {@link CanvasViewport#preventAtlasBleeding} is false, then this will be
+     * equivalent to {@link CanvasViewport#maxCanvasHeight}.
+     */
+    get usableMaxCanvasHeight(): number {
+        if (this.preventAtlasBleeding) {
+            return this.maxCanvasHeight - 2;
+        } else {
+            return this.maxCanvasHeight;
+        }
     }
 
     /**
@@ -165,12 +249,26 @@ export class CanvasViewport extends BaseViewport {
             // requires texture sizes to be powers of 2. Make sure that the
             // maximum canvas dimensions aren't exceeded
             const [newUnscaledWidth, newUnscaledHeight] = this.child.dimensions;
-            const newWidth = newUnscaledWidth * this.resolution;
-            const newHeight = newUnscaledHeight * this.resolution;
+            let newWidth = newUnscaledWidth * this.resolution;
+            let newHeight = newUnscaledHeight * this.resolution;
+
+            if (this.preventAtlasBleeding) {
+                newWidth += 2;
+                newHeight += 2;
+            }
+
             const newCanvasWidth = Math.min(Math.max(roundToPower2(newWidth), this.canvas.width), this.maxCanvasWidth);
             const newCanvasHeight = Math.min(Math.max(roundToPower2(newHeight), this.canvas.height), this.maxCanvasHeight);
 
-            if(newCanvasWidth === 0 || newCanvasHeight === 0) {
+            let usableNewCanvasWidth = newCanvasWidth;
+            let usableNewCanvasHeight = newCanvasHeight;
+
+            if (this.preventAtlasBleeding) {
+                usableNewCanvasWidth -= 2;
+                usableNewCanvasHeight -= 2;
+            }
+
+            if(usableNewCanvasWidth === 0 || usableNewCanvasHeight === 0) {
                 if(!BaseViewport.dimensionlessWarned) {
                     BaseViewport.dimensionlessWarned = true;
                     console.warn(Msg.DIMENSIONLESS_CANVAS);
@@ -252,8 +350,8 @@ export class CanvasViewport extends BaseViewport {
         const [width, height] = this.child.dimensions;
 
         return [
-            Math.min(this.maxCanvasWidth / width, this.resolution),
-            Math.min(this.maxCanvasHeight / height, this.resolution)
+            Math.min(this.usableMaxCanvasWidth / width, this.resolution),
+            Math.min(this.usableMaxCanvasHeight / height, this.resolution)
         ];
     }
 
@@ -266,8 +364,8 @@ export class CanvasViewport extends BaseViewport {
         const [width, height] = this.child.dimensions;
 
         return [
-            Math.min(this.maxCanvasWidth, Math.ceil(width * this.resolution)),
-            Math.min(this.maxCanvasHeight, Math.ceil(height * this.resolution))
+            Math.min(this.usableMaxCanvasWidth, Math.ceil(width * this.resolution)),
+            Math.min(this.usableMaxCanvasHeight, Math.ceil(height * this.resolution))
         ];
     }
 
@@ -308,8 +406,14 @@ export class CanvasViewport extends BaseViewport {
         const wasDirty = dirtyRects.length > 0;
 
         if (wasDirty) {
-            // clip to dirty rectangles
+            // clip to dirty rectangles (and translate if using atlas bleeding
+            // prevention)
             this.context.save();
+
+            if (this.preventAtlasBleeding) {
+                this.context.translate(1, 1);
+            }
+
             this.context.beginPath();
             for (const dirtyRect of dirtyRects) {
                 this.clipToRect(dirtyRect);
@@ -328,7 +432,15 @@ export class CanvasViewport extends BaseViewport {
             }
 
             // paint child
-            this.child.paint(dirtyRects);
+            const absDirtyRects: Rect[] = [];
+            for (const dirtyRect of dirtyRects) {
+                absDirtyRects.push([
+                    dirtyRect[0] / scaleX, dirtyRect[1] / scaleY,
+                    dirtyRect[2] / scaleX, dirtyRect[3] / scaleY
+                ]);
+            }
+
+            this.child.paint(absDirtyRects);
 
             // stop clipping/scaling
             this.context.restore();
@@ -387,10 +499,18 @@ export class CanvasViewport extends BaseViewport {
             ctx.rect(vpX, vpY, vpW, vpH);
             ctx.clip();
 
+            let sx = (xDst - origXDst) * esx;
+            let sy = (yDst - origYDst) * esy;
+
+            if (this.preventAtlasBleeding) {
+                sx++;
+                sy++;
+            }
+
             ctx.drawImage(
                 this.canvas,
-                (xDst - origXDst) * esx,
-                (yDst - origYDst) * esy,
+                sx,
+                sy,
                 wClipped * esx,
                 hClipped * esy,
                 xDst,

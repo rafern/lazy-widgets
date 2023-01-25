@@ -90,7 +90,18 @@ export class DOMRoot extends Root {
         this.postLayoutUpdate();
         if(this.paint()) {
             this.domCanvasContext.globalCompositeOperation = 'copy';
-            this.domCanvasContext.drawImage(this.canvas, 0, 0);
+
+            const [w, h] = this.viewport.usableCanvasDimensions;
+            let sx = 0, sy = 0;
+
+            if (this.preventAtlasBleeding) {
+                sx++;
+                sy++;
+            }
+
+            this.domCanvasContext.drawImage(
+                this.canvas, sx, sy, w, h, 0, 0, w, h
+            );
         }
     }
 

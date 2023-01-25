@@ -103,7 +103,15 @@ export class DebuggableCanvasViewport extends CanvasViewport {
                 }
 
                 this.overlayContext.fillStyle = `rgba(${event[2] ? 0 : 255}, 0, ${event[2] ? 255 : 0}, ${1 - animDelta})`;
-                this.overlayContext.fillRect(...event[0]);
+
+                if (this.preventAtlasBleeding) {
+                    const rect = event[0];
+                    this.overlayContext.fillRect(
+                        rect[0] + 1, rect[1] + 1, rect[2], rect[3]
+                    );
+                } else {
+                    this.overlayContext.fillRect(...event[0]);
+                }
             }
 
             for (const event of expired) {
@@ -134,8 +142,11 @@ export class DebuggableCanvasViewport extends CanvasViewport {
             this.outputContext.font = '16px sans-serif';
             this.outputContext.strokeStyle = 'black';
             this.outputContext.fillStyle = 'white';
-            this.outputContext.strokeText(this._ppsText, 8, 8);
-            this.outputContext.fillText(this._ppsText, 8, 8);
+
+            const xy = this.preventAtlasBleeding ? 9 : 8;
+
+            this.outputContext.strokeText(this._ppsText, xy, xy);
+            this.outputContext.fillText(this._ppsText, xy, xy);
             this.outputContext.restore();
         }
     }
@@ -202,7 +213,7 @@ export class DebuggableCanvasViewport extends CanvasViewport {
             const now = Date.now();
             const elapsed = now - this._lastPPSMeasurement;
             if (elapsed > 1000) {
-                const pps = this._paintCounter / elapsed;
+                const pps = this._paintCounter * 1000 / elapsed;
                 this._lastPPSMeasurement = now;
                 this._ppsText = `PPS: ${pps.toFixed(4)} (${this._paintCounter} since last)`;
                 this._overlayDirty = true;

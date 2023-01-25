@@ -39,6 +39,10 @@ export interface RootProperties {
     canvasStartingHeight?: number;
     /** The starting layout constraints of the Root. */
     constraints?: LayoutConstraints;
+    /** Sets {@link Root#maxCanvasWidth}. */
+    maxCanvasWidth?: number;
+    /** Sets {@link Root#maxCanvasHeight}. */
+    maxCanvasHeight?: number;
 }
 
 /**
@@ -134,8 +138,16 @@ export class Root {
         this.child.inheritedTheme = properties?.theme ?? new Theme();
         this.child.attach(this, this.viewport, null);
 
-        if(properties?.constraints) {
+        if (properties?.constraints) {
             this.viewport.constraints = properties.constraints;
+        }
+
+        if (properties?.maxCanvasWidth !== undefined) {
+            this.viewport.maxCanvasWidth = properties.maxCanvasWidth;
+        }
+
+        if (properties?.maxCanvasHeight !== undefined) {
+            this.viewport.maxCanvasHeight = properties.maxCanvasHeight;
         }
     }
 
