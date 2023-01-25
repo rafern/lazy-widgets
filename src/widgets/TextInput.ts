@@ -166,6 +166,24 @@ export class TextInput extends Widget {
     }
 
     protected handleChange(): void {
+        // clamp cursor positions if the new text has a smaller length
+        // than the old text
+        const textLength = this.variable.value.length;
+        if(this.cursorPos > textLength) {
+            this.cursorPos = textLength;
+            this.cursorOffsetDirty = true;
+        }
+        if(this.selectPos > textLength) {
+            this.selectPos = textLength;
+            this.cursorOffsetDirty = true;
+        }
+
+        // if the text input is selected (caret enabled), then reset the blink
+        // time
+        if (this.blinkStart !== 0) {
+            this.blinkStart = Date.now();
+        }
+
         this.markWholeAsDirty();
     }
 
@@ -257,18 +275,6 @@ export class TextInput extends Widget {
      */
     set text(text: string) {
         this.variable.value = text;
-
-        // clamp cursor positions if the new text has a smaller length
-        // than the old text
-        const textLength = this.variable.value.length;
-        if(this.cursorPos > textLength) {
-            this.cursorPos = textLength;
-            this.cursorOffsetDirty = true;
-        }
-        if(this.selectPos > textLength) {
-            this.selectPos = textLength;
-            this.cursorOffsetDirty = true;
-        }
     }
 
     get text(): string {
