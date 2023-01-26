@@ -44,7 +44,10 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
     protected override handleEvent(event: Event): Widget | null {
         // Reverse children if necessary
-        let children = this.children;
+        // XXX use iterator instead of _children because an event might trigger
+        // an action that removes a child, and the iterator creates a copy of
+        // the children list
+        let children = this as Iterable<W>;
         if(event.reversed) {
             children = Array.from(children).reverse();
         }
@@ -69,7 +72,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
     protected override handlePreLayoutUpdate(): void {
         // Pre-layout update children
-        for(const child of this.children) {
+        for(const child of this._children) {
             child.preLayoutUpdate();
 
             // If child's layout is dirty, set own layoutDirty flag
@@ -81,7 +84,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
     protected override handlePostLayoutUpdate(): void {
         // Post-layout update children
-        for(const child of this.children) {
+        for(const child of this._children) {
             child.postLayoutUpdate();
         }
     }
@@ -101,7 +104,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         }
 
         this.enabledChildCount = 0;
-        for(const child of this.children) {
+        for(const child of this._children) {
             // Resolve dimensions of disabled children with zero-width
             // constraints just so layout dirty flag is cleared
             if(!child.enabled) {
@@ -132,7 +135,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         // Get free space
         const spacing = this.multiContainerSpacing;
         let usedSpace = Math.max(this.enabledChildCount - 1, 0) * spacing;
-        for(const child of this.children) {
+        for(const child of this._children) {
             // Ignore disabled children
             if(!child.enabled) {
                 continue;
@@ -161,7 +164,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             // that they stretch properly and shrink children if neccessary (on
             // overflow)
             let spaceLeft = maxLength;
-            for(const child of this.children) {
+            for(const child of this._children) {
                 // Ignore disabled children
                 if(!child.enabled) {
                     continue;
@@ -193,7 +196,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             freeSpacePerFlex = freeSpace / totalFlex;
         }
 
-        for(const child of this.children) {
+        for(const child of this._children) {
             // Ignore disabled children
             if(!child.enabled) {
                 continue;
@@ -268,7 +271,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             mainOffset += extraSpacing;
         }
 
-        for(const child of this.children) {
+        for(const child of this._children) {
             // Ignore disabled children
             if(!child.enabled) {
                 continue;
@@ -288,7 +291,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Paint children
-        for(const child of this.children) {
+        for(const child of this._children) {
             child.paint(dirtyRects);
         }
     }

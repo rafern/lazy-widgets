@@ -1,4 +1,4 @@
-import type { Widget } from '../widgets/Widget';
+import type { Widget, WidgetProperties } from '../widgets/Widget';
 import { Parent } from './Parent';
 
 /**
@@ -10,6 +10,43 @@ import { Parent } from './Parent';
  * @category Widget
  */
 export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
+    /**
+     * This widget's children. Note that this is marked as readonly so that it
+     * cannot be accidentally replaced with a new array. This way, references to
+     * this array are always valid. If you want to clear this array, set the
+     * length to zero instead of creating a new instance. readonly still means
+     * that you can add/remove elements to/from the array.
+     *
+     * See {@link MultiParent#children} for the public iterator getter.
+     */
+    protected readonly _children: Array<W>;
+
+    constructor(children: Array<W>, propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
+        super(propagatesEvents, properties);
+
+        this._children = [...children];
+    }
+
+    override [Symbol.iterator](): Iterator<W> {
+        const children = [...this._children];
+        const childCount = children.length;
+        let index = 0;
+
+        return <Iterator<W>>{
+            next() {
+                if (index >= childCount || index < 0) {
+                    return { value: undefined, done: true };
+                } else {
+                    return { value: children[index++], done: false };
+                }
+            }
+        }
+    }
+
+    override get childCount(): number {
+        return this._children.length;
+    }
+
     /**
      * Add child(ren) to this widget.
      *

@@ -11,14 +11,29 @@ export abstract class SingleParent<W extends Widget = Widget> extends Parent<W> 
     /**
      * Create a new SingleParent instance.
      *
-     * @param child - The mandatory single child of this widget. Cannot be changed later, unless {@link Parent#_children} is changed directly via the widget using this mixin.
+     * @param child - The mandatory single child of this widget. Cannot be changed later.
      */
-    constructor(child: W, propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
-        super([child], propagatesEvents, properties);
+    constructor(readonly child: W, propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
+        super(propagatesEvents, properties);
     }
 
-    /** This widget's child. */
-    get child(): W {
-        return this._children[0];
+    override [Symbol.iterator](): Iterator<W> {
+        const child = this.child;
+        let first = true;
+
+        return <Iterator<W>>{
+            next() {
+                if (first) {
+                    first = false;
+                    return { value: child, done: false };
+                } else {
+                    return { value: undefined, done: true };
+                }
+            }
+        }
+    }
+
+    override get childCount(): 1 {
+        return 1;
     }
 }

@@ -1,4 +1,4 @@
-import { Widget, WidgetProperties } from '../widgets/Widget';
+import { Widget } from '../widgets/Widget';
 import type { Viewport } from '../core/Viewport';
 import type { Theme } from '../theme/Theme';
 import type { Root } from '../core/Root';
@@ -19,31 +19,19 @@ import type { Root } from '../core/Root';
  *
  * @category Widget
  */
-export abstract class Parent<W extends Widget = Widget> extends Widget {
+export abstract class Parent<W extends Widget = Widget> extends Widget implements Iterable<W> {
     /**
-     * This widget's children. Note that this is marked as readonly so that it
-     * cannot be accidentally replaced with a new array. This way, references to
-     * this array are always valid. If you want to clear this array, set the
-     * length to zero instead of creating a new instance. readonly still means
-     * that you can add/remove elements to/from the array.
-     *
-     * See {@link Parent#children} for the public iterator getter.
+     * Get iterator for children of this parent widget. Cannot modify list of
+     * children via this iterator; for read-only purposes only.
      */
-    protected readonly _children: Array<W>;
+    abstract [Symbol.iterator](): Iterator<W>;
 
-    /**
-     * Create a new Parent. Automatically adds all widgets in the input array
-     * to {@link Parent#_children}.
-     */
-    constructor(children: Array<W>, propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
-        super(propagatesEvents, properties);
-
-        this._children = [...children];
-    }
+    /** Get amount of children of this parent widget. */
+    abstract get childCount(): number;
 
     override set inheritedTheme(theme: Theme | undefined) {
         super.inheritedTheme = theme;
-        for(const child of this.children) {
+        for(const child of this) {
             child.inheritedTheme = theme;
         }
     }
@@ -52,23 +40,10 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
         return super.inheritedTheme;
     }
 
-    /** Get amount of children of this parent widget. */
-    get childCount(): number {
-        return this._children.length;
-    }
-
-    /**
-     * Get iterator for children of this parent widget. Cannot modify list of
-     * children via this iterator; for read-only purposes only.
-     */
-    get children(): Iterable<W> {
-        return this._children.values();
-    }
-
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
         super.attach(root, viewport, parent);
 
-        for(const child of this.children) {
+        for(const child of this) {
             child.attach(root, viewport, this);
         }
     }
@@ -76,7 +51,7 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
     override detach(): void {
         super.detach();
 
-        for(const child of this.children) {
+        for(const child of this) {
             child.detach();
         }
     }
@@ -85,7 +60,7 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
         const changed = super.updateActiveState();
 
         if(changed) {
-            for(const child of this._children) {
+            for(const child of this) {
                 child.updateActiveState();
             }
         }
@@ -96,7 +71,7 @@ export abstract class Parent<W extends Widget = Widget> extends Widget {
     override finalizeBounds() {
         super.finalizeBounds();
 
-        for(const child of this.children) {
+        for(const child of this) {
             child.finalizeBounds();
         }
     }
