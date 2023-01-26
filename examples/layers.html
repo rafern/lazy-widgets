@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
+                DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
+                ValidatedVariable, Background, LayeredContainer, TextAlignMode
+            } from '../dist/index.esm.js';
+
+            // Create the root
+            const label = new Label('Hello world!');
+
+            const root = new DOMRoot(
+                new LayeredContainer(
+                    0,
+                    [
+                        {
+                            child: new Background(
+                                new Margin(
+                                    new Column()
+                                    .add(label)
+                                    .add(
+                                        new TextInput(new ValidatedVariable('', null, value => {
+                                            label.text = `Text input: ${value}`;
+                                        }, false))
+                                    )
+                                    .add(
+                                        new Row({
+                                            multiContainerAlignment: {
+                                                main: FlexAlignment.Center,
+                                                cross: Alignment.Stretch
+                                            },
+                                        }).add([
+                                            new TextButton('Button 1', () => label.text = 'Button 1 clicked!'),
+                                            new TextButton('Button 2', () => label.text = 'Button 2 clicked!'),
+                                        ])
+                                    )
+                                )
+                            )
+                        },
+                        {
+                            child: new Label(
+                                'I am superimposing the default layer!',
+                                {
+                                    bodyTextFill: 'red'
+                                }
+                            )
+                        },
+                        {
+                            child: new Column({
+                                multiContainerAlignment: {
+                                    main: FlexAlignment.End,
+                                    cross: Alignment.Stretch
+                                }
+                            }).add(
+                                new Label(
+                                    "I am above all layers, but i can't expand the layout, because my layer's canExpand option is false!",
+                                    {
+                                        bodyTextFill: 'red',
+                                        bodyTextAlign: TextAlignMode.End
+                                    }
+                                )
+                            ),
+                            canExpand: false
+                        }
+                    ]
+                )
+            );
+
+            // Create, bind DOM and register the keyboard driver
+            const keyboardDriver = new DOMKeyboardDriver();
+            keyboardDriver.bindDOMElem(root.domElem);
+            root.registerDriver(keyboardDriver);
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

@@ -1,5 +1,6 @@
 import { Widget } from '../widgets/Widget';
 import { Layer } from './Layer';
+import type { LayerInit } from './LayerInit';
 
 type LayerIteratorNextType<W extends Widget> = [layer: Layer<W>, layerName: string | null];
 
@@ -29,18 +30,57 @@ function makeLayerIterator<W extends Widget>(startIndex: number, delta: number, 
 
 export class LayerContext<W extends Widget> implements Iterable<LayerIteratorNextType<W>> {
     readonly defaultLayer: Layer<W>;
-    private _defaultLayerIndex = 0;
-    private readonly layers: Array<Layer<W>>;
+    private _defaultLayerIndex;
+    private readonly layers = new Array<Layer<W>>();
     private readonly layerNames = new Map<string, number>();
     private _layersDirty = true;
 
-    constructor(defaultLayerChild: W) {
-        this.defaultLayer = <Layer<W>>{
-            child: defaultLayerChild,
-            canExpand: true
-        };
+    constructor(defaultLayerIndex: number, layersInit: Array<LayerInit<W>>) {
+        const layerCount = layersInit.length;
 
-        this.layers = [this.defaultLayer];
+        if (defaultLayerIndex < 0) {
+            defaultLayerIndex += layerCount;
+        }
+
+        if (defaultLayerIndex < 0 || defaultLayerIndex >= layerCount) {
+            throw new Error('Default layer index is out of bounds');
+        }
+
+        for (const layerInit of layersInit) {
+            const canExpand = layerInit.canExpand ?? true;
+            const name = layerInit.name ?? null;
+            const child = layerInit.child;
+
+            if (!child) {
+                throw new Error('A layer must have a child widget');
+            }
+
+            if (name !== null) {
+                this.layerNames.set(name, this.layers.length);
+            }
+
+            this.layers.push(<Layer<W>>{ child, canExpand });
+        }
+
+        this._defaultLayerIndex = defaultLayerIndex;
+        this.defaultLayer = this.layers[defaultLayerIndex];
+
+        if (!this.defaultLayer.canExpand) {
+            throw new Error('Default layer must be able to expand the layout');
+        }
+    }
+
+    static fromDefaultLayerChild<W extends Widget>(defaultLayerChild: W) {
+        return new LayerContext(0, [
+            <Layer<W>>{
+                child: defaultLayerChild,
+                canExpand: true
+            }
+        ]);
+    }
+
+    get layerCount() {
+        return this.layers.length;
     }
 
     get defaultLayerIndex() {
@@ -55,13 +95,24 @@ export class LayerContext<W extends Widget> implements Iterable<LayerIteratorNex
         return makeLayerIterator(0, 1, this.layers, this.layerNames);
     }
 
-    get inReverse(): Iterable<LayerIteratorNextType<W>> {
+    get backToFront(): Iterable<LayerIteratorNextType<W>> {
         const layers = this.layers;
         const layerNames = this.layerNames;
 
         return {
             [Symbol.iterator]() {
                 return makeLayerIterator(0, 1, layers, layerNames);
+            }
+        }
+    }
+
+    get frontToBack(): Iterable<LayerIteratorNextType<W>> {
+        const layers = this.layers;
+        const layerNames = this.layerNames;
+
+        return {
+            [Symbol.iterator]() {
+                return makeLayerIterator(layers.length - 1, -1, layers, layerNames);
             }
         }
     }
@@ -113,6 +164,10 @@ export class LayerContext<W extends Widget> implements Iterable<LayerIteratorNex
 
         if (index < 0 || index >= layerCount) {
             throw new RangeError('Cannot remove layer: index out of bounds');
+        }
+
+        if (index === this._defaultLayerIndex) {
+            throw new Error('Default layer connot be removed');
         }
 
         this.layers.splice(index, 1);
