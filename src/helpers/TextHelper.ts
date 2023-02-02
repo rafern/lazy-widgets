@@ -432,7 +432,7 @@ export class TextHelper {
                 // wrapped, must also re-measure
                 if(this.hasWrappedLines || this._width !== this.maxWidth) {
                     this.measureDirty = true;
-                } else {
+                } else if (this.wrapMode !== WrapMode.None) {
                     this._width = this.maxWidth;
                 }
             }
@@ -456,15 +456,17 @@ export class TextHelper {
         this.hasWrappedLines = false;
 
         const fullLineHeight = this._lineHeight + this._lineSpacing;
+        const notWrapping = this.maxWidth === Infinity || this.wrapMode === WrapMode.None;
 
         if(this.text.length === 0) {
             // Special case for empty string; set height to height of single
-            // line and width to 0 if maxWidth is not set or maxWidth if set
+            // line and width to 0 if maxWidth is not set or maxWidth if set and
+            // wrap mode is not None
             this._height = fullLineHeight;
-            this._width = this.maxWidth === Infinity ? 0 : this.maxWidth;
+            this._width = notWrapping ? 0 : this.maxWidth;
             this._lineRanges.length = 1;
             this._lineRanges[0] = [[0, 0, 0, false]];
-        } else if(this.maxWidth === Infinity || this.wrapMode === WrapMode.None) {
+        } else if(notWrapping) {
             // Don't wrap text, but split lines when there's a newline character
             this._lineRanges.length = 0;
             let lineStart = 0;
@@ -499,7 +501,7 @@ export class TextHelper {
                 lineStart = end;
             }
 
-            if(this.maxWidth !== Infinity) {
+            if(!notWrapping) {
                 this._width = this.maxWidth;
             }
         } else {
