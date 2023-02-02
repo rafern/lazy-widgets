@@ -78,7 +78,7 @@ export class TooltipBox<W extends Widget = Widget> extends SingleParent<W> {
         const [_wX, wY, _wW, wH] = this.tooltipRect;
 
         if (this._parent) {
-            [pX, pY, pW, pH] = this._parent.rect;
+            [pX, pY, pW, pH] = this._parent.idealRect;
         }
 
         const spaceAbove = Math.max(wY - pY, 0);
@@ -88,20 +88,20 @@ export class TooltipBox<W extends Widget = Widget> extends SingleParent<W> {
 
         // decide whether to place tooltip above or below widget. fall back to
         // above the widget
-        const fitsAbove = spaceAbove >= this.height;
-        const fitsBelow = spaceBelow >= this.height;
+        const fitsAbove = spaceAbove >= this.idealHeight;
+        const fitsBelow = spaceBelow >= this.idealHeight;
 
         if (fitsAbove && fitsBelow) {
             if (this.cursorY <= (wY + 0.5 * wH)) {
                 // put above
-                y = wY - this.height;
+                y = wY - this.idealHeight;
             } else {
                 // put below
                 y = wBot;
             }
         } else if (fitsAbove) {
             // put above
-            y = wY - this.height;
+            y = wY - this.idealHeight;
         } else if (fitsBelow) {
             // put below
             y = wBot;
@@ -114,11 +114,11 @@ export class TooltipBox<W extends Widget = Widget> extends SingleParent<W> {
 
         // clamp to bounds of parent
         const pRight = pX + pW;
-        if (x + this.width > pRight) {
-            x = pRight - this.width;
+        if (x + this.idealWidth > pRight) {
+            x = pRight - this.idealWidth;
         }
-        if (y + this.height > pBot) {
-            y = pBot - this.height;
+        if (y + this.idealHeight > pBot) {
+            y = pBot - this.idealHeight;
         }
         if (x < 0) {
             x = 0;
