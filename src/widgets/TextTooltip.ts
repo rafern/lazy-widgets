@@ -3,6 +3,11 @@ import { Tooltip } from './Tooltip';
 import { TooltipBox } from './TooltipBox';
 import type { Widget, WidgetProperties } from './Widget';
 
+/**
+ * A convenience widget for a {@link Tooltip} that has a {@link Label}.
+ *
+ * @category Widget
+ */
 export class TextTooltip<W extends Widget = Widget> extends Tooltip<W, TooltipBox<Label>> {
     constructor(child: W, tooltipText: string, properties?: Readonly<WidgetProperties>) {
         super(

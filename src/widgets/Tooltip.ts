@@ -12,15 +12,45 @@ import type { Widget, WidgetProperties } from './Widget';
 const SENSITIVITY_RADIUS = 8;
 const HOVER_TIME = 1000;
 
+/**
+ * Wraps a widget and provides a tooltip. Automatically manages a given
+ * {@link TooltipBox}, which will be used as the actual visual tooltip.
+ *
+ * Whenever this widget is hovered for a small amount of time without moving
+ * the pointer too much, a new layer will be created with the passed
+ * {@link TooltipBox}, in the top-most {@link LayeredContainer}. Unhovering this
+ * wrapper will remove the layer.
+ *
+ * Has a tolerance for small movements, so that shaky pointers can still be used
+ * to detect hovering.
+ */
 export class Tooltip<W extends Widget = Widget, T extends TooltipBox = TooltipBox> extends PassthroughWidget<W> {
+    /** The top-most container in the current UI tree. Internal use only */
     private _topLayerContainer: LayeredContainer | null = null;
+    /** The currently created layer for the {@link Tooltip#tooltipWidget} */
     private _layer: Layer<T> | null = null;
+    /**
+     * The timestamp for when the hovering started. 0 if not hovering. For
+     * internal use only.
+     */
     private _hoverStart = 0;
+    /**
+     * The X pointer position for when the hovering started. For internal use
+     * only.
+     */
     private _hoverStartX = 0;
+    /**
+     * The Y pointer position for when the hovering started. For internal use
+     * only.
+     */
     private _hoverStartY = 0;
+    /** The actual tooltip that will be shown when this wrapper is hovered. */
+    readonly tooltipWidget: T;
 
-    constructor(child: W, readonly tooltipWidget: T, properties?: Readonly<WidgetProperties>) {
+    constructor(child: W, tooltipWidget: T, properties?: Readonly<WidgetProperties>) {
         super(child, properties);
+
+        this.tooltipWidget = tooltipWidget;
     }
 
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
@@ -99,6 +129,9 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipBox = TooltipBo
         this.updateTooltipRect();
     }
 
+    /**
+     * Add a layer to the {@link Tooltip#tooltipWidget}. For internal use only.
+     */
     private addLayer(): void {
         if (this._topLayerContainer === null) {
             return;
@@ -117,6 +150,10 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipBox = TooltipBo
         this.updateTooltipRect();
     }
 
+    /**
+     * Update the {@link TooltipBox#tooltipRect} of the
+     * {@link Tooltip#tooltipWidget}. For internal use only.
+     */
     private updateTooltipRect() {
         if (this._layer === null) {
             return;
@@ -125,6 +162,10 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipBox = TooltipBo
         this.tooltipWidget.tooltipRect = this.queryRectFromHere(this.idealRect, this._topLayerContainer);
     }
 
+    /**
+     * Remove the layer of the {@link Tooltip#tooltipWidget}
+     * ({@link Tooltip#_layer}). For internal use only.
+     */
     private removeLayer(): void {
         const layer = this._layer as Layer<T>;
         const container = this._topLayerContainer as LayeredContainer;
