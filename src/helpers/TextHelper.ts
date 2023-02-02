@@ -415,9 +415,9 @@ export class TextHelper {
                 if(this.hasWrappedLines) {
                     this.measureDirty = true;
                 } else {
-                    // [1] If text doesn't need to be re-measured, then the
-                    // width still needs to be updated as it's set to be equal
-                    // to maxWidth if maxWidth is not infinity
+                    // If text doesn't need to be re-measured, then the width
+                    // still needs to be updated as it's set to be equal to
+                    // maxWidth if maxWidth is not infinity
                     this._width = 0;
                     for(const range of this._lineRanges) {
                         const width = range[range.length - 1][2];
@@ -427,13 +427,12 @@ export class TextHelper {
                     }
                 }
             } else {
-                // Wrapping, but no lines were wrapped and maxWidth is smaller
+                // Wrapping, but no lines were wrapped and maxWidth is different
                 // than previous width. Must re-measure text. If lines were
                 // wrapped, must also re-measure
-                if(this.hasWrappedLines || this._width > this.maxWidth) {
+                if(this.hasWrappedLines || this._width !== this.maxWidth) {
                     this.measureDirty = true;
                 } else {
-                    // ... _width still needs to be updated (see comment [1])
                     this._width = this.maxWidth;
                 }
             }
