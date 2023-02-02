@@ -7,7 +7,7 @@ import { resolveContainerDimensions } from '../helpers/resolveContainerDimension
 import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
 import { Alignment2D } from '../theme/Alignment2D';
 import { safeRoundRect } from '../helpers/safeRoundRect';
-import { layoutField } from '../decorators/FlagFields';
+import { layoutArrayField, layoutField } from '../decorators/FlagFields';
 
 const startAlignment = <Alignment2D>{
     horizontal: Alignment.Start, vertical: Alignment.Start
@@ -24,6 +24,8 @@ export class TooltipBox<W extends Widget = Widget> extends SingleParent<W> {
     cursorX = 0;
     @layoutField
     cursorY = 0;
+    @layoutArrayField(false)
+    tooltipRect: Rect = [0, 0, 0, 0];
 
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         super(child, false, properties);
@@ -66,11 +68,66 @@ export class TooltipBox<W extends Widget = Widget> extends SingleParent<W> {
     }
 
     override resolvePosition(x: number, y: number): void {
-        super.resolvePosition(x, y);
-
         // resolve best alignment that places the child under (or over) the
         // cursor
-        // TODO
+        // check if there is space above or below the wrapper widget
+        let pX = 0;
+        let pY = 0;
+        let pW = Infinity;
+        let pH = Infinity;
+        const [_wX, wY, _wW, wH] = this.tooltipRect;
+
+        if (this._parent) {
+            [pX, pY, pW, pH] = this._parent.rect;
+        }
+
+        const spaceAbove = Math.max(wY - pY, 0);
+        const pBot = pY + pH;
+        const wBot = wY + wH;
+        const spaceBelow = Math.max(pBot - wBot, 0);
+
+        // decide whether to place tooltip above or below widget. fall back to
+        // above the widget
+        const fitsAbove = spaceAbove >= this.height;
+        const fitsBelow = spaceBelow >= this.height;
+
+        if (fitsAbove && fitsBelow) {
+            if (this.cursorY <= (wY + 0.5 * wH)) {
+                // put above
+                y = wY - this.height;
+            } else {
+                // put below
+                y = wBot;
+            }
+        } else if (fitsAbove) {
+            // put above
+            y = wY - this.height;
+        } else if (fitsBelow) {
+            // put below
+            y = wBot;
+        } else {
+            // put on cursor
+            y = this.cursorY;
+        }
+
+        x = this.cursorX;
+
+        // clamp to bounds of parent
+        const pRight = pX + pW;
+        if (x + this.width > pRight) {
+            x = pRight - this.width;
+        }
+        if (y + this.height > pBot) {
+            y = pBot - this.height;
+        }
+        if (x < 0) {
+            x = 0;
+        }
+        if (y < 0) {
+            y = 0;
+        }
+
+        super.resolvePosition(x, y);
 
         resolveContainerPosition(x, y, this.idealWidth, this.idealHeight, this.tooltipPadding, startAlignment, this.child);
     }

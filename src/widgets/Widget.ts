@@ -886,4 +886,91 @@ export abstract class Widget extends BaseTheme {
     protected markWholeAsDirty(): void {
         this.markAsDirty([this.x, this.y, this.width, this.height]);
     }
+
+    /**
+     * Query the position and dimensions of a rectangle as if it were in the
+     * same coordinate origin as an ascendant widget (or the root). Call this
+     * from a child widget.
+     *
+     * Useful for reversing transformations made by ascendant widgets.
+     *
+     * Must be overridden by widgets that transform children or that have a
+     * different coordinate origin.
+     */
+    queryRect(rect: Rect, relativeTo: Widget | null = null): Rect {
+        if (relativeTo === this) {
+            return rect;
+        } else if (this._parent === null) {
+            if (relativeTo !== null) {
+                throw new Error("Can't query rectangle relative to this widget; relative widget is not an ascendant of the starting widget");
+            }
+
+            return rect;
+        } else {
+            return this._parent.queryRect(rect, relativeTo);
+        }
+    }
+
+    /**
+     * Query the position and dimensions of a rectangle as if it were in the
+     * same coordinate origin as an ascendant widget (or the root).
+     *
+     * Useful for reversing transformations made by ascendant widgets.
+     *
+     * Must not be overridden.
+     */
+    queryRectFromHere(rect: Rect, relativeTo: Widget | null = null): Rect {
+        if (this._parent === null) {
+            if (relativeTo !== null) {
+                throw new Error("Can't query rectangle relative to this widget; relative widget is not an ascendant of the starting widget");
+            }
+
+            return rect;
+        } else {
+            return this._parent.queryRect(rect, relativeTo);
+        }
+    }
+
+    /**
+     * Query the position of a point as if it were in the same coordinate origin
+     * as an ascendant widget (or the root). Call this from a child widget.
+     *
+     * Useful for reversing transformations made by ascendant widgets.
+     *
+     * Must be overridden by widgets that transform children or that have a
+     * different coordinate origin.
+     */
+    queryPoint(x: number, y: number, relativeTo: Widget | null = null): [x: number, y: number] {
+        if (relativeTo === this) {
+            return [x, y];
+        } else if (this._parent === null) {
+            if (relativeTo !== null) {
+                throw new Error("Can't query point relative to this widget; relative widget is not an ascendant of the starting widget");
+            }
+
+            return [x, y];
+        } else {
+            return this._parent.queryPoint(x, y, relativeTo);
+        }
+    }
+
+    /**
+     * Query the position of a point as if it were in the same coordinate origin
+     * as an ascendant widget (or the root).
+     *
+     * Useful for reversing transformations made by ascendant widgets.
+     *
+     * Must not be overridden.
+     */
+    queryPointFromHere(x: number, y: number, relativeTo: Widget | null = null): [x: number, y: number] {
+        if (this._parent === null) {
+            if (relativeTo !== null) {
+                throw new Error("Can't query point relative to this widget; relative widget is not an ascendant of the starting widget");
+            }
+
+            return [x, y];
+        } else {
+            return this._parent.queryPoint(x, y, relativeTo);
+        }
+    }
 }

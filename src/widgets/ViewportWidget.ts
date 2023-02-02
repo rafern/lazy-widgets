@@ -360,4 +360,33 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
 
         super.propagateDirtyRect(rect);
     }
+
+    override queryRect(rect: Rect, relativeTo: Widget | null = null): Rect {
+        // convert rect from relative coordinates to absolute coordinates if
+        // necessary
+        if (this.internalViewport.relativeCoordinates) {
+            const vpX = this.internalViewport.rect[0] + this.internalViewport.offset[0];
+            const vpY = this.internalViewport.rect[1] + this.internalViewport.offset[1];
+
+            const left = rect[0] + vpX;
+            const top = rect[1] + vpY;
+            const right = rect[0] + rect[2] + vpX;
+            const bottom = rect[1] + rect[3] + vpY;
+
+            rect = [ left, top, right - left, bottom - top ];
+        }
+
+        return super.queryRect(rect, relativeTo);
+    }
+
+    override queryPoint(x: number, y: number, relativeTo: Widget | null = null): [x: number, y: number] {
+        // convert point from relative coordinates to absolute coordinates if
+        // necessary
+        if (this.internalViewport.relativeCoordinates) {
+            x += this.internalViewport.rect[0] + this.internalViewport.offset[0];
+            y += this.internalViewport.rect[1] + this.internalViewport.offset[1];
+        }
+
+        return super.queryPoint(x, y, relativeTo);
+    }
 }

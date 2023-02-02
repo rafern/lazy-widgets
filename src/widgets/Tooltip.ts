@@ -89,19 +89,40 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipBox = TooltipBo
         return this.child.dispatchEvent(event);
     }
 
+    override resolvePosition(x: number, y: number): void {
+        super.resolvePosition(x, y);
+        this.updateTooltipRect();
+    }
+
+    override finalizeBounds(): void {
+        super.finalizeBounds();
+        this.updateTooltipRect();
+    }
+
     private addLayer(): void {
         if (this._topLayerContainer === null) {
             return;
         }
 
+        // add layer with tooltip widget
         this._layer = <Layer<T>>{
             child: this.tooltipWidget,
             canExpand: false
         };
         this._topLayerContainer.pushLayer(this._layer);
-        // TODO get cursor pos relative to layerered container
-        this.tooltipWidget.cursorX = this._hoverStartX;
-        this.tooltipWidget.cursorY = this._hoverStartY;
+
+        // get cursor pos and this widget relative to layerered container.
+        // update tooltip widget with these positions
+        [this.tooltipWidget.cursorX, this.tooltipWidget.cursorY] = this.queryPointFromHere(this._hoverStartX, this._hoverStartY, this._topLayerContainer);
+        this.updateTooltipRect();
+    }
+
+    private updateTooltipRect() {
+        if (this._layer === null) {
+            return;
+        }
+
+        this.tooltipWidget.tooltipRect = this.queryRectFromHere(this.idealRect, this._topLayerContainer);
     }
 
     private removeLayer(): void {
