@@ -195,6 +195,21 @@
             "type": "CornerRadii",
             "default": "8",
             "description": "The radii to be used for rounding corners in {@link RoundedCorners}."
+        },
+        "tooltipFill": {
+            "type": "FillStyle",
+            "default": "'rgba(0,0,0,0.5)'",
+            "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} to paint a {@link TooltipBox}'s background with."
+        },
+        "tooltipPadding": {
+            "type": "Padding",
+            "default": "<Padding>{left: 4, right: 4, top: 4, bottom: 4}",
+            "description": "The {@link Padding} used in {@link TooltipBox}."
+        },
+        "tooltipRadii": {
+            "type": "CornerRadii",
+            "default": "8",
+            "description": "The radii to be used for rounding corners in {@link TooltipBox}."
         }
     }
 }

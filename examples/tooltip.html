@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
+                DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
+                ValidatedVariable, Background, LayeredContainer, TextTooltip
+            } from '../dist/index.esm.js';
+
+            // Create the root
+            const root = new DOMRoot(
+                LayeredContainer.fromDefaultLayerChild(
+                    new Background(
+                        new Margin(
+                            new Column().add([
+                                new Label('Hover your cursor over the input to show a tooltip:'),
+                                new TextTooltip(
+                                    new TextInput(new ValidatedVariable('Hover over this!')),
+                                    'I am a tooltip!'
+                                )
+                            ]),
+                            {
+                                containerPadding: {
+                                    left: 64, right: 64, top: 64, bottom: 64
+                                }
+                            }
+                        )
+                    )
+                )
+            );
+
+            // Create, bind DOM and register the keyboard driver
+            const keyboardDriver = new DOMKeyboardDriver();
+            keyboardDriver.bindDOMElem(root.domElem);
+            root.registerDriver(keyboardDriver);
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

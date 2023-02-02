@@ -1,8 +1,9 @@
 import { Widget, WidgetProperties } from './Widget';
-import { Alignment } from '../theme/Alignment';
 import { SingleParent } from './SingleParent';
 import type { Event } from '../events/Event';
 import type { Rect } from '../helpers/Rect';
+import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions';
+import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
 
 /**
  * A {@link SingleParent} which contains a single child and automatically paints
@@ -51,93 +52,12 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
-        // Get padding
-        const padding = this.containerPadding;
-        const hPadding = padding.left + padding.right;
-        const vPadding = padding.top + padding.bottom;
-        let childMaxWidth = maxWidth - hPadding;
-        let childMaxHeight = maxHeight - vPadding;
-
-        // If there isn't enough space for padding, resolve child's layout with
-        // a tight fit of 0 for axis with lack of space
-        if(childMaxWidth < 0) {
-            childMaxWidth = 0;
-        }
-        if(childMaxHeight < 0) {
-            childMaxHeight = 0;
-        }
-
-        // Provide minimum constraints if using stretch alignment, correcting
-        // for padding. If maximum constraints are available (not infinite), use
-        // those instead
-        const alignment = this.containerAlignment;
-        let childMinWidth = 0;
-        if(alignment.horizontal === Alignment.Stretch) {
-            if(childMaxWidth !== Infinity) {
-                childMinWidth = childMaxWidth;
-            } else {
-                childMinWidth = Math.max(minWidth - hPadding, 0);
-            }
-        }
-
-        let childMinHeight = 0;
-        if(alignment.vertical === Alignment.Stretch) {
-            if(childMaxHeight !== Infinity) {
-                childMinHeight = childMaxHeight;
-            } else {
-                childMinHeight = Math.max(minHeight - vPadding, 0);
-            }
-        }
-
-        // Resolve child's dimensions
-        this.child.resolveDimensions(childMinWidth, childMaxWidth, childMinHeight, childMaxHeight);
-        const [childWidth, childHeight] = this.child.idealDimensions;
-
-        // Resolve own dimensions
-        this.idealWidth = Math.max(minWidth, childWidth + hPadding);
-        this.idealHeight = Math.max(minHeight, childHeight + vPadding);
+        [this.idealWidth, this.idealHeight] = resolveContainerDimensions(minWidth, maxWidth, minHeight, maxHeight, this.containerPadding, this.containerAlignment, this.child);
     }
 
     override resolvePosition(x: number, y: number): void {
         super.resolvePosition(x, y);
-
-        // Get padding and alignment
-        const padding = this.containerPadding;
-        const alignment = this.containerAlignment;
-
-        // Calculate used space
-        const [childWidth, childHeight] = this.child.idealDimensions;
-        const usedWidth = childWidth + padding.left + padding.right;
-        const usedHeight = childHeight + padding.top + padding.bottom;
-
-        // Horizontal offset
-        let childX = x + padding.left;
-        if(alignment.horizontal !== Alignment.Stretch) {
-            // Get free space for this axis
-            const freeSpace = this.idealWidth - usedWidth;
-
-            // Ignore if free space is negative or zero, as in, the child didn't
-            // even get the space they requested or just enough space. If there
-            // is free space, distribute free space according to chosen
-            // alignment ratio
-            if(freeSpace > 0) {
-                childX += freeSpace * alignment.horizontal;
-            }
-        }
-
-        // Vertical offset
-        let childY = y + padding.top;
-        if(alignment.vertical !== Alignment.Stretch) {
-            // Same logic as above, but for vertical axis
-            const freeSpace = this.idealHeight - usedHeight;
-
-            if(freeSpace > 0) {
-                childY += freeSpace * alignment.vertical;
-            }
-        }
-
-        // Resolve child's position
-        this.child.resolvePosition(childX, childY);
+        resolveContainerPosition(x, y, this.idealWidth, this.idealHeight, this.containerPadding, this.containerAlignment, this.child);
     }
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {

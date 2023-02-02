@@ -110,6 +110,9 @@ export class BaseTheme implements ThemeProperties {
         this._radioButtonLength = properties.radioButtonLength;
         this._radioButtonInnerPadding = properties.radioButtonInnerPadding;
         this._roundedCornersRadii = properties.roundedCornersRadii;
+        this._tooltipFill = properties.tooltipFill;
+        this._tooltipPadding = properties.tooltipPadding;
+        this._tooltipRadii = properties.tooltipRadii;
         // XXX BASETHEME CTOR AUTO-GENERATED CODE END
     }
 
@@ -629,6 +632,48 @@ export class BaseTheme implements ThemeProperties {
         if(this._roundedCornersRadii !== value) {
             this._roundedCornersRadii = value;
             this.onThemeUpdated('roundedCornersRadii');
+        }
+    }
+
+    /** See {@link BaseTheme#tooltipFill}. For internal use only. */
+    private _tooltipFill?: FillStyle;
+
+    get tooltipFill(): FillStyle {
+        return this._tooltipFill ?? this._fallbackTheme?.tooltipFill ?? 'rgba(0,0,0,0.5)';
+    }
+
+    set tooltipFill(value: FillStyle | undefined) {
+        if(this._tooltipFill !== value) {
+            this._tooltipFill = value;
+            this.onThemeUpdated('tooltipFill');
+        }
+    }
+
+    /** See {@link BaseTheme#tooltipPadding}. For internal use only. */
+    private _tooltipPadding?: Padding;
+
+    get tooltipPadding(): Padding {
+        return this._tooltipPadding ?? this._fallbackTheme?.tooltipPadding ?? <Padding>{left: 4, right: 4, top: 4, bottom: 4};
+    }
+
+    set tooltipPadding(value: Padding | undefined) {
+        if(this._tooltipPadding !== value) {
+            this._tooltipPadding = value;
+            this.onThemeUpdated('tooltipPadding');
+        }
+    }
+
+    /** See {@link BaseTheme#tooltipRadii}. For internal use only. */
+    private _tooltipRadii?: CornerRadii;
+
+    get tooltipRadii(): CornerRadii {
+        return this._tooltipRadii ?? this._fallbackTheme?.tooltipRadii ?? 8;
+    }
+
+    set tooltipRadii(value: CornerRadii | undefined) {
+        if(this._tooltipRadii !== value) {
+            this._tooltipRadii = value;
+            this.onThemeUpdated('tooltipRadii');
         }
     }
 

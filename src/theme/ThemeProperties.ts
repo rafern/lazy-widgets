@@ -87,5 +87,11 @@ export interface ThemeProperties {
     radioButtonInnerPadding?: number;
     /** The radii to be used for rounding corners in {@link RoundedCorners}. */
     roundedCornersRadii?: CornerRadii;
+    /** The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} to paint a {@link TooltipBox}'s background with. */
+    tooltipFill?: FillStyle;
+    /** The {@link Padding} used in {@link TooltipBox}. */
+    tooltipPadding?: Padding;
+    /** The radii to be used for rounding corners in {@link TooltipBox}. */
+    tooltipRadii?: CornerRadii;
     // XXX THEMEPROPERTIES AUTO-GENERATED CODE END
 }
