@@ -551,10 +551,14 @@ export class TextInput extends Widget {
             this.autoScrollCaret();
         } else {
             // Delete backwards
-            // NOTE, still checking if delta < 0 so that nothing is done if
-            // delta is 0
+            // XXX can't just move cursor back by the delta, because the
+            // variable watcher clamps the cursor the the text's range; if a
+            // single character is deleted at the end, then the cursor will
+            // actually move by 2 positions instead of 1! to fix this, calculate
+            // the wanted cursor index before changing the text
+            const wantedIndex = Math.max(this.cursorPos + delta, 0);
             this.variable.value = this.text.substring(0, this.cursorPos + delta) + this.text.substring(this.cursorPos);
-            this.moveCursor(delta, false);
+            this.moveCursorTo(wantedIndex, false);
         }
     }
 
