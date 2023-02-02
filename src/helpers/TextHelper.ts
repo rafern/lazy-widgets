@@ -753,13 +753,16 @@ export class TextHelper {
         const yOffset = line * fullLineHeight;
         const range = this._lineRanges[line];
         const shift = this.getLineShift(line);
-        if(range.length === 1 && range[0][0] === range[0][1]) {
-            return [range[0][0], [range[0][2] + shift, yOffset]];
+        const lineStart = range[0][0];
+        if(range.length === 1 && lineStart === range[0][1]) {
+            return [lineStart, [range[0][2] + shift, yOffset]];
         }
 
-        // For each character, find index at which offset is smaller than
-        // total length minus half length of current character
-        const lineStart = range[0][0];
+        // Special case; if this is at or before the start of the line, select
+        // the beginning of the line
+        if (offset[0] <= shift) {
+            return [lineStart, [shift, yOffset]];
+        }
 
         // Special case; if line range ends with a newline, ignore last
         // character
@@ -767,6 +770,9 @@ export class TextHelper {
         if(this.text[lineEnd - 1] === '\n') {
             lineEnd--;
         }
+
+        // For each character, find index at which offset is smaller than
+        // total length minus half length of current character
 
         let closestNext = -1;
         let closestNextLen = 0;
