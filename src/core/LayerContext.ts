@@ -33,7 +33,7 @@ export class LayerContext<W extends Widget> implements Iterable<LayerIteratorNex
     private _defaultLayerIndex;
     private readonly layers = new Array<Layer<W>>();
     private readonly layerNames = new Map<string, number>();
-    private _layersDirty = true;
+    layersDirty = true;
 
     constructor(defaultLayerIndex: number, layersInit: Array<LayerInit<W>>) {
         const layerCount = layersInit.length;
@@ -87,10 +87,6 @@ export class LayerContext<W extends Widget> implements Iterable<LayerIteratorNex
         return this._defaultLayerIndex;
     }
 
-    get layersDirty() {
-        return this._layersDirty;
-    }
-
     [Symbol.iterator]() {
         return makeLayerIterator(0, 1, this.layers, this.layerNames);
     }
@@ -124,7 +120,7 @@ export class LayerContext<W extends Widget> implements Iterable<LayerIteratorNex
             this.layerNames.set(name, index);
         }
 
-        this._layersDirty = true;
+        this.layersDirty = true;
         return index;
     }
 
@@ -147,7 +143,7 @@ export class LayerContext<W extends Widget> implements Iterable<LayerIteratorNex
             this.layerNames.set(name, index);
         }
 
-        this._layersDirty = true;
+        this.layersDirty = true;
         return index;
     }
 
@@ -172,6 +168,7 @@ export class LayerContext<W extends Widget> implements Iterable<LayerIteratorNex
 
         this.layers.splice(index, 1);
         this.updateIndices(index, -1);
+        this.layersDirty = true;
     }
 
     getNamedLayerIndex(name: string): number | null {

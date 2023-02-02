@@ -55,6 +55,12 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
     }
 
     protected override handlePreLayoutUpdate(): void {
+        // Mark layout as dirty if the layer context is dirty
+        if (this.layerContext.layersDirty) {
+            this.layerContext.layersDirty = false;
+            this._layoutDirty = true;
+        }
+
         // Pre-layout update all children. Propagate layoutDirty flag
         for (const child of this) {
             child.preLayoutUpdate();
