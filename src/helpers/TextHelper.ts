@@ -681,9 +681,10 @@ export class TextHelper {
      *
      * See {@link TextHelper#findIndexOffsetFromOffset} for the opposite.
      *
+     * @param preferLineEnd - If true, the offset at the end of the line will be returned, instead of at the beginning of the line. Only applies to line ranges that were wrapped.
      * @returns Returns a 2-tuple containing the offset, in pixels. Vertical offset in the tuple is at the top of the character. Note that this is not neccessarily an integer.
      */
-    findOffsetFromIndex(index: number): [x: number, yTop: number] {
+    findOffsetFromIndex(index: number, preferLineEnd = false): [x: number, yTop: number] {
         // Update line ranges if needed
         this.updateTextDims();
 
@@ -709,9 +710,24 @@ export class TextHelper {
             index = this.text.length;
         }
 
+        // Handle wrapping preferences
+        let lineRange = this._lineRanges[line];
+        if (preferLineEnd && line > 0 && index === lineRange[0][0]) {
+            // check if there is a newline at the end of the last render group
+            // of the previous line
+            const prevLineRange = this._lineRanges[line - 1];
+            const prevTextGroup = prevLineRange[prevLineRange.length - 1];
+            const prevEndIndex = prevTextGroup[1] - 1;
+            if (prevEndIndex >= 0 && this.text[prevEndIndex] !== '\n') {
+                // line was created due to wrap. prefer previous line
+                line--;
+                lineRange = prevLineRange;
+            }
+        }
+
         // Get horizontal offset
         return [
-            this.getLineRangeWidthUntil(this._lineRanges[line], index) + this.getLineShift(line),
+            this.getLineRangeWidthUntil(lineRange, index) + this.getLineShift(line),
             line * this.fullLineHeight,
         ];
     }

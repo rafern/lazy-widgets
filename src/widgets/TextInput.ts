@@ -891,13 +891,13 @@ export class TextInput extends Widget {
         // anti-aliasing artifacts (cursor loses sharpness despite being fully
         // vertical)
         if(this.cursorOffsetDirty) {
-            this.cursorOffset = this.textHelper.findOffsetFromIndex(this.cursorPos);
+            this.cursorOffset = this.textHelper.findOffsetFromIndex(this.cursorPos, true);
 
             if(this.selectPos === this.cursorPos) {
                 this.selectOffset[0] = this.cursorOffset[0];
                 this.selectOffset[1] = this.cursorOffset[1];
             } else {
-                this.selectOffset = this.textHelper.findOffsetFromIndex(this.selectPos);
+                this.selectOffset = this.textHelper.findOffsetFromIndex(this.selectPos, true);
             }
 
             this.cursorOffsetDirty = false;
