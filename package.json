@@ -5,6 +5,7 @@
   "main": "./dist/index.esm.js",
   "exports": "./dist/index.esm.js",
   "types": "./dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "lint": "eslint src/ --ext .ts",
     "lint-fix": "eslint src/ --ext .ts --fix",
@@ -12,7 +13,7 @@
     "dev": "concurrently --kill-others 'http-server -c-1 .' 'esbuild --watch --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=dist/index.esm.js src/index.ts'",
     "docs": "typedoc --options typedoc.json",
     "generate_theme": "node generate_theme.mjs",
-    "test": "echo Dummy test - TODO implement tests",
+    "test": "mocha",
     "clean": "rimraf dist/*"
   },
   "files": [
@@ -30,13 +31,18 @@
     "url": "https://github.com/rafern/lazy-widgets.git"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.1",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
+    "chai": "^4.3.7",
     "concurrently": "^7.6.0",
     "esbuild": "^0.17.3",
     "eslint": "^8.32.0",
     "eslint-plugin-tsdoc": "^0.2.17",
+    "mocha": "^10.2.0",
     "rimraf": "^4.1.1",
+    "ts-node": "^10.9.1",
     "typedoc": "^0.23.24",
     "typescript": "^4.9.4"
   },
