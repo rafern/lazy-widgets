@@ -7,9 +7,21 @@ import type { Rect } from '../helpers/Rect';
 import { Parent } from './Parent';
 import type { Widget, WidgetProperties } from './Widget';
 
+/**
+ * A tuple with a layer and the name of that layer (or null if it is an unnamed
+ * layer). For internal use only.
+ *
+ * @internal
+ */
 type LayerIteratorNextType<W extends Widget> = [layer: Layer<W>, layerName: string | null];
 
-function makeLayerIterator<W extends Widget>(startIndex: number, delta: number, layers: Array<Layer<W>>, layerNames: Map<string, number>) {
+/**
+ * Makes an iterator for a list of layers, given a starting index and a delta
+ * for the direction of the iteration. For internal use only.
+ *
+ * @internal
+ */
+function makeLayerIterator<W extends Widget>(startIndex: number, delta: number, layers: Array<Layer<W>>, layerNames: Map<string, number>): Iterator<LayerIteratorNextType<W>> {
     const names = new Map<number, string>();
 
     for (const [name, nameIndex] of layerNames) {
@@ -33,12 +45,36 @@ function makeLayerIterator<W extends Widget>(startIndex: number, delta: number, 
     }
 }
 
+/**
+ * A {@link Parent} where each child is in a separate layer. Layers have an
+ * order, and are placed in that order; layers at the beginning of the list are
+ * below layers at the end of the list, painting is done in a back-to-front
+ * order, while event dispatching is done in a front-to-back order.
+ *
+ * A layerered container must always contain at least one layer; the default
+ * layer. The default layer can't be removed, and must be able to expand.
+ *
+ * Can be constrained to a specific type of children.
+ *
+ * @category Widget
+ */
 export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
+    /** The default layer. Can't be removed */
     readonly defaultLayer: Layer<W>;
+    /** The current index of the default layer */
     private _defaultLayerIndex;
+    /** The list of layers in this container */
     private readonly layers = new Array<Layer<W>>();
+    /**
+     * A map which names some layers. Each key is the layer name, and each value
+     * is the index of the layer in the layers list.
+     */
     private readonly layerNames = new Map<string, number>();
 
+    /**
+     * @param defaultLayerIndex - The index of the default layer in the layersInit list
+     * @param layersInit - The list of layers to be added to this container
+     */
     constructor(defaultLayerIndex: number, layersInit: Array<LayerInit<W>>, properties?: Readonly<WidgetProperties>) {
         super(true, properties);
 
@@ -76,6 +112,11 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         }
     }
 
+    /**
+     * Create a new {@link LayeredContainer} with a single default layer.
+     * Shortcut for using the constructor with a single-element array as the
+     * layers list, and a default layer index of 0.
+     */
     static fromDefaultLayerChild<W extends Widget>(defaultLayerChild: W, properties?: Readonly<WidgetProperties>) {
         return new LayeredContainer(0, [
             <LayerInit<W>>{
@@ -95,14 +136,23 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         return this.layerCount;
     }
 
+    /**
+     * Get the amount of layers currently in this container. Equivalent to
+     * {@link LayeredContainer#childCount};
+     */
     get layerCount() {
         return this.layers.length;
     }
 
+    /**
+     * Get the current index of the default layer. May change if a layer is
+     * inserted or removed before the default layer.
+     */
     get defaultLayerIndex() {
         return this._defaultLayerIndex;
     }
 
+    /** Iterate all layers from back to front. */
     get backToFrontLayers(): Iterable<LayerIteratorNextType<W>> {
         const layers = this.layers;
         const layerNames = this.layerNames;
@@ -114,6 +164,7 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         }
     }
 
+    /** Iterate all layers from front to back. */
     get frontToBackLayers(): Iterable<LayerIteratorNextType<W>> {
         const layers = this.layers;
         const layerNames = this.layerNames;
@@ -191,6 +242,7 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         }
     }
 
+    /** Add a new layer to the container at the end of the layers list. */
     pushLayer(layer: Layer<W>, name: string | null = null): number {
         const index = this.layers.push(layer) - 1;
 
@@ -202,6 +254,7 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         return index;
     }
 
+    /** Add a new layer to the container at a given index of the layers list. */
     insertLayerBefore(layer: Layer<W>, index: number, name: string | null = null): number {
         const layerCount = this.layers.length;
 
@@ -225,10 +278,16 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         return index;
     }
 
+    /**
+     * Add a new layer to the container after a given index of the layers list.
+     */
     insertLayerAfter(layer: Layer<W>, index: number, name: string | null = null): number {
         return this.insertLayerBefore(layer, index + 1, name);
     }
 
+    /**
+     * Remove a layer from the container at a given index of the layers list.
+     */
     removeLayer(index: number) {
         const layerCount = this.layers.length;
 
@@ -249,6 +308,11 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         this.updateIndices(index, -1);
     }
 
+    /**
+     * Get the current index of a named layer by its name.
+     *
+     * @returns Returns the index of the named layer, or null if no layer has been added with this name.
+     */
     getNamedLayerIndex(name: string): number | null {
         const index = this.layerNames.get(name);
 
@@ -259,6 +323,11 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         }
     }
 
+    /**
+     * Get a named layer by its name.
+     *
+     * @returns Returns the named layer, or null if no layer has been added with this name.
+     */
     getNamedLayer(name: string): Layer<W> | null {
         const index = this.layerNames.get(name);
 
@@ -269,11 +338,23 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         }
     }
 
+    /**
+     * Get the current index of a layer by its value.
+     *
+     * @returns Returns the index of the layer, or null if the layer is not present in the container.
+     */
     getLayerIndex(layer: Layer<W>): number | null {
         const index = this.layers.indexOf(layer);
         return (index < 0) ? null : index;
     }
 
+    /**
+     * Change the indices of the named layers and default layer if they exceed
+     * indexMin, by a given delta. For internal use only.
+     *
+     * @param indexMin - Indices with this value or greater will be updated
+     * @param delta - The amount of change the indices by
+     */
     private updateIndices(indexMin: number, delta: number) {
         // XXX is this safe? i've read that it is, but it doesn't feel right
         for (const [name, index] of this.layerNames) {
@@ -287,6 +368,11 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         }
     }
 
+    /**
+     * Attach a given layer to the UI root. For internal use only.
+     *
+     * @param layer - The layer to attach to the UI root.
+     */
     private attachLayer(layer: Layer<W>) {
         if (this.attached) {
             layer.child.attach(this._root as Root, this._viewport as Viewport, this);
@@ -295,6 +381,11 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         this._layoutDirty = true;
     }
 
+    /**
+     * Detach a given layer from the UI root. For internal use only.
+     *
+     * @param layer - The layer to deatach from the UI root.
+     */
     private detachLayer(layer: Layer<W>) {
         if (this.attached) {
             const child = layer.child;
