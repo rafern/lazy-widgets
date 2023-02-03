@@ -244,6 +244,8 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
 
     /** Add a new layer to the container at the end of the layers list. */
     pushLayer(layer: Layer<W>, name: string | null = null): number {
+        this.assertNameAvailable(name);
+
         const index = this.layers.push(layer) - 1;
 
         if (name !== null) {
@@ -256,6 +258,8 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
 
     /** Add a new layer to the container at a given index of the layers list. */
     insertLayerBefore(layer: Layer<W>, index: number, name: string | null = null): number {
+        this.assertNameAvailable(name);
+
         const layerCount = this.layers.length;
 
         if (index < 0) {
@@ -394,5 +398,16 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         }
 
         this._layoutDirty = true;
+    }
+
+    /**
+     * Assert that a layer name is available. If no name is provided, this
+     * method will always succeed. If the name is already taken, an error is
+     * thrown.
+     */
+    private assertNameAvailable(name: string | null) {
+        if (name !== null && this.layerNames.has(name)) {
+            throw new Error('');
+        }
     }
 }
