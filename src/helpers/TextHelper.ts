@@ -427,14 +427,8 @@ export class TextHelper {
                     }
                 }
             } else {
-                // Wrapping, but no lines were wrapped and maxWidth is different
-                // than previous width. Must re-measure text. If lines were
-                // wrapped, must also re-measure
-                if(this.hasWrappedLines || this._width !== this.maxWidth) {
-                    this.measureDirty = true;
-                } else if (this.wrapMode !== WrapMode.None) {
-                    this._width = this.maxWidth;
-                }
+                // Wrapping, must re-measure text
+                this.measureDirty = true;
             }
         }
 
@@ -501,7 +495,7 @@ export class TextHelper {
                 lineStart = end;
             }
 
-            if(!notWrapping) {
+            if(this.maxWidth !== Infinity) {
                 this._width = this.maxWidth;
             }
         } else {
