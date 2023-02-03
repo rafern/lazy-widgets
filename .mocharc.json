@@ -1,5 +1,8 @@
 {
-  "require": "ts-node/register",
+  "require": [
+    "ts-node/register",
+    "tests/test-helper.ts"
+  ],
   "loader": "ts-node/esm",
   "extensions": ["ts"],
   "spec": [
