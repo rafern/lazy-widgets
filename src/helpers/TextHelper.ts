@@ -494,10 +494,6 @@ export class TextHelper {
                 // Set start of next line
                 lineStart = end;
             }
-
-            if(this.maxWidth !== Infinity) {
-                this._width = this.maxWidth;
-            }
         } else {
             // Wrap text
             this._lineRanges.length = 0;
