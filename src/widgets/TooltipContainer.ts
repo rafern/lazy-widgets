@@ -19,7 +19,7 @@ const startAlignment = <Alignment2D>{
  *
  * @category Widget
  */
-export class TooltipBox<W extends Widget = Widget> extends SingleParent<W> {
+export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W> {
     /**
      * The horizontal component of the cursor position to place this tooltip
      * around. Automatically set by {@link Tooltip} widget. Used for

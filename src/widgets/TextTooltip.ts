@@ -1,6 +1,6 @@
 import { Label } from './Label';
 import { Tooltip } from './Tooltip';
-import { TooltipBox } from './TooltipBox';
+import { TooltipContainer } from './TooltipContainer';
 import type { Widget, WidgetProperties } from './Widget';
 
 /**
@@ -8,11 +8,11 @@ import type { Widget, WidgetProperties } from './Widget';
  *
  * @category Widget
  */
-export class TextTooltip<W extends Widget = Widget> extends Tooltip<W, TooltipBox<Label>> {
+export class TextTooltip<W extends Widget = Widget> extends Tooltip<W, TooltipContainer<Label>> {
     constructor(child: W, tooltipText: string, properties?: Readonly<WidgetProperties>) {
         super(
             child,
-            new TooltipBox(
+            new TooltipContainer(
                 new Label(
                     tooltipText,
                     {

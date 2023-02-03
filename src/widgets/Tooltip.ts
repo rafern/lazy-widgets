@@ -6,7 +6,7 @@ import { Leave } from '../events/Leave';
 import { PointerMove } from '../events/PointerMove';
 import { LayeredContainer } from './LayeredContainer';
 import { PassthroughWidget } from './PassthroughWidget';
-import { TooltipBox } from './TooltipBox';
+import { TooltipContainer } from './TooltipContainer';
 import type { Widget, WidgetProperties } from './Widget';
 
 const SENSITIVITY_RADIUS = 8;
@@ -14,17 +14,17 @@ const HOVER_TIME = 1000;
 
 /**
  * Wraps a widget and provides a tooltip. Automatically manages a given
- * {@link TooltipBox}, which will be used as the actual visual tooltip.
+ * {@link TooltipContainer}, which will be used as the actual visual tooltip.
  *
  * Whenever this widget is hovered for a small amount of time without moving
  * the pointer too much, a new layer will be created with the passed
- * {@link TooltipBox}, in the top-most {@link LayeredContainer}. Unhovering this
- * wrapper will remove the layer.
+ * {@link TooltipContainer}, in the top-most {@link LayeredContainer}.
+ * Unhovering this wrapper will remove the layer.
  *
  * Has a tolerance for small movements, so that shaky pointers can still be used
  * to detect hovering.
  */
-export class Tooltip<W extends Widget = Widget, T extends TooltipBox = TooltipBox> extends PassthroughWidget<W> {
+export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = TooltipContainer> extends PassthroughWidget<W> {
     /** The top-most container in the current UI tree. Internal use only */
     private _topLayerContainer: LayeredContainer | null = null;
     /** The currently created layer for the {@link Tooltip#tooltipWidget} */
@@ -151,7 +151,7 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipBox = TooltipBo
     }
 
     /**
-     * Update the {@link TooltipBox#tooltipRect} of the
+     * Update the {@link TooltipContainer#tooltipRect} of the
      * {@link Tooltip#tooltipWidget}. For internal use only.
      */
     private updateTooltipRect() {

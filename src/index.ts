@@ -122,6 +122,6 @@ export * from './widgets/TextMargin';
 export * from './widgets/TextTooltip';
 export * from './widgets/ThemeScope';
 export * from './widgets/Tooltip';
-export * from './widgets/TooltipBox';
+export * from './widgets/TooltipContainer';
 export * from './widgets/ViewportWidget';
 export * from './widgets/Widget';
