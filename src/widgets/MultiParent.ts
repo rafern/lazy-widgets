@@ -16,8 +16,6 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
      * this array are always valid. If you want to clear this array, set the
      * length to zero instead of creating a new instance. readonly still means
      * that you can add/remove elements to/from the array.
-     *
-     * See {@link MultiParent#children} for the public iterator getter.
      */
     protected readonly _children: Array<W>;
 
@@ -56,7 +54,7 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
      *
      * Calls {@link Widget#markWholeAsDirty}.
      *
-     * @param children - If this is a widget, then it is pushed to {@link Parent#_children}. If this is an array of widgets, then each widget is pushed to {@link Parent#_children}.
+     * @param children - If this is a widget, then it is pushed to {@link MultiParent#_children}. If this is an array of widgets, then each widget is pushed to {@link MultiParent#_children}.
      * @returns Returns this so that the method is chainable.
      */
     add(children: W | Array<W>): this {
@@ -91,7 +89,7 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
      * Calls {@link Widget#markWholeAsDirty} and sets
      * {@link Widget#_layoutDirty} to true.
      *
-     * @param children - If this is a widget, then it is removed from {@link Parent#_children}. If this is an array of widgets, then each widget is removed from {@link Parent#_children}.
+     * @param children - If this is a widget, then it is removed from {@link MultiParent#_children}. If this is an array of widgets, then each widget is removed from {@link MultiParent#_children}.
      * @returns Returns this so that the method is chainable.
      */
     remove(children: W | Array<W>): this {

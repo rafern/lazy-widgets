@@ -7,10 +7,10 @@ import type { Root } from '../core/Root';
  * A class for widgets which may have children.
  *
  * Overrides the {@link Widget#inheritedTheme} accessor so that inherited themes
- * are propagated to children. Also provides utilities for getting the amount of
- * children, a public iterator for children and a protected child list. This
- * way, widgets that extend this class can decide if modifying the list of
- * children should be public or not.
+ * are propagated to children. Also provides a getter for the amount of children
+ * that this parent has, and is an iterable which iterates each child of this
+ * parent. Child classes are responsible for implementing both the getter and
+ * the iterator.
  *
  * Can be constrained to a specific type of children.
  *

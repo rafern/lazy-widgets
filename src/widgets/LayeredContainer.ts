@@ -10,10 +10,8 @@ import type { Widget, WidgetProperties } from './Widget';
 /**
  * A tuple with a layer and the name of that layer (or null if it is an unnamed
  * layer). For internal use only.
- *
- * @internal
  */
-type LayerIteratorNextType<W extends Widget> = [layer: Layer<W>, layerName: string | null];
+export type LayerIteratorNextType<W extends Widget> = [layer: Layer<W>, layerName: string | null];
 
 /**
  * Makes an iterator for a list of layers, given a starting index and a delta
