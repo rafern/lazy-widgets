@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "eslint src/ --ext .ts",
     "lint-fix": "eslint src/ --ext .ts --fix",
-    "build": "tsc & esbuild --minify --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=dist/index.esm.js src/index.ts",
+    "build": "tsc && esbuild --minify --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=dist/index.esm.js src/index.ts",
     "dev": "concurrently --kill-others 'http-server -c-1 .' 'esbuild --watch --bundle --sourcemap --keep-names --target=es6 --format=esm --outfile=dist/index.esm.js src/index.ts'",
     "docs": "typedoc --options typedoc.json",
     "generate_theme": "node generate_theme.mjs",
