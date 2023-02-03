@@ -15,7 +15,6 @@ jobs:
           node-version: 18
           cache: 'npm'
       - run: npm ci
-      - run: npm run lint
       - run: npm run build
       - run: tar -czf build.tar.gz dist/
       - uses: actions/upload-artifact@v3
@@ -23,8 +22,21 @@ jobs:
           name: build
           path: build.tar.gz
 
+  test:
+    environment: Main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test
+
   generate-docs:
-    needs: build
+    needs: [build, test]
     environment: Main
     runs-on: ubuntu-latest
     steps:
@@ -49,6 +61,7 @@ jobs:
           path: 'docs/'
 
   deploy-docs:
+    if: startsWith(github.ref, 'refs/tags/releases/')
     needs: generate-docs
     permissions:
       pages: write
@@ -63,6 +76,7 @@ jobs:
         uses: actions/deploy-pages@v1
 
   publish-npm:
+    if: startsWith(github.ref, 'refs/tags/releases/')
     needs: deploy-docs
     environment: Main
     runs-on: ubuntu-latest
