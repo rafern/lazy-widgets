@@ -7,7 +7,6 @@ This library's API is not stable and is expected to heavily change in the
 future. Planned features/changes:
 - Rewrite flexbox system to distribute final space instead of remaining space
 - Rewrite layout system to no longer use 2 stages, or to not unnecessarily mark widgets as dirty
-- Add layer system
 - Add decoration system
 - Immediately-dispatched input events
 - Replace callbacks with events

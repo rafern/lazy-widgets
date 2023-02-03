@@ -14,7 +14,8 @@
     "docs": "typedoc --options typedoc.json",
     "generate_theme": "node generate_theme.mjs",
     "test": "mocha",
-    "clean": "rimraf dist/*"
+    "clean": "rimraf dist/*",
+    "pack": "npm run clean && npm run lint && npm run test && npm run docs && npm run build && npm pack"
   },
   "files": [
     "dist"
