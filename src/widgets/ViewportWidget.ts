@@ -53,6 +53,12 @@ export interface ViewportWidgetProperties extends WidgetProperties {
  * child and clipping it or, optionally, by using a {@link Viewport} to paint
  * the child widget to a dedicated canvas.
  *
+ * Note that, if using a {@link CanvasViewport} by setting
+ * {@link ViewportWidget#useCanvas} to true, widgets may be blurry when the
+ * offset is not aligned to the same grid as the parent viewport. This is not
+ * fixable. For better quality use {@link ClippedViewport}; only use
+ * {@link ViewportWidget#useCanvas} when absolutely necessary.
+ *
  * @category Widget
  */
 export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
