@@ -128,17 +128,17 @@ export class DOMPointerDriver extends PointerDriver {
 
     /** Add pointer event listeners to root's DOM element. */
     private addListeners(root: Root, rootBind: DOMPointerDriverBind): void {
-        // Make listeners for mouse events, queueing events. Add them to the
+        // Make listeners for mouse events, dispatching events. Add them to the
         // root DOM bind so they can be removed later when needed
         const domElem = rootBind.domElem;
         if(rootBind.pointerListen === null) {
             rootBind.pointerListen = (event: PointerEvent) => {
-                this.movePointer(
+                this.handleCapture(event, this.movePointer(
                     root, this.getPointerID(event),
                     ...getPointerEventNormPos(event, domElem),
                     event.buttons,
                     ...unpackModifiers(event),
-                );
+                ));
             }
 
             domElem.addEventListener('pointermove', rootBind.pointerListen);
@@ -148,7 +148,9 @@ export class DOMPointerDriver extends PointerDriver {
 
         if(rootBind.pointerleaveListen === null) {
             rootBind.pointerleaveListen = (event: PointerEvent) => {
-                this.leavePointer(root, this.getPointerID(event));
+                this.handleCapture(
+                    event, this.leavePointer(root, this.getPointerID(event))
+                );
             }
 
             domElem.addEventListener('pointerleave', rootBind.pointerleaveListen);
@@ -161,14 +163,12 @@ export class DOMPointerDriver extends PointerDriver {
                     return;
                 }
 
-                this.wheelPointer(
+                this.handleCapture(event, this.wheelPointer(
                     root, this.mousePointerID,
                     ...getPointerEventNormPos(event, domElem),
                     event.deltaX, event.deltaY, event.deltaZ, deltaMode,
                     ...unpackModifiers(event),
-                );
-
-                event.preventDefault();
+                ));
             }
 
             domElem.addEventListener('wheel', rootBind.wheelListen, { passive: false });
@@ -176,7 +176,7 @@ export class DOMPointerDriver extends PointerDriver {
 
         if(rootBind.contextMenuListen === null) {
             rootBind.contextMenuListen = (event: MouseEvent) => {
-                // Prevent right-click from opening context menu
+                // Prevent right-click/long-tap from opening context menu
                 event.preventDefault();
             }
 
@@ -236,6 +236,20 @@ export class DOMPointerDriver extends PointerDriver {
         const rootBind = this.domElems.get(root);
         if(rootBind !== undefined) {
             this.removeListeners(rootBind);
+        }
+    }
+
+    /**
+     * Handle the capture of a DOM event. If captured, then the event will be
+     * stopImmediatePropagation'ed.
+     */
+    private handleCapture(event: Event, captured: boolean) {
+        if (captured) {
+            event.stopImmediatePropagation();
+
+            if (event.type === 'wheel') {
+                event.preventDefault();
+            }
         }
     }
 }

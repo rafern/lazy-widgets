@@ -18,7 +18,6 @@ import { Leave } from '../events/Leave';
  * @category Driver
  */
 export interface PointerDriverState {
-    eventQueue: Array<Event>;
     pointer: number | null;
     pressing: number;
     hovering: boolean;
@@ -37,8 +36,7 @@ export interface PointerDriverState {
 export class PointerDriver implements Driver {
     /**
      * The current state for each registered and enabled root. Contains whether
-     * each root is pressing, hovering, which pointer is bound to it and its
-     * event queue
+     * each root is pressing, hovering, and which pointer is bound to it
      */
     protected states: Map<Root, PointerDriverState> = new Map();
     /**
@@ -68,9 +66,9 @@ export class PointerDriver implements Driver {
         // Clear state
         state.pointer = null;
         if(state.hovering) {
-            // Queue up Leave event if hovering
-            state.eventQueue.push(
-                new Leave(root.getFocusCapturer(FocusType.Pointer))
+            // Dispatch Leave event if hovering
+            this.dispatchEvent(
+                root, new Leave(root.getFocusCapturer(FocusType.Pointer))
             );
         }
         state.hovering = false;
@@ -95,8 +93,8 @@ export class PointerDriver implements Driver {
      * Unregister a pointer.
      *
      * If a root has this pointer bound to it, the pointer is unbound from the
-     * root, a Leave event is queued to the root and the hovering and pressing
-     * state of the root is set to false.
+     * root, a Leave event is dispatched to the root and the hovering and
+     * pressing state of the root is set to false.
      */
     unregisterPointer(pointer: number): void {
         for(const [root, state] of this.states) {
@@ -111,13 +109,13 @@ export class PointerDriver implements Driver {
     }
 
     /**
-     * Check if a given pointer can queue an event to a given root. Also
+     * Check if a given pointer can dispatch an event to a given root. Also
      * automatically assigns pointer to root if possible. For internal use only.
      *
      * @param state - The root's state. Although the function could technically get the state itself, it's passed to avoid repetition since you will need the state yourself
      * @param givingActiveInput - Is the pointer giving active input (pressing button or scrolling)? If so, then it can auto-assign if the root is not being pressed by another pointer
      */
-    private canQueueEvent(root: Root, pointer: number, state: PointerDriverState, givingActiveInput: boolean): boolean {
+    private canDispatchEvent(root: Root, pointer: number, state: PointerDriverState, givingActiveInput: boolean): boolean {
         // If there is no pointer assigned, assign this one
         const firstAssign = state.pointer === null;
         if(firstAssign) {
@@ -125,7 +123,7 @@ export class PointerDriver implements Driver {
         }
 
         // If pointer is entering this root for the first time, then find which
-        // root the pointer was assigned to and queue a leave event
+        // root the pointer was assigned to and dispatch a leave event
         const pointerMatches = state.pointer === pointer;
         if(!pointerMatches || firstAssign) {
             for(const [otherRoot, otherState] of this.states) {
@@ -164,9 +162,14 @@ export class PointerDriver implements Driver {
     }
 
     /**
-     * Queue up a pointer event to a given root. The type of
+     * Dispatch a pointer event to a given root. The type of
      * {@link PointerEvent} is decided automatically based on the root's state
      * and whether its pressing or not.
+     *
+     * If null, the last pressing state is used, meaning that the pressing state
+     * has not changed. Useful if getting pointer movement in an event based
+     * environment where you only know when a pointer press occurs, but not if
+     * the pointer is pressed or not
      *
      * @param pointer - The registered pointer ID
      * @param xNorm - The normalised (non-integer range from 0 to 1) X coordinate of the pointer event. 0 is the left edge of the root, while 1 is the right edge of the root.
@@ -175,16 +178,12 @@ export class PointerDriver implements Driver {
      * @param shift - Is shift being pressed?
      * @param ctrl - Is control being pressed?
      * @param alt - Is alt being pressed?
-     *
-     * If null, the last pressing state is used, meaning that the pressing state
-     * has not changed. Useful if getting pointer movement in an event based
-     * environment where you only know when a pointer press occurs, but not if
-     * the pointer is pressed or not
+     * @returns Returns true if the pointer event was captured.
      */
-    movePointer(root: Root, pointer: number, xNorm: number, yNorm: number, pressing: number | null, shift: boolean, ctrl: boolean, alt: boolean): void {
+    movePointer(root: Root, pointer: number, xNorm: number, yNorm: number, pressing: number | null, shift: boolean, ctrl: boolean, alt: boolean): boolean {
         const state = this.states.get(root);
         if(typeof state === 'undefined') {
-            return;
+            return false;
         }
 
         // If press state was not supplied, then it hasn't changed. Use the last
@@ -193,14 +192,15 @@ export class PointerDriver implements Driver {
             pressing = state.pressing;
         }
 
-        // Abort if this pointer can't queue an event to the target root
-        if(!this.canQueueEvent(root, pointer, state, pressing > 0)) {
-            return;
+        // Abort if this pointer can't dispatch an event to the target root
+        if(!this.canDispatchEvent(root, pointer, state, pressing > 0)) {
+            return false;
         }
 
-        // Update state and queue up event
+        // Update state and dispatch event
         state.hovering = true;
         const [x, y] = this.denormaliseCoords(root, xNorm, yNorm);
+        let captured = false;
         if(pressing !== state.pressing) {
             // Get how many bits in the bitmask you need to check
             const bits = Math.floor(Math.log2(Math.max(pressing, state.pressing)));
@@ -214,16 +214,15 @@ export class PointerDriver implements Driver {
                     continue;
                 }
 
-                if(isPressed) {
-                    state.eventQueue.push(new PointerPress(x, y, bit, shift, ctrl, alt));
-                } else {
-                    state.eventQueue.push(new PointerRelease(x, y, bit, shift, ctrl, alt));
-                }
+                captured ||= this.dispatchEvent(
+                    root,
+                    new (isPressed ? PointerPress : PointerRelease)(x, y, bit, shift, ctrl, alt)
+                );
             }
 
             state.pressing = pressing;
         } else {
-            state.eventQueue.push(new PointerMove(x, y, shift, ctrl, alt));
+            captured = this.dispatchEvent(root, new PointerMove(x, y, shift, ctrl, alt));
         }
 
         // Update pointer's hint
@@ -232,35 +231,39 @@ export class PointerDriver implements Driver {
         } else {
             this.setPointerHint(pointer, PointerHint.Hovering);
         }
+
+        return captured;
     }
 
     /**
-     * Queue up a {@link Leave} event to a given root. Event will only be queued
-     * if the root was being hovered.
+     * Dispatch a {@link Leave} event to a given root. Event will only be
+     * dispatched if the root was being hovered.
      *
      * @param pointer - The registered pointer ID
+     * @returns Returns true if the event was captured
      */
-    leavePointer(root: Root, pointer: number): void {
+    leavePointer(root: Root, pointer: number): boolean {
         const state = this.states.get(root);
         if(typeof state === 'undefined') {
-            return;
+            return false;
         }
 
-        // Queue leave event if this is the assigned pointer and if hovering
+        // Dispatch leave event if this is the assigned pointer and if hovering
         if(state.hovering && state.pointer == pointer) {
             state.hovering = false;
             state.pressing = 0;
             state.dragLast = null;
-            state.eventQueue.push(
-                new Leave(root.getFocusCapturer(FocusType.Pointer))
-            );
+            const captured = this.dispatchEvent(root, new Leave(root.getFocusCapturer(FocusType.Pointer)));
             this.setPointerHint(pointer, PointerHint.None);
+            return captured;
+        } else {
+            return false;
         }
     }
 
     /**
-     * Queue up a {@link Leave} event to any root with the given pointer
-     * assigned. Event will only be queued if the root was being hovered.
+     * Dispatch a {@link Leave} event to any root with the given pointer
+     * assigned. Event will only be dispatched if the root was being hovered.
      * Pointer will also be unassigned from root.
      *
      * @param pointer - The registered pointer ID
@@ -272,8 +275,8 @@ export class PointerDriver implements Driver {
     }
 
     /**
-     * Queue up a mouse wheel event in a given 2D direction. Event will only be
-     * queued if the root was being hovered.
+     * Dispatch a mouse wheel event in a given 2D direction. Event will only be
+     * dispatched if the root was being hovered.
      *
      * @param pointer - The registered pointer ID
      * @param xNorm - The normalised (non-integer range from 0 to 1) X coordinate of the pointer event. 0 is the left edge of the root, while 1 is the right edge of the root.
@@ -285,22 +288,26 @@ export class PointerDriver implements Driver {
      * @param shift - Is shift being pressed?
      * @param ctrl - Is control being pressed?
      * @param alt - Is alt being pressed?
+     * @returns Returns true if the pointer event was captured.
      */
-    wheelPointer(root: Root, pointer: number, xNorm: number, yNorm: number, deltaX: number, deltaY: number, deltaZ: number, deltaMode: PointerWheelMode, shift: boolean, ctrl: boolean, alt: boolean): void {
+    wheelPointer(root: Root, pointer: number, xNorm: number, yNorm: number, deltaX: number, deltaY: number, deltaZ: number, deltaMode: PointerWheelMode, shift: boolean, ctrl: boolean, alt: boolean): boolean {
         const state = this.states.get(root);
         if(typeof state === 'undefined') {
-            return;
+            return false;
         }
 
-        // Abort if this pointer can't queue an event to the target root
-        if(!this.canQueueEvent(root, pointer, state, true)) {
-            return;
+        // Abort if this pointer can't dispatch an event to the target root
+        if(!this.canDispatchEvent(root, pointer, state, true)) {
+            return false;
         }
 
-        // Update state and queue up event
+        // Update state and dispatch event
         state.hovering = true;
         const [x, y] = this.denormaliseCoords(root, xNorm, yNorm);
-        state.eventQueue.push(new PointerWheel(x, y, deltaX, deltaY, deltaZ, deltaMode, false, shift, ctrl, alt));
+        return this.dispatchEvent(
+            root,
+            new PointerWheel(x, y, deltaX, deltaY, deltaZ, deltaMode, false, shift, ctrl, alt)
+        );
     }
 
     /**
@@ -338,7 +345,6 @@ export class PointerDriver implements Driver {
     onEnable(root: Root): void {
         // Create new state for UI that just got enabled
         this.states.set(root, <PointerDriverState>{
-            eventQueue: [],
             pointer: null,
             pressing: 0,
             hovering: false,
@@ -367,13 +373,21 @@ export class PointerDriver implements Driver {
     }
 
     /**
-     * Dispatches all queued events (found in {@link PointerDriver#states}) for
-     * the root and clears its event queue
+     * Update the pointer driver. Does nothing, as the pointer driver dispatches
+     * pointer events immediately.
      */
-    update(root: Root): void {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    update(_root: Root): void {}
+
+    /**
+     * Dispatch an event to a root.
+     *
+     * @returns Returns true if the event was captured
+     */
+    private dispatchEvent(root: Root, event: Event): boolean {
         const state = this.states.get(root);
         if(typeof state === 'undefined') {
-            return;
+            return false;
         }
 
         // Check if drag to scroll is enabled for this root
@@ -381,41 +395,38 @@ export class PointerDriver implements Driver {
             ? false
             : this.dragToScroll.get(state.pointer);
 
-        // Dispatch all queued events for this root
-        for(const event of state.eventQueue) {
-            // If this is a pointer event and pointer is dragging, continue
-            // doing dragging logic
-            if(event instanceof PointerEvent && state.dragLast !== null) {
-                const [startX, startY] = state.dragLast;
-                root.dispatchEvent(new PointerWheel(
-                    ...state.dragOrigin,
-                    startX - event.x, startY - event.y, 0,
-                    PointerWheelMode.Pixel, false, false, false, true,
-                ));
+        // If this is a pointer event and pointer is dragging, continue
+        // doing dragging logic
+        if(event instanceof PointerEvent && state.dragLast !== null) {
+            const [startX, startY] = state.dragLast;
+            const captured = root.dispatchEvent(new PointerWheel(
+                ...state.dragOrigin,
+                startX - event.x, startY - event.y, 0,
+                PointerWheelMode.Pixel, false, false, false, true,
+            ));
 
-                if(event instanceof PointerRelease) {
-                    state.dragLast = null;
-                } else {
-                    state.dragLast[0] = event.x;
-                    state.dragLast[1] = event.y;
-                }
-
-                continue;
-            }
-
-            // Dispatch event. If nobody captures the event, dragToScroll is
-            // enabled and this is a pointer press, then start dragging
-            if(root.dispatchEvent(event)) {
+            if(event instanceof PointerRelease) {
                 state.dragLast = null;
-            } else if(dragToScroll && event instanceof PointerPress) {
-                state.dragLast = [event.x, event.y];
-                state.dragOrigin[0] = event.x;
-                state.dragOrigin[1] = event.y;
+            } else {
+                state.dragLast[0] = event.x;
+                state.dragLast[1] = event.y;
             }
+
+            return captured;
         }
 
-        // Clear queue
-        state.eventQueue.length = 0;
+        // Dispatch event. If nobody captures the event, dragToScroll is
+        // enabled and this is a pointer press, then start dragging
+        if(root.dispatchEvent(event)) {
+            state.dragLast = null;
+            return true;
+        } else if(dragToScroll && event instanceof PointerPress) {
+            state.dragLast = [event.x, event.y];
+            state.dragOrigin[0] = event.x;
+            state.dragOrigin[1] = event.y;
+        }
+
+        return false;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
