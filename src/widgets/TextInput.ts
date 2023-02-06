@@ -1036,7 +1036,7 @@ export class TextInput extends Widget {
 
         // Paint background for selection if there is a selection
         const padding = this.inputTextInnerPadding;
-        if(this.cursorPos !== this.selectPos) {
+        if(this.cursorPos !== this.selectPos && this.blinkOn !== null) {
             ctx.fillStyle = this.inputSelectBackgroundFill;
             if(this.cursorOffset[1] === this.selectOffset[1]) {
                 // Same line
