@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
+    </head>
+    <body>
+        <p>Try changing the focused element by pressing tab or shift+tab</p>
+        <div id="top-container"></div>
+        <textarea>This is just a selectable HTML element</textarea>
+        <div id="bottom-container"></div>
         <script type='module'>
             import {
                 DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
@@ -9,7 +15,7 @@
             } from '../dist/index.esm.js';
 
             // Create the roots
-            function makeRoot() {
+            function makeRoot(container) {
                 const label = new Label('Hello world!');
 
                 const root = new DOMRoot(
@@ -48,14 +54,18 @@
                 root.registerDriver(pointerDriver);
 
                 // Add root to body
-                document.body.appendChild(root.domElem);
+                container.appendChild(root.domElem);
 
                 return root;
             }
 
             const roots = [];
-            for (let i = 0; i < 10; i++) {
-                roots.push(makeRoot());
+
+            for (const containerID of ['top-container', 'bottom-container']) {
+                const container = document.getElementById(containerID);
+                for (let i = 0; i < 5; i++) {
+                    roots.push(makeRoot(container));
+                }
             }
 
             // Run the update loop
@@ -72,7 +82,5 @@
         <noscript>
             Please enable Javascript. This example may not work if running via file:// URIs
         </noscript>
-    </head>
-    <body>
     </body>
 </html>
