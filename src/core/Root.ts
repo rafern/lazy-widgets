@@ -13,6 +13,7 @@ import { FocusType } from './FocusType';
 import { Leave } from '../events/Leave';
 import type { Driver } from './Driver';
 import { Theme } from '../theme/Theme';
+import type { CaptureList } from './CaptureList';
 
 /**
  * Optional Root constructor properties.
@@ -292,15 +293,19 @@ export class Root {
      * focus type of the event will be cleared in the root with
      * {@link Root#clearFocus}.
      *
-     * @returns Returns true if the event was captured
+     * Dispatching a single event can result in a chain of dispatched events.
+     * These extra events will be returned.
+     *
+     * @returns Returns a list of dispatched events and whether they were captured.
      */
-    dispatchEvent(event: Event): boolean {
+    dispatchEvent(event: Event): CaptureList {
         // Ignore event if Root is disabled
         if(!this.enabled) {
-            return false;
+            return [[event, false]];
         }
 
         // If event is focusable and is missing a target...
+        const originalEvent = event;
         if(event.focusType !== null && event.target === null) {
             // Ignore event if it needs a focus but there is no component
             // focused in the needed focus
@@ -313,10 +318,13 @@ export class Root {
                 // special case for tab key with no currently focused widget;
                 // try to do tab selection
                 if(event instanceof KeyPress && event.key === 'Tab') {
-                    this.dispatchEvent(new TabSelect(this.getFocus(FocusType.Tab), event.shift));
+                    return [
+                        [event, false],
+                        ...this.dispatchEvent(new TabSelect(this.getFocus(FocusType.Tab), event.shift))
+                    ];
+                } else {
+                    return [[event, false]];
                 }
-
-                return false;
             }
 
             // Set event target
@@ -330,11 +338,15 @@ export class Root {
 
         // Pass event down to internal Container
         let captured = this.child.dispatchEvent(event);
+        const captureList: CaptureList = [[originalEvent, captured !== null]];
+
         if(captured === null) {
             if(event instanceof KeyPress) {
                 if(event.key === 'Tab') {
                     // special case for tab key; try to do tab selection
-                    this.dispatchEvent(new TabSelect(this.getFocus(FocusType.Tab), event.shift));
+                    captureList.push(
+                        ...this.dispatchEvent(new TabSelect(this.getFocus(FocusType.Tab), event.shift))
+                    );
                 } else if(event.key === 'Escape') {
                     // special case for escape key; clear keyboard focus
                     this.clearFocus(FocusType.Keyboard);
@@ -351,12 +363,12 @@ export class Root {
         }
 
         if(event instanceof TabSelect) {
-            if(event.reachedRelative && captured === null) {
-                // If the tab selection failed even though the relative widget
-                // was reached, then the end of the search was likely reached.
-                // Try to start from the beginning again
-                captured = this.child.dispatchEvent(event);
-            }
+            // if(event.reachedRelative && captured === null) {
+            //     // If the tab selection failed even though the relative widget
+            //     // was reached, then the end of the search was likely reached.
+            //     // Try to start from the beginning again
+            //     captured = this.child.dispatchEvent(event);
+            // }
 
             if(captured) {
                 if(!event.reachedRelative && !Root.badTabCaptureWarned) {
@@ -372,18 +384,22 @@ export class Root {
 
         // Update focus capturer if it changed
         if(event.focusType === null) {
-            return captured !== null;
+            return captureList;
         }
 
         const oldCapturer = this.getFocusCapturer(event.focusType);
         if(oldCapturer === captured) {
-            return captured !== null;
+            return captureList;
         }
 
         // Special case: when the pointer focus capturer changes, dispatch a
         // leave event to the last capturer
         if(event.focusType === FocusType.Pointer && oldCapturer !== null) {
-            this.child.dispatchEvent(new Leave(oldCapturer));
+            const leaveEvent = new Leave(oldCapturer);
+            captureList.push([
+                leaveEvent,
+                this.child.dispatchEvent(leaveEvent) !== null
+            ]);
         }
 
         this._fociCapturers.set(event.focusType, captured);
@@ -391,7 +407,7 @@ export class Root {
             driver.onFocusCapturerChanged(this, event.focusType, oldCapturer, captured);
         }
 
-        return captured !== null;
+        return captureList;
     }
 
     /**

@@ -1,34 +1,6 @@
 import { KeyboardDriver } from './KeyboardDriver';
-import { FocusType } from '../core/FocusType';
 import { Msg } from '../core/Strings';
-
-/**
- * The set of keys that will call preventDefault if captured.
- *
- * @category Driver
- */
-const PREVENT_DEFAULT_KEYS = new Set([
-    'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home',
-    'PageDown', 'PageUp', 'Tab', ' ',
-]);
-
-/**
- * The set of keys that will call preventDefault when holding ctrl if captured.
- *
- * @category Driver
- */
-const PREVENT_DEFAULT_CTRL_KEYS = new Set([
-    'a', 'A',
-]);
-
-/**
- * The set of keys that will call preventDefault, even if not captured.
- *
- * @category Driver
- */
-const PREVENT_DEFAULT_FORCE_KEYS = new Set([
-    'Tab'
-]);
+import type { CaptureList } from '../core/CaptureList';
 
 /**
  * Unpack a KeyboardEvent into a 4-tuple containing the event's key and modifier
@@ -73,16 +45,19 @@ export class DOMKeyboardDriver extends KeyboardDriver {
     private domElems: Map<HTMLElement, DOMKeyboardDriverBind> = new Map();
 
     /** Calls preventDefault on a keyboard event if needed. */
-    maybePreventDefault(event: KeyboardEvent): void {
-        if(PREVENT_DEFAULT_KEYS.has(event.key) || (PREVENT_DEFAULT_CTRL_KEYS.has(event.key) && event.ctrlKey)) {
-            if(PREVENT_DEFAULT_FORCE_KEYS.has(event.key)) {
-                event.preventDefault();
-            } else {
-                const currentFocus = this.getFocusedRoot()?.getFocus(FocusType.Keyboard) ?? null;
-                if(currentFocus !== null) {
-                    event.preventDefault();
-                }
+    maybePreventDefault(captureList: CaptureList, event: KeyboardEvent): void {
+        let captured = false;
+
+        for (const [_event, eventCaptured] of captureList) {
+            if (eventCaptured) {
+                captured = true;
+                break;
             }
+        }
+
+        if(captured) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
         }
     }
 
@@ -142,13 +117,11 @@ export class DOMKeyboardDriver extends KeyboardDriver {
 
         if(listenToKeys) {
             bind.keydownListen = (event) => {
-                this.maybePreventDefault(event);
-                this.keyDown(...unpackKeyboardEvent(event));
+                this.maybePreventDefault(this.keyDown(...unpackKeyboardEvent(event)), event);
             };
 
             bind.keyupListen = (event) => {
-                this.maybePreventDefault(event);
-                this.keyUp(...unpackKeyboardEvent(event));
+                this.maybePreventDefault(this.keyUp(...unpackKeyboardEvent(event)), event);
             };
 
             domElem.addEventListener('keydown', bind.keydownListen);

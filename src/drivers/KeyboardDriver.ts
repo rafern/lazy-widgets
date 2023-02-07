@@ -1,10 +1,10 @@
-import type { KeyEvent } from '../events/KeyEvent';
 import { KeyRelease } from '../events/KeyRelease';
 import type { Widget } from '../widgets/Widget';
 import { KeyPress } from '../events/KeyPress';
 import { FocusType } from '../core/FocusType';
 import type { Driver } from '../core/Driver';
 import type { Root } from '../core/Root';
+import type { CaptureList } from '../core/CaptureList';
 
 /**
  * A generic keyboard {@link Driver | driver}.
@@ -15,39 +15,16 @@ import type { Root } from '../core/Root';
  * @category Driver
  */
 export class KeyboardDriver implements Driver {
-    /** The list of key down/up events that haven't been dispatched yet. */
-    private eventQueues: Map<Root, Array<KeyEvent>> = new Map();
+    /**
+     * This list of {@link Root | Roots} that are using this driver. Used as a
+     * fallback for dispatching events. Order of Roots will change; the last
+     * focused (with any focus type) Root is moved to the beginning of the list.
+     */
+    private registeredRoots = new Array<Root>();
     /** A set containing the keys currently down. */
     private keysDown: Set<string> = new Set();
     /** The currently focused root. New keyboard events will go to this root */
     private focus: Root | null = null;
-    /**
-     * The last {@link Root} that had "activity"; the last Root where any focus
-     * was grabbed. Used as a fallback when there is no focus. If this is null,
-     * then a root from {@link KeyboardDriver#eventQueues} is picked; this
-     * fallback of a fallback may result in weird behaviour if there are more
-     * than 1 Roots, since eventQueues is a Map, and Map iteration is not
-     * guaranteed to be in the same order
-     */
-    private lastActivity: Root | null = null;
-
-    /**
-     * Get the {@link KeyboardDriver#eventQueues | event queue} of a given root.
-     * If this driver is not registered to the given root or the given root is
-     * disabled, making it not present in eventQueues, then null is returned.
-     */
-    private getEventQueue(root: Root | null): Array<KeyEvent> | null {
-        if(root === null) {
-            return null;
-        }
-
-        const eventQueue = this.eventQueues.get(root);
-        if(typeof eventQueue === 'undefined') {
-            return null;
-        }
-
-        return eventQueue;
-    }
 
     /**
      * Changes the current {@link KeyboardDriver#focus | root focus}.
@@ -81,17 +58,14 @@ export class KeyboardDriver implements Driver {
 
     /**
      * Similar to {@link KeyboardDriver#getFocusedRoot}, but can fall back to
-     * {@link KeyboardDriver#lastActivity} if {@link KeyboardDriver#focus} is
-     * null, or a {@link Root} in {@link KeyboardDriver#eventQueues} if
-     * lastActivity is also null.
+     * the first root of {@link KeyboardDriver#registeredRoots} if
+     * {@link KeyboardDriver#focus} is null.
      */
     getEffectiveFocusedRoot(): Root | null {
         if(this.focus) {
             return this.focus;
-        } else if(this.lastActivity) {
-            return this.lastActivity;
-        } else if(this.eventQueues.size > 0) {
-            return this.eventQueues.keys().next().value;
+        } else if(this.registeredRoots.length > 0) {
+            return this.registeredRoots[0];
         } else {
             return null;
         }
@@ -106,36 +80,44 @@ export class KeyboardDriver implements Driver {
     }
 
     /**
-     * Push a new {@link KeyPress} event to {@link KeyboardDriver#eventQueues}.
+     * Dispatch a new {@link KeyPress} event to the
+     * {@link KeyboardDriver#getEffectiveFocusedRoot | effective focused Root}.
      *
      * @param key - Must follow the {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values | KeyboardEvent.key} Web API.
      * @param shift - Is shift being pressed?
      * @param ctrl - Is control being pressed?
      * @param alt - Is alt being pressed?
+     * @returns Returns a list of dispatched events and whether they were captured.
      */
-    keyDown(key: string, shift: boolean, ctrl: boolean, alt: boolean): void {
+    keyDown(key: string, shift: boolean, ctrl: boolean, alt: boolean): CaptureList {
         this.keysDown.add(key);
-        const eventQueue = this.getEventQueue(this.getEffectiveFocusedRoot());
-        if(eventQueue !== null) {
-            eventQueue.push(new KeyPress(key, shift, ctrl, alt, null));
+        const root = this.getEffectiveFocusedRoot();
+        if(root) {
+            return root.dispatchEvent(new KeyPress(key, shift, ctrl, alt, null));
         }
+
+        return [];
     }
 
     /**
-     * Push a new {@link KeyRelease} event to {@link KeyboardDriver#eventQueues}.
+     * Dispatch a new {@link KeyRelease} event to the
+     * {@link KeyboardDriver#getEffectiveFocusedRoot | effective focused Root}.
      *
      * @param key - Must follow the {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values | KeyboardEvent.key} Web API.
      * @param shift - Is shift being pressed?
      * @param ctrl - Is control being pressed?
      * @param alt - Is alt being pressed?
+     * @returns Returns a list of dispatched events and whether they were captured.
      */
-    keyUp(key: string, shift: boolean, ctrl: boolean, alt: boolean): void {
+    keyUp(key: string, shift: boolean, ctrl: boolean, alt: boolean): CaptureList {
         if(this.keysDown.delete(key)) {
-            const eventQueue = this.getEventQueue(this.getEffectiveFocusedRoot());
-            if(eventQueue !== null) {
-                eventQueue.push(new KeyRelease(key, shift, ctrl, alt, null));
+            const root = this.getEffectiveFocusedRoot();
+            if(root) {
+                return root.dispatchEvent(new KeyRelease(key, shift, ctrl, alt, null));
             }
         }
+
+        return [];
     }
 
     /**
@@ -147,13 +129,16 @@ export class KeyboardDriver implements Driver {
      * @param shift - Is shift being pressed?
      * @param ctrl - Is control being pressed?
      * @param alt - Is alt being pressed?
+     * @returns Returns a list of dispatched events and whether they were captured.
      */
-    keyPress(key: string, shift: boolean, ctrl: boolean, alt: boolean): void {
+    keyPress(key: string, shift: boolean, ctrl: boolean, alt: boolean): CaptureList {
         const wasDown = this.isKeyDown(key);
-        this.keyDown(key, shift, ctrl, alt);
+        const captured = this.keyDown(key, shift, ctrl, alt);
         if(!wasDown) {
-            this.keyUp(key, shift, ctrl, alt);
+            captured.push(...this.keyUp(key, shift, ctrl, alt));
         }
+
+        return captured;
     }
 
     /**
@@ -168,46 +153,35 @@ export class KeyboardDriver implements Driver {
     }
 
     /**
-     * Adds enabled root to {@link KeyboardDriver#eventQueues}.
+     * Adds enabled root to {@link KeyboardDriver#registeredRoots}.
      */
     onEnable(root: Root): void {
-        if(!this.eventQueues.has(root)) {
-            this.eventQueues.set(root, []);
+        if(this.registeredRoots.indexOf(root) >= 0) {
+            console.warn('KeyboardDriver was already registered to the Root, but "onEnable" was called');
+        } else {
+            this.registeredRoots.push(root);
         }
     }
 
     /**
-     * Removes disabled root from {@link KeyboardDriver#eventQueues}. If the
+     * Removes disabled root from {@link KeyboardDriver#registeredRoots}. If the
      * root was the {@link KeyboardDriver#focus}, then
      * {@link KeyboardDriver#clearFocus | the focus is cleared }.
      */
     onDisable(root: Root): void {
-        if(this.eventQueues.has(root)) {
-            this.eventQueues.delete(root);
+        const index = this.registeredRoots.indexOf(root);
+        if(index < 0) {
+            console.warn('KeyboardDriver was not registered to the Root, but "onDisable" was called');
+        } else {
+            this.registeredRoots.splice(index, 1);
             if(root === this.focus) {
                 this.clearFocus();
             }
         }
     }
 
-    /**
-     * Dispatches all {@link KeyboardDriver#eventQueues | queued events } for
-     * the root and clears its event queue
-     */
-    update(root: Root): void {
-        const eventQueue = this.getEventQueue(root);
-        if(eventQueue === null) {
-            return;
-        }
-
-        // Dispatch queued keyboard events
-        for(const event of eventQueue) {
-            root.dispatchEvent(event);
-        }
-
-        // Clear event queue
-        eventQueue.length = 0;
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    update(_root: Root): void {}
 
     /**
      * Does nothing if the new focus type is not a {@link FocusType.Keyboard}.
@@ -216,6 +190,10 @@ export class KeyboardDriver implements Driver {
      * {@link KeyboardDriver#changeFocusedRoot | changed to the new root}. If
      * there is no new focused widget (the root's keyboard focus was cleared),
      * then nothing happens.
+     *
+     * If a {@link Root} becomes focused (with any focus type, not just keyboard
+     * focus), it is moved to the beginning of the
+     * {@link KeyboardDriver#registeredRoots} list.
      *
      * This behaviour is confusing, however, it's required so that the keyboard
      * focus "lingers" for future tab key presses; this way, pressing tab can do
@@ -227,14 +205,17 @@ export class KeyboardDriver implements Driver {
      */
     onFocusChanged(root: Root, focusType: FocusType, newFocus: Widget | null): void {
         if(newFocus !== null) {
-            this.lastActivity = root;
+            const oldIndex = this.registeredRoots.indexOf(root);
+
+            if (oldIndex < 0) {
+                console.warn("Focus changed to Root which doesn't have this KeyboardDriver attached");
+            } else if (oldIndex > 0) {
+                this.registeredRoots.splice(oldIndex, 1);
+                this.registeredRoots.unshift(root);
+            }
         }
 
-        if(focusType !== FocusType.Keyboard) {
-            return;
-        }
-
-        if(root !== this.focus && newFocus !== null) {
+        if(focusType === FocusType.Keyboard && root !== this.focus && newFocus !== null) {
             this.changeFocusedRoot(root);
         }
     }

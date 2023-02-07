@@ -3,6 +3,8 @@ import { CornerRadii, NonUniformCornerRadius } from '../widgets/CornerRadii';
 /**
  * CanvasRenderingContext2D.roundRect, but safe to use in browsers without
  * support, like Firefox.
+ *
+ * @category Helper
  */
 export function safeRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radii: CornerRadii) {
     // XXX implemented by following the spec:

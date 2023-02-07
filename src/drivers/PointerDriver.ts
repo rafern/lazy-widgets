@@ -68,7 +68,7 @@ export class PointerDriver implements Driver {
         if(state.hovering) {
             // Dispatch Leave event if hovering
             this.dispatchEvent(
-                root, new Leave(root.getFocusCapturer(FocusType.Pointer))
+                root, state, new Leave(root.getFocusCapturer(FocusType.Pointer))
             );
         }
         state.hovering = false;
@@ -182,7 +182,8 @@ export class PointerDriver implements Driver {
      */
     movePointer(root: Root, pointer: number, xNorm: number, yNorm: number, pressing: number | null, shift: boolean, ctrl: boolean, alt: boolean): boolean {
         const state = this.states.get(root);
-        if(typeof state === 'undefined') {
+        if(state === undefined) {
+            console.warn('PointerDriver was not registered to Root, but tried to dispatch an event to it');
             return false;
         }
 
@@ -216,13 +217,18 @@ export class PointerDriver implements Driver {
 
                 captured ||= this.dispatchEvent(
                     root,
+                    state,
                     new (isPressed ? PointerPress : PointerRelease)(x, y, bit, shift, ctrl, alt)
                 );
             }
 
             state.pressing = pressing;
         } else {
-            captured = this.dispatchEvent(root, new PointerMove(x, y, shift, ctrl, alt));
+            captured = this.dispatchEvent(
+                root,
+                state,
+                new PointerMove(x, y, shift, ctrl, alt)
+            );
         }
 
         // Update pointer's hint
@@ -244,7 +250,8 @@ export class PointerDriver implements Driver {
      */
     leavePointer(root: Root, pointer: number): boolean {
         const state = this.states.get(root);
-        if(typeof state === 'undefined') {
+        if(state === undefined) {
+            console.warn('PointerDriver was not registered to Root, but tried to dispatch an event to it');
             return false;
         }
 
@@ -253,7 +260,11 @@ export class PointerDriver implements Driver {
             state.hovering = false;
             state.pressing = 0;
             state.dragLast = null;
-            const captured = this.dispatchEvent(root, new Leave(root.getFocusCapturer(FocusType.Pointer)));
+            const captured = this.dispatchEvent(
+                root,
+                state,
+                new Leave(root.getFocusCapturer(FocusType.Pointer))
+            );
             this.setPointerHint(pointer, PointerHint.None);
             return captured;
         } else {
@@ -292,7 +303,8 @@ export class PointerDriver implements Driver {
      */
     wheelPointer(root: Root, pointer: number, xNorm: number, yNorm: number, deltaX: number, deltaY: number, deltaZ: number, deltaMode: PointerWheelMode, shift: boolean, ctrl: boolean, alt: boolean): boolean {
         const state = this.states.get(root);
-        if(typeof state === 'undefined') {
+        if(state === undefined) {
+            console.warn('PointerDriver was not registered to Root, but tried to dispatch an event to it');
             return false;
         }
 
@@ -306,6 +318,7 @@ export class PointerDriver implements Driver {
         const [x, y] = this.denormaliseCoords(root, xNorm, yNorm);
         return this.dispatchEvent(
             root,
+            state,
             new PointerWheel(x, y, deltaX, deltaY, deltaZ, deltaMode, false, shift, ctrl, alt)
         );
     }
@@ -343,6 +356,11 @@ export class PointerDriver implements Driver {
      * Creates a state for the enabled root in {@link PointerDriver#states}.
      */
     onEnable(root: Root): void {
+        if (this.states.has(root)) {
+            console.warn('PointerDriver was already registered to the Root, but "onEnable" was called');
+            return;
+        }
+
         // Create new state for UI that just got enabled
         this.states.set(root, <PointerDriverState>{
             pointer: null,
@@ -358,12 +376,17 @@ export class PointerDriver implements Driver {
      * the disabled root from {@link PointerDriver#states}.
      */
     onDisable(root: Root): void {
+        if (!this.states.has(root)) {
+            console.warn('PointerDriver was not registered to the Root, but "onDisable" was called');
+            return;
+        }
+
         // Dispatch leave event
         root.dispatchEvent(new Leave());
 
         // Reset hint for assigned pointer and stop dragging
         const state = this.states.get(root);
-        if(typeof state !== 'undefined' && state.pointer !== null) {
+        if(state !== undefined && state.pointer !== null) {
             this.setPointerHint(state.pointer, PointerHint.None);
             state.dragLast = null;
         }
@@ -372,10 +395,6 @@ export class PointerDriver implements Driver {
         this.states.delete(root);
     }
 
-    /**
-     * Update the pointer driver. Does nothing, as the pointer driver dispatches
-     * pointer events immediately.
-     */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     update(_root: Root): void {}
 
@@ -384,12 +403,7 @@ export class PointerDriver implements Driver {
      *
      * @returns Returns true if the event was captured
      */
-    private dispatchEvent(root: Root, event: Event): boolean {
-        const state = this.states.get(root);
-        if(typeof state === 'undefined') {
-            return false;
-        }
-
+    private dispatchEvent(root: Root, state: PointerDriverState, event: Event): boolean {
         // Check if drag to scroll is enabled for this root
         const dragToScroll = state.pointer === null
             ? false
@@ -399,11 +413,19 @@ export class PointerDriver implements Driver {
         // doing dragging logic
         if(event instanceof PointerEvent && state.dragLast !== null) {
             const [startX, startY] = state.dragLast;
-            const captured = root.dispatchEvent(new PointerWheel(
+            const capturedList = root.dispatchEvent(new PointerWheel(
                 ...state.dragOrigin,
                 startX - event.x, startY - event.y, 0,
                 PointerWheelMode.Pixel, false, false, false, true,
             ));
+
+            let captured = false;
+            for (const [_event, eventCaptured] of capturedList) {
+                if (eventCaptured) {
+                    captured = true;
+                    break;
+                }
+            }
 
             if(event instanceof PointerRelease) {
                 state.dragLast = null;

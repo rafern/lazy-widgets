@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
+                DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
+                ValidatedVariable, Background
+            } from '../dist/index.esm.js';
+
+            // Create the roots
+            function makeRoot() {
+                const label = new Label('Hello world!');
+
+                const root = new DOMRoot(
+                    new Background(
+                        new Margin(
+                            new Column()
+                            .add(label)
+                            .add(
+                                new TextInput(new ValidatedVariable('', null, value => {
+                                    label.text = `Text input: ${value}`;
+                                }, false))
+                            )
+                            .add(
+                                new Row({
+                                    multiContainerAlignment: {
+                                        main: FlexAlignment.Center,
+                                        cross: Alignment.Stretch
+                                    },
+                                }).add([
+                                    new TextButton('Button 1', () => label.text = 'Button 1 clicked!'),
+                                    new TextButton('Button 2', () => label.text = 'Button 2 clicked!'),
+                                ])
+                            )
+                        )
+                    )
+                );
+
+                // Create, bind DOM and register the keyboard driver
+                const keyboardDriver = new DOMKeyboardDriver();
+                keyboardDriver.bindDOMElem(root.domElem);
+                root.registerDriver(keyboardDriver);
+
+                // Create, bind DOM and register the pointer driver
+                const pointerDriver = new DOMPointerDriver();
+                pointerDriver.bindDOMElem(root, root.domElem);
+                root.registerDriver(pointerDriver);
+
+                // Add root to body
+                document.body.appendChild(root.domElem);
+
+                return root;
+            }
+
+            const roots = [];
+            for (let i = 0; i < 10; i++) {
+                roots.push(makeRoot());
+            }
+
+            // Run the update loop
+            function updateLoop() {
+                for (const root of roots) {
+                    root.update();
+                }
+
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>
