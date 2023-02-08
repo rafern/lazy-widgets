@@ -259,12 +259,12 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         } else {
             // remove from enabled roots list in group
             const group = this.getGroup(root);
-            const index = group.enabledRoots.indexOf(root);
-            if (index < 0) {
+            const groupIndex = group.enabledRoots.indexOf(root);
+            if (groupIndex < 0) {
                 throw new Error("Root not found in group's enabled root list; this is a bug, please report it");
             }
 
-            group.enabledRoots.splice(index, 1);
+            group.enabledRoots.splice(groupIndex, 1);
 
             // remove from access list
             this.accessList.splice(index, 1);
