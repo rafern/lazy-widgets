@@ -10,7 +10,6 @@ import { PointerMove } from '../events/PointerMove';
 import { TextHelper } from '../helpers/TextHelper';
 import { AutoScroll } from '../events/AutoScroll';
 import type { Viewport } from '../core/Viewport';
-import { TabSelect } from '../events/TabSelect';
 import type { Bounds } from '../helpers/Bounds';
 import { KeyPress } from '../events/KeyPress';
 import { FocusType } from '../core/FocusType';
@@ -137,6 +136,18 @@ export class TextInput extends Widget {
     readonly variable: ValidatedVariable<string, unknown>;
     /** The callback used for the {@link TextInput#"variable"} */
     private readonly callback: () => void;
+    /**
+     * Is tab mode enabled? When enabled, pressing the tab key will type a tab
+     * character instead of changing focus.
+     *
+     * Toggled automatically by pressing ctrl+m, but can be manually toggled by
+     * changing this flag. If the TextInput grabs the keyboard focus, then this
+     * is automatically disabled so that user flow isn't unexpectedly
+     * interrupted.
+     *
+     * Does nothing if {@link TextInput#typeableTab} is disabled.
+     */
+    tabModeEnabled = false;
 
     /** Create a new TextInput. */
     constructor(variable: ValidatedVariable<string, unknown> = new ValidatedVariable(''), properties?: Readonly<TextInputProperties>) {
@@ -604,6 +615,7 @@ export class TextInput extends Widget {
             this.selectPos = this.variable.value.length;
             this.cursorPos = this.selectPos;
             this.cursorOffsetDirty = true;
+            this.tabModeEnabled = false;
             this.autoScrollCaret();
         }
     }
@@ -782,6 +794,10 @@ export class TextInput extends Widget {
                     this.selectPos = 0;
                     this.cursorOffsetDirty = true;
                     this.markWholeAsDirty();
+                } else if(event.key === 'm' || event.key === 'M') {
+                    if (this.typeableTab) {
+                        this.tabModeEnabled = !this.tabModeEnabled;
+                    }
                 } else {
                     return this;
                 }
@@ -824,17 +840,8 @@ export class TextInput extends Widget {
             } else if(event.key === 'Enter') {
                 this.insertText('\n');
             } else if(event.key === 'Tab') {
-                if(this.typeableTab) {
-                    // HACK if shift if being held, do a tab-selection but don't
-                    // do reverse order. not capturing the event makes its do it
-                    // in normal order, so manually do tab-selection and capture
-                    // the event
-                    if(event.shift) {
-                        root.dispatchEvent(new TabSelect(this, false));
-                        return this;
-                    } else {
-                        this.insertText('\t');
-                    }
+                if(!event.shift && this.typeableTab && this.tabModeEnabled) {
+                    this.insertText('\t');
                 } else {
                     return null; // don't capture, let tab select another widget
                 }
