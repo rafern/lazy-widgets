@@ -14,8 +14,13 @@
                 ValidatedVariable, Background
             } from '../dist/index.esm.js';
 
+            // Create drivers
+            const keyboardDriver = new DOMKeyboardDriver();
+            const pointerDriver = new DOMPointerDriver();
+
             // Create the roots
-            function makeRoot(container) {
+            let groupedKeyboardDriver = null;
+            function makeRoot(container, wrapsAround) {
                 const label = new Label('Hello world!');
 
                 const root = new DOMRoot(
@@ -43,13 +48,11 @@
                     )
                 );
 
-                // Create, bind DOM and register the keyboard driver
-                const keyboardDriver = new DOMKeyboardDriver();
-                keyboardDriver.bindDOMElem(root.domElem);
+                // Bind DOM and register the keyboard driver
+                keyboardDriver.bindSingletRoot(root, { domElem: root.domElem, wrapsAround });
                 root.registerDriver(keyboardDriver);
 
-                // Create, bind DOM and register the pointer driver
-                const pointerDriver = new DOMPointerDriver();
+                // Bind DOM and register the pointer driver
                 pointerDriver.bindDOMElem(root, root.domElem);
                 root.registerDriver(pointerDriver);
 
@@ -63,8 +66,9 @@
 
             for (const containerID of ['top-container', 'bottom-container']) {
                 const container = document.getElementById(containerID);
+
                 for (let i = 0; i < 5; i++) {
-                    roots.push(makeRoot(container));
+                    roots.push(makeRoot(container, i === 2));
                 }
             }
 

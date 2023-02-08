@@ -23,7 +23,7 @@
 
             // Create, bind DOM and register the keyboard driver
             const keyboardDriver = new DOMKeyboardDriver();
-            keyboardDriver.bindDOMElem(root.domElem);
+            keyboardDriver.bindSingletRoot(root, { domElem: root.domElem });
             root.registerDriver(keyboardDriver);
 
             // Create, bind DOM and register the pointer driver

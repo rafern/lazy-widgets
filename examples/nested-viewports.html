@@ -62,7 +62,7 @@
             const pointerDriver = new DOMPointerDriver();
 
             // Register roots and bind DOM elements to drivers
-            keyboardDriver.bindDOMElem(root.domElem);
+            keyboardDriver.bindSingletRoot(root, { domElem: root.domElem });
             root.registerDriver(keyboardDriver);
 
             pointerDriver.bindDOMElem(root, root.domElem);

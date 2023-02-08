@@ -44,9 +44,15 @@
             const vkRoot = new DOMVirtualKeyboardRoot(keyboardDriver);
 
             // Register roots and bind DOM elements to drivers
-            keyboardDriver.bindDOMElem(root.domElem);
+            keyboardDriver.bindSingletRoot(root, { domElem: root.domElem });
             root.registerDriver(keyboardDriver);
-            keyboardDriver.bindDOMElem(vkRoot.domElem);
+            // XXX bind virtual keyboard's DOM element to the keyboard driver,
+            // but don't register the driver with the VK's Root. this ensures
+            // that the keyboard driver doesn't detect the selection of the VK
+            // as an out-of-focus event
+            // XXX selectable is set to false so that pressing tab doesn't
+            // select a button in the virtual keyboard
+            keyboardDriver.bindSingletRoot(vkRoot, { domElem: vkRoot.domElem, selectable: false });
 
             pointerDriver.bindDOMElem(root, root.domElem);
             root.registerDriver(pointerDriver);

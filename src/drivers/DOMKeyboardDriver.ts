@@ -1,6 +1,9 @@
 import { KeyboardDriver } from './KeyboardDriver';
-import { Msg } from '../core/Strings';
+import type { KeyboardDriverGroup, KeyboardDriverGroupOptions } from './KeyboardDriver';
 import type { CaptureList } from '../core/CaptureList';
+import type { TabKeyHelper } from '../helpers/TabKeyHelper';
+import { getTabKeyHelper } from '../helpers/TabKeyHelper';
+import { TabSelect } from '../events/TabSelect';
 
 /**
  * Unpack a KeyboardEvent into a 4-tuple containing the event's key and modifier
@@ -16,16 +19,31 @@ function unpackKeyboardEvent(event: KeyboardEvent): [key: string, shift: boolean
 }
 
 /**
- * A container which has all the event listeners for a {@link Root} DOM bind to
- * a {@link DOMKeyboardDriver}; a link between a DOM element and an existing
- * Root.
+ * A {@link KeyboardDriverGroup} bound to a DOM element, with extra properties
+ * used for cleaning up event listeners.
  *
  * @category Driver
  */
-export interface DOMKeyboardDriverBind {
-    blurListen: ((this: HTMLElement, event: FocusEvent) => void) | null,
-    keydownListen: ((this: HTMLElement, event: KeyboardEvent) => void) | null,
-    keyupListen: ((this: HTMLElement, event: KeyboardEvent) => void) | null
+export interface DOMKeyboardDriverGroup extends KeyboardDriverGroup {
+    domElem: HTMLElement,
+    focusListen: (event: FocusEvent) => void,
+    blurListen: (event: FocusEvent) => void,
+    keydownListen: ((event: KeyboardEvent) => void) | null,
+    keyupListen: ((event: KeyboardEvent) => void) | null,
+    origTabIndex: number,
+    selectable: boolean,
+}
+
+/**
+ * {@link KeyboardDriverGroupOptions} used for creating a new
+ * {@link DOMKeyboardDriverGroup}.
+ *
+ * @category Driver
+ */
+export interface DOMKeyboardDriverGroupOptions extends KeyboardDriverGroupOptions {
+    domElem: HTMLElement;
+    listenToKeys?: boolean;
+    selectable?: true;
 }
 
 /**
@@ -37,12 +55,16 @@ export interface DOMKeyboardDriverBind {
  *
  * @category Driver
  */
-export class DOMKeyboardDriver extends KeyboardDriver {
-    /**
-     * The list of HTML DOM elements bound to this keyboard driver and their
-     * event listeners
-     */
-    private domElems: Map<HTMLElement, DOMKeyboardDriverBind> = new Map();
+export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DOMKeyboardDriverGroupOptions> {
+    private tabKeyHelper: TabKeyHelper;
+
+    constructor() {
+        super();
+
+        // Get tab helper. This will be used for checking if tab is pressed in
+        // the "focus" event handler
+        this.tabKeyHelper = getTabKeyHelper();
+    }
 
     /** Calls preventDefault on a keyboard event if needed. */
     maybePreventDefault(captureList: CaptureList, event: KeyboardEvent): void {
@@ -61,92 +83,22 @@ export class DOMKeyboardDriver extends KeyboardDriver {
         }
     }
 
-    /**
-     * Bind an HTML DOM element to this keyboard driver.
-     *
-     * If the root was already bound,
-     * {@link DOMKeyboardDriver#removeListeners} is called, replacing the old
-     * listeners. Populates {@link DOMKeyboardDriver#domElems} with the new
-     * bind.
-     *
-     * @param listenToKeys - If true, event listeners will be added to listen for keys. blur event listeners are always added no matter what.
-     */
-    bindDOMElem(domElem: HTMLElement, listenToKeys = true): void {
-        let bind = this.domElems.get(domElem);
-        if(bind !== undefined) {
-            console.warn(Msg.DOM_DRIVER_REBIND);
-            this.removeListeners(domElem, bind);
-        } else {
-            bind = <DOMKeyboardDriverBind>{
-                blurListen: null,
-                keydownListen: null,
-                keyupListen: null
-            };
-            this.domElems.set(domElem, bind);
-        }
-
-        this.addListeners(domElem, bind, listenToKeys);
-    }
-
-    /**
-     * Unbind an HTML DOM element from this keyboard driver. Removes all used
-     * listeners.
-     */
-    unbindDOMElem(domElem: HTMLElement): void {
-        const bind = this.domElems.get(domElem);
-        if(bind === undefined) {
+    private dispatchTabSelect(group: DOMKeyboardDriverGroup, directionReversed: boolean) {
+        const rootCount = group.enabledRoots.length;
+        if (rootCount === 0) {
             return;
         }
 
-        this.removeListeners(domElem, bind);
-        this.domElems.delete(domElem);
-    }
+        const delta = directionReversed ? -1 : 1;
+        let i = directionReversed ? (rootCount - 1) : 0;
 
-    /** Add pointer event listeners to DOM element. */
-    private addListeners(domElem: HTMLElement, bind: DOMKeyboardDriverBind, listenToKeys = true): void {
-        // Listen for keyboard events, filling event queue, and blur event for
-        // clearing keyboard focus
-        bind.blurListen = (event) => {
-            // XXX should the HTMLElement cast be done?
-            if(this.shouldClearFocus(event.relatedTarget as HTMLElement)) {
-                this.clearFocus();
+        for (; i >= 0 && i < rootCount; i += delta) {
+            const captureList = group.enabledRoots[i].dispatchEvent(new TabSelect(null, directionReversed));
+            for (const [event, captured] of captureList) {
+                if (captured && event instanceof TabSelect) {
+                    return;
+                }
             }
-        };
-
-        domElem.addEventListener('blur', bind.blurListen);
-
-        if(listenToKeys) {
-            bind.keydownListen = (event) => {
-                this.maybePreventDefault(this.keyDown(...unpackKeyboardEvent(event)), event);
-            };
-
-            bind.keyupListen = (event) => {
-                this.maybePreventDefault(this.keyUp(...unpackKeyboardEvent(event)), event);
-            };
-
-            domElem.addEventListener('keydown', bind.keydownListen);
-            domElem.addEventListener('keyup', bind.keyupListen);
-        }
-    }
-
-    /**
-     * Remove event listeners from DOM element and unset tracked listeners in
-     * bind.
-     */
-    private removeListeners(domElem: HTMLElement, bind: DOMKeyboardDriverBind): void {
-        if(bind.blurListen) {
-            domElem.removeEventListener('blur', bind.blurListen);
-            bind.blurListen = null;
-        }
-
-        if(bind.keydownListen) {
-            domElem.removeEventListener('keydown', bind.keydownListen);
-            bind.keydownListen = null;
-        }
-
-        if(bind.keyupListen) {
-            domElem.removeEventListener('keyup', bind.keyupListen);
-            bind.keyupListen = null;
         }
     }
 
@@ -157,6 +109,149 @@ export class DOMKeyboardDriver extends KeyboardDriver {
      * @param newTarget - The HTML DOM element to which the focus has been lost to
      */
     shouldClearFocus(newTarget: HTMLElement | null): boolean {
-        return newTarget === null || !this.domElems.has(newTarget);
+        if (newTarget === null) {
+            return true;
+        }
+
+        for (const group of this.groups) {
+            // XXX even if the group is not selectable, the focus should still
+            // not be cleared when a non-selectable group's DOM element is
+            // focused, since it can be focused by clicking with the mouse
+            if (group.domElem === newTarget) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    override createGroup(options: DOMKeyboardDriverGroupOptions): DOMKeyboardDriverGroup {
+        // assert that the DOM element isn't already assigned
+        const domElem = options.domElem;
+        const listenToKeys = !!(options.listenToKeys ?? true);
+        const selectable = !!(options.selectable ?? true);
+        if (!domElem || !(domElem instanceof HTMLElement)) {
+            throw new Error('DOM element is not valid');
+        }
+
+        for (const group of this.groups) {
+            if (group.domElem === domElem) {
+                throw new Error('DOM element is already assigned to a group');
+            }
+        }
+
+        // make group
+        const group = super.createGroup(options);
+        group.domElem = domElem;
+
+        // change tabIndex of DOM element
+        group.origTabIndex = domElem.tabIndex;
+
+        if (!selectable) {
+            // XXX even if an html element is not focusable by default, tabindex
+            // still needs to be set to -1 if it's not meant to be focusable.
+            // this is because there are a lot of edge cases where the tabindex
+            // is reported as -1 if it's not set, but the element is actually
+            // focusable because, for example, contenteditable is true
+            domElem.tabIndex = -1;
+        } else if (domElem.tabIndex < 0) {
+            domElem.tabIndex = 0;
+        }
+
+        // add listeners
+        group.focusListen = async (event: FocusEvent) => {
+            if (!selectable || group.enabledRoots.length === 0) {
+                return;
+            }
+
+            // HACK only auto-send tab event if the focus event was caused by
+            // pressing tab. there is no api for this, but we can monkey-patch
+            // it:
+            // 1. check relatedTarget. if null, then focus was caused by calling
+            //    the `.focus()` method
+            // 2. check if tab key is down. focus direction can be determined by
+            //    checking if shift key is down
+            // there is also no api for checking if a key is pressed, so we have
+            // to use a global key listener in the page.
+            // the keyboard state is invalid when focusing the window, so an
+            // extra check is also needed for that.
+            if ((event.relatedTarget && this.tabKeyHelper.pressed) || await this.tabKeyHelper.isTabInitiatedFocus()) {
+                // BUG if the focus is caused by the window itself getting
+                // focus, then it's impossible to tell the direction of the tab
+                // since no keydown event is ever dispatched. this means that
+                // tabbing into a window/iframe without pressing shift will have
+                // the correct behaviour, but SHIFT-tabbing into a window will
+                // not:
+                // 1. the last root will be selected (correct)
+                // 2. shift will be detected as not pressed (incorrect)
+                // 3. the first widget will be tabselected instead of the last
+                //    (incorrect)
+                // a way to work around this bug would be to detect if there are
+                // any elements with tabindex BEFORE the domElem, only if this
+                // focus is caused by focusing the window, but this won't work
+                // if the bound DOM element is the only element in the page with
+                // a tabindex, and it's very expensive to query the entire DOM
+                // every time the user tabs into a window/iframe
+                this.dispatchTabSelect(group, this.tabKeyHelper.directionReversed);
+            }
+        };
+
+        group.blurListen = (event: FocusEvent) => {
+            // XXX should the HTMLElement cast be done?
+            if(this.shouldClearFocus(event.relatedTarget as (HTMLElement | null))) {
+                this.clearFocus();
+            }
+        };
+
+        domElem.addEventListener('focus', group.focusListen);
+        domElem.addEventListener('blur', group.blurListen);
+
+        if(listenToKeys) {
+            group.keydownListen = (event: KeyboardEvent) => {
+                this.maybePreventDefault(this.keyDown(...unpackKeyboardEvent(event)), event);
+            };
+
+            group.keyupListen = (event: KeyboardEvent) => {
+                this.maybePreventDefault(this.keyUp(...unpackKeyboardEvent(event)), event);
+            };
+
+            domElem.addEventListener('keydown', group.keydownListen);
+            domElem.addEventListener('keyup', group.keyupListen);
+        } else {
+            group.keydownListen = null;
+            group.keyupListen = null;
+        }
+
+        // reference tab helper if this is the first group
+        if (this.groups.length === 1) {
+            this.tabKeyHelper.ref(this);
+        }
+
+        return group;
+    }
+
+    override deleteGroup(group: DOMKeyboardDriverGroup): void {
+        // delete group
+        super.deleteGroup(group);
+
+        // unreference tab helper if there are no groups anymore
+        if (this.groups.length === 0) {
+            this.tabKeyHelper.unref(this);
+        }
+
+        // clean up tabIndex
+        group.domElem.tabIndex = group.origTabIndex;
+
+        // clean up listeners
+        group.domElem.removeEventListener('focus', group.focusListen);
+        group.domElem.removeEventListener('blur', group.blurListen);
+
+        if(group.keydownListen) {
+            group.domElem.removeEventListener('keydown', group.keydownListen);
+        }
+
+        if(group.keyupListen) {
+            group.domElem.removeEventListener('keyup', group.keyupListen);
+        }
     }
 }

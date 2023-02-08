@@ -363,13 +363,6 @@ export class Root {
         }
 
         if(event instanceof TabSelect) {
-            // if(event.reachedRelative && captured === null) {
-            //     // If the tab selection failed even though the relative widget
-            //     // was reached, then the end of the search was likely reached.
-            //     // Try to start from the beginning again
-            //     captured = this.child.dispatchEvent(event);
-            // }
-
             if(captured) {
                 if(!event.reachedRelative && !Root.badTabCaptureWarned) {
                     Root.badTabCaptureWarned = true;
