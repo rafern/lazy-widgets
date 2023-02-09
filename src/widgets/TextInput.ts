@@ -126,6 +126,7 @@ export class TextInput extends Widget {
      * move to the next widget instead of typing the character, not move to the
      * previous focusable widget.
      */
+    @watchField(TextInput.prototype.markDirtyCaret)
     typeableTab: boolean;
     /**
      * Should the caret position be {@link AutoScroll | auto-scrolled} after the
@@ -147,6 +148,7 @@ export class TextInput extends Widget {
      *
      * Does nothing if {@link TextInput#typeableTab} is disabled.
      */
+    @watchField(TextInput.prototype.markDirtyCaret)
     tabModeEnabled = false;
 
     /** Create a new TextInput. */
@@ -174,6 +176,13 @@ export class TextInput extends Widget {
     private hideTextWatchCallback(): void {
         this.cursorOffsetDirty = true;
         this.markWholeAsDirty();
+    }
+
+    /** Internal method for updating the caret rendering. */
+    private markDirtyCaret(): void {
+        if (this.blinkWasOn) {
+            this.markWholeAsDirty();
+        }
     }
 
     protected handleChange(): void {
@@ -230,9 +239,11 @@ export class TextInput extends Widget {
         } else if(property === 'inputBackgroundFill' ||
                 property === 'inputTextFill' ||
                 property === 'inputTextFillInvalid' ||
-                property === 'inputTextFillDisabled' ||
-                property === 'cursorThickness') {
+                property === 'inputTextFillDisabled') {
             this.markWholeAsDirty();
+        } else if(property === 'cursorThickness' ||
+                property === 'cursorIndicatorSize') {
+            this.markDirtyCaret();
         } else if(property === 'inputTextAlign') {
             this.cursorOffsetDirty = true;
         }
@@ -307,6 +318,10 @@ export class TextInput extends Widget {
     /** The current line number, starting from 0. */
     get line(): number {
         return this.textHelper.getLine(this.cursorPos);
+    }
+
+    get effectiveTabMode(): boolean {
+        return this.typeableTab && this.tabModeEnabled;
     }
 
     /** Auto-scroll to the caret if the {@link blinkStart | caret is shown}. */
@@ -1126,7 +1141,60 @@ export class TextInput extends Widget {
         this.blinkWasOn = blinkOn;
         if(blinkOn) {
             ctx.fillStyle = fillStyle;
-            ctx.fillRect(...this.caretAbsoluteRect);
+            const [cx, cy, cw, ch] = this.caretAbsoluteRect;
+            ctx.fillRect(cx, cy, cw, ch);
+
+            if (this.effectiveTabMode) {
+                const indicatorSize = Math.min(ch, this.cursorIndicatorSize);
+                const indicatorThickness = Math.min(cw * 0.4, this.cursorThickness);
+
+                // pre-calc arrow points:
+                //      2----3        <- top
+                //       `\.  `\.
+                // 0--------1    4    <- mty (mid top Y)
+                // |             |
+                // 9--------8    5    <- mby (mid bottom Y)
+                //       ,/'  ,/'
+                //      7----6        <- bottom
+                //
+                // ^    ^   ^^   ^
+                // |    |   ||   |
+                // left |   ||   right
+                //      |   |mrx (mid right x)
+                //      |   ix (inner X)
+                //      mlx (mid left x)
+
+                const halfSize = indicatorSize / 2;
+                const halfThickness = indicatorThickness / 2;
+                const left = cx + cw * 2;
+                const unroundedRight = left + indicatorSize;
+                const right = Math.ceil(unroundedRight);
+                const top = Math.floor(cy);
+                const unroundedBottom = cy + indicatorSize;
+                const bottom = Math.ceil(unroundedBottom);
+                const midX = left + halfSize;
+                const mlx = Math.floor(midX - halfThickness);
+                const mrx = Math.ceil(midX + halfThickness);
+                const ix = Math.floor(unroundedRight - halfThickness);
+                const midY = cy + halfSize;
+                const mty = Math.floor(midY - halfThickness);
+                const mby = Math.ceil(midY + halfThickness);
+
+                // paint tab indicator arrow
+                ctx.beginPath();
+                ctx.moveTo(left, mty);
+                ctx.lineTo(ix, mty);
+                ctx.lineTo(mlx, top);
+                ctx.lineTo(mrx, top);
+                ctx.lineTo(right, mty);
+                ctx.lineTo(right, mby);
+                ctx.lineTo(mrx, bottom);
+                ctx.lineTo(mlx, bottom);
+                ctx.lineTo(ix, mby);
+                ctx.lineTo(left, mby);
+                ctx.closePath();
+                ctx.fill();
+            }
         }
 
         // Stop clipping

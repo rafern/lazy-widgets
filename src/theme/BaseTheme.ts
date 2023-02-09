@@ -104,6 +104,7 @@ export class BaseTheme implements ThemeProperties {
         this._inputTextAlign = properties.inputTextAlign;
         this._blinkRate = properties.blinkRate;
         this._cursorThickness = properties.cursorThickness;
+        this._cursorIndicatorSize = properties.cursorIndicatorSize;
         this._scrollBarThickness = properties.scrollBarThickness;
         this._scrollBarMinPercent = properties.scrollBarMinPercent;
         this._scrollBarMinPixels = properties.scrollBarMinPixels;
@@ -548,6 +549,20 @@ export class BaseTheme implements ThemeProperties {
         if(this._cursorThickness !== value) {
             this._cursorThickness = value;
             this.onThemeUpdated('cursorThickness');
+        }
+    }
+
+    /** See {@link BaseTheme#cursorIndicatorSize}. For internal use only. */
+    private _cursorIndicatorSize?: number;
+
+    get cursorIndicatorSize(): number {
+        return this._cursorIndicatorSize ?? this._fallbackTheme?.cursorIndicatorSize ?? 5;
+    }
+
+    set cursorIndicatorSize(value: number | undefined) {
+        if(this._cursorIndicatorSize !== value) {
+            this._cursorIndicatorSize = value;
+            this.onThemeUpdated('cursorIndicatorSize');
         }
     }
 

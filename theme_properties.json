@@ -166,6 +166,11 @@
             "default": "1",
             "description": "The thickness of a text cursor in pixels."
         },
+        "cursorIndicatorSize": {
+            "type": "number",
+            "default": "6",
+            "description": "The side length of a text cursor's indicator in pixels. For now there is only a tab mode indicator."
+        },
         "scrollBarThickness": {
             "type": "number",
             "default": "8",

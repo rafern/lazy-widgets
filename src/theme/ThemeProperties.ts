@@ -75,6 +75,8 @@ export interface ThemeProperties {
     blinkRate?: number;
     /** The thickness of a text cursor in pixels. */
     cursorThickness?: number;
+    /** The side length of a text cursor's indicator in pixels. For now there is only a tab mode indicator. */
+    cursorIndicatorSize?: number;
     /** The thickness of a {@link ScrollableViewportWidget}'s scrollbar in pixels. */
     scrollBarThickness?: number;
     /** The minimum length of the filled part of a {@link ScrollableViewportWidget}'s scrollbar in percentage of total length. */
