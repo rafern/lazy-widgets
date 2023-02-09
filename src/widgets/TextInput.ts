@@ -13,7 +13,7 @@ import type { Viewport } from '../core/Viewport';
 import type { Bounds } from '../helpers/Bounds';
 import { KeyPress } from '../events/KeyPress';
 import { FocusType } from '../core/FocusType';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Rect } from '../helpers/Rect';
 import type { Root } from '../core/Root';
 import { Leave } from '../events/Leave';
@@ -642,7 +642,7 @@ export class TextInput extends Widget {
         }
     }
 
-    protected override handleEvent(event: Event): this | null {
+    protected override handleEvent(event: TricklingEvent): this | null {
         // If editing is disabled, abort
         if(!this._editingEnabled) {
             return null;

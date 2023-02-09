@@ -1,6 +1,6 @@
 import type { LayoutConstraints } from "./LayoutConstraints";
 import type { Widget } from "../widgets/Widget";
-import type { Event } from "../events/Event";
+import type { TricklingEvent } from "../events/TricklingEvent";
 import type { Rect } from "../helpers/Rect";
 
 /**
@@ -111,7 +111,7 @@ export interface Viewport {
      * @param event - The event to dispatch down the UI tree
      * @returns Returns the widget that captured the event or null if none captured the event.
      */
-    dispatchEvent(event: Event): Widget | null;
+    dispatchEvent(event: TricklingEvent): Widget | null;
 
     /**
      * Mark a rectangle relative to this viewport as dirty.

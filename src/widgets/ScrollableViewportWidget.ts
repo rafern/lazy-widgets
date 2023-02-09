@@ -7,7 +7,7 @@ import { ClickState } from '../helpers/ClickState';
 import { TextHelper } from '../helpers/TextHelper';
 import { AutoScroll } from '../events/AutoScroll';
 import type { Bounds } from '../helpers/Bounds';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import { Leave } from '../events/Leave';
 import type { Widget } from './Widget';
 import { Root } from '../core/Root';
@@ -185,7 +185,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
      *
      * @returns Returns true if the event was captured
      */
-    private handleEventScrollbar(vertical: boolean, corner: boolean, event: Event, root: Root): boolean {
+    private handleEventScrollbar(vertical: boolean, corner: boolean, event: TricklingEvent, root: Root): boolean {
         // Abort if the other scrollbar is being dragged
         if(this.verticalDragged !== null && this.verticalDragged !== vertical) {
             return false;
@@ -371,7 +371,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         }
     }
 
-    protected override handleEvent(event: Event): Widget | null {
+    protected override handleEvent(event: TricklingEvent): Widget | null {
         // Try to drag a scrollbar if this is a pointer or leave event with no
         // target or target on this. Don't do this if the scrollbars are hidden
         const widthBiCoupled = this.widthCoupling === AxisCoupling.Bi;

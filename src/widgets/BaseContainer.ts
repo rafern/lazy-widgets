@@ -1,6 +1,6 @@
 import { Widget, WidgetProperties } from './Widget';
 import { SingleParent } from './SingleParent';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Rect } from '../helpers/Rect';
 import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions';
 import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
@@ -29,7 +29,7 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         }
     }
 
-    protected override handleEvent(event: Event): Widget | null {
+    protected override handleEvent(event: TricklingEvent): Widget | null {
         // Dispatch event to child
         return this.child.dispatchEvent(event);
     }

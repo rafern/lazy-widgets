@@ -1,6 +1,6 @@
 /**
- * The focus type of an {@link Event}. Used to categorise events when focusing
- * {@link Widget | widgets} in {@link Root | roots}.
+ * The focus type of a {@link TricklingEvent}. Used to categorise events when
+ * focusing {@link Widget | widgets} in {@link Root | roots}.
  *
  * @category Core
  */

@@ -6,7 +6,7 @@ import { TabSelect } from '../events/TabSelect';
 import type { Bounds } from '../helpers/Bounds';
 import { BaseTheme } from '../theme/BaseTheme';
 import { FocusType } from '../core/FocusType';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Theme } from '../theme/Theme';
 import type { Rect } from '../helpers/Rect';
 import type { Root } from '../core/Root';
@@ -279,7 +279,7 @@ export abstract class Widget extends BaseTheme {
      * event may be captured and result in weird behaviour when the user
      * attempts to use tab to select another widget.
      */
-    protected handleEvent(event: Event): Widget | null {
+    protected handleEvent(event: TricklingEvent): Widget | null {
         if(event.target === this) {
             return this;
         } else {
@@ -297,7 +297,7 @@ export abstract class Widget extends BaseTheme {
      *
      * @returns Returns the widget that captured the event or null if none captured the event.
      */
-    dispatchEvent(event: Event): Widget | null {
+    dispatchEvent(event: TricklingEvent): Widget | null {
         if(!this._enabled) {
             return null;
         }

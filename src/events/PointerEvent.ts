@@ -4,7 +4,7 @@ import { FocusType } from '../core/FocusType';
 import type { SourcePointer } from '../drivers/SourcePointer';
 
 /**
- * A pointer {@link Event}.
+ * A pointer {@link TricklingEvent}.
  *
  * Has a focus type decided by the child classes and does not need focus.
  *

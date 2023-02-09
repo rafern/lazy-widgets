@@ -2,7 +2,7 @@ import { Layer } from '../core/Layer';
 import type { LayerInit } from '../core/LayerInit';
 import type { Root } from '../core/Root';
 import type { Viewport } from '../core/Viewport';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Rect } from '../helpers/Rect';
 import { Parent } from './Parent';
 import type { Widget, WidgetProperties } from './Widget';
@@ -174,7 +174,7 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         }
     }
 
-    protected override handleEvent(event: Event): Widget | null {
+    protected override handleEvent(event: TricklingEvent): Widget | null {
         // Dispatch event to children. Front layers receive the event before the
         // back layers
         for (const [layer, _name] of this.frontToBackLayers) {

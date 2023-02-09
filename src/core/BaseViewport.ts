@@ -2,7 +2,7 @@ import type { LayoutConstraints } from './LayoutConstraints';
 import { watchArrayField } from '../decorators/FlagFields';
 import { PointerEvent } from '../events/PointerEvent';
 import type { Widget } from '../widgets/Widget';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Rect } from '../helpers/Rect';
 import type { Viewport } from './Viewport';
 
@@ -117,7 +117,7 @@ export abstract class BaseViewport implements Viewport {
 
     abstract paint(extraDirtyRects: Array<Rect>): boolean;
 
-    dispatchEvent(event: Event): Widget | null {
+    dispatchEvent(event: TricklingEvent): Widget | null {
         // Drop event if it is a positional event with no target outside the
         // child's viewport
         if(event instanceof PointerEvent) {

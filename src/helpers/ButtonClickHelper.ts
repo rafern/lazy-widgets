@@ -7,7 +7,7 @@ import type { Widget } from "../widgets/Widget";
 import { KeyEvent } from "../events/KeyEvent";
 import { KeyPress } from "../events/KeyPress";
 import { FocusType } from "../core/FocusType";
-import type { Event } from "../events/Event";
+import type { TricklingEvent } from "../events/TricklingEvent";
 import { ClickHelper } from "./ClickHelper";
 import { ClickState } from "./ClickState";
 import type { Root } from "../core/Root";
@@ -88,7 +88,7 @@ export class ButtonClickHelper extends CompoundClickHelper {
      * @param bounds - The bounding box to be used for detecting pointer clicks
      * @returns Returns a 2-tuple containing, respective, whether a click occurred, and whether the event should be captured
      */
-    handleEvent(event: Event, root: Root, enabled: boolean, bounds: Bounds): [wasClick: boolean, capture: boolean] {
+    handleEvent(event: TricklingEvent, root: Root, enabled: boolean, bounds: Bounds): [wasClick: boolean, capture: boolean] {
         if(event instanceof PointerWheel) {
             // Ignore wheel events
             return [false, false];

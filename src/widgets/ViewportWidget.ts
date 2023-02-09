@@ -7,7 +7,7 @@ import { Widget, WidgetProperties } from './Widget';
 import type { Viewport } from '../core/Viewport';
 import type { Bounds } from '../helpers/Bounds';
 import { SingleParent } from './SingleParent';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Root } from '../core/Root';
 import { DynMsg } from '../core/Strings';
 import { Rect } from '../helpers/Rect';
@@ -222,7 +222,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         return [ left, left + width, top, top + height ];
     }
 
-    protected override handleEvent(event: Event): Widget | null {
+    protected override handleEvent(event: TricklingEvent): Widget | null {
         return this.internalViewport.dispatchEvent(event);
     }
 

@@ -6,7 +6,7 @@ import { PointerMove } from '../events/PointerMove';
 import type { Widget } from '../widgets/Widget';
 import { FocusType } from '../core/FocusType';
 import type { Driver } from '../core/Driver';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import { PointerHint } from './PointerHint';
 import type { Root } from '../core/Root';
 import { Leave } from '../events/Leave';
@@ -417,7 +417,7 @@ export class PointerDriver implements Driver {
      *
      * @returns Returns true if the event was captured
      */
-    private dispatchEvent(root: Root, state: PointerDriverState, event: Event, source: SourcePointer | null): boolean {
+    private dispatchEvent(root: Root, state: PointerDriverState, event: TricklingEvent, source: SourcePointer | null): boolean {
         // Check if drag to scroll is enabled for this root
         const dragToScroll = state.pointer === null
             ? false

@@ -12,7 +12,7 @@ import { EnterKey } from './EnterKey';
 import { ShiftKey } from './ShiftKey';
 import { SpaceKey } from './SpaceKey';
 import { Column } from '../Column';
-import type { Event } from '../../events/Event';
+import type { TricklingEvent } from '../../events/TricklingEvent';
 import { Leave } from '../../events/Leave';
 import { PointerEvent } from '../../events/PointerEvent';
 import { TabKey } from './TabKey';
@@ -135,7 +135,7 @@ export class VirtualKeyboard extends Column {
         }
     }
 
-    protected override handleEvent(event: Event): Widget | null {
+    protected override handleEvent(event: TricklingEvent): Widget | null {
         // Ignore all non-pointer events
         if ((event instanceof PointerEvent) || (event instanceof Leave)) {
             return super.handleEvent(event);

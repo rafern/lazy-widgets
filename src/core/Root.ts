@@ -8,7 +8,7 @@ import { CanvasViewport } from './CanvasViewport';
 import type { Widget } from '../widgets/Widget';
 import { TabSelect } from '../events/TabSelect';
 import { KeyPress } from '../events/KeyPress';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import { FocusType } from './FocusType';
 import { Leave } from '../events/Leave';
 import type { Driver } from './Driver';
@@ -276,8 +276,8 @@ export class Root {
     }
 
     /**
-     * Dispatches an {@link Event} to this root's {@link Root#child} by calling
-     * {@link Widget#dispatchEvent}. Updates
+     * Dispatches a {@link TricklingEvent} to this root's {@link Root#child} by
+     * calling {@link Widget#dispatchEvent}. Updates
      * {@link Root#_fociCapturers | foci capturers} and notifies
      * {@link Root#drivers} by calling {@link Driver#onFocusCapturerChanged} if
      * the capturer changes. Does nothing if root is disabled.
@@ -292,7 +292,7 @@ export class Root {
      *
      * @returns Returns a list of dispatched events and whether they were captured.
      */
-    dispatchEvent(event: Event): CaptureList {
+    dispatchEvent(event: TricklingEvent): CaptureList {
         // Ignore event if Root is disabled
         if(!this.enabled) {
             return [[event, false]];

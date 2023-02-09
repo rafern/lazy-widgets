@@ -1,7 +1,7 @@
 import { Layer } from '../core/Layer';
 import type { Root } from '../core/Root';
 import type { Viewport } from '../core/Viewport';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import { Leave } from '../events/Leave';
 import { PointerMove } from '../events/PointerMove';
 import { LayeredContainer } from './LayeredContainer';
@@ -90,7 +90,7 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
         }
     }
 
-    protected override handleEvent(event: Event): Widget | null {
+    protected override handleEvent(event: TricklingEvent): Widget | null {
         // check if this event should count as a hover/unhover
         if (event instanceof PointerMove) {
             if (this._hoverStart === 0) {

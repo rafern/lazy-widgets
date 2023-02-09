@@ -1,6 +1,6 @@
 import type { Widget } from '../widgets/Widget';
 import { FocusType } from '../core/FocusType';
-import { Event } from './Event';
+import { TricklingEvent } from './TricklingEvent';
 
 /**
  * An event which contains text pasted by the clipboard.
@@ -9,7 +9,7 @@ import { Event } from './Event';
  *
  * @category Event
  */
-export class TextPasteEvent extends Event {
+export class TextPasteEvent extends TricklingEvent {
     /** The pasted text */
     readonly text: string;
 

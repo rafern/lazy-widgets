@@ -4,7 +4,7 @@ import { ClickState } from '../helpers/ClickState';
 import type { FocusType } from '../core/FocusType';
 import type { Variable } from '../state/Variable';
 import type { Viewport } from '../core/Viewport';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Root } from '../core/Root';
 import type { Rect } from '../helpers/Rect';
 
@@ -105,7 +105,7 @@ export class RadioButton<V> extends Widget {
         }
     }
 
-    protected override handleEvent(event: Event): this | null {
+    protected override handleEvent(event: TricklingEvent): this | null {
         const x = this.idealX + this.offsetX;
         const y = this.idealY + this.offsetY;
         const [wasClick, capture] = this.clickHelper.handleEvent(

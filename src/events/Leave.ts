@@ -1,16 +1,16 @@
 import { FocusType} from '../core/FocusType';
 import { Widget } from '../widgets/Widget';
-import { Event } from './Event';
+import { TricklingEvent } from './TricklingEvent';
 
 /**
- * A leave {@link Event}. Dispatched when the pointer leaves the root or the
- * focus capturer changes to another widget.
+ * A leave {@link TricklingEvent}. Dispatched when the pointer leaves the root
+ * or the focus capturer changes to another widget.
  *
  * Has a focus type of {@link FocusType.Pointer} and needs focus.
  *
  * @category Event
  */
-export class Leave extends Event {
+export class Leave extends TricklingEvent {
     constructor(target: Widget | null = null) {
         super(target, FocusType.Pointer, true);
     }

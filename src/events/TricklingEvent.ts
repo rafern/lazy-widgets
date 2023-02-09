@@ -2,12 +2,12 @@ import type { FocusType } from '../core/FocusType';
 import type { Widget } from '../widgets/Widget';
 
 /**
- * A generic event. This is an abstract class and must be implemented in child
- * classes.
+ * A generic event that trickles down a UI tree. This is an abstract class and
+ * must be implemented in child classes.
  *
  * @category Event
  */
-export abstract class Event {
+export abstract class TricklingEvent {
     /** The target of this event. Can be null */
     readonly target: Widget | null;
     /**
@@ -30,8 +30,8 @@ export abstract class Event {
     }
 
     /**
-     * Create a new Event with the same properties as this, except with a new
-     * given target.
+     * Create a new TricklingEvent with the same properties as this, except with
+     * a new given target.
      */
-    abstract cloneWithTarget(target: Widget | null): Event;
+    abstract cloneWithTarget(target: Widget | null): TricklingEvent;
 }

@@ -4,7 +4,7 @@ import { watchField } from '../decorators/FlagFields';
 import { ClickState } from '../helpers/ClickState';
 import { FillStyle } from '../theme/FillStyle';
 import { FocusType } from '../core/FocusType';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import { DynMsg } from '../core/Strings';
 import { Theme } from '../theme/Theme';
 import { Button } from './Button';
@@ -158,7 +158,7 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
         }
     }
 
-    protected override handleEvent(event: Event): Widget | null {
+    protected override handleEvent(event: TricklingEvent): Widget | null {
         const capturer = super.handleEvent(event);
 
         if(this.clickHelper.clickStateChanged) {

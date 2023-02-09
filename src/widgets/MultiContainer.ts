@@ -1,7 +1,7 @@
 import { FlexAlignment } from '../theme/FlexAlignment';
 import { Widget, WidgetProperties } from './Widget';
 import { Alignment } from '../theme/Alignment';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import { MultiParent } from './MultiParent';
 import type { Rect } from '../helpers/Rect';
 
@@ -41,7 +41,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         }
     }
 
-    protected override handleEvent(event: Event): Widget | null {
+    protected override handleEvent(event: TricklingEvent): Widget | null {
         // Reverse children if necessary
         // XXX use iterator instead of _children because an event might trigger
         // an action that removes a child, and the iterator creates a copy of

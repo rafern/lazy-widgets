@@ -1,6 +1,6 @@
 import type { FocusType } from '../core/FocusType';
 import type { Widget } from '../widgets/Widget';
-import { Event } from './Event';
+import { TricklingEvent } from './TricklingEvent';
 
 /**
  * An event which contains the state of modifier keys. This is an abstract class
@@ -8,7 +8,7 @@ import { Event } from './Event';
  *
  * @category Event
  */
-export abstract class ModifierEvent extends Event {
+export abstract class ModifierEvent extends TricklingEvent {
     /** Is shift being pressed? */
     readonly shift: boolean;
     /** Is control being pressed? */

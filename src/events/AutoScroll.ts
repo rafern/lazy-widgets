@@ -1,12 +1,12 @@
 import type { Bounds } from '../helpers/Bounds';
 import { Widget } from '../widgets/Widget';
 import { DynMsg } from '../core/Strings';
-import { Event } from './Event';
+import { TricklingEvent } from './TricklingEvent';
 
 /**
- * An auto-scroll {@link Event}. Dispatched when a widget (or part of a widget)
- * wants to be visible to the user, such as the current caret position when
- * typing a character.
+ * An auto-scroll {@link TricklingEvent}. Dispatched when a widget (or part of a
+ * widget) wants to be visible to the user, such as the current caret position
+ * when typing a character.
  *
  * This event is not static. As the event propagates in the UI tree, it will be
  * updated so that the wanted bounds are up-to-date.
@@ -23,7 +23,7 @@ import { Event } from './Event';
  *
  * @category Event
  */
-export class AutoScroll extends Event {
+export class AutoScroll extends TricklingEvent {
     /**
      * The widget that the auto-scroll {@link AutoScroll#bounds} will be
      * relative to.

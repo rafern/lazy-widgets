@@ -1,4 +1,4 @@
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 
 /**
  * A list of pairs. Each pair contains, in this order, the event that was
@@ -6,4 +6,4 @@ import type { Event } from '../events/Event';
  *
  * @category Core
  */
-export type CaptureList = Array<[event: Event, captured: boolean]>;
+export type CaptureList = Array<[event: TricklingEvent, captured: boolean]>;

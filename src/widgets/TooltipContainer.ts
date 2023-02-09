@@ -1,7 +1,7 @@
 import { Widget, WidgetProperties } from './Widget';
 import { Alignment } from '../theme/Alignment';
 import { SingleParent } from './SingleParent';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Rect } from '../helpers/Rect';
 import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions';
 import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
@@ -56,7 +56,7 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
         }
     }
 
-    protected override handleEvent(_event: Event): null {
+    protected override handleEvent(_event: TricklingEvent): null {
         // ignore all events. tooltips are not interactible
         return null;
     }

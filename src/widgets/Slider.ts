@@ -10,7 +10,7 @@ import type { Bounds } from '../helpers/Bounds';
 import { KeyPress } from '../events/KeyPress';
 import { FocusType } from '../core/FocusType';
 import { KeyEvent } from '../events/KeyEvent';
-import type { Event } from '../events/Event';
+import type { TricklingEvent } from '../events/TricklingEvent';
 import { Variable } from '../state/Variable';
 import type { Root } from '../core/Root';
 import { DynMsg } from '../core/Strings';
@@ -199,7 +199,7 @@ export class Slider extends Widget {
         }
     }
 
-    protected override handleEvent(event: Event): this | null {
+    protected override handleEvent(event: TricklingEvent): this | null {
         // Ignore unhandled events
         if(event instanceof PointerWheel || !(event instanceof PointerEvent || event instanceof KeyEvent || event instanceof Leave)) {
             return null;

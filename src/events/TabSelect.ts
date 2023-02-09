@@ -1,11 +1,11 @@
 import { Widget } from '../widgets/Widget';
 import { DynMsg } from '../core/Strings';
-import { Event } from './Event';
+import { TricklingEvent } from './TricklingEvent';
 
 /**
- * A tab selection {@link Event}. Dispatched when tab is pressed and either the
- * keyboard-focused widget doesn't capture the event, or when manually
- * dispatched.
+ * A tab selection {@link TricklingEvent}. Dispatched when tab is pressed and
+ * either the keyboard-focused widget doesn't capture the event, or when
+ * manually dispatched.
  *
  * Has no focus type and does not need focus. Cannot be targetted.
  *
@@ -14,7 +14,7 @@ import { Event } from './Event';
  *
  * @category Event
  */
-export class TabSelect extends Event {
+export class TabSelect extends TricklingEvent {
     /** The widget that the tab selected will be done relative to. */
     readonly relativeTo: Widget | null;
     /**

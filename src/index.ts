@@ -29,7 +29,6 @@ export * from './drivers/RayPointerDriver';
 export * from './drivers/RayPointerSource';
 // events
 export * from './events/AutoScroll';
-export * from './events/Event';
 export * from './events/KeyEvent';
 export * from './events/KeyPress';
 export * from './events/KeyRelease';
@@ -43,6 +42,7 @@ export * from './events/PointerRelease';
 export * from './events/PointerWheel';
 export * from './events/TabSelect';
 export * from './events/TextPasteEvent';
+export * from './events/TricklingEvent';
 // helpers
 export * from './helpers/BaseClickHelper';
 export * from './helpers/Bounds';
