@@ -208,11 +208,11 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
 
         if(listenToKeys) {
             group.keydownListen = (event: KeyboardEvent) => {
-                this.maybePreventDefault(this.keyDown(...unpackKeyboardEvent(event)), event);
+                this.maybePreventDefault(this.keyDown(...unpackKeyboardEvent(event), false), event);
             };
 
             group.keyupListen = (event: KeyboardEvent) => {
-                this.maybePreventDefault(this.keyUp(...unpackKeyboardEvent(event)), event);
+                this.maybePreventDefault(this.keyUp(...unpackKeyboardEvent(event), false), event);
             };
 
             domElem.addEventListener('keydown', group.keydownListen);

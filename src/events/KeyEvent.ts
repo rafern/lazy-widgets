@@ -17,10 +17,16 @@ export abstract class KeyEvent extends ModifierEvent {
      * Web API.
      */
     readonly key: string;
+    /**
+     * Does this event original from a virtual keyboard? If true, then
+     * {@link TabSelect} events will not be dispatched when a Tab key press is
+     * not caught.
+     */
+    readonly virtual: boolean;
 
-    /** Create a new KeyEvent. */
-    constructor(key: string, shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null) {
+    constructor(key: string, shift: boolean, ctrl: boolean, alt: boolean, virtual: boolean, target: Widget | null) {
         super(shift, ctrl, alt, target, FocusType.Keyboard, true);
         this.key = key;
+        this.virtual = virtual;
     }
 }

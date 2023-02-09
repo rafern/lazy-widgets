@@ -2,7 +2,7 @@ import type { KeyboardDriver } from '../../drivers/KeyboardDriver';
 import type { FlexAlignment2D } from '../../theme/FlexAlignment2D';
 import type { VirtualKeyRowTemplate } from './VirtualKeyRow';
 import { FlexAlignment } from '../../theme/FlexAlignment';
-import type { WidgetProperties } from '../Widget';
+import type { Widget, WidgetProperties } from '../Widget';
 import { Alignment } from '../../theme/Alignment';
 import { VirtualKeyRow } from './VirtualKeyRow';
 import type { KeyContext } from './KeyContext';
@@ -12,6 +12,10 @@ import { EnterKey } from './EnterKey';
 import { ShiftKey } from './ShiftKey';
 import { SpaceKey } from './SpaceKey';
 import { Column } from '../Column';
+import type { Event } from '../../events/Event';
+import { Leave } from '../../events/Leave';
+import { PointerEvent } from '../../events/PointerEvent';
+import { TabKey } from './TabKey';
 
 /**
  * A template for the keys in a {@link VirtualKeyboard}. Each member of the
@@ -51,6 +55,12 @@ function EscapeKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetP
     );
 }
 
+function TabKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): TabKey {
+    return new TabKey(
+        keyContext, undefined, undefined, properties,
+    );
+}
+
 /**
  * The default template for the keys in a {@link VirtualKeyboard}; A QWERTY
  * keyboard with US layout.
@@ -67,7 +77,7 @@ export const defaultVirtualKeyboardTemplate: VirtualKeyboardTemplate = [
     // Fourth row
     [ShiftKeyTemplate, ['zxcvbnm,./', 'ZXCVBNM<>?']],
     // Fifth row
-    [BackspaceKeyTemplate, SpaceKeyTemplate, EscapeKeyTemplate],
+    [BackspaceKeyTemplate, SpaceKeyTemplate, TabKeyTemplate, EscapeKeyTemplate],
 ];
 
 /**
@@ -78,6 +88,9 @@ export const defaultVirtualKeyboardTemplate: VirtualKeyboardTemplate = [
  * Equivalent to creating a {@link Column} of {@link VirtualKeyRow} with a shared
  * {@link KeyContext}. Key rows will be created with SpaceBetween main alignment
  * and Stretch cross alignment.
+ *
+ * Ignores all events except pointer events, so that the virtual keyboard never
+ * gets the keyboard or tab focus.
  *
  * @category Widget
  * @category Alias Widget
@@ -108,6 +121,7 @@ export class VirtualKeyboard extends Column {
                     keyContext.shift,
                     keyContext.ctrl,
                     keyContext.alt,
+                    true,
                 );
             },
             shift: false,
@@ -120,6 +134,15 @@ export class VirtualKeyboard extends Column {
                 rowTemplate, keyContext, minWidth, minHeight,
                 properties,
             ));
+        }
+    }
+
+    protected override handleEvent(event: Event): Widget | null {
+        // Ignore all non-pointer events
+        if ((event instanceof PointerEvent) || (event instanceof Leave)) {
+            return super.handleEvent(event);
+        } else {
+            return null;
         }
     }
 }

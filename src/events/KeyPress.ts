@@ -10,6 +10,6 @@ import { KeyEvent } from './KeyEvent';
  */
 export class KeyPress extends KeyEvent {
     cloneWithTarget(target: Widget | null): KeyPress {
-        return new KeyPress(this.key, this.shift, this.ctrl, this.alt, target);
+        return new KeyPress(this.key, this.shift, this.ctrl, this.alt, this.virtual, target);
     }
 }

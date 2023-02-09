@@ -10,6 +10,6 @@ import { KeyEvent } from './KeyEvent';
  */
 export class KeyRelease extends KeyEvent {
     cloneWithTarget(target: Widget | null): KeyRelease {
-        return new KeyRelease(this.key, this.shift, this.ctrl, this.alt, target);
+        return new KeyRelease(this.key, this.shift, this.ctrl, this.alt, this.virtual, target);
     }
 }

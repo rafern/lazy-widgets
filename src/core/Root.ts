@@ -316,8 +316,9 @@ export class Root {
 
             if(event.needsFocus && focus === null) {
                 // special case for tab key with no currently focused widget;
-                // try to do tab selection
-                if(event instanceof KeyPress && event.key === 'Tab') {
+                // try to do tab selection. does not apply to virtual tab
+                // presses
+                if(event instanceof KeyPress && !event.virtual && event.key === 'Tab') {
                     return [
                         [event, false],
                         ...this.dispatchEvent(new TabSelect(this.getFocus(FocusType.Tab), event.shift))
@@ -342,8 +343,9 @@ export class Root {
 
         if(captured === null) {
             if(event instanceof KeyPress) {
-                if(event.key === 'Tab') {
-                    // special case for tab key; try to do tab selection
+                if(event.key === 'Tab' && !event.virtual) {
+                    // special case for tab key; try to do tab selection. does
+                    // not apply to virtual tab presses
                     captureList.push(
                         ...this.dispatchEvent(new TabSelect(this.getFocus(FocusType.Tab), event.shift))
                     );

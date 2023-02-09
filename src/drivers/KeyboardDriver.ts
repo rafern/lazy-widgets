@@ -135,11 +135,12 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
      * @param shift - Is shift being pressed?
      * @param ctrl - Is control being pressed?
      * @param alt - Is alt being pressed?
+     * @param virtual - Is the key down originating from a virtual keyboard? False by default
      * @returns Returns a list of dispatched events and whether they were captured.
      */
-    keyDown(key: string, shift: boolean, ctrl: boolean, alt: boolean): CaptureList {
+    keyDown(key: string, shift: boolean, ctrl: boolean, alt: boolean, virtual = false): CaptureList {
         this.keysDown.add(key);
-        return this.dispatchEvent(new KeyPress(key, shift, ctrl, alt, null));
+        return this.dispatchEvent(new KeyPress(key, shift, ctrl, alt, virtual, null));
     }
 
     /**
@@ -150,11 +151,12 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
      * @param shift - Is shift being pressed?
      * @param ctrl - Is control being pressed?
      * @param alt - Is alt being pressed?
+     * @param virtual - Is the key up originating from a virtual keyboard? False by default
      * @returns Returns a list of dispatched events and whether they were captured.
      */
-    keyUp(key: string, shift: boolean, ctrl: boolean, alt: boolean): CaptureList {
+    keyUp(key: string, shift: boolean, ctrl: boolean, alt: boolean, virtual = false): CaptureList {
         if(this.keysDown.delete(key)) {
-            return this.dispatchEvent(new KeyRelease(key, shift, ctrl, alt, null));
+            return this.dispatchEvent(new KeyRelease(key, shift, ctrl, alt, virtual, null));
         }
 
         return [];
@@ -169,13 +171,14 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
      * @param shift - Is shift being pressed?
      * @param ctrl - Is control being pressed?
      * @param alt - Is alt being pressed?
+     * @param virtual - Is the key press originating from a virtual keyboard? False by default
      * @returns Returns a list of dispatched events and whether they were captured.
      */
-    keyPress(key: string, shift: boolean, ctrl: boolean, alt: boolean): CaptureList {
+    keyPress(key: string, shift: boolean, ctrl: boolean, alt: boolean, virtual = false): CaptureList {
         const wasDown = this.isKeyDown(key);
-        const captured = this.keyDown(key, shift, ctrl, alt);
+        const captured = this.keyDown(key, shift, ctrl, alt, virtual);
         if(!wasDown) {
-            captured.push(...this.keyUp(key, shift, ctrl, alt));
+            captured.push(...this.keyUp(key, shift, ctrl, alt, virtual));
         }
 
         return captured;

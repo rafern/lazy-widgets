@@ -3,14 +3,14 @@ import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from './KeyContext';
 
 /**
- * A {@link BasicVirtualKey} which emits 'Escape' key presses.
+ * A {@link BasicVirtualKey} which emits 'Tab' key presses. Does not trigger tab
+ * selection.
  *
  * @category Widget
  * @category Alias Widget
  */
-export class EscapeKey extends BasicVirtualKey {
-    /** Create a new EscapeKey. */
+export class TabKey extends BasicVirtualKey {
     constructor(keyContext: KeyContext, minWidth = 48, minHeight = 24, properties?: Readonly<WidgetProperties>) {
-        super('Esc', 'Escape', keyContext, minWidth, minHeight, properties);
+        super('Tab', 'Tab', keyContext, minWidth, minHeight, properties);
     }
 }

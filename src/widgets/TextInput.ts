@@ -855,7 +855,7 @@ export class TextInput extends Widget {
             } else if(event.key === 'Enter') {
                 this.insertText('\n');
             } else if(event.key === 'Tab') {
-                if(!event.shift && this.typeableTab && this.tabModeEnabled) {
+                if(this.typeableTab && (event.virtual || (!event.shift && this.tabModeEnabled))) {
                     this.insertText('\t');
                 } else {
                     return null; // don't capture, let tab select another widget
