@@ -45,6 +45,11 @@ export interface KeyboardDriverGroup {
     wrapsAround: boolean;
 }
 
+/**
+ * Options used for creating a new {@link KeyboardDriverGroup}.
+ *
+ * @category Driver
+ */
 export interface KeyboardDriverGroupOptions {
     /** See {@link KeyboardDriverGroup#wrapsAround}. */
     wrapsAround: boolean;
@@ -59,7 +64,15 @@ export interface KeyboardDriverGroupOptions {
  * @category Driver
  */
 export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup, O extends KeyboardDriverGroupOptions = KeyboardDriverGroupOptions> implements Driver {
+    /**
+     * Groups belonging to this driver. Roots in the same group transfer tab
+     * selections between themselves. Do not modify from a child class.
+     */
     protected readonly groups = new Array<G>();
+    /**
+     * A map from a Root to a group. Used only for optimisation purposes. Do not
+     * modify from a child class.
+     */
     protected readonly groupMap = new Map<Root, G>();
     /**
      * The list of {@link Root | Roots} that are using this driver, in the order
@@ -330,6 +343,12 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         return this.focus !== null && this.focus.getFocus(FocusType.Keyboard) !== null;
     }
 
+    /**
+     * Dispatches an event to the currently focused root (or a fallback).
+     * Handles wrap-around for tab selection. Internal use only.
+     *
+     * @param event - The event to dispatch
+     */
     private dispatchEvent(event: KeyEvent) {
         const root = this.getEffectiveFocusedRoot();
         if(root) {
@@ -369,7 +388,8 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         return [];
     }
 
-    getGroupIndex(group: G): number {
+    /** Get the index of a group in the groups list. For internal use only */
+    private getGroupIndex(group: G): number {
         const index = this.groups.indexOf(group);
         if (index < 0) {
             throw new Error('Group does not exist; maybe it belongs to another KeyboardDriver?');
@@ -378,6 +398,12 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         return index;
     }
 
+    /**
+     * Get the group that a {@link Root} is assigned to. Throws an error if the
+     * Root is not assigned to any group in this driver.
+     *
+     * @returns Returns the group assigned to this Root. The group is live, do not modify it directly.
+     */
     getGroup(root: Root): G {
         const group = this.groupMap.get(root);
         if (!group) {
@@ -387,6 +413,11 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         return group;
     }
 
+    /**
+     * Get a new group, with no {@link Root | Roots}.
+     *
+     * @returns Returns the created group. The group is live, do not modify it directly.
+     */
     createGroup(options: O): G {
         const group = <G>{
             roots: new Array<Root>(),
@@ -399,6 +430,10 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         return group;
     }
 
+    /**
+     * Delete a group that is assigned to this keyboard. Throws an error if the
+     * group is still in use (has assigned {@link Root | Roots}).
+     */
     deleteGroup(group: G): void {
         // find group index
         const index = this.getGroupIndex(group);
@@ -414,6 +449,10 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         this.groups.splice(index, 1);
     }
 
+    /**
+     * Bind a {@link Root} to a group that is assigned to this keyboard. Throws
+     * an error if the Root is already assigned to a group in this driver.
+     */
     bindRoot(root: Root, group: G): void {
         // assert the root is not already bound in this driver
         if (this.groupMap.has(root)) {
@@ -428,6 +467,10 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         this.groupMap.set(root, group);
     }
 
+    /**
+     * Unbind a {@link Root} from its assigned group. Throws an error if the
+     * Root is not assigned to any group in this driver.
+     */
     unbindGroup(root: Root): void {
         // remove root from group
         const group = this.getGroup(root);
@@ -441,6 +484,14 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         group.roots.splice(index, 1);
     }
 
+    /**
+     * Bind a {@link Root} to this keyboard, in a new group dedicated to the
+     * Root. Equivalent to creating a new group and binding a Root to it. Useful
+     * if you are using lazy-widgets directly in the DOM, where each Root has a
+     * dedicated DOM element.
+     *
+     * @returns Returns the created group. The group is live, do not modify it directly.
+     */
     bindSingletRoot(root: Root, options: O): G {
         const group = this.createGroup(options);
 

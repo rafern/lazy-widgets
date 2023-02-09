@@ -25,24 +25,40 @@ function unpackKeyboardEvent(event: KeyboardEvent): [key: string, shift: boolean
  * @category Driver
  */
 export interface DOMKeyboardDriverGroup extends KeyboardDriverGroup {
+    /** The DOM element where the event listeners are added */
     domElem: HTMLElement,
+    /** "focus" event listener. For cleanup only */
     focusListen: (event: FocusEvent) => void,
+    /** "blue" event listener. For cleanup only */
     blurListen: (event: FocusEvent) => void,
+    /** "keydown" event listener. For cleanup only */
     keydownListen: ((event: KeyboardEvent) => void) | null,
+    /** "keyup" event listener. For cleanup only */
     keyupListen: ((event: KeyboardEvent) => void) | null,
+    /** The original tabIndex of the DOM element. For cleanup only */
     origTabIndex: number,
+    /**
+     * If true, then the DOM element's tabIndex will be set to 0 if negative, so
+     * that it can be selected via tab focus. Defaults to true.
+     */
     selectable: boolean,
 }
 
 /**
- * {@link KeyboardDriverGroupOptions} used for creating a new
- * {@link DOMKeyboardDriverGroup}.
+ * Options used for creating a new {@link DOMKeyboardDriverGroup}.
  *
  * @category Driver
  */
 export interface DOMKeyboardDriverGroupOptions extends KeyboardDriverGroupOptions {
+    /** See {@link DOMKeyboardDriverGroup#domElem}. */
     domElem: HTMLElement;
+    /**
+     * If true (the default), event listeners will be added to listen for keys.
+     * If false, then the group will not listen for key presses, but will still
+     * keep the focsu as-is.
+     */
     listenToKeys?: boolean;
+    /** See {@link DOMKeyboardDriverGroup#selectable}. */
     selectable?: true;
 }
 
@@ -66,7 +82,13 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
         this.tabKeyHelper = getTabKeyHelper();
     }
 
-    /** Calls preventDefault on a keyboard event if needed. */
+    /**
+     * Calls preventDefault and stopImmediatePropagation on a keyboard event if
+     * needed.
+     *
+     * @param captureList - List of events that were **maybe** captured by a Root
+     * @param event - The keyboard event that can be preventDefault'ed/stopImmediatePropagation'ed
+     */
     maybePreventDefault(captureList: CaptureList, event: KeyboardEvent): void {
         let captured = false;
 
@@ -80,25 +102,6 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
         if(captured) {
             event.preventDefault();
             event.stopImmediatePropagation();
-        }
-    }
-
-    private dispatchTabSelect(group: DOMKeyboardDriverGroup, directionReversed: boolean) {
-        const rootCount = group.enabledRoots.length;
-        if (rootCount === 0) {
-            return;
-        }
-
-        const delta = directionReversed ? -1 : 1;
-        let i = directionReversed ? (rootCount - 1) : 0;
-
-        for (; i >= 0 && i < rootCount; i += delta) {
-            const captureList = group.enabledRoots[i].dispatchEvent(new TabSelect(null, directionReversed));
-            for (const [event, captured] of captureList) {
-                if (captured && event instanceof TabSelect) {
-                    return;
-                }
-            }
         }
     }
 
@@ -128,6 +131,8 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
     override createGroup(options: DOMKeyboardDriverGroupOptions): DOMKeyboardDriverGroup {
         // assert that the DOM element isn't already assigned
         const domElem = options.domElem;
+        // TODO is this (listenToKeys) still useful? i no longer see a use-case
+        // for this. need to investigate
         const listenToKeys = !!(options.listenToKeys ?? true);
         const selectable = !!(options.selectable ?? true);
         if (!domElem || !(domElem instanceof HTMLElement)) {
@@ -159,7 +164,7 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
         }
 
         // add listeners
-        group.focusListen = async (event: FocusEvent) => {
+        group.focusListen = async (focusEvent: FocusEvent) => {
             if (!selectable || group.enabledRoots.length === 0) {
                 return;
             }
@@ -175,7 +180,7 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
             // to use a global key listener in the page.
             // the keyboard state is invalid when focusing the window, so an
             // extra check is also needed for that.
-            if ((event.relatedTarget && this.tabKeyHelper.pressed) || await this.tabKeyHelper.isTabInitiatedFocus()) {
+            if ((focusEvent.relatedTarget && this.tabKeyHelper.pressed) || await this.tabKeyHelper.isTabInitiatedFocus()) {
                 // BUG if the focus is caused by the window itself getting
                 // focus, then it's impossible to tell the direction of the tab
                 // since no keydown event is ever dispatched. this means that
@@ -192,7 +197,26 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
                 // if the bound DOM element is the only element in the page with
                 // a tabindex, and it's very expensive to query the entire DOM
                 // every time the user tabs into a window/iframe
-                this.dispatchTabSelect(group, this.tabKeyHelper.directionReversed);
+
+                // XXX must check enabled roots again because
+                // isTabInitiatedFocus is async, to avoid data races
+                const rootCount = group.enabledRoots.length;
+                if (rootCount === 0) {
+                    return;
+                }
+
+                const directionReversed = this.tabKeyHelper.directionReversed
+                const delta = directionReversed ? -1 : 1;
+                let i = directionReversed ? (rootCount - 1) : 0;
+
+                for (; i >= 0 && i < rootCount; i += delta) {
+                    const captureList = group.enabledRoots[i].dispatchEvent(new TabSelect(null, directionReversed));
+                    for (const [event, captured] of captureList) {
+                        if (captured && event instanceof TabSelect) {
+                            return;
+                        }
+                    }
+                }
             }
         };
 

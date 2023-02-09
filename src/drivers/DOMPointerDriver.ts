@@ -12,10 +12,15 @@ import { Msg } from '../core/Strings';
  * @category Driver
  */
 export interface DOMPointerDriverBind {
+    /** The DOM element where the event listeners are added */
     domElem: HTMLElement,
+    /** `/pointer(move|down|up)/` event listener. For cleanup only */
     pointerListen: ((this: HTMLElement, event: PointerEvent) => void) | null,
+    /** "pointerleave" event listener. For cleanup only */
     pointerleaveListen: ((this: HTMLElement, event: PointerEvent) => void) | null,
+    /** "wheel" event listener. For cleanup only */
     wheelListen: ((this: HTMLElement, event: WheelEvent) => void) | null,
+    /** "contextmenu" event listener. For cleanup only */
     contextMenuListen: ((this: HTMLElement, event: MouseEvent) => void) | null
 }
 
