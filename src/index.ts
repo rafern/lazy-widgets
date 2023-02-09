@@ -82,6 +82,7 @@ export * from './widgets/VirtualKeyboard/GlyphVirtualKey';
 export * from './widgets/VirtualKeyboard/KeyContext';
 export * from './widgets/VirtualKeyboard/ShiftKey';
 export * from './widgets/VirtualKeyboard/SpaceKey';
+export * from './widgets/VirtualKeyboard/TabKey';
 export * from './widgets/VirtualKeyboard/VirtualKey';
 export * from './widgets/VirtualKeyboard/VirtualKeyboard';
 export * from './widgets/VirtualKeyboard/VirtualKeyRow';
