@@ -14,7 +14,6 @@ import { Container } from './Container';
  * @category Alias Widget
  */
 export class TextMargin<W extends Widget = Widget> extends Container<W> {
-    /** Create a new TextMargin. */
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         // default properties
         properties = {

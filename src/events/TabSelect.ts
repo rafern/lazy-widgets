@@ -31,7 +31,6 @@ export class TabSelect extends Event {
      */
     reachedRelative: boolean;
 
-    /**  Create a new TabSelect. */
     constructor(relativeTo: Widget | null, reversed: boolean) {
         super(null, null, false, reversed);
 

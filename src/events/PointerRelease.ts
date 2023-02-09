@@ -10,7 +10,6 @@ import { Widget } from '../widgets/Widget';
  * @category Event
  */
 export class PointerRelease extends PointerButtonEvent {
-    /** Create a new PointerRelease. */
     constructor(x: number, y: number, button: number, shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null = null) {
         super(x, y, button, shift, ctrl, alt, target, FocusType.Pointer);
     }

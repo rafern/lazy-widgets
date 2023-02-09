@@ -35,6 +35,8 @@ function unpackModifiers(event: MouseEvent): [shift: boolean, ctrl: boolean, alt
  * elements. Each HTML DOM element is bound to a specific root, which synergizes
  * well with DOMRoot.
  *
+ * Automatically registers a pointer to be used by the mouse.
+ *
  * @category Driver
  */
 export class DOMPointerDriver extends PointerDriver {
@@ -50,11 +52,6 @@ export class DOMPointerDriver extends PointerDriver {
      */
     private mousePointerID: number;
 
-    /**
-     * Create a new DOMPointerDriver.
-     *
-     * Automatically registers a pointer to be used by the mouse.
-     */
     constructor() {
         super();
 

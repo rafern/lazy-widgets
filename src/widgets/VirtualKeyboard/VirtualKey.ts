@@ -14,8 +14,6 @@ import { TextButton } from '../TextButton';
  */
 export class VirtualKey extends ArtificialConstraint<TextButton> {
     /**
-     * Create a new VirtualKey.
-     *
      * @param text - The text to display in the virtual key.
      * @param callback - The callback called when the button is pressed.
      * @param minWidth - Minimum width constraint. Will be passed to ArtificialConstraint base class.

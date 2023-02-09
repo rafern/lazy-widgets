@@ -10,7 +10,6 @@ import { VirtualKey } from './VirtualKey';
  * @category Alias Widget
  */
 export class AltKey extends VirtualKey {
-    /** Create a new AltKey. */
     constructor(keyContext: KeyContext, minWidth = 42, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super(
             'Alt',

@@ -18,7 +18,6 @@ export class ThemeScope<W extends Widget = Widget> extends PassthroughWidget<W> 
     /** The theme used for the child. */
     private scopeTheme: Theme;
 
-    /** Create a new ThemeScope. */
     constructor(child: W, themeOverride: Theme) {
         super(child);
         this.scopeTheme = themeOverride;

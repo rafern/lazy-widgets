@@ -14,7 +14,6 @@ import { Container } from './Container';
  * @category Alias Widget
  */
 export class Center<W extends Widget = Widget> extends Container<W> {
-    /** Create a new Center. */
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         properties = {
             containerAlignment: <Alignment2D>{

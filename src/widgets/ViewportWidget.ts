@@ -120,7 +120,6 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     /** Similar to {@link ViewportWidget#reservedX}, but vertical. */
     protected reservedY = 0;
 
-    /** Create a new ViewportWidget. */
     constructor(child: W, properties?: Readonly<ViewportWidgetProperties>) {
         // Viewport clears its own background, has a single child and propagates
         // events

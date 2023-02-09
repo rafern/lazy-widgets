@@ -15,7 +15,6 @@ export abstract class PointerEvent extends ModifierEvent {
     /** Pointer event position's Y coordinate in pixels. Not an integer. */
     readonly y: number;
 
-    /** Create a new PointerEvent. */
     constructor(x: number, y: number, shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null = null, focusType: FocusType | null = null) {
         super(shift, ctrl, alt, target, focusType, false);
         this.x = x;

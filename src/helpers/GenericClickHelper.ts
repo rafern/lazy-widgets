@@ -21,8 +21,6 @@ export class GenericClickHelper implements BaseClickHelper {
     protected widget: Widget;
 
     /**
-     * Create a new GenericClickHelper
-     *
      * @param widget - The Widget aggregating this helper
      */
     constructor(widget: Widget) {

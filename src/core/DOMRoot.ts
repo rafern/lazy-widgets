@@ -18,16 +18,6 @@ export class DOMRoot extends Root {
     /** This root's canvas element's context. Used for painting */
     private domCanvasContext: CanvasRenderingContext2D;
 
-    /**
-     * Create a new DOMRoot.
-     *
-     * Sets {@link Root#child} and {@link Root#child}'s
-     * {@link Widget#inheritedTheme | inherited theme}. Also sets up a
-     * {@link Root#pointerStyleHandler} which simply sets the CSS cursor style
-     * of {@link DOMRoot#domElem}, unless a handler is already supplied in the
-     * optional properties argument. Creates {@link DOMRoot#domElem} and
-     * {@link DOMRoot#domCanvasContext}.
-     */
     constructor(child: Widget, properties?: Readonly<RootProperties>) {
         super(child, properties);
 

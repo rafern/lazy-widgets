@@ -9,8 +9,6 @@ import { Parent } from './Parent';
  */
 export abstract class SingleParent<W extends Widget = Widget> extends Parent<W> {
     /**
-     * Create a new SingleParent instance.
-     *
      * @param child - The mandatory single child of this widget. Cannot be changed later.
      */
     constructor(readonly child: W, propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {

@@ -70,8 +70,6 @@ export class CanvasViewport extends BaseViewport {
     private readonly dirtyRects: Array<Rect> = [];
 
     /**
-     * Create a new CanvasViewport.
-     *
      * Creates a new canvas with a starting width and height, setting
      * {@link CanvasViewport#canvas} and {@link Viewport#context}. Failure to
      * get a canvas context results in an exception.

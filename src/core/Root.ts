@@ -127,12 +127,6 @@ export class Root {
     /** Has the warning for poorly captured TabSelect events been issued? */
     private static badTabCaptureWarned = false;
 
-    /**
-     * Creates a new Root.
-     *
-     * Sets {@link Root#child}, {@link Root#pointerStyleHandler} and
-     * {@link Root#child}'s {@link Widget#inheritedTheme | inherited theme}.
-     */
     constructor(child: Widget, properties?: Readonly<RootProperties>) {
         this.viewport = Root.makeViewport(child, properties);
         this.pointerStyleHandler = properties?.pointerStyleHandler ?? null;

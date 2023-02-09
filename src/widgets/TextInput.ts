@@ -151,7 +151,6 @@ export class TextInput extends Widget {
     @watchField(TextInput.prototype.markDirtyCaret)
     tabModeEnabled = false;
 
-    /** Create a new TextInput. */
     constructor(variable: ValidatedVariable<string, unknown> = new ValidatedVariable(''), properties?: Readonly<TextInputProperties>) {
         // TextInputs clear their own background, have no children and don't
         // propagate events

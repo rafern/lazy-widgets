@@ -18,8 +18,6 @@ export class GlyphVirtualKey extends VirtualKey {
     readonly keyContext: Readonly<KeyContext>;
 
     /**
-     * Create a new GlyphVirtualKey.
-     *
      * @param glyph - The glyph to emit/show when shift is not held.
      * @param altGlyph - The alternative glyph to emit/show when shift is held. Will be equal to glyph if set to null.
      * @param keyContext - The {@link KeyContext} shared by other keys to tell when shift is being held in a virtual keyboard.

@@ -80,7 +80,6 @@ export class PointerWheel extends PointerEvent {
     /** The percentage of a page to remove from a page scroll */
     static readonly PagePercentError = 0.1;
 
-    /** Create a new PointerWheel. */
     constructor(x: number, y: number, deltaX: number, deltaY: number, deltaZ: number, deltaMode: PointerWheelMode, fromDrag: boolean, shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null = null) {
         super(x, y, shift, ctrl, alt, target, FocusType.Pointer);
         this.deltaX = deltaX;

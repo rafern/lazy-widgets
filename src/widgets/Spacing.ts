@@ -26,7 +26,6 @@ export class Spacing extends Widget {
     /** The minimum height this will try to expand */
     minHeight: number;
 
-    /** Create a new Spacing. */
     constructor(properties?: Readonly<SpacingProperties>) {
         // default properties
         properties = {

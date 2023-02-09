@@ -30,16 +30,6 @@ export class VirtualKeyboardRoot extends Root {
     /** The {@link KeyboardDriver} used by this root's virtual keyboard. */
     private readonly keyboardDriver: KeyboardDriver;
 
-    /**
-     * Creates a new VirtualKeyboardRoot.
-     *
-     * Sets {@link VirtualKeyboardRoot#child} to a new {@link Margin} containing
-     * a {@link VirtualKeyboard} with the given keyboard and
-     * {@link VirtualKeyboardTemplate | keyboard template},
-     * {@link VirtualKeyboardRoot#pointerStyleHandler} and
-     * {@link VirtualKeyboardRoot#child}'s
-     * {@link Widget#inheritedTheme | inherited theme}.
-     */
     constructor(keyboardDriver: KeyboardDriver, properties?: VirtualKeyboardRootProperties) {
         super(
             new Background(

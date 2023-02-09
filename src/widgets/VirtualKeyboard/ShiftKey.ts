@@ -10,7 +10,6 @@ import { VirtualKey } from './VirtualKey';
  * @category Alias Widget
  */
 export class ShiftKey extends VirtualKey {
-    /** Create a new ShiftKey. */
     constructor(keyContext: KeyContext, minWidth = 84, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super(
             'Shift',

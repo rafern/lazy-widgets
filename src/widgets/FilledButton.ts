@@ -45,7 +45,6 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
     /** The inherited theme for the child */
     private childTheme: Theme;
 
-    /** Create a new FilledButton. */
     constructor(child: W, callback: (() => void) | null = null, properties?: Readonly<FilledButtonProperties>) {
         super(child, callback, properties);
 

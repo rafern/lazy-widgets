@@ -9,7 +9,6 @@ import type { KeyContext } from './KeyContext';
  * @category Alias Widget
  */
 export class EnterKey extends BasicVirtualKey {
-    /** Create a new EnterKey. */
     constructor(keyContext: KeyContext, minWidth = 72, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super('Enter', 'Enter', keyContext, minWidth, minHeight, properties);
     }

@@ -24,7 +24,6 @@ export abstract class PointerButtonEvent extends PointerEvent {
      */
     readonly button: number;
 
-    /** Create a new PointerButtonEvent. */
     constructor(x: number, y: number, button: number, shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null = null, focusType: FocusType | null = null) {
         super(x, y, shift, ctrl, alt, target, focusType);
         this.button = button;

@@ -10,7 +10,6 @@ import { Widget } from '../widgets/Widget';
  * @category Event
  */
 export class PointerMove extends PointerEvent {
-    /** Create a new PointerMove. */
     constructor(x: number, y: number, shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null = null) {
         super(x, y, shift, ctrl, alt, target, FocusType.Pointer);
     }

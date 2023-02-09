@@ -8,7 +8,6 @@ import { MultiContainer } from './MultiContainer';
  * @category Alias Widget
  */
 export class Row<W extends Widget = Widget> extends MultiContainer<W> {
-    /** Create a new Row. */
     constructor(properties?: Readonly<WidgetProperties>) {
         super(false, properties);
     }

@@ -10,7 +10,6 @@ export class Theme extends BaseTheme {
     /** Listeners that are listening for changes in this theme (or fallback) */
     protected subscribers: Set<(property: string | null) => void>;
 
-    /** Create a new Theme */
     constructor(properties?: ThemeProperties, fallbackTheme?: Theme) {
         super(properties, fallbackTheme);
         this.subscribers = new Set();

@@ -42,6 +42,8 @@ export interface ScrollableViewportWidgetProperties extends ViewportWidgetProper
  *
  * Can be constrained to a specific type of children.
  *
+ * If an axis is bi-coupled, that axis will not have a scrollbar.
+ *
  * @category Widget
  */
 export class ScrollableViewportWidget<W extends Widget = Widget> extends ViewportWidget<W> {
@@ -83,11 +85,6 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
     /** The line height used for scrolling via wheel events. */
     private _scrollLineHeight = 0;
 
-    /**
-     * Create a new ScrollableViewportWidget.
-     *
-     * If an axis is bi-coupled, that axis will not have a scrollbar.
-     */
     constructor(child: W, properties?: Readonly<ScrollableViewportWidgetProperties>) {
         super(child, properties);
 

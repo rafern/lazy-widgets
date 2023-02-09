@@ -58,8 +58,6 @@ export type VirtualKeyRowTemplate = Array<GlyphVirtualKeysTemplate | VirtualKeyT
  */
 export class VirtualKeyRow extends Row<VirtualKey> {
     /**
-     * Create a new VirtualKeyRow.
-     *
      * @param rowTemplate - Template for this row of virtual keys.
      * @param keyContext - The {@link KeyContext} to be shared among all virtual keys in this row.
      * @param minWidth - The minWidth to use when creating {@link GlyphVirtualKey | GlyphVirtualKeys}.

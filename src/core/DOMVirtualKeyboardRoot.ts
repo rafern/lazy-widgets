@@ -16,17 +16,6 @@ export class DOMVirtualKeyboardRoot extends DOMRoot {
     /** The {@link KeyboardDriver} used by this root's virtual keyboard. */
     private readonly keyboardDriver: KeyboardDriver;
 
-    /**
-     * Creates a new VirtualKeyboardRoot.
-     *
-     * Sets {@link Root#child} to a new {@link Margin} containing a
-     * {@link VirtualKeyboard} with the given keyboard and
-     * {@link VirtualKeyboardTemplate | keyboard template} and
-     * {@link Root#child}'s {@link Widget#inheritedTheme | inherited theme}.
-     * Also sets up a {@link Root#pointerStyleHandler} which simply sets the CSS
-     * cursor style of {@link DOMRoot#domElem}. Creates {@link DOMRoot#domElem}
-     * and {@link DOMRoot#domCanvasContext}.
-     */
     constructor(keyboardDriver: KeyboardDriver, properties?: VirtualKeyboardRootProperties) {
         super(
             new Background(

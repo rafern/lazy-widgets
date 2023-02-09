@@ -30,8 +30,6 @@ export class Label extends Widget {
     wrapText: boolean;
 
     /**
-     * Create a new Label.
-     *
      * @param text - The text of the label. Has the same behaviour as setting {@link Label#text}.
      */
     constructor(text = '', properties?: Readonly<LabelProperties>) {

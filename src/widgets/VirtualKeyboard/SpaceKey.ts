@@ -9,7 +9,6 @@ import type { KeyContext } from './KeyContext';
  * @category Alias Widget
  */
 export class SpaceKey extends BasicVirtualKey {
-    /** Create a new SpaceKey. */
     constructor(keyContext: KeyContext, minWidth = 84, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         properties = {
             flex: 1,

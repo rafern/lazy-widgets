@@ -22,7 +22,6 @@ export abstract class Event {
     /** Is this event dispatched in reverse-order? */
     readonly reversed: boolean;
 
-    /** Create a new Event. */
     constructor(target: Widget | null, focusType: FocusType | null, needsFocus: boolean, reversed = false) {
         this.target = target;
         this.focusType = focusType;

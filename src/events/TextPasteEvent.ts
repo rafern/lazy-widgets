@@ -13,7 +13,6 @@ export class TextPasteEvent extends Event {
     /** The pasted text */
     readonly text: string;
 
-    /** Create a new Event. */
     constructor(text: string, target: Widget | null = null) {
         super(target, FocusType.Keyboard, false);
         this.text = text;

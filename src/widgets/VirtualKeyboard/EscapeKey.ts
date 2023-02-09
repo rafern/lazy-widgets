@@ -9,7 +9,6 @@ import type { KeyContext } from './KeyContext';
  * @category Alias Widget
  */
 export class EscapeKey extends BasicVirtualKey {
-    /** Create a new EscapeKey. */
     constructor(keyContext: KeyContext, minWidth = 48, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super('Esc', 'Escape', keyContext, minWidth, minHeight, properties);
     }

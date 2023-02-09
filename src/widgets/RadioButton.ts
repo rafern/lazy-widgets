@@ -39,8 +39,6 @@ export class RadioButton<V> extends Widget {
     private _wasSelected = false;
 
     /**
-     * Create a new radio button.
-     *
      * @param variable - The shared variable that radio buttons will save the value to when selected.
      * @param value - The value that will be used to set the {@link RadioButton#"variable"} when the radio button is clicked
      */

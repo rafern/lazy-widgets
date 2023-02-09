@@ -11,7 +11,6 @@ import { BaseContainer } from './BaseContainer';
  * @category Alias Widget
  */
 export class Container<W extends Widget = Widget> extends BaseContainer<W> {
-    /** Create a new Container. */
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         super(child, true, properties);
     }

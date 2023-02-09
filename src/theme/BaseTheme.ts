@@ -64,7 +64,6 @@ export class BaseTheme implements ThemeProperties {
     // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
     protected onThemeUpdated(property: string | null = null): void {}
 
-    /** Create a new BaseTheme */
     constructor(properties?: ThemeProperties, fallbackTheme?: Theme) {
         this._fallbackTheme = fallbackTheme;
 

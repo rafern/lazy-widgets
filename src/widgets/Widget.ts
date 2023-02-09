@@ -125,7 +125,6 @@ export abstract class Widget extends BaseTheme {
         }
     }
 
-    /** Create a new Widget. */
     constructor(propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
         super(properties);
 

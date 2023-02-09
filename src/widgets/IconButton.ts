@@ -8,7 +8,6 @@ import { Button } from './Button';
  * @category Aggregate Widget
  */
 export class IconButton extends Button<Icon> {
-    /** Create a new IconButton. */
     constructor(image: HTMLImageElement, callback: (() => void) | null, properties?: Readonly<IconProperties>) {
         super(
             new Icon(image, properties),

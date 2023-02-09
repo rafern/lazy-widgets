@@ -74,7 +74,6 @@ export class Slider extends Widget {
      */
     private dragBounds: Bounds = [0, 0, 0, 0];
 
-    /** Create a new Slider */
     constructor(variable: Variable<number> = new Variable(0), minValue = 0, maxValue = 1, properties?: Readonly<SliderProperties>) {
         // Sliders need a clear background, have no children and don't propagate
         // events

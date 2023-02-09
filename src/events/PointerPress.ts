@@ -9,7 +9,6 @@ import { Widget } from '../widgets/Widget';
  * @category Event
  */
 export class PointerPress extends PointerButtonEvent {
-    /** Create a new PointerPress. */
     constructor(x: number, y: number, button: number, shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null = null) {
         super(x, y, button, shift, ctrl, alt, target);
     }

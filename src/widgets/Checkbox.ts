@@ -30,8 +30,6 @@ export class Checkbox extends Widget {
     private _clickable = true;
 
     /**
-     * Create a new Checkbox.
-     *
      * @param variable - The {@link Variable} where the value will be stored.
      */
     constructor(variable: Variable<boolean> = new Variable(false), properties?: Readonly<WidgetProperties>) {

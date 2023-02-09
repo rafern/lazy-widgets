@@ -16,7 +16,6 @@ export abstract class ModifierEvent extends Event {
     /** Is alt being pressed? */
     readonly alt: boolean;
 
-    /** Create a new ModifierEvent. */
     constructor(shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null, focusType: FocusType | null, needsFocus: boolean) {
         super(target, focusType, needsFocus);
         this.shift = shift;

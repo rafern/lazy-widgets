@@ -14,7 +14,6 @@ import type { Widget } from './Widget';
  * @category Alias Widget
  */
 export class Margin<W extends Widget = Widget> extends Container<W> {
-    /** Create a new Margin. */
     constructor(child: W, properties?: Readonly<ThemeProperties>) {
         properties = {
             containerAlignment: <Alignment2D>{

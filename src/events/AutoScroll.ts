@@ -45,7 +45,6 @@ export class AutoScroll extends Event {
      */
     bounds: Bounds;
 
-    /**  Create a new AutoScroll. */
     constructor(originallyRelativeTo: Widget, bounds: Bounds) {
         super(null, null, false);
 

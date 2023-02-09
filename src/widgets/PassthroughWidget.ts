@@ -17,7 +17,6 @@ import type { Rect } from '../helpers/Rect';
  * @category Widget
  */
 export class PassthroughWidget<W extends Widget = Widget> extends SingleParent<W> {
-    /** Create a new PassthroughWidget. */
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         // Passthrough widgets dont need a clear background, have a child and
         // propagate events

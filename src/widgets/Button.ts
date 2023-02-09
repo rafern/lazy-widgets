@@ -22,7 +22,6 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
      */
     callback: (() => void) | null;
 
-    /** Create a new Button. */
     constructor(child: W, callback: (() => void) | null, properties?: Readonly<WidgetProperties>) {
         super(child, false, properties);
 

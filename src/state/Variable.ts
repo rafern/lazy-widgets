@@ -24,8 +24,6 @@ export class Variable<V, C extends CallableFunction = VariableCallback<V>> {
     private callbacks: Set<C> = new Set();
 
     /**
-     * Create a new Variable.
-     *
      * @param initialValue - The initial value of this variable. Sets {@link Variable#_value}.
      * @param callback - A callback for when the variable changes. Equivalent to calling {@link Variable#watch} after creating the variable, but allows for variables to created inline.
      * @param callNow - If true, the callback will be called once immediately after it's registered, unless the callback is already registered. Doesn't apply if no callback was passed.

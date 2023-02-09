@@ -10,7 +10,6 @@ import type { Rect } from '../helpers/Rect';
  * @category Alias Widget
  */
 export class Separator extends Spacing {
-    /** Create a new Separator. */
     constructor(properties?: Readonly<SpacingProperties>) {
         super({
             minWidth: 1,

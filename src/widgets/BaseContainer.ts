@@ -14,7 +14,6 @@ import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
  * @category Widget
  */
 export abstract class BaseContainer<W extends Widget = Widget> extends SingleParent<W> {
-    /** Create a new BaseContainer. */
     constructor(child: W, propagateEvents: boolean, properties?: Readonly<WidgetProperties>) {
         // Containers clear their own background, have a child and may propagate
         // events

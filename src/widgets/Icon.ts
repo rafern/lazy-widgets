@@ -121,7 +121,6 @@ export class Icon extends Widget {
     @damageField
     fit: IconFit;
 
-    /** Create a new Icon. */
     constructor(image: HTMLImageElement | HTMLVideoElement | string, properties?: Readonly<IconProperties>) {
         // Icons need a clear background, have no children and don't propagate
         // events

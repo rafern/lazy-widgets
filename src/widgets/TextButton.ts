@@ -13,7 +13,6 @@ import { FilledButton } from './FilledButton';
  * @category Aggregate Widget
  */
 export class TextButton extends FilledButton<Label> {
-    /** Create a new TextButton. */
     constructor(text: string, callback: (() => void) | null = null, properties?: Readonly<LabelProperties>) {
         // default properties
         properties = {

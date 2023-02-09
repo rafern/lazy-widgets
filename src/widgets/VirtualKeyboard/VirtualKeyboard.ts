@@ -97,8 +97,6 @@ export const defaultVirtualKeyboardTemplate: VirtualKeyboardTemplate = [
  */
 export class VirtualKeyboard extends Column {
     /**
-     * Create a new VirtualKeyboard.
-     *
      * @param keyboardTemplate - By default, the virtual keyboard template is {@link defaultVirtualKeyboardTemplate}.
      * @param minWidth - The minWidth to use when creating {@link GlyphVirtualKey | GlyphVirtualKeys}.
      * @param minHeight - The minHeight to use when creating {@link GlyphVirtualKey | GlyphVirtualKeys}.

@@ -24,7 +24,6 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
     /** The number of enabled children in this container */
     private enabledChildCount = 0;
 
-    /** Create a MultiContainer. */
     constructor(vertical: boolean, properties?: Readonly<WidgetProperties>) {
         // MultiContainers clear their own background, have children and
         // propagate events

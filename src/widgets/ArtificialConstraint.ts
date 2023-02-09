@@ -27,7 +27,6 @@ export class ArtificialConstraint<W extends Widget = Widget> extends Passthrough
     @layoutArrayField()
     constraints: LayoutConstraints;
 
-    /** Create a new PassthroughWidget. */
     constructor(child: W, constraints: LayoutConstraints, properties?: Readonly<WidgetProperties>) {
         super(child, properties);
 
