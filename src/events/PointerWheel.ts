@@ -2,6 +2,7 @@ import { FocusType } from '../core/FocusType';
 import { PointerEvent } from './PointerEvent';
 import { Widget } from '../widgets/Widget';
 import { DynMsg } from '../core/Strings';
+import type { SourcePointer } from '../drivers/SourcePointer';
 
 /**
  * The scrolling mode that determines how the {@link PointerWheel#deltaX},
@@ -80,8 +81,8 @@ export class PointerWheel extends PointerEvent {
     /** The percentage of a page to remove from a page scroll */
     static readonly PagePercentError = 0.1;
 
-    constructor(x: number, y: number, deltaX: number, deltaY: number, deltaZ: number, deltaMode: PointerWheelMode, fromDrag: boolean, shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null = null) {
-        super(x, y, shift, ctrl, alt, target, FocusType.Pointer);
+    constructor(x: number, y: number, deltaX: number, deltaY: number, deltaZ: number, deltaMode: PointerWheelMode, fromDrag: boolean, shift: boolean, ctrl: boolean, alt: boolean, source: SourcePointer | null, target: Widget | null = null) {
+        super(x, y, shift, ctrl, alt, source, target, FocusType.Pointer);
         this.deltaX = deltaX;
         this.deltaY = deltaY;
         this.deltaZ = deltaZ;
@@ -90,11 +91,11 @@ export class PointerWheel extends PointerEvent {
     }
 
     correctOffset(xOffset: number, yOffset: number): PointerWheel {
-        return new PointerWheel(this.x - xOffset, this.y - yOffset, this.deltaX, this.deltaY, this.deltaZ, this.deltaMode, this.fromDrag, this.shift, this.ctrl, this.alt, this.target);
+        return new PointerWheel(this.x - xOffset, this.y - yOffset, this.deltaX, this.deltaY, this.deltaZ, this.deltaMode, this.fromDrag, this.shift, this.ctrl, this.alt, this.source, this.target);
     }
 
     cloneWithTarget(target: Widget | null): PointerWheel {
-        return new PointerWheel(this.x, this.y, this.deltaX, this.deltaY, this.deltaZ, this.deltaMode, this.fromDrag, this.shift, this.ctrl, this.alt, target);
+        return new PointerWheel(this.x, this.y, this.deltaX, this.deltaY, this.deltaZ, this.deltaMode, this.fromDrag, this.shift, this.ctrl, this.alt, this.source, target);
     }
 
     /**

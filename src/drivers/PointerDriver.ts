@@ -10,6 +10,7 @@ import type { Event } from '../events/Event';
 import { PointerHint } from './PointerHint';
 import type { Root } from '../core/Root';
 import { Leave } from '../events/Leave';
+import type { SourcePointer } from './SourcePointer';
 
 /**
  * A container which has the state associated with a specific {@link Root} for
@@ -59,6 +60,7 @@ export class PointerDriver implements Driver {
     /** Unassign a pointer from a given root and its state. */
     private unassignPointer(root: Root, state: PointerDriverState) {
         // Clear pointer state
+        const pointerID = state.pointer;
         if(state.pointer !== null) {
             this.setPointerHint(state.pointer, PointerHint.None);
         }
@@ -68,7 +70,9 @@ export class PointerDriver implements Driver {
         if(state.hovering) {
             // Dispatch Leave event if hovering
             this.dispatchEvent(
-                root, state, new Leave(root.getFocusCapturer(FocusType.Pointer))
+                root, state,
+                new Leave(root.getFocusCapturer(FocusType.Pointer)),
+                pointerID === null ? null : [this, pointerID]
             );
         }
         state.hovering = false;
@@ -202,6 +206,8 @@ export class PointerDriver implements Driver {
         state.hovering = true;
         const [x, y] = this.denormaliseCoords(root, xNorm, yNorm);
         let captured = false;
+        const source: SourcePointer = [this, pointer];
+
         if(pressing !== state.pressing) {
             // Get how many bits in the bitmask you need to check
             const bits = Math.floor(Math.log2(Math.max(pressing, state.pressing)));
@@ -218,7 +224,8 @@ export class PointerDriver implements Driver {
                 captured ||= this.dispatchEvent(
                     root,
                     state,
-                    new (isPressed ? PointerPress : PointerRelease)(x, y, bit, shift, ctrl, alt)
+                    new (isPressed ? PointerPress : PointerRelease)(x, y, bit, shift, ctrl, alt, source),
+                    source
                 );
             }
 
@@ -227,7 +234,8 @@ export class PointerDriver implements Driver {
             captured = this.dispatchEvent(
                 root,
                 state,
-                new PointerMove(x, y, shift, ctrl, alt)
+                new PointerMove(x, y, shift, ctrl, alt, source),
+                source
             );
         }
 
@@ -263,7 +271,8 @@ export class PointerDriver implements Driver {
             const captured = this.dispatchEvent(
                 root,
                 state,
-                new Leave(root.getFocusCapturer(FocusType.Pointer))
+                new Leave(root.getFocusCapturer(FocusType.Pointer)),
+                [this, pointer]
             );
             this.setPointerHint(pointer, PointerHint.None);
             return captured;
@@ -316,10 +325,15 @@ export class PointerDriver implements Driver {
         // Update state and dispatch event
         state.hovering = true;
         const [x, y] = this.denormaliseCoords(root, xNorm, yNorm);
+        const source: SourcePointer = [this, pointer];
         return this.dispatchEvent(
             root,
             state,
-            new PointerWheel(x, y, deltaX, deltaY, deltaZ, deltaMode, false, shift, ctrl, alt)
+            new PointerWheel(
+                x, y, deltaX, deltaY, deltaZ, deltaMode, false, shift, ctrl,
+                alt, source
+            ),
+            source
         );
     }
 
@@ -403,7 +417,7 @@ export class PointerDriver implements Driver {
      *
      * @returns Returns true if the event was captured
      */
-    private dispatchEvent(root: Root, state: PointerDriverState, event: Event): boolean {
+    private dispatchEvent(root: Root, state: PointerDriverState, event: Event, source: SourcePointer | null): boolean {
         // Check if drag to scroll is enabled for this root
         const dragToScroll = state.pointer === null
             ? false
@@ -416,7 +430,7 @@ export class PointerDriver implements Driver {
             const capturedList = root.dispatchEvent(new PointerWheel(
                 ...state.dragOrigin,
                 startX - event.x, startY - event.y, 0,
-                PointerWheelMode.Pixel, false, false, false, true,
+                PointerWheelMode.Pixel, false, false, false, true, source
             ));
 
             let captured = false;

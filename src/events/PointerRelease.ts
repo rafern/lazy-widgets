@@ -1,6 +1,7 @@
 import { PointerButtonEvent } from './PointerButtonEvent';
 import { FocusType } from '../core/FocusType';
 import { Widget } from '../widgets/Widget';
+import type { SourcePointer } from '../drivers/SourcePointer';
 
 /**
  * A pointer release {@link PointerButtonEvent} (pointer button up).
@@ -10,15 +11,15 @@ import { Widget } from '../widgets/Widget';
  * @category Event
  */
 export class PointerRelease extends PointerButtonEvent {
-    constructor(x: number, y: number, button: number, shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null = null) {
-        super(x, y, button, shift, ctrl, alt, target, FocusType.Pointer);
+    constructor(x: number, y: number, button: number, shift: boolean, ctrl: boolean, alt: boolean, source: SourcePointer | null, target: Widget | null = null) {
+        super(x, y, button, shift, ctrl, alt, source, target, FocusType.Pointer);
     }
 
     correctOffset(xOffset: number, yOffset: number): PointerRelease {
-        return new PointerRelease(this.x - xOffset, this.y - yOffset, this.button, this.shift, this.ctrl, this.alt, this.target);
+        return new PointerRelease(this.x - xOffset, this.y - yOffset, this.button, this.shift, this.ctrl, this.alt, this.source, this.target);
     }
 
     cloneWithTarget(target: Widget | null): PointerRelease {
-        return new PointerRelease(this.x, this.y, this.button, this.shift, this.ctrl, this.alt, target);
+        return new PointerRelease(this.x, this.y, this.button, this.shift, this.ctrl, this.alt, this.source, target);
     }
 }

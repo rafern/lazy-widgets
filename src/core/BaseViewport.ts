@@ -1,10 +1,10 @@
-import type { LayoutConstraints } from "./LayoutConstraints";
-import { watchArrayField } from "../decorators/FlagFields";
-import { PointerEvent } from "../events/PointerEvent";
-import type { Widget } from "../widgets/Widget";
-import type { Event } from "../events/Event";
-import type { Rect } from "../helpers/Rect";
-import type { Viewport } from "./Viewport";
+import type { LayoutConstraints } from './LayoutConstraints';
+import { watchArrayField } from '../decorators/FlagFields';
+import { PointerEvent } from '../events/PointerEvent';
+import type { Widget } from '../widgets/Widget';
+import type { Event } from '../events/Event';
+import type { Rect } from '../helpers/Rect';
+import type { Viewport } from './Viewport';
 
 /**
  * The base implementation of the {@link Viewport} interface. See

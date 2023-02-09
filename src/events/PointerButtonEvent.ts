@@ -1,6 +1,7 @@
 import type { Widget } from '../widgets/Widget';
 import { PointerEvent } from './PointerEvent';
 import { FocusType } from '../core/FocusType';
+import type { SourcePointer } from '../drivers/SourcePointer';
 
 /**
  * A {@link PointerEvent} for button presses/releases, containing helpers for
@@ -24,8 +25,8 @@ export abstract class PointerButtonEvent extends PointerEvent {
      */
     readonly button: number;
 
-    constructor(x: number, y: number, button: number, shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null = null, focusType: FocusType | null = null) {
-        super(x, y, shift, ctrl, alt, target, focusType);
+    constructor(x: number, y: number, button: number, shift: boolean, ctrl: boolean, alt: boolean, source: SourcePointer | null, target: Widget | null = null, focusType: FocusType | null = null) {
+        super(x, y, shift, ctrl, alt, source, target, focusType);
         this.button = button;
     }
 
