@@ -3,7 +3,7 @@ import type { KeyboardDriverGroup, KeyboardDriverGroupOptions } from './Keyboard
 import type { CaptureList } from '../core/CaptureList';
 import type { TabKeyHelper } from '../helpers/TabKeyHelper';
 import { getTabKeyHelper } from '../helpers/TabKeyHelper';
-import { TabSelect } from '../events/TabSelect';
+import { TabSelectEvent } from '../events/TabSelectEvent';
 
 /**
  * Unpack a KeyboardEvent into a 4-tuple containing the event's key and modifier
@@ -210,9 +210,9 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
                 let i = directionReversed ? (rootCount - 1) : 0;
 
                 for (; i >= 0 && i < rootCount; i += delta) {
-                    const captureList = group.enabledRoots[i].dispatchEvent(new TabSelect(null, directionReversed));
+                    const captureList = group.enabledRoots[i].dispatchEvent(new TabSelectEvent(null, directionReversed));
                     for (const [event, captured] of captureList) {
-                        if (captured && event instanceof TabSelect) {
+                        if (captured && event instanceof TabSelectEvent) {
                             return;
                         }
                     }

@@ -1,6 +1,5 @@
-import type { FocusType } from '../core/FocusType';
 import type { Widget } from '../widgets/Widget';
-import { TricklingEvent } from './TricklingEvent';
+import { TargetableTricklingEvent } from './TargetableTricklingEvent';
 
 /**
  * An event which contains the state of modifier keys. This is an abstract class
@@ -8,7 +7,9 @@ import { TricklingEvent } from './TricklingEvent';
  *
  * @category Event
  */
-export abstract class ModifierEvent extends TricklingEvent {
+export abstract class ModifierEvent extends TargetableTricklingEvent {
+    override readonly userCapturable: true;
+
     /** Is shift being pressed? */
     readonly shift: boolean;
     /** Is control being pressed? */
@@ -16,8 +17,10 @@ export abstract class ModifierEvent extends TricklingEvent {
     /** Is alt being pressed? */
     readonly alt: boolean;
 
-    constructor(shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null, focusType: FocusType | null, needsFocus: boolean) {
-        super(target, focusType, needsFocus);
+    constructor(shift: boolean, ctrl: boolean, alt: boolean, target: Widget | null) {
+        super(target);
+
+        this.userCapturable = true;
         this.shift = shift;
         this.ctrl = ctrl;
         this.alt = alt;

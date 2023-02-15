@@ -4,6 +4,7 @@ import { Alignment } from '../theme/Alignment';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import { MultiParent } from './MultiParent';
 import type { Rect } from '../helpers/Rect';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 
 /**
  * A {@link MultiParent} which automatically paints children, adds spacing,
@@ -41,12 +42,17 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         }
     }
 
-    protected override handleEvent(event: TricklingEvent): Widget | null {
+    protected override handleEvent(baseEvent: WidgetEvent): Widget | null {
+        if (baseEvent.propagation !== PropagationModel.Trickling) {
+            return super.handleEvent(baseEvent);
+        }
+
         // Reverse children if necessary
         // XXX use iterator instead of _children because an event might trigger
         // an action that removes a child, and the iterator creates a copy of
         // the children list
         let children = this as Iterable<W>;
+        const event = baseEvent as TricklingEvent;
         if(event.reversed) {
             children = Array.from(children).reverse();
         }

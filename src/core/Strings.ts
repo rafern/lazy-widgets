@@ -61,9 +61,8 @@ export const DynMsg = {
     INVALID_ATTACHMENT: (attaching: boolean) => `Attempt to ${attaching ? 'at' : 'de'}tach ${attaching ? 'at' : 'de'}tached Widget. Make sure the Widget is not being reused in another Root without first removing it from the first Root.`,
     INVALID_KB_ROW_TEMPLATE: (entry: unknown) => `Unknown virtual key row template format for entry: ${entry}. A key row template must either be a function that returns a VirtualKey instance, or a pair of symbols.`,
     INVALID_ENUM: (value: unknown, enumName: string, variableName: string, unexpected = false) => `${unexpected ? 'Unexpected' : 'Unknown'} ${enumName} value: ${value}. Make sure ${variableName} is being passed as an enum value instead of its corresponding hardcoded value; this value may have become invalid due to an update.${unexpected ? ' If this is a valid value, then this may be a bug caused by invalid input combinations. Please report it.' : ''}`,
-    OVERCAPTURING_WIDGET: (capturer: object) => `TabSelect event captured by widget (${capturer.constructor.name}), but reachedRelative was false; a widget type is probably capturing events by default. Make sure to only capture events that you need so that other Widgets aren't broken.`,
+    OVERCAPTURING_WIDGET: (capturer: object) => `TabSelectEvent event captured by widget (${capturer.constructor.name}), but reachedRelative was false; a widget type is probably capturing events by default. Make sure to only capture events that you need so that other Widgets aren't broken.`,
     MAYBE_DIMENSIONLESS: (axisName: string) => `ViewportWidget has no minimum ${axisName} and ${axisName} isn't bi-directionally coupled, therefore, it may be dimensionless. Set a minimum ${axisName} and/or bi-directionally couple the ${axisName}.`,
-    UNTARGETABLE_EVENT: (eventName: string) => `${eventName} events cannot be targetted to a specific widget. Target ignored`,
 };
 
 /**

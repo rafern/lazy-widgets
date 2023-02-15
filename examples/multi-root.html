@@ -4,6 +4,7 @@
     </head>
     <body>
         <p>Try changing the focused element by pressing tab or shift+tab</p>
+        <p>Roots with a red background are in a group with wrap-around mode enabled, meaning they will "trap" tab selections to the group</p>
         <div id="top-container"></div>
         <textarea>This is just a selectable HTML element</textarea>
         <div id="bottom-container"></div>
@@ -44,7 +45,10 @@
                                     new TextButton('Button 2', () => label.text = 'Button 2 clicked!'),
                                 ])
                             )
-                        )
+                        ),
+                        wrapsAround ? {
+                            canvasFill: 'rgba(255, 0, 0, 0.75)'
+                        } : {}
                     )
                 );
 

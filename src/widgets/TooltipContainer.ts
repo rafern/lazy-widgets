@@ -1,7 +1,6 @@
 import { Widget, WidgetProperties } from './Widget';
 import { Alignment } from '../theme/Alignment';
 import { SingleParent } from './SingleParent';
-import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Rect } from '../helpers/Rect';
 import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions';
 import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
@@ -54,11 +53,6 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
         } else if (property === 'tooltipFill' || property === 'tooltipRadii') {
             this.markWholeAsDirty();
         }
-    }
-
-    protected override handleEvent(_event: TricklingEvent): null {
-        // ignore all events. tooltips are not interactible
-        return null;
     }
 
     protected override handlePreLayoutUpdate(): void {

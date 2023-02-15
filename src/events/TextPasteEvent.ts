@@ -1,6 +1,6 @@
 import type { Widget } from '../widgets/Widget';
 import { FocusType } from '../core/FocusType';
-import { TricklingEvent } from './TricklingEvent';
+import { TargetableTricklingEvent } from './TargetableTricklingEvent';
 
 /**
  * An event which contains text pasted by the clipboard.
@@ -9,12 +9,23 @@ import { TricklingEvent } from './TricklingEvent';
  *
  * @category Event
  */
-export class TextPasteEvent extends TricklingEvent {
+export class TextPasteEvent extends TargetableTricklingEvent {
+    static override readonly type = 'text-paste';
+    override readonly type: typeof TargetableTricklingEvent.type;
+    override readonly focusType: FocusType.Keyboard;
+    override readonly needsFocus: false;
+    override readonly userCapturable: true;
+
     /** The pasted text */
     readonly text: string;
 
     constructor(text: string, target: Widget | null = null) {
-        super(target, FocusType.Keyboard, false);
+        super(target);
+
+        this.type = TextPasteEvent.type;
+        this.focusType = FocusType.Keyboard;
+        this.needsFocus = false;
+        this.userCapturable = true;
         this.text = text;
     }
 

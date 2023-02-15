@@ -12,10 +12,12 @@ import { EnterKey } from './EnterKey';
 import { ShiftKey } from './ShiftKey';
 import { SpaceKey } from './SpaceKey';
 import { Column } from '../Column';
-import type { TricklingEvent } from '../../events/TricklingEvent';
-import { Leave } from '../../events/Leave';
-import { PointerEvent } from '../../events/PointerEvent';
+import type { WidgetEvent } from '../../events/WidgetEvent';
+import { LeaveEvent } from '../../events/LeaveEvent';
 import { TabKey } from './TabKey';
+import { PointerPressEvent } from '../../events/PointerPressEvent';
+import { PointerReleaseEvent } from '../../events/PointerReleaseEvent';
+import { PointerMove } from '../../events/PointerMove';
 
 /**
  * A template for the keys in a {@link VirtualKeyboard}. Each member of the
@@ -135,9 +137,9 @@ export class VirtualKeyboard extends Column {
         }
     }
 
-    protected override handleEvent(event: TricklingEvent): Widget | null {
+    protected override handleEvent(event: WidgetEvent): Widget | null {
         // Ignore all non-pointer events
-        if ((event instanceof PointerEvent) || (event instanceof Leave)) {
+        if (event.type === PointerPressEvent.type || event.type === PointerReleaseEvent.type || event.type === PointerMove.type || event.type === LeaveEvent.type) {
             return super.handleEvent(event);
         } else {
             return null;

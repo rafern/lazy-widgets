@@ -1,19 +1,19 @@
-import { KeyRelease } from '../events/KeyRelease';
+import { KeyReleaseEvent } from '../events/KeyReleaseEvent';
 import type { Widget } from '../widgets/Widget';
-import { KeyPress } from '../events/KeyPress';
+import { KeyPressEvent } from '../events/KeyPressEvent';
 import { FocusType } from '../core/FocusType';
 import type { Driver } from '../core/Driver';
 import type { Root } from '../core/Root';
 import type { CaptureList } from '../core/CaptureList';
 import { KeyEvent } from '../events/KeyEvent';
-import { TabSelect } from '../events/TabSelect';
+import { TabSelectEvent } from '../events/TabSelectEvent';
 
 /**
- * A group of Roots. When a {@link TabSelect} is not captured by a {@link Root}
- * in a group, the TabSelect is carried over to the next (or previous, depending
- * on the direction) root in the group. Although TabSelect events are carried
- * over between Roots in the same group, they are **not** automatically carried
- * over **between different groups**.
+ * A group of Roots. When a {@link TabSelectEvent} is not captured by a
+ * {@link Root} in a group, the TabSelectEvent is carried over to the next (or
+ * previous, depending on the direction) root in the group. Although
+ * TabSelectEvent events are carried over between Roots in the same group, they
+ * are **not** automatically carried over **between different groups**.
  *
  * This behaviour is useful for binding Roots to DOM elements. For example,
  * {@link DOMRoot | DOMRoots} should be placed in groups with a single DOMRoot,
@@ -36,11 +36,11 @@ export interface KeyboardDriverGroup {
      */
     enabledRoots: Array<Root>;
     /**
-     * Should {@link TabSelect} events wrap-around to the other end of the group
-     * if not captured by the last (or first) {@link Root}? If this is true, the
-     * navigation will be trapped to this group for keyboard-only users, since
-     * that will be the only way to change keyboard focus. Useful for 3D engines
-     * where all Roots share the same canvas.
+     * Should {@link TabSelectEvent} events wrap-around to the other end of the
+     * group if not captured by the last (or first) {@link Root}? If this is
+     * true, the navigation will be trapped to this group for keyboard-only
+     * users, since that will be the only way to change keyboard focus. Useful
+     * for 3D engines where all Roots share the same canvas.
      */
     wrapsAround: boolean;
 }
@@ -141,7 +141,7 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
     }
 
     /**
-     * Dispatch a new {@link KeyPress} event to the
+     * Dispatch a new {@link KeyPressEvent} event to the
      * {@link KeyboardDriver#getEffectiveFocusedRoot | effective focused Root}.
      *
      * @param key - Must follow the {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values | KeyboardEvent.key} Web API.
@@ -153,11 +153,11 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
      */
     keyDown(key: string, shift: boolean, ctrl: boolean, alt: boolean, virtual = false): CaptureList {
         this.keysDown.add(key);
-        return this.dispatchEvent(new KeyPress(key, shift, ctrl, alt, virtual, null));
+        return this.dispatchEvent(new KeyPressEvent(key, shift, ctrl, alt, virtual, null));
     }
 
     /**
-     * Dispatch a new {@link KeyRelease} event to the
+     * Dispatch a new {@link KeyReleaseEvent} event to the
      * {@link KeyboardDriver#getEffectiveFocusedRoot | effective focused Root}.
      *
      * @param key - Must follow the {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values | KeyboardEvent.key} Web API.
@@ -169,7 +169,7 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
      */
     keyUp(key: string, shift: boolean, ctrl: boolean, alt: boolean, virtual = false): CaptureList {
         if(this.keysDown.delete(key)) {
-            return this.dispatchEvent(new KeyRelease(key, shift, ctrl, alt, virtual, null));
+            return this.dispatchEvent(new KeyReleaseEvent(key, shift, ctrl, alt, virtual, null));
         }
 
         return [];
@@ -356,14 +356,14 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
             const group = this.getGroup(root);
             const rootCount = group.enabledRoots.length;
 
-            // check if there was any uncaptured TabSelect event and carry it
-            // over to another root in the same group
+            // check if there was any uncaptured TabSelectEvent event and carry
+            // it over to another root in the same group
             if (rootCount > 1 || (group.wrapsAround && rootCount > 0)) {
                 const capListLen = captureList.length;
                 for (let i = 0; i < capListLen; i++) {
                     const [cEvent, captured] = captureList[i];
 
-                    if (!captured && cEvent instanceof TabSelect) {
+                    if (!captured && cEvent instanceof TabSelectEvent) {
                         let iNext = i + (cEvent.reversed ? -1 : 1);
                         if (iNext < 0 || iNext >= rootCount) {
                             if (group.wrapsAround) {
@@ -375,7 +375,7 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
 
                         const nextRoot = group.enabledRoots[iNext];
                         captureList.splice(i, 1);
-                        captureList.push(...nextRoot.dispatchEvent(new TabSelect(null, cEvent.reversed)));
+                        captureList.push(...nextRoot.dispatchEvent(new TabSelectEvent(null, cEvent.reversed)));
 
                         break;
                     }

@@ -117,7 +117,7 @@ export abstract class BaseViewport implements Viewport {
 
     abstract paint(extraDirtyRects: Array<Rect>): boolean;
 
-    dispatchEvent(event: TricklingEvent): Widget | null {
+    dispatchTricklingEvent(event: TricklingEvent): Widget | null {
         // Drop event if it is a positional event with no target outside the
         // child's viewport
         if(event instanceof PointerEvent) {

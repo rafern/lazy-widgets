@@ -3,17 +3,20 @@ import type { LayoutConstraints } from './LayoutConstraints';
 import type { TextInputHandler } from './TextInputHandler';
 import { DynMsg, groupedStackTrace } from './Strings';
 import { PointerEvent } from '../events/PointerEvent';
-import { PointerWheel } from '../events/PointerWheel';
+import { PointerWheelEvent } from '../events/PointerWheelEvent';
 import { CanvasViewport } from './CanvasViewport';
 import type { Widget } from '../widgets/Widget';
-import { TabSelect } from '../events/TabSelect';
-import { KeyPress } from '../events/KeyPress';
-import type { TricklingEvent } from '../events/TricklingEvent';
+import { TabSelectEvent } from '../events/TabSelectEvent';
+import { KeyPressEvent } from '../events/KeyPressEvent';
 import { FocusType } from './FocusType';
-import { Leave } from '../events/Leave';
+import { LeaveEvent } from '../events/LeaveEvent';
 import type { Driver } from './Driver';
 import { Theme } from '../theme/Theme';
 import type { CaptureList } from './CaptureList';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
+import { TricklingEvent } from '../events/TricklingEvent';
+import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions';
 
 /**
  * Optional Root constructor properties.
@@ -52,7 +55,13 @@ export interface RootProperties {
  *
  * @category Core
  */
-export class Root {
+export class Root implements WidgetEventEmitter {
+    /** Typed user listeners attached to this Root */
+    private typedListeners: WidgetEventTypedListenerMap = new Map();
+    /** Untyped user listeners attached to this Root */
+    private untypedListeners: WidgetEventUntypedListenerList = [];
+    /** Next user listener ID */
+    private nextListener = 0;
     /** The internal viewport. Manages drawing */
     protected viewport: CanvasViewport;
     /** The list of drivers registered to this root */
@@ -124,7 +133,9 @@ export class Root {
      * and {@link Root#getTextInput}
      */
     protected _mobileTextInUse = false;
-    /** Has the warning for poorly captured TabSelect events been issued? */
+    /**
+     * Has the warning for poorly captured TabSelectEvent events been issued?
+     */
     private static badTabCaptureWarned = false;
 
     constructor(child: Widget, properties?: Readonly<RootProperties>) {
@@ -276,7 +287,7 @@ export class Root {
     }
 
     /**
-     * Dispatches a {@link TricklingEvent} to this root's {@link Root#child} by
+     * Dispatches a {@link WidgetEvent} to this root's {@link Root#child} by
      * calling {@link Widget#dispatchEvent}. Updates
      * {@link Root#_fociCapturers | foci capturers} and notifies
      * {@link Root#drivers} by calling {@link Driver#onFocusCapturerChanged} if
@@ -292,11 +303,26 @@ export class Root {
      *
      * @returns Returns a list of dispatched events and whether they were captured.
      */
-    dispatchEvent(event: TricklingEvent): CaptureList {
+    dispatchEvent(baseEvent: WidgetEvent): CaptureList {
         // Ignore event if Root is disabled
         if(!this.enabled) {
-            return [[event, false]];
+            return [[baseEvent, false]];
         }
+
+        // Dispatch to user event listeners
+        if (eventEmitterHandleEvent(this.typedListeners, this.untypedListeners, baseEvent)) {
+            return [[baseEvent, true]];
+        }
+
+        // Don't do anything else if event is not a trickling event; can't
+        // bubble up because we're at the root already, and can't do anything
+        // with a sticky event since that's meant to be handled by users
+        if (baseEvent.propagation !== PropagationModel.Trickling) {
+            return [[baseEvent, false]];
+        }
+
+        // Event is a trickling event
+        let event = baseEvent as TricklingEvent;
 
         // If event is focusable and is missing a target...
         const originalEvent = event;
@@ -312,10 +338,10 @@ export class Root {
                 // special case for tab key with no currently focused widget;
                 // try to do tab selection. does not apply to virtual tab
                 // presses
-                if(event instanceof KeyPress && !event.virtual && event.key === 'Tab') {
+                if(event instanceof KeyPressEvent && !event.virtual && event.key === 'Tab') {
                     return [
                         [event, false],
-                        ...this.dispatchEvent(new TabSelect(this.getFocus(FocusType.Tab), event.shift))
+                        ...this.dispatchEvent(new TabSelectEvent(this.getFocus(FocusType.Tab), event.shift))
                     ];
                 } else {
                     return [[event, false]];
@@ -327,7 +353,7 @@ export class Root {
         }
 
         // Clear pointer style. This will be set by children if neccessary
-        if((event instanceof PointerEvent && !(event instanceof PointerWheel)) || event instanceof Leave) {
+        if((event instanceof PointerEvent && !(event instanceof PointerWheelEvent)) || event instanceof LeaveEvent) {
             this.pointerStyle = 'default';
         }
 
@@ -336,12 +362,12 @@ export class Root {
         const captureList: CaptureList = [[originalEvent, captured !== null]];
 
         if(captured === null) {
-            if(event instanceof KeyPress) {
+            if(event instanceof KeyPressEvent) {
                 if(event.key === 'Tab' && !event.virtual) {
                     // special case for tab key; try to do tab selection. does
                     // not apply to virtual tab presses
                     captureList.push(
-                        ...this.dispatchEvent(new TabSelect(this.getFocus(FocusType.Tab), event.shift))
+                        ...this.dispatchEvent(new TabSelectEvent(this.getFocus(FocusType.Tab), event.shift))
                     );
                 } else if(event.key === 'Escape') {
                     // special case for escape key; clear keyboard focus
@@ -352,13 +378,13 @@ export class Root {
             // If this was a tab selection relative to a widget, but the widget
             // was not found, try again but with no relative widget. This
             // happens when a removed widget still has tab focus
-            if(event instanceof TabSelect && event.relativeTo !== null) {
-                event = new TabSelect(null, event.reversed);
+            if(event instanceof TabSelectEvent && event.relativeTo !== null) {
+                event = new TabSelectEvent(null, event.reversed);
                 captured = this.child.dispatchEvent(event);
             }
         }
 
-        if(event instanceof TabSelect) {
+        if(event instanceof TabSelectEvent) {
             if(captured) {
                 if(!event.reachedRelative && !Root.badTabCaptureWarned) {
                     Root.badTabCaptureWarned = true;
@@ -384,7 +410,7 @@ export class Root {
         // Special case: when the pointer focus capturer changes, dispatch a
         // leave event to the last capturer
         if(event.focusType === FocusType.Pointer && oldCapturer !== null) {
-            const leaveEvent = new Leave(oldCapturer);
+            const leaveEvent = new LeaveEvent(oldCapturer);
             captureList.push([
                 leaveEvent,
                 this.child.dispatchEvent(leaveEvent) !== null
@@ -753,5 +779,23 @@ export class Root {
         this.clearDrivers();
         this.child.detach();
         this.textInputHandler = null;
+    }
+
+    on(eventType: string, listener: WidgetEventListener, once = false): void {
+        eventEmitterOn(this.nextListener, this.typedListeners, eventType, listener, once);
+        this.nextListener++;
+    }
+
+    onAny(listener: WidgetEventListener): void {
+        eventEmitterOnAny(this.nextListener, this.untypedListeners, listener);
+        this.nextListener++;
+    }
+
+    off(eventType: string, listener: WidgetEventListener, once = false): boolean {
+        return eventEmitterOff(this.typedListeners, eventType, listener, once);
+    }
+
+    offAny(listener: WidgetEventListener): boolean {
+        return eventEmitterOffAny(this.untypedListeners, listener);
     }
 }

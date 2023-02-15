@@ -1,5 +1,5 @@
 import { getPointerEventNormPos } from '../helpers/getPointerEventNormPos';
-import { parseDOMDeltaMode } from '../events/PointerWheel';
+import { parseDOMDeltaMode } from '../events/PointerWheelEvent';
 import { PointerDriver } from './PointerDriver';
 import type { Root } from '../core/Root';
 import { Msg } from '../core/Strings';

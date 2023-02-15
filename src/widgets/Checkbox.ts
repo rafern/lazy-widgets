@@ -7,6 +7,7 @@ import type { TricklingEvent } from '../events/TricklingEvent';
 import { Variable } from '../state/Variable';
 import type { Root } from '../core/Root';
 import type { Rect } from '../helpers/Rect';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 
 /**
  * A checkbox widget; can be ticked or unticked.
@@ -98,11 +99,15 @@ export class Checkbox extends Widget {
         }
     }
 
-    protected override handleEvent(event: TricklingEvent): this | null {
+    protected override handleEvent(event: WidgetEvent): Widget | null {
+        if (event.propagation !== PropagationModel.Trickling) {
+            return super.handleEvent(event);
+        }
+
         const x = this.idealX + this.offsetX;
         const y = this.idealY + this.offsetY;
         const [wasClick, capture] = this.clickHelper.handleEvent(
-            event,
+            event as TricklingEvent,
             this.root,
             this.clickable,
             [x, x + this.actualLength, y, y + this.actualLength]

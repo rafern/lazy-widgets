@@ -1,7 +1,7 @@
-import { PointerWheel, PointerWheelMode } from '../events/PointerWheel';
-import { PointerRelease } from '../events/PointerRelease';
+import { PointerWheelEvent, PointerWheelMode } from '../events/PointerWheelEvent';
+import { PointerReleaseEvent } from '../events/PointerReleaseEvent';
 import { PointerEvent } from '../events/PointerEvent';
-import { PointerPress } from '../events/PointerPress';
+import { PointerPressEvent } from '../events/PointerPressEvent';
 import { PointerMove } from '../events/PointerMove';
 import type { Widget } from '../widgets/Widget';
 import { FocusType } from '../core/FocusType';
@@ -9,7 +9,7 @@ import type { Driver } from '../core/Driver';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import { PointerHint } from './PointerHint';
 import type { Root } from '../core/Root';
-import { Leave } from '../events/Leave';
+import { LeaveEvent } from '../events/LeaveEvent';
 import type { SourcePointer } from './SourcePointer';
 
 /**
@@ -68,10 +68,10 @@ export class PointerDriver implements Driver {
         // Clear state
         state.pointer = null;
         if(state.hovering) {
-            // Dispatch Leave event if hovering
+            // Dispatch LeaveEvent event if hovering
             this.dispatchEvent(
                 root, state,
-                new Leave(root.getFocusCapturer(FocusType.Pointer)),
+                new LeaveEvent(root.getFocusCapturer(FocusType.Pointer)),
                 pointerID === null ? null : [this, pointerID]
             );
         }
@@ -83,7 +83,7 @@ export class PointerDriver implements Driver {
     /**
      * Register a new pointer.
      *
-     * @param dragToScroll - If true, then dragging will result in PointerWheel events if no widget captures the events.
+     * @param dragToScroll - If true, then dragging will result in PointerWheelEvent events if no widget captures the events.
      * @returns Returns {@link PointerDriver#nextPointerID} and increments it
      */
     registerPointer(dragToScroll = false): number {
@@ -97,7 +97,7 @@ export class PointerDriver implements Driver {
      * Unregister a pointer.
      *
      * If a root has this pointer bound to it, the pointer is unbound from the
-     * root, a Leave event is dispatched to the root and the hovering and
+     * root, a LeaveEvent event is dispatched to the root and the hovering and
      * pressing state of the root is set to false.
      */
     unregisterPointer(pointer: number): void {
@@ -224,7 +224,7 @@ export class PointerDriver implements Driver {
                 captured ||= this.dispatchEvent(
                     root,
                     state,
-                    new (isPressed ? PointerPress : PointerRelease)(x, y, bit, shift, ctrl, alt, source),
+                    new (isPressed ? PointerPressEvent : PointerReleaseEvent)(x, y, bit, shift, ctrl, alt, source),
                     source
                 );
             }
@@ -250,7 +250,7 @@ export class PointerDriver implements Driver {
     }
 
     /**
-     * Dispatch a {@link Leave} event to a given root. Event will only be
+     * Dispatch a {@link LeaveEvent} event to a given root. Event will only be
      * dispatched if the root was being hovered.
      *
      * @param pointer - The registered pointer ID
@@ -271,7 +271,7 @@ export class PointerDriver implements Driver {
             const captured = this.dispatchEvent(
                 root,
                 state,
-                new Leave(root.getFocusCapturer(FocusType.Pointer)),
+                new LeaveEvent(root.getFocusCapturer(FocusType.Pointer)),
                 [this, pointer]
             );
             this.setPointerHint(pointer, PointerHint.None);
@@ -282,7 +282,7 @@ export class PointerDriver implements Driver {
     }
 
     /**
-     * Dispatch a {@link Leave} event to any root with the given pointer
+     * Dispatch a {@link LeaveEvent} event to any root with the given pointer
      * assigned. Event will only be dispatched if the root was being hovered.
      * Pointer will also be unassigned from root.
      *
@@ -329,7 +329,7 @@ export class PointerDriver implements Driver {
         return this.dispatchEvent(
             root,
             state,
-            new PointerWheel(
+            new PointerWheelEvent(
                 x, y, deltaX, deltaY, deltaZ, deltaMode, false, shift, ctrl,
                 alt, source
             ),
@@ -396,7 +396,7 @@ export class PointerDriver implements Driver {
         }
 
         // Dispatch leave event
-        root.dispatchEvent(new Leave());
+        root.dispatchEvent(new LeaveEvent());
 
         // Reset hint for assigned pointer and stop dragging
         const state = this.states.get(root);
@@ -427,7 +427,7 @@ export class PointerDriver implements Driver {
         // doing dragging logic
         if(event instanceof PointerEvent && state.dragLast !== null) {
             const [startX, startY] = state.dragLast;
-            const capturedList = root.dispatchEvent(new PointerWheel(
+            const capturedList = root.dispatchEvent(new PointerWheelEvent(
                 ...state.dragOrigin,
                 startX - event.x, startY - event.y, 0,
                 PointerWheelMode.Pixel, false, false, false, true, source
@@ -441,7 +441,7 @@ export class PointerDriver implements Driver {
                 }
             }
 
-            if(event instanceof PointerRelease) {
+            if(event instanceof PointerReleaseEvent) {
                 state.dragLast = null;
             } else {
                 state.dragLast[0] = event.x;
@@ -456,7 +456,7 @@ export class PointerDriver implements Driver {
         if(root.dispatchEvent(event)) {
             state.dragLast = null;
             return true;
-        } else if(dragToScroll && event instanceof PointerPress) {
+        } else if(dragToScroll && event instanceof PointerPressEvent) {
             state.dragLast = [event.x, event.y];
             state.dragOrigin[0] = event.x;
             state.dragOrigin[1] = event.y;

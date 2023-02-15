@@ -1,8 +1,8 @@
 import { ThemeProperties } from "../theme/ThemeProperties";
 import { PointerEvent } from '../events/PointerEvent';
-import { AutoScroll } from '../events/AutoScroll';
+import { AutoScrollEvent } from '../events/AutoScrollEvent';
 import type { Viewport } from '../core/Viewport';
-import { TabSelect } from '../events/TabSelect';
+import { TabSelectEvent } from '../events/TabSelectEvent';
 import type { Bounds } from '../helpers/Bounds';
 import { BaseTheme } from '../theme/BaseTheme';
 import { FocusType } from '../core/FocusType';
@@ -11,8 +11,9 @@ import type { Theme } from '../theme/Theme';
 import type { Rect } from '../helpers/Rect';
 import type { Root } from '../core/Root';
 import { DynMsg } from '../core/Strings';
-
-const twoPi = Math.PI * 2;
+import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
+import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions';
+import { PropagationModel, WidgetEvent } from "../events/WidgetEvent";
 
 /**
  * Optional Widget constructor properties.
@@ -32,7 +33,7 @@ export interface WidgetProperties extends ThemeProperties {
  *
  * @category Widget
  */
-export abstract class Widget extends BaseTheme {
+export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     /**
      * Is this widget enabled? If it isn't, it will act as if it doesn't exist,
      * but will still be present in the UI tree.
@@ -44,7 +45,7 @@ export abstract class Widget extends BaseTheme {
      */
     protected _layoutDirty = true;
     /**
-     * Widget will get targetted events even if the target is not itself if it
+     * Widget will get targeted events even if the target is not itself if it
      * this is true. Useful for implementing container widgets.
      */
     readonly propagatesEvents: boolean;
@@ -109,6 +110,12 @@ export abstract class Widget extends BaseTheme {
      * all ascendants are enabled?
      */
     private _active = false;
+    /** Typed user listeners attached to this Widget */
+    private typedListeners: WidgetEventTypedListenerMap = new Map();
+    /** Untyped user listeners attached to this Widget */
+    private untypedListeners: WidgetEventUntypedListenerList = [];
+    /** Next user listener ID */
+    private nextListener = 0;
 
     /**
      * How much this widget will expand relative to other widgets in a flexbox
@@ -268,76 +275,122 @@ export abstract class Widget extends BaseTheme {
      * Widget event handling callback. If the event is to be captured, the
      * capturer is returned, else, null.
      *
-     * By default, this will do nothing and capture the event if it is targetted
-     * at itself.
+     * By default, this will do nothing and capture the event if it is targeted
+     * at itself. Bubbling events will be automatically dispatched to the parent
+     * or root. Sticky events will be ignored.
      *
      * If overriding, return the widget that has captured the event (could be
      * `this`, for example, or a child widget if implementing a container), or
      * null if no widget captured the event. Make sure to not capture any events
      * that you do not need, or you may have unexpected results; for example, if
-     * you capture all dispatched events indiscriminately, a {@link TabSelect}
-     * event may be captured and result in weird behaviour when the user
-     * attempts to use tab to select another widget.
+     * you capture all dispatched events indiscriminately, a
+     * {@link TabSelectEvent} event may be captured and result in weird
+     * behaviour when the user attempts to use tab to select another widget.
+     *
+     * Parent widgets should dispatch {@link TricklingEvent | TricklingEvents}
+     * to children. All widgets should dispatch
+     * {@link BubblingEvent | BubblingEvents} to the {@link Widget#parent} or
+     * {@link Widget#root}, if available. {@link StickyEvent | StickyEvents}
+     * should never be dispatched to children or parents.
+     *
+     * Note that bubbling events captured by a Root will return null, since
+     * there is no capturing **Widget**.
+     *
+     * Since the default handleEvent implementation already correctly handles
+     * bubbling and sticky events, it's a good idea to call super.handleEvent on
+     * these cases to avoid rewriting code, after transforming the event if
+     * necessary.
      */
-    protected handleEvent(event: TricklingEvent): Widget | null {
-        if(event.target === this) {
-            return this;
-        } else {
-            return null;
+    protected handleEvent(baseEvent: WidgetEvent): Widget | null {
+        if(baseEvent.propagation === PropagationModel.Trickling) {
+            if ((baseEvent as TricklingEvent).target === this) {
+                return this;
+            } else {
+                return null;
+            }
+        } else if(baseEvent.propagation === PropagationModel.Bubbling) {
+            if (this._parent) {
+                return this._parent.dispatchEvent(baseEvent);
+            } else if (this._root) {
+                this._root.dispatchEvent(baseEvent);
+            }
         }
+
+        return null;
     }
 
     /**
-     * Called when an event is passed to the Widget. Checks if the target
-     * matches the Widget, unless the Widget propagates events, or if the event
-     * is a {@link PointerEvent} and is in the bounds of the Widget. If neither
-     * of the conditions are true, the event is not captured (null is returned),
-     * else, the {@link Widget#handleEvent} method is called and its result is
-     * returned. Must not be overridden.
+     * Called when an event is passed to the Widget. Must not be overridden.
+     * Dispatches to user event listeners first; if a user listener captures the
+     * event, then `this` is returned.
+     *
+     * For trickling events:
+     * Checks if the target matches the Widget, unless the Widget propagates
+     * events, or if the event is a {@link PointerEvent} and is in the bounds of
+     * the Widget. If neither of the conditions are true, the event is not
+     * captured (null is returned), else, the {@link Widget#handleEvent} method
+     * is called and its result is returned.
+     *
+     * For bubbling or sticky events:
+     * Passes the event to the handleEvent method and returns the result.
      *
      * @returns Returns the widget that captured the event or null if none captured the event.
      */
-    dispatchEvent(event: TricklingEvent): Widget | null {
+    dispatchEvent(baseEvent: WidgetEvent): Widget | null {
+        // ignore event if widget is disabled
         if(!this._enabled) {
             return null;
         }
 
-        if(event.target === null) {
-            if(event instanceof PointerEvent) {
-                if(event.x < this.x || event.y < this.y || event.x >= this.x + this.width || event.y >= this.y + this.height) {
-                    return null;
+        // dispatch to user event listeners
+        if (eventEmitterHandleEvent(this.typedListeners, this.untypedListeners, baseEvent)) {
+            return this;
+        }
+
+        if (baseEvent.propagation === PropagationModel.Trickling) {
+            const event = baseEvent as TricklingEvent;
+
+            // handle special cases
+            if(event.target === null) {
+                if(event instanceof PointerEvent) {
+                    if(event.x < this.x || event.y < this.y || event.x >= this.x + this.width || event.y >= this.y + this.height) {
+                        return null;
+                    }
+                } else if(event instanceof AutoScrollEvent) {
+                    if(event.originallyRelativeTo === this) {
+                        return this;
+                    } else if(!this.propagatesEvents) {
+                        return null;
+                    }
                 }
-            } else if(event instanceof AutoScroll) {
-                if(event.originallyRelativeTo === this) {
-                    return this;
-                } else if(!this.propagatesEvents) {
-                    return null;
+            } else if(event.target !== this && !this.propagatesEvents) {
+                return null;
+            }
+
+            // handle event
+            let capturer = null;
+            if(event.reversed) {
+                capturer = this.handleEvent(event);
+            }
+
+            if(event instanceof TabSelectEvent) {
+                if(event.reachedRelative) {
+                    if(this.tabFocusable && (capturer === this || capturer === null)) {
+                        return this;
+                    }
+                } else if(event.relativeTo === this) {
+                    event.reachedRelative = true;
                 }
             }
-        } else if(event.target !== this && !this.propagatesEvents) {
-            return null;
-        }
 
-        let capturer = null;
-        if(event.reversed) {
-            capturer = this.handleEvent(event);
-        }
-
-        if(event instanceof TabSelect) {
-            if(event.reachedRelative) {
-                if(this.tabFocusable && (capturer === this || capturer === null)) {
-                    return this;
-                }
-            } else if(event.relativeTo === this) {
-                event.reachedRelative = true;
+            if(!event.reversed) {
+                capturer = this.handleEvent(event);
             }
-        }
 
-        if(!event.reversed) {
-            capturer = this.handleEvent(event);
+            return capturer;
+        } else {
+            return this.handleEvent(baseEvent);
         }
-
-        return capturer;
     }
 
     /**
@@ -556,18 +609,6 @@ export abstract class Widget extends BaseTheme {
         if(this._enabled) {
             this.handlePostLayoutUpdate();
         }
-    }
-
-    /**
-     * Painting utility: paints a circle. Should not be overridden. Coordinates
-     * are relative to the center of the circle. Uses ctx's current fillStyle.
-     * Does not restore the context state after finishing.
-     */
-    protected paintCircle(x: number, y: number, radius: number): void {
-        const ctx = this.viewport.context;
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, twoPi);
-        ctx.fill();
     }
 
     /**
@@ -838,11 +879,11 @@ export abstract class Widget extends BaseTheme {
     }
 
     /**
-     * {@link AutoScroll | Auto-scroll} to this widget. Uses the whole widget as
-     * the {@link AutoScroll#bounds | auto-scroll bounds}.
+     * {@link AutoScrollEvent | Auto-scroll} to this widget. Uses the whole
+     * widget as the {@link AutoScrollEvent#bounds | auto-scroll bounds}.
      */
     autoScroll(): void {
-        this.root.dispatchEvent(new AutoScroll(this, [0, this.idealWidth, 0, this.idealHeight]));
+        this.root.dispatchEvent(new AutoScrollEvent(this, [0, this.idealWidth, 0, this.idealHeight]));
     }
 
     /**
@@ -971,5 +1012,23 @@ export abstract class Widget extends BaseTheme {
         } else {
             return this._parent.queryPoint(x, y, relativeTo);
         }
+    }
+
+    on(eventType: string, listener: WidgetEventListener, once = false): void {
+        eventEmitterOn(this.nextListener, this.typedListeners, eventType, listener, once);
+        this.nextListener++;
+    }
+
+    onAny(listener: WidgetEventListener): void {
+        eventEmitterOnAny(this.nextListener, this.untypedListeners, listener);
+        this.nextListener++;
+    }
+
+    off(eventType: string, listener: WidgetEventListener, once = false): boolean {
+        return eventEmitterOff(this.typedListeners, eventType, listener, once);
+    }
+
+    offAny(listener: WidgetEventListener): boolean {
+        return eventEmitterOffAny(this.untypedListeners, listener);
     }
 }

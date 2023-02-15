@@ -1,14 +1,13 @@
 import type { Widget } from '../widgets/Widget';
 import { PointerEvent } from './PointerEvent';
-import { FocusType } from '../core/FocusType';
 import type { SourcePointer } from '../drivers/SourcePointer';
 
 /**
  * A {@link PointerEvent} for button presses/releases, containing helpers for
  * checking whether it was the left/primary button, right/secondary button or
  * middle/tertiary button. Always take the button ID into account when handling
- * this event as you get a pair of {@link PointerPress} and
- * {@link PointerRelease} events per button ID.
+ * this event as you get a pair of {@link PointerPressEvent} and
+ * {@link PointerReleaseEvent} events per button ID.
  *
  * Has a focus type decided by the child classes and does not need focus.
  *
@@ -25,8 +24,9 @@ export abstract class PointerButtonEvent extends PointerEvent {
      */
     readonly button: number;
 
-    constructor(x: number, y: number, button: number, shift: boolean, ctrl: boolean, alt: boolean, source: SourcePointer | null, target: Widget | null = null, focusType: FocusType | null = null) {
-        super(x, y, shift, ctrl, alt, source, target, focusType);
+    constructor(x: number, y: number, button: number, shift: boolean, ctrl: boolean, alt: boolean, source: SourcePointer | null, target: Widget | null = null) {
+        super(x, y, shift, ctrl, alt, source, target);
+
         this.button = button;
     }
 

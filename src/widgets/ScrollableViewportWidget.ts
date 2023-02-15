@@ -1,17 +1,18 @@
 import { ViewportWidget, ViewportWidgetProperties } from './ViewportWidget';
 import { AxisCoupling } from '../widgets/AxisCoupling';
 import { PointerEvent } from '../events/PointerEvent';
-import { PointerWheel } from '../events/PointerWheel';
+import { PointerWheelEvent } from '../events/PointerWheelEvent';
 import { ClickHelper } from '../helpers/ClickHelper';
 import { ClickState } from '../helpers/ClickState';
 import { TextHelper } from '../helpers/TextHelper';
-import { AutoScroll } from '../events/AutoScroll';
+import { AutoScrollEvent } from '../events/AutoScrollEvent';
 import type { Bounds } from '../helpers/Bounds';
 import type { TricklingEvent } from '../events/TricklingEvent';
-import { Leave } from '../events/Leave';
+import { LeaveEvent } from '../events/LeaveEvent';
 import type { Widget } from './Widget';
 import { Root } from '../core/Root';
 import type { Rect } from '../helpers/Rect';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 
 /**
  * The mode for how a scrollbar is shown in a {@link ScrollableViewportWidget}.
@@ -312,11 +313,11 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
      * Handle a wheel scroll event. If scrolling fails due to being at the
      * limit, this returns true if the last scroll attempt happened less than
      * 200 milliseconds ago. This behaviour is disabled if
-     * {@link PointerWheel#fromDrag} is true.
+     * {@link PointerWheelEvent#fromDrag} is true.
      *
      * @returns Returns true if this changed scroll was successful
      */
-    private handleWheelEvent(event: PointerWheel): boolean {
+    private handleWheelEvent(event: PointerWheelEvent): boolean {
         const offset = this.offset;
         const [oldX, oldY] = offset;
         const [dx, dy] = event.getDeltaPixels(true, this._scrollLineHeight, this.idealWidth, this.idealHeight);
@@ -371,14 +372,18 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         }
     }
 
-    protected override handleEvent(event: TricklingEvent): Widget | null {
+    protected override handleEvent(event: WidgetEvent): Widget | null {
+        if (event.propagation !== PropagationModel.Trickling) {
+            return super.handleEvent(event);
+        }
+
         // Try to drag a scrollbar if this is a pointer or leave event with no
         // target or target on this. Don't do this if the scrollbars are hidden
         const widthBiCoupled = this.widthCoupling === AxisCoupling.Bi;
         const heightBiCoupled = this.heightCoupling === AxisCoupling.Bi;
 
         if(this._scrollbarMode !== ScrollbarMode.Hidden &&
-           (event instanceof Leave || event instanceof PointerEvent) &&
+           (event instanceof LeaveEvent || event instanceof PointerEvent) &&
            (event.target === null || event.target === this)) {
             const [childWidth, childHeight] = this.child.idealDimensions;
             const overlay = this._scrollbarMode === ScrollbarMode.Overlay;
@@ -403,7 +408,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             // If the event was grabbed by either scrollbar, capture it
             if(grabbedEvent) {
                 // If this is a wheel event, handle it
-                if(event instanceof PointerWheel) {
+                if(event instanceof PointerWheelEvent) {
                     this.handleWheelEvent(event);
                 }
 
@@ -417,7 +422,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         // If this is an auto-scroll event and it's been captured, then scroll
         // to the capturer's wanted bounds, make the event relative to this
         // scrollable viewport and re-capture it
-        if(capturer !== null && event instanceof AutoScroll) {
+        if(capturer !== null && event instanceof AutoScrollEvent) {
             const reserve = this._scrollbarMode === ScrollbarMode.Layout;
             const reserveX = reserve && !heightBiCoupled;
             const reserveY = reserve && !widthBiCoupled;
@@ -516,7 +521,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
 
         // If this is a wheel event and nobody captured the event, try
         // scrolling. If scrolling did indeed occur, then capture the event.
-        if(capturer === null && event instanceof PointerWheel && this.handleWheelEvent(event)) {
+        if(capturer === null && event instanceof PointerWheelEvent && this.handleWheelEvent(event)) {
             return this;
         }
 

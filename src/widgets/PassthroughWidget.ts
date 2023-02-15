@@ -1,7 +1,7 @@
 import { Widget, WidgetProperties } from './Widget';
 import { SingleParent } from './SingleParent';
-import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Rect } from '../helpers/Rect';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 
 /**
  * A {@link SingleParent} which contains a single child and does nothing,
@@ -23,9 +23,12 @@ export class PassthroughWidget<W extends Widget = Widget> extends SingleParent<W
         super(child, true, properties);
     }
 
-    protected override handleEvent(event: TricklingEvent): Widget | null {
-        // Dispatch event to child
-        return this.child.dispatchEvent(event);
+    protected override handleEvent(event: WidgetEvent): Widget | null {
+        if (event.propagation !== PropagationModel.Trickling) {
+            return super.handleEvent(event);
+        } else {
+            return this.child.dispatchEvent(event);
+        }
     }
 
     protected override handlePreLayoutUpdate(): void {

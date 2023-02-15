@@ -1,6 +1,5 @@
 import type { Widget } from '../widgets/Widget';
 import { ModifierEvent } from './ModifierEvent';
-import { FocusType } from '../core/FocusType';
 import type { SourcePointer } from '../drivers/SourcePointer';
 
 /**
@@ -11,6 +10,8 @@ import type { SourcePointer } from '../drivers/SourcePointer';
  * @category Event
  */
 export abstract class PointerEvent extends ModifierEvent {
+    override readonly needsFocus: false;
+
     /** Pointer event position's X coordinate in pixels. Not an integer. */
     readonly x: number;
     /** Pointer event position's Y coordinate in pixels. Not an integer. */
@@ -25,8 +26,10 @@ export abstract class PointerEvent extends ModifierEvent {
      */
     readonly source: SourcePointer | null;
 
-    constructor(x: number, y: number, shift: boolean, ctrl: boolean, alt: boolean, source: SourcePointer | null, target: Widget | null = null, focusType: FocusType | null = null) {
-        super(shift, ctrl, alt, target, focusType, false);
+    constructor(x: number, y: number, shift: boolean, ctrl: boolean, alt: boolean, source: SourcePointer | null, target: Widget | null = null) {
+        super(shift, ctrl, alt, target);
+
+        this.needsFocus = false;
         this.x = x;
         this.y = y;
         this.source = source;

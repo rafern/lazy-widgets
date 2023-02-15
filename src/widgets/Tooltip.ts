@@ -1,13 +1,13 @@
 import { Layer } from '../core/Layer';
 import type { Root } from '../core/Root';
 import type { Viewport } from '../core/Viewport';
-import type { TricklingEvent } from '../events/TricklingEvent';
-import { Leave } from '../events/Leave';
+import { LeaveEvent } from '../events/LeaveEvent';
 import { PointerMove } from '../events/PointerMove';
 import { LayeredContainer } from './LayeredContainer';
 import { PassthroughWidget } from './PassthroughWidget';
 import { TooltipContainer } from './TooltipContainer';
 import type { Widget, WidgetProperties } from './Widget';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 
 const SENSITIVITY_RADIUS = 8;
 const HOVER_TIME = 1000;
@@ -90,7 +90,11 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
         }
     }
 
-    protected override handleEvent(event: TricklingEvent): Widget | null {
+    protected override handleEvent(event: WidgetEvent): Widget | null {
+        if (event.propagation !== PropagationModel.Trickling) {
+            return super.handleEvent(event);
+        }
+
         // check if this event should count as a hover/unhover
         if (event instanceof PointerMove) {
             if (this._hoverStart === 0) {
@@ -107,7 +111,7 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
                     this._hoverStartY = event.y;
                 }
             }
-        } else if (event instanceof Leave) {
+        } else if (event instanceof LeaveEvent) {
             this._hoverStart = 0;
 
             if (this._layer) {

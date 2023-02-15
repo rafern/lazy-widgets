@@ -1,7 +1,8 @@
-import type { LayoutConstraints } from "./LayoutConstraints";
-import type { Widget } from "../widgets/Widget";
-import type { TricklingEvent } from "../events/TricklingEvent";
-import type { Rect } from "../helpers/Rect";
+import type { LayoutConstraints } from './LayoutConstraints';
+import type { Widget } from '../widgets/Widget';
+import type { TricklingEvent } from '../events/TricklingEvent';
+import type { Rect } from '../helpers/Rect';
+import { BubblingEvent } from '../events/BubblingEvent';
 
 /**
  * Viewports are constrained rectangles that can be painted to. Viewports have a
@@ -106,13 +107,13 @@ export interface Viewport {
      */
     paint(extraDirtyRects: Array<Rect>): boolean;
     /**
-     * Dispatch an event to the Viewport's {@link Viewport#child}.
+     * Dispatch an event to the Viewport's {@link Viewport#child}. Only
+     * {@link TricklingEvent} is supported.
      *
      * @param event - The event to dispatch down the UI tree
      * @returns Returns the widget that captured the event or null if none captured the event.
      */
-    dispatchEvent(event: TricklingEvent): Widget | null;
-
+    dispatchTricklingEvent(event: TricklingEvent): Widget | null;
     /**
      * Mark a rectangle relative to this viewport as dirty.
      *

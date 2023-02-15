@@ -7,6 +7,8 @@ import type { Viewport } from '../core/Viewport';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Root } from '../core/Root';
 import type { Rect } from '../helpers/Rect';
+import { paintCircle } from '../helpers/paintCircle';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 
 /**
  * A radio button widget; used for selecting one of many options. Uses a shared
@@ -105,11 +107,15 @@ export class RadioButton<V> extends Widget {
         }
     }
 
-    protected override handleEvent(event: TricklingEvent): this | null {
+    protected override handleEvent(event: WidgetEvent): Widget | null {
+        if (event.propagation !== PropagationModel.Trickling) {
+            return super.handleEvent(event);
+        }
+
         const x = this.idealX + this.offsetX;
         const y = this.idealY + this.offsetY;
         const [wasClick, capture] = this.clickHelper.handleEvent(
-            event,
+            event as TricklingEvent,
             this.root,
             true,
             [x, x + this.actualLength, y, y + this.actualLength]
@@ -170,7 +176,7 @@ export class RadioButton<V> extends Widget {
         const halfLength = this.actualLength / 2;
         const radioX = this.offsetX + this.x + halfLength;
         const radioY = this.offsetY + this.y + halfLength;
-        this.paintCircle(radioX, radioY, halfLength);
+        paintCircle(ctx, radioX, radioY, halfLength);
 
         // Draw checked part of checkbox
         if(this.selected) {
@@ -185,10 +191,10 @@ export class RadioButton<V> extends Widget {
             // Fall back to filling entire radio button if there isn't enough
             // space for padding
             if(innerLength <= 0) {
-                this.paintCircle(radioX, radioY, halfLength);
+                paintCircle(ctx, radioX, radioY, halfLength);
             } else {
                 const halfInnerLength = innerLength / 2;
-                this.paintCircle(radioX, radioY, halfInnerLength);
+                paintCircle(ctx, radioX, radioY, halfInnerLength);
             }
         }
     }

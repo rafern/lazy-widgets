@@ -2,6 +2,7 @@ import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
 import type { Widget, WidgetProperties } from './Widget';
 import type { FocusType } from '../core/FocusType';
 import { BaseContainer } from './BaseContainer';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { TricklingEvent } from '../events/TricklingEvent';
 
 /**
@@ -57,9 +58,14 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
         this.clickHelper.onFocusDropped(focusType);
     }
 
-    protected override handleEvent(event: TricklingEvent): Widget | null {
+    protected override handleEvent(event: WidgetEvent): Widget | null {
+        if (event.propagation !== PropagationModel.Trickling) {
+            return super.handleEvent(event);
+        }
+
         const [wasClick, capture] = this.clickHelper.handleEvent(
-            event, this.root, this.callback !== null, this.bounds
+            event as TricklingEvent, this.root, this.callback !== null,
+            this.bounds
         );
 
         if(wasClick) {

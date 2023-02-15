@@ -11,8 +11,15 @@ import type { SourcePointer } from '../drivers/SourcePointer';
  * @category Event
  */
 export class PointerMove extends PointerEvent {
+    static override readonly type = 'pointer-move';
+    override readonly type: typeof PointerMove.type;
+    override readonly focusType: FocusType.Pointer;
+
     constructor(x: number, y: number, shift: boolean, ctrl: boolean, alt: boolean, source: SourcePointer | null, target: Widget | null = null) {
-        super(x, y, shift, ctrl, alt, source, target, FocusType.Pointer);
+        super(x, y, shift, ctrl, alt, source, target);
+
+        this.type = PointerMove.type;
+        this.focusType = FocusType.Pointer;
     }
 
     correctOffset(xOffset: number, yOffset: number): PointerMove {

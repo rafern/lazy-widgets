@@ -1,22 +1,23 @@
 import { layoutField, damageArrayField, watchField } from '../decorators/FlagFields';
 import { ValidatedVariable } from '../state/ValidatedVariable';
-import { PointerRelease } from '../events/PointerRelease';
+import { PointerReleaseEvent } from '../events/PointerReleaseEvent';
 import { TextPasteEvent } from '../events/TextPasteEvent';
 import { PointerEvent } from '../events/PointerEvent';
-import { PointerPress } from '../events/PointerPress';
-import { PointerWheel } from '../events/PointerWheel';
+import { PointerPressEvent } from '../events/PointerPressEvent';
+import { PointerWheelEvent } from '../events/PointerWheelEvent';
 import { Widget, WidgetProperties } from './Widget';
 import { PointerMove } from '../events/PointerMove';
 import { TextHelper } from '../helpers/TextHelper';
-import { AutoScroll } from '../events/AutoScroll';
+import { AutoScrollEvent } from '../events/AutoScrollEvent';
 import type { Viewport } from '../core/Viewport';
 import type { Bounds } from '../helpers/Bounds';
-import { KeyPress } from '../events/KeyPress';
+import { KeyPressEvent } from '../events/KeyPressEvent';
 import { FocusType } from '../core/FocusType';
-import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Rect } from '../helpers/Rect';
 import type { Root } from '../core/Root';
-import { Leave } from '../events/Leave';
+import { LeaveEvent } from '../events/LeaveEvent';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import { TricklingEvent } from '../events/TricklingEvent';
 
 /**
  * Optional TextInput constructor properties.
@@ -129,8 +130,8 @@ export class TextInput extends Widget {
     @watchField(TextInput.prototype.markDirtyCaret)
     typeableTab: boolean;
     /**
-     * Should the caret position be {@link AutoScroll | auto-scrolled} after the
-     * layout is finalized?
+     * Should the caret position be {@link AutoScrollEvent | auto-scrolled}
+     * after the layout is finalized?
      */
     private needsAutoScroll = false;
     /** The helper for keeping track of the checkbox value */
@@ -642,21 +643,26 @@ export class TextInput extends Widget {
         }
     }
 
-    protected override handleEvent(event: TricklingEvent): this | null {
+    protected override handleEvent(baseEvent: WidgetEvent): Widget | null {
+        if (baseEvent.propagation !== PropagationModel.Trickling) {
+            return super.handleEvent(baseEvent);
+        }
+
         // If editing is disabled, abort
         if(!this._editingEnabled) {
             return null;
         }
 
+        const event = baseEvent as TricklingEvent;
         const root = this.root;
 
-        if(event instanceof Leave) {
+        if(event instanceof LeaveEvent) {
             // Stop dragging if the pointer leaves the text input, since it
             // won't receive pointer release events outside the widget
             this.dragging = false;
             this.lastClick = 0;
             return this;
-        } else if(event instanceof PointerWheel) {
+        } else if(event instanceof PointerWheelEvent) {
             // Don't capture wheel events
             return null;
         } else if(event instanceof PointerEvent) {
@@ -665,8 +671,8 @@ export class TextInput extends Widget {
 
             // Request keyboard focus if this is a pointer press with the
             // primary button
-            if(event instanceof PointerPress || event instanceof PointerMove) {
-                const isPress = event instanceof PointerPress && event.isPrimary;
+            if(event instanceof PointerPressEvent || event instanceof PointerMove) {
+                const isPress = event instanceof PointerPressEvent && event.isPrimary;
                 if(isPress) {
                     this.dragging = true;
                     const clickTime = (new Date()).getTime();
@@ -747,7 +753,7 @@ export class TextInput extends Widget {
 
                 // Request focus
                 root.requestFocus(FocusType.Keyboard, this);
-            } else if(event instanceof PointerRelease && event.isPrimary) {
+            } else if(event instanceof PointerReleaseEvent && event.isPrimary) {
                 // Stop dragging
                 this.dragging = false;
 
@@ -767,7 +773,7 @@ export class TextInput extends Widget {
             }
 
             return this;
-        } else if(event instanceof KeyPress) {
+        } else if(event instanceof KeyPressEvent) {
             // Stop dragging
             this.dragging = false;
             this.lastClick = 0;
@@ -999,7 +1005,7 @@ export class TextInput extends Widget {
 
         if(this.needsAutoScroll) {
             this.needsAutoScroll = false;
-            this.root.dispatchEvent(new AutoScroll(this, this.caretBounds));
+            this.root.dispatchEvent(new AutoScrollEvent(this, this.caretBounds));
         }
     }
 

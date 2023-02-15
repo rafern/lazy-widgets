@@ -7,10 +7,11 @@ import { Widget, WidgetProperties } from './Widget';
 import type { Viewport } from '../core/Viewport';
 import type { Bounds } from '../helpers/Bounds';
 import { SingleParent } from './SingleParent';
-import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Root } from '../core/Root';
 import { DynMsg } from '../core/Strings';
 import { Rect } from '../helpers/Rect';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import { TricklingEvent } from '../events/TricklingEvent';
 
 /**
  * Optional ViewportWidget constructor properties.
@@ -222,8 +223,13 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         return [ left, left + width, top, top + height ];
     }
 
-    protected override handleEvent(event: TricklingEvent): Widget | null {
-        return this.internalViewport.dispatchEvent(event);
+    protected override handleEvent(event: WidgetEvent): Widget | null {
+        // TODO transform
+        if (event.propagation === PropagationModel.Trickling) {
+            return this.internalViewport.dispatchTricklingEvent(event as TricklingEvent);
+        } else {
+            return super.handleEvent(event);
+        }
     }
 
     protected override handlePreLayoutUpdate(): void {

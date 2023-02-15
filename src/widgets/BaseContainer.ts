@@ -1,6 +1,6 @@
 import { Widget, WidgetProperties } from './Widget';
 import { SingleParent } from './SingleParent';
-import type { TricklingEvent } from '../events/TricklingEvent';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { Rect } from '../helpers/Rect';
 import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions';
 import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
@@ -29,9 +29,12 @@ export abstract class BaseContainer<W extends Widget = Widget> extends SinglePar
         }
     }
 
-    protected override handleEvent(event: TricklingEvent): Widget | null {
-        // Dispatch event to child
-        return this.child.dispatchEvent(event);
+    protected override handleEvent(event: WidgetEvent): Widget | null {
+        if (event.propagation === PropagationModel.Trickling) {
+            return this.child.dispatchEvent(event);
+        } else {
+            return super.handleEvent(event);
+        }
     }
 
     protected override handlePreLayoutUpdate(): void {

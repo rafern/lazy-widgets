@@ -1,12 +1,12 @@
-import { PointerRelease } from '../events/PointerRelease';
+import { PointerReleaseEvent } from '../events/PointerReleaseEvent';
 import { GenericClickHelper } from './GenericClickHelper';
-import { PointerPress } from '../events/PointerPress';
+import { PointerPressEvent } from '../events/PointerPressEvent';
 import { PointerEvent } from '../events/PointerEvent';
 import { FocusType } from '../core/FocusType';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import { ClickState } from './ClickState';
 import type { Root } from '../core/Root';
-import { Leave } from '../events/Leave';
+import { LeaveEvent } from '../events/LeaveEvent';
 import type { Bounds } from './Bounds';
 
 /**
@@ -88,7 +88,7 @@ export class ClickHelper extends GenericClickHelper {
      * @param bounds - A 4-tuple containing, respectively, left coordinate, right coordinate, top coordinate and bottom coordinate of clickable area, in pixels
      */
     handleClickEvent(event: TricklingEvent, root: Root, bounds: Bounds): void {
-        if(event instanceof Leave) {
+        if(event instanceof LeaveEvent) {
             // Drop focus on this widget if this is a leave event
             root.dropFocus(FocusType.Pointer, this.widget);
             this.pointerPos = null;
@@ -98,7 +98,7 @@ export class ClickHelper extends GenericClickHelper {
             this.pointerPos = this.getNormalInRect(event.x, event.y, ...bounds);
 
             // If pointer is over the clickable rectangle, then change the
-            // pointer style, else, if not targetted, drop focus
+            // pointer style, else, if not targeted, drop focus
             const inside = this.isNormalInRect(...this.pointerPos);
             if(inside) {
                 root.pointerStyle = 'pointer';
@@ -109,14 +109,14 @@ export class ClickHelper extends GenericClickHelper {
 
             // If this is a press event, request focus and set starting
             // pointer coordinates. Ignore if wrong button
-            if(event instanceof PointerPress && event.button === this.pointerButton) {
+            if(event instanceof PointerPressEvent && event.button === this.pointerButton) {
                 this.startingPointerPos = this.pointerPos;
                 root.requestFocus(FocusType.Pointer, this.widget);
                 return this.setClickState(ClickState.Hold, inside);
             }
 
             // If this is a release event, drop focus. Ignore if wrong button
-            if(event instanceof PointerRelease && event.button === this.pointerButton) {
+            if(event instanceof PointerReleaseEvent && event.button === this.pointerButton) {
                 root.dropFocus(FocusType.Pointer, this.widget);
                 if(inside) {
                     return this.setClickState(ClickState.Hover, inside);

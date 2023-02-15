@@ -1,5 +1,5 @@
-import { PointerPress } from '../events/PointerPress';
-import { PointerWheel } from '../events/PointerWheel';
+import { PointerPressEvent } from '../events/PointerPressEvent';
+import { PointerWheelEvent } from '../events/PointerWheelEvent';
 import { PointerEvent } from '../events/PointerEvent';
 import { damageField } from '../decorators/FlagFields';
 import { ClickHelper } from '../helpers/ClickHelper';
@@ -7,15 +7,15 @@ import { Widget, WidgetProperties } from './Widget';
 import { ClickState } from '../helpers/ClickState';
 import type { Viewport } from '../core/Viewport';
 import type { Bounds } from '../helpers/Bounds';
-import { KeyPress } from '../events/KeyPress';
+import { KeyPressEvent } from '../events/KeyPressEvent';
 import { FocusType } from '../core/FocusType';
 import { KeyEvent } from '../events/KeyEvent';
-import type { TricklingEvent } from '../events/TricklingEvent';
 import { Variable } from '../state/Variable';
 import type { Root } from '../core/Root';
 import { DynMsg } from '../core/Strings';
-import { Leave } from '../events/Leave';
+import { LeaveEvent } from '../events/LeaveEvent';
 import type { Rect } from '../helpers/Rect';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 
 /**
  * Optional Slider constructor properties.
@@ -199,21 +199,25 @@ export class Slider extends Widget {
         }
     }
 
-    protected override handleEvent(event: TricklingEvent): this | null {
+    protected override handleEvent(event: WidgetEvent): Widget | null {
+        if (event.propagation !== PropagationModel.Trickling) {
+            return super.handleEvent(event);
+        }
+
         // Ignore unhandled events
-        if(event instanceof PointerWheel || !(event instanceof PointerEvent || event instanceof KeyEvent || event instanceof Leave)) {
+        if(event instanceof PointerWheelEvent || !(event instanceof PointerEvent || event instanceof KeyEvent || event instanceof LeaveEvent)) {
             return null;
         }
 
         // Ignore tab key presses so tab selection works, and escape so widget
         // unfocusing works
-        if(event instanceof KeyPress && (event.key === 'Tab' || event.key === 'Escape')) {
+        if(event instanceof KeyPressEvent && (event.key === 'Tab' || event.key === 'Escape')) {
             return null;
         }
 
         // Handle key presses
         if(event instanceof KeyEvent) {
-            if(event instanceof KeyPress) {
+            if(event instanceof KeyPressEvent) {
                 const incMul = event.shift ? 10 : 1;
                 if(event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
                     this.stepValue(false, incMul);
@@ -228,7 +232,7 @@ export class Slider extends Widget {
         // Save slider bounds so that the slider doesn't glitch out if dragged
         // while the layout changes. To handle hovering properly, also update if
         // moving pointer, but drag hasn't been initiated
-        if(event instanceof PointerPress || this.clickHelper.clickState !== ClickState.Hold) {
+        if(event instanceof PointerPressEvent || this.clickHelper.clickState !== ClickState.Hold) {
             const x = this.idealX + this.offsetX;
             const y = this.idealY + this.offsetY;
             this.dragBounds = [ x, x + this.actualWidth, y, y + this.actualHeight ];

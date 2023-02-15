@@ -1,17 +1,17 @@
 import { CompoundClickHelper } from "./CompoundClickHelper";
 import { GenericClickHelper } from "./GenericClickHelper";
 import { PointerEvent } from "../events/PointerEvent";
-import { PointerWheel } from "../events/PointerWheel";
-import { KeyRelease } from "../events/KeyRelease";
+import { PointerWheelEvent } from "../events/PointerWheelEvent";
+import { KeyReleaseEvent } from "../events/KeyReleaseEvent";
 import type { Widget } from "../widgets/Widget";
 import { KeyEvent } from "../events/KeyEvent";
-import { KeyPress } from "../events/KeyPress";
+import { KeyPressEvent } from "../events/KeyPressEvent";
 import { FocusType } from "../core/FocusType";
 import type { TricklingEvent } from "../events/TricklingEvent";
 import { ClickHelper } from "./ClickHelper";
 import { ClickState } from "./ClickState";
 import type { Root } from "../core/Root";
-import { Leave } from "../events/Leave";
+import { LeaveEvent } from "../events/LeaveEvent";
 import type { Bounds } from "./Bounds";
 
 /**
@@ -89,7 +89,7 @@ export class ButtonClickHelper extends CompoundClickHelper {
      * @returns Returns a 2-tuple containing, respective, whether a click occurred, and whether the event should be captured
      */
     handleEvent(event: TricklingEvent, root: Root, enabled: boolean, bounds: Bounds): [wasClick: boolean, capture: boolean] {
-        if(event instanceof PointerWheel) {
+        if(event instanceof PointerWheelEvent) {
             // Ignore wheel events
             return [false, false];
         } else if(event instanceof KeyEvent) {
@@ -99,7 +99,7 @@ export class ButtonClickHelper extends CompoundClickHelper {
             if(event.key !== 'Enter') {
                 return [false, false];
             }
-        } else if(!(event instanceof PointerEvent || event instanceof Leave)) {
+        } else if(!(event instanceof PointerEvent || event instanceof LeaveEvent)) {
             // Discard unhandled events
             return [false, false];
         }
@@ -112,11 +112,11 @@ export class ButtonClickHelper extends CompoundClickHelper {
         }
 
         // Update button state
-        if(event instanceof KeyPress) {
+        if(event instanceof KeyPressEvent) {
             this.pointerClickHelper.clickStateChanged = false;
             this.keyboardClickHelper.setClickState(ClickState.Hold, true);
             this.widget.autoScroll();
-        } else if(event instanceof KeyRelease) {
+        } else if(event instanceof KeyReleaseEvent) {
             this.pointerClickHelper.clickStateChanged = false;
             this.keyboardClickHelper.setClickState(ClickState.Hover, true);
         } else {
