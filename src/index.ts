@@ -140,3 +140,6 @@ export * from './widgets/Tooltip';
 export * from './widgets/TooltipContainer';
 export * from './widgets/ViewportWidget';
 export * from './widgets/Widget';
+// xml
+export * from './xml/BaseXMLUIParser';
+export * from './xml/XMLUIParser';
