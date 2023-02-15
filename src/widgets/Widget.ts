@@ -14,6 +14,7 @@ import { DynMsg } from '../core/Strings';
 import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
 import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions';
 import { PropagationModel, WidgetEvent } from "../events/WidgetEvent";
+import type { WidgetAutoXML } from "../xml/WidgetAutoXML";
 
 /**
  * Optional Widget constructor properties.
@@ -34,6 +35,17 @@ export interface WidgetProperties extends ThemeProperties {
  * @category Widget
  */
 export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
+    /**
+     * Input mapping for automatically generating a widget factory for a
+     * {@link BaseXMLUIParser} with {@link BaseXMLUIParser#registerAutoFactory}.
+     * If null, then {@link BaseXMLUIParser#registerFactory} must be manually
+     * called by the user.
+     *
+     * This static property must be overridden by a concrete child class if you
+     * want to provide auto-factory support.
+     */
+    static autoXML: WidgetAutoXML | null = null;
+
     /**
      * Is this widget enabled? If it isn't, it will act as if it doesn't exist,
      * but will still be present in the UI tree.

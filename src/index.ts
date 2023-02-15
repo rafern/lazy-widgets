@@ -143,3 +143,6 @@ export * from './widgets/Widget';
 // xml
 export * from './xml/BaseXMLUIParser';
 export * from './xml/XMLUIParser';
+
+// re-export concrete widgets in separate namespace, so they can be iterated
+export * as widgets from './widgets/concrete-widgets';

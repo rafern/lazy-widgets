@@ -1,6 +1,7 @@
 import { ArtificialConstraint } from '../ArtificialConstraint';
 import type { WidgetProperties } from '../Widget';
 import { TextButton } from '../TextButton';
+import { VirtualKeyAutoXML } from '../../xml/VirtualKeyAutoXML';
 
 /**
  * An {@link ArtificialConstraint} with a {@link TextButton} which calls a given
@@ -13,6 +14,8 @@ import { TextButton } from '../TextButton';
  * @category Aggregate Widget
  */
 export class VirtualKey extends ArtificialConstraint<TextButton> {
+    static override autoXML = VirtualKeyAutoXML;
+
     /**
      * @param text - The text to display in the virtual key.
      * @param callback - The callback called when the button is pressed.

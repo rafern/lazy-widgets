@@ -1,3 +1,4 @@
+import { BasicVirtualKeyAutoXML } from '../../xml/BasicVirtualKeyAutoXML';
 import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from './KeyContext';
 import { VirtualKey } from './VirtualKey';
@@ -9,6 +10,8 @@ import { VirtualKey } from './VirtualKey';
  * @category Alias Widget
  */
 export class BasicVirtualKey extends VirtualKey {
+    static override autoXML = BasicVirtualKeyAutoXML;
+
     /**
      * @param text - The text to display in the virtual key.
      * @param keyCode - The {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values | key code} to emit in the keyContext's callback when the virtual key is pressed

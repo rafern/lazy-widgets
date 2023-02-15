@@ -14,6 +14,11 @@ export function toKebabCase(str: string): string {
     let accum = str[0].toLowerCase();
     for (let i = 1; i < str.length; i++) {
         const char = str[i];
+
+        if (char === ':') {
+            throw new Error('Colon characters are not allowed in element or variable names');
+        }
+
         const charLower = char.toLowerCase();
         if (char === charLower) {
             accum += char;

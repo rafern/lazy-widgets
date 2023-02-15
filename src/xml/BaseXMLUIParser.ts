@@ -1,5 +1,6 @@
 import { Widget } from '../widgets/Widget';
 import { toKebabCase } from './toKebabCase';
+import { WidgetAutoXML } from './WidgetAutoXML';
 
 export type XMLWidgetFactory = (parser: BaseXMLUIParser, xmlNode: Node) => Widget;
 
@@ -8,10 +9,10 @@ export class BaseXMLUIParser {
     private domParser = new DOMParser();
 
     registerFactory(name: string, factory: XMLWidgetFactory): void;
-    registerFactory(widgetCtor: new () => Widget, factory: XMLWidgetFactory): void;
-    registerFactory(nameOrWidgetCtor: string | (new () => Widget), factory: XMLWidgetFactory) {
+    registerFactory<T extends Widget>(widgetClass: new (...args: unknown[]) => T, factory: XMLWidgetFactory): void;
+    registerFactory<T extends Widget = Widget>(nameOrWidgetClass: string | (new (...args: unknown[]) => T), factory: XMLWidgetFactory) {
         // handle constructors as names
-        let name = nameOrWidgetCtor;
+        let name = nameOrWidgetClass;
         if (typeof name !== 'string') {
             name = name.name;
         }
@@ -30,6 +31,21 @@ export class BaseXMLUIParser {
         this.factories.set(name, factory);
     }
 
+    registerAutoFactory<T extends Widget = Widget>(widgetClass: (new () => T) & { autoXML: WidgetAutoXML }) {
+        if (widgetClass.autoXML === null) {
+            throw new Error('Widget class does not have an automatic XML factory config object set. Must be manually registered');
+        }
+
+        if (typeof widgetClass.autoXML === 'function') {
+            // this is a self-register function, call it
+            widgetClass.autoXML(this);
+        } else {
+            // this is an auto-factory config. create a new factory that fits
+            // the requirements of the config
+            // TODO
+        }
+    }
+
     parseNode(xmlNode: Node): Widget {
         // get factory for this element name
         const name = xmlNode.nodeName.toLowerCase();
@@ -40,7 +56,6 @@ export class BaseXMLUIParser {
         }
 
         // generate widget
-        // TODO input mapping
         // TODO id mapping
         // TODO pre-parsed node attributes, to handle vue-like tag syntax
         return factory(this, xmlNode);

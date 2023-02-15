@@ -1,5 +1,6 @@
 import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from './KeyContext';
+import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAutoXML';
 import { VirtualKey } from './VirtualKey';
 
 /**
@@ -10,6 +11,8 @@ import { VirtualKey } from './VirtualKey';
  * @category Alias Widget
  */
 export class AltKey extends VirtualKey {
+    static override autoXML = SpecializedVirtualKeyAutoXML;
+
     constructor(keyContext: KeyContext, minWidth = 42, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super(
             'Alt',
