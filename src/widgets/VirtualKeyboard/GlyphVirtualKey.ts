@@ -24,7 +24,7 @@ export class GlyphVirtualKey extends VirtualKey {
             {
                 name: 'alt-glyph',
                 mode: 'value',
-                validator: 'nullable-string',
+                validator: 'nullable:string',
             },
             {
                 name: 'key-context',

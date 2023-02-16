@@ -93,7 +93,7 @@ export class VirtualKeyRow extends Row<VirtualKey> {
      * @param minHeight - The minHeight to use when creating {@link GlyphVirtualKey | GlyphVirtualKeys}.
      */
     constructor(rowTemplate: VirtualKeyRowTemplate, keyContext: KeyContext, minWidth = 24, minHeight = 24, properties?: Readonly<WidgetProperties>) {
-        super(properties);
+        super([], properties);
 
         for(const entry of rowTemplate) {
             if(typeof entry === 'function') {

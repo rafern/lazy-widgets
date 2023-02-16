@@ -146,7 +146,7 @@ export class VirtualKeyboard extends Column {
             ...properties
         };
 
-        super(properties);
+        super([], properties);
 
         // Make context
         const keyContext = <KeyContext>{
