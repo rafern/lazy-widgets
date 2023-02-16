@@ -24,7 +24,7 @@ export class Label extends Widget {
         parameters: [
             {
                 mode: 'text',
-                optionalName: 'text',
+                name: 'text',
                 optional: true
             }
         ],

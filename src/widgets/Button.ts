@@ -19,7 +19,8 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
     static override autoXML: WidgetAutoXML = {
         parameters: [
             {
-                mode: 'widget'
+                mode: 'widget',
+                name: 'child'
             },
             {
                 mode: 'value',

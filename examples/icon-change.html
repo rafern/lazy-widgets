@@ -57,15 +57,15 @@
             const root = new DOMRoot(
                 new Background(
                     new Margin(
-                        new Column().add([
+                        new Column([
                             new ArtificialConstraint(icon, [0, 256, 0, 256]),
                             new Label('The icon should change between a banana and an apple'),
-                            new Row().add([
+                            new Row([
                                 new TextButton('Change Icon.image.src', () => changeImage(false, false)),
                                 new TextButton('Change Icon.image', () => changeImage(false, true))
                             ]),
                             new Label('The video should change between a test video and the big buck bunny trailer'),
-                            new Row().add([
+                            new Row([
                                 new TextButton('Change Icon.image.src', () => changeImage(true, false)),
                                 new TextButton('Change Icon.image', () => changeImage(true, true))
                             ]),

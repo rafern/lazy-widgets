@@ -14,7 +14,7 @@ export class BasicVirtualKey extends VirtualKey {
         parameters: [
             {
                 mode: 'text',
-                optionalName: 'text'
+                name: 'text'
             },
             {
                 name: 'key-code',

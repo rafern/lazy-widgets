@@ -18,7 +18,7 @@ export class TextButton extends FilledButton<Label> {
         parameters: [
             {
                 mode: 'text',
-                optionalName: 'text'
+                name: 'text'
             },
             {
                 mode: 'value',

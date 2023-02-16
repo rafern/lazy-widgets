@@ -17,24 +17,21 @@
                         {
                             child: new Background(
                                 new Margin(
-                                    new Column()
-                                    .add(label)
-                                    .add(
+                                    new Column([
+                                        label,
                                         new TextInput(new ValidatedVariable('', null, value => {
                                             label.text = `Text input: ${value}`;
-                                        }, false))
-                                    )
-                                    .add(
-                                        new Row({
+                                        }, false)),
+                                        new Row([
+                                            new TextButton('Button 1', () => label.text = 'Button 1 clicked!'),
+                                            new TextButton('Button 2', () => label.text = 'Button 2 clicked!'),
+                                        ], {
                                             multiContainerAlignment: {
                                                 main: FlexAlignment.Center,
                                                 cross: Alignment.Stretch
                                             },
-                                        }).add([
-                                            new TextButton('Button 1', () => label.text = 'Button 1 clicked!'),
-                                            new TextButton('Button 2', () => label.text = 'Button 2 clicked!'),
-                                        ])
-                                    )
+                                        })
+                                    ])
                                 )
                             )
                         },
@@ -47,12 +44,7 @@
                             )
                         },
                         {
-                            child: new Column({
-                                multiContainerAlignment: {
-                                    main: FlexAlignment.End,
-                                    cross: Alignment.Stretch
-                                }
-                            }).add(
+                            child: new Column([
                                 new Label(
                                     "I am above all layers, but i can't expand the layout, because my layer's canExpand option is false!",
                                     {
@@ -60,7 +52,12 @@
                                         bodyTextAlign: TextAlignMode.End
                                     }
                                 )
-                            ),
+                            ], {
+                                multiContainerAlignment: {
+                                    main: FlexAlignment.End,
+                                    cross: Alignment.Stretch
+                                }
+                            }),
                             canExpand: false
                         }
                     ]

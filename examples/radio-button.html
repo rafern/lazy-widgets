@@ -15,15 +15,16 @@
             const root = new DOMRoot(
                 new Background(
                     new Margin(
-                        new Column()
-                        .add(new Label('Select an option:'))
-                        .add(new LabelledRadioButton('Option 1', variable, 'option_1_value'))
-                        .add(new LabelledRadioButton('Option 2', variable, 'option_2_value'))
-                        .add(new LabelledRadioButton('Option 3', variable, 'option_3_value'))
-                        .add(new LabelledRadioButton('Option 4', variable, 'option_4_value'))
-                        .add(new LabelledRadioButton('Option 5', variable, 'option_5_value'))
-                        .add(new Spacing({ flex: 0, minHeight: 8 }))
-                        .add(label)
+                        new Column([
+                            new Label('Select an option:'),
+                            new LabelledRadioButton('Option 1', variable, 'option_1_value'),
+                            new LabelledRadioButton('Option 2', variable, 'option_2_value'),
+                            new LabelledRadioButton('Option 3', variable, 'option_3_value'),
+                            new LabelledRadioButton('Option 4', variable, 'option_4_value'),
+                            new LabelledRadioButton('Option 5', variable, 'option_5_value'),
+                            new Spacing({ flex: 0, minHeight: 8 }),
+                            label
+                        ])
                     )
                 )
             );

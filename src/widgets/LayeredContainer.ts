@@ -62,7 +62,8 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
         parameters: [
             {
                 mode: 'layer',
-                isList: true
+                name: 'layers',
+                list: true
             },
             {
                 mode: 'value',

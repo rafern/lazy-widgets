@@ -18,7 +18,7 @@ export class VirtualKey extends ArtificialConstraint<TextButton> {
         parameters: [
             {
                 mode: 'text',
-                optionalName: 'text'
+                name: 'text'
             },
             {
                 name: 'callback',

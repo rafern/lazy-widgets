@@ -19,7 +19,8 @@ export class ThemeScope<W extends Widget = Widget> extends PassthroughWidget<W> 
     static override autoXML: WidgetAutoXML = {
         parameters: [
             {
-                mode: 'widget'
+                mode: 'widget',
+                name: 'child'
             },
             {
                 mode: 'value',

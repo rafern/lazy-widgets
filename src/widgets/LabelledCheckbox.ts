@@ -16,7 +16,7 @@ export class LabelledCheckbox extends Row {
         parameters: [
             {
                 mode: 'text',
-                optionalName: 'text'
+                name: 'text'
             },
             {
                 mode: 'value',

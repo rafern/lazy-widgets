@@ -17,7 +17,7 @@ export class LabelledRadioButton<V> extends Row {
         parameters: [
             {
                 mode: 'text',
-                optionalName: 'text'
+                name: 'text'
             },
             {
                 mode: 'value',

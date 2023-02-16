@@ -23,13 +23,13 @@
             const root = new DOMRoot(
                 new Background(
                     new Margin(
-                        new Column().add([
+                        new Column([
                             icon,
-                            new Row({
-                                multiContainerAlignment: { main: 0.5, cross: 0.5 }
-                            }).add([
+                            new Row([
                                 button
-                            ])
+                            ], {
+                                multiContainerAlignment: { main: 0.5, cross: 0.5 }
+                            })
                         ])
                     )
                 )

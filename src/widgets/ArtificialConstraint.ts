@@ -16,8 +16,8 @@ export class ArtificialConstraint<W extends Widget = Widget> extends Passthrough
     static override autoXML: WidgetAutoXML = {
         parameters: [
             {
-                // param name: child
                 mode: 'widget',
+                name: 'child',
             },
             {
                 name: 'constraints',

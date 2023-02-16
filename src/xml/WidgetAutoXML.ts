@@ -1,5 +1,7 @@
-import { Widget } from '../widgets/Widget';
-import { BaseXMLUIParser } from './BaseXMLUIParser';
+import type { Widget } from '../widgets/Widget';
+import type { BaseXMLUIParser, XMLWidgetFactory } from './BaseXMLUIParser';
+
+export type WidgetAutoXMLConfigValidator = (value: unknown) => unknown;
 
 /**
  * A parameter for the constructor of a Widget class, configured in a
@@ -9,39 +11,43 @@ export interface WidgetAutoXMLConfigParameter {
     mode: 'value';
     name: string;
     optional?: boolean;
-    validator?: ((value: unknown) => unknown) | 'array' | 'boolean' | 'function' | 'image-source' | 'key-context' | 'layout-constraints' | 'number' | 'object' | 'string' | 'theme' | 'validated-variable' | 'variable' | 'nullable:array' | 'nullable:boolean' | 'nullable:function' | 'nullable:image-source' | 'nullable:key-context' | 'nullable:layout-constraints' | 'nullable:number' | 'nullable:object' | 'nullable:string' | 'nullable:theme' | 'nullable:validated-variable' | 'nullable:variable';
+    validator?: WidgetAutoXMLConfigValidator | 'array' | 'boolean' | 'function' | 'image-source' | 'key-context' | 'layout-constraints' | 'number' | 'object' | 'string' | 'theme' | 'validated-variable' | 'variable' | 'nullable:array' | 'nullable:boolean' | 'nullable:function' | 'nullable:image-source' | 'nullable:key-context' | 'nullable:layout-constraints' | 'nullable:number' | 'nullable:object' | 'nullable:string' | 'nullable:theme' | 'nullable:validated-variable' | 'nullable:variable';
 }
 
 /** A widget parameter for a {@link WidgetAutoXMLConfig}. */
 export interface WidgetAutoXMLConfigWidgetParameter {
     mode: 'widget';
+    name?: string;
     optional?: boolean;
-    isList?: boolean;
+    list?: boolean;
     validator?: <W extends Widget>(value: Widget) => W;
 }
 
 /** A layer list parameter for a {@link WidgetAutoXMLConfig}. */
 export interface WidgetAutoXMLConfigLayerParameter {
     mode: 'layer';
-    isList: boolean;
+    list: boolean;
+    name?: string;
 }
 
 /**
  * A string parameter for a {@link WidgetAutoXMLConfig}, passed as an XML text
- * node.
+ * node. There can only be one text parameter.
  */
 export interface WidgetAutoXMLConfigTextParameter {
     mode: 'text';
-    optionalName?: string;
+    name?: string;
     optional?: boolean;
 }
+
+export type WidgetAutoXMLConfigParameterList = Array<WidgetAutoXMLConfigParameter | WidgetAutoXMLConfigWidgetParameter | WidgetAutoXMLConfigLayerParameter | WidgetAutoXMLConfigTextParameter>;
 
 /**
  * An input mapping for a {@link Widget | Widget's}
  * {@link BaseXMLUIParser#registerAutoFactory | auto-factory}.
  */
 export interface WidgetAutoXMLConfig {
-    parameters: Array<WidgetAutoXMLConfigParameter | WidgetAutoXMLConfigWidgetParameter | WidgetAutoXMLConfigLayerParameter | WidgetAutoXMLConfigTextParameter>;
+    parameters: WidgetAutoXMLConfigParameterList;
     hasOptions: boolean;
 }
 
@@ -52,7 +58,7 @@ export interface WidgetAutoXMLConfig {
 export type WidgetAutoXMLSelfRegister = (parser: BaseXMLUIParser) => void;
 
 /**
- * Widget factory auto-register object. Can be a config object, or a
- * self-register function.
+ * Widget factory auto-register object. Can be a config object, or an XML widget
+ * factory which will be self-registered.
  */
-export type WidgetAutoXML = WidgetAutoXMLConfig | WidgetAutoXMLSelfRegister;
+export type WidgetAutoXML = WidgetAutoXMLConfig | XMLWidgetFactory;

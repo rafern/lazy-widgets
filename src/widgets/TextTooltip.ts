@@ -13,11 +13,12 @@ export class TextTooltip<W extends Widget = Widget> extends Tooltip<W, TooltipCo
     static override autoXML: WidgetAutoXML = {
         parameters: [
             {
-                mode: 'widget'
+                mode: 'widget',
+                name: 'child'
             },
             {
                 mode: 'text',
-                optionalName: 'tooltip-text'
+                name: 'tooltip-text'
             }
         ],
         hasOptions: true

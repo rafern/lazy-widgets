@@ -4,7 +4,8 @@ export const MultiParentAutoXML: WidgetAutoXML = {
     parameters: [
         {
             mode: 'widget',
-            isList: true,
+            name: 'children',
+            list: true,
             optional: true,
         }
     ],

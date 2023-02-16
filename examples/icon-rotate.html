@@ -12,10 +12,11 @@
             const root = new DOMRoot(
                 new Background(
                     new Margin(
-                        new Column()
-                        .add(new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }))
-                        .add(new ArtificialConstraint(icon, [0, 128, 0, 128]))
-                        .add(new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }))
+                        new Column([
+                            new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }),
+                            new ArtificialConstraint(icon, [0, 128, 0, 128]),
+                            new Label('BANANA', { bodyTextAlign: TextAlignMode.Center })
+                        ])
                     )
                 )
             );

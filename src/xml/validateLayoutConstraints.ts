@@ -1,6 +1,6 @@
 import type { LayoutConstraints } from '../core/LayoutConstraints';
 
-export function validateKeyContext(value: unknown): LayoutConstraints {
+export function validateLayoutConstraints(value: unknown): LayoutConstraints {
     if (typeof value !== 'object') {
         throw new Error('Invalid LayoutConstraints; not an object type');
     }

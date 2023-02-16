@@ -29,10 +29,12 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
     static override autoXML: WidgetAutoXML = {
         parameters: [
             {
-                mode: 'widget'
+                mode: 'widget',
+                name: 'child'
             },
             {
-                mode: 'widget'
+                mode: 'widget',
+                name: 'tooltip-widget'
             }
         ],
         hasOptions: true

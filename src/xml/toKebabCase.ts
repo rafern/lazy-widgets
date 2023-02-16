@@ -21,10 +21,10 @@ export function toKebabCase(str: string): string {
 
         const charLower = char.toLowerCase();
         if (char === charLower) {
-            accum += char;
+            accum += charLower;
         } else {
             // letter is upper case, create break
-            accum = `${accum}-${char}`;
+            accum = `${accum}-${charLower}`;
         }
     }
 

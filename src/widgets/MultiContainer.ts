@@ -28,7 +28,8 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             },
             {
                 mode: 'widget',
-                isList: true,
+                name: 'children',
+                list: true,
                 optional: true,
             }
         ],

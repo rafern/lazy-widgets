@@ -3,27 +3,15 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
-                DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
-                ValidatedVariable, Background, LayeredContainer, TextTooltip
+                DOMRoot, DOMKeyboardDriver, DOMPointerDriver, XMLUIParser
             } from '../dist/index.esm.js';
 
+            // Load top widget from XML file
+            const xmlParser = new XMLUIParser();
+            const topWidget = await xmlParser.parseFromURL('example-ui.xml');
+
             // Create the root
-            const root = new DOMRoot(
-                LayeredContainer.fromDefaultLayerChild(
-                    new Background(
-                        new Margin(
-                            new Column([
-                                new Label('Hover your cursor over the input to show a tooltip:'),
-                                new TextTooltip(
-                                    new TextInput(new ValidatedVariable('Hover over this!')),
-                                    'I am a tooltip!'
-                                )
-                            ])
-                        )
-                    )
-                )
-            );
+            const root = new DOMRoot(topWidget);
 
             // Create, bind DOM and register the keyboard driver
             const keyboardDriver = new DOMKeyboardDriver();

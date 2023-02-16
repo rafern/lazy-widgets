@@ -11,12 +11,13 @@
             const root = new DOMRoot(
                 new Background(
                     new Margin(
-                        new Column()
-                        .add(new Label('Text area (200x200 minimum length):'))
-                        .add(new TextArea(
-                            new ValidatedVariable('Type some text here...'),
-                            { minWidth: 200, minHeight: 200 }
-                        ))
+                        new Column([
+                            new Label('Text area (200x200 minimum length):'),
+                            new TextArea(
+                                new ValidatedVariable('Type some text here...'),
+                                { minWidth: 200, minHeight: 200 }
+                            )
+                        ])
                     )
                 )
             );

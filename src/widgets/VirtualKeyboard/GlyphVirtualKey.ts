@@ -18,7 +18,7 @@ export class GlyphVirtualKey extends VirtualKey {
         parameters: [
             {
                 mode: 'text',
-                optionalName: 'glyph'
+                name: 'glyph'
             },
             {
                 name: 'alt-glyph',
