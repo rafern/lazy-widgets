@@ -2,6 +2,7 @@ import { ScrollableViewportWidget, ScrollableViewportWidgetProperties, Scrollbar
 import type { ValidatedVariable } from "../state/ValidatedVariable";
 import { TextInput, TextInputProperties } from "./TextInput";
 import { AxisCoupling } from "../widgets/AxisCoupling";
+import type { WidgetAutoXML } from "../xml/WidgetAutoXML";
 
 /**
  * A {@link ScrollableViewportWidget} with a {@link TextInput}. Meant to be used
@@ -18,6 +19,17 @@ import { AxisCoupling } from "../widgets/AxisCoupling";
  * @category Aggregate Widget
  */
 export class TextArea extends ScrollableViewportWidget<TextInput> {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'value',
+                name: 'variable',
+                validator: 'variable'
+            }
+        ],
+        hasOptions: true
+    };
+
     constructor(variable: ValidatedVariable<string, unknown>, properties?: Readonly<ScrollableViewportWidgetProperties & TextInputProperties>) {
         // default properties
         properties = {

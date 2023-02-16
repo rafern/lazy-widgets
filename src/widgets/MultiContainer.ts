@@ -5,6 +5,7 @@ import type { TricklingEvent } from '../events/TricklingEvent';
 import { MultiParent } from './MultiParent';
 import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link MultiParent} which automatically paints children, adds spacing,
@@ -18,6 +19,22 @@ import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
  * @category Widget
  */
 export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'value',
+                name: 'vertical',
+                validator: 'boolean',
+            },
+            {
+                mode: 'widget',
+                isList: true,
+                optional: true,
+            }
+        ],
+        hasOptions: true,
+    };
+
     /** Is this container vertical? */
     private vertical: boolean;
     /** The unused space along the main axis after resolving dimensions */
@@ -25,12 +42,16 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
     /** The number of enabled children in this container */
     private enabledChildCount = 0;
 
-    constructor(vertical: boolean, properties?: Readonly<WidgetProperties>) {
+    constructor(vertical: boolean, children?: Array<W>, properties?: Readonly<WidgetProperties>) {
         // MultiContainers clear their own background, have children and
         // propagate events
         super([], true, properties);
 
         this.vertical = vertical;
+
+        if (children) {
+            this.add(children);
+        }
     }
 
     protected override onThemeUpdated(property: string | null = null): void {

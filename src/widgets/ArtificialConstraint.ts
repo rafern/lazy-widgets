@@ -2,6 +2,7 @@ import type { LayoutConstraints } from '../core/LayoutConstraints';
 import { layoutArrayField } from '../decorators/FlagFields';
 import type { Widget, WidgetProperties } from './Widget';
 import { PassthroughWidget } from './PassthroughWidget';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link PassthroughWidget} which imposes further layout constraints onto a
@@ -12,6 +13,21 @@ import { PassthroughWidget } from './PassthroughWidget';
  * @category Widget
  */
 export class ArtificialConstraint<W extends Widget = Widget> extends PassthroughWidget<W> {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                // param name: child
+                mode: 'widget',
+            },
+            {
+                name: 'constraints',
+                mode: 'value',
+                validator: 'layout-constraints',
+            }
+        ],
+        hasOptions: true,
+    }
+
     /**
      * The further constraints given to the child. A 4-tuple containing,
      * respectively, minimum width, maximum width, minimum height and maximum

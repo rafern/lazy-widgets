@@ -3,6 +3,7 @@ import { TextAlignMode } from '../helpers/TextHelper';
 import { Label, LabelProperties } from './Label';
 import { Alignment } from '../theme/Alignment';
 import { FilledButton } from './FilledButton';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link FilledButton} with a {@link Label}. Alignment is forced to be
@@ -13,7 +14,23 @@ import { FilledButton } from './FilledButton';
  * @category Aggregate Widget
  */
 export class TextButton extends FilledButton<Label> {
-    constructor(text: string, callback: (() => void) | null = null, properties?: Readonly<LabelProperties>) {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'value',
+                name: 'text',
+                validator: 'string'
+            },
+            {
+                mode: 'value',
+                name: 'callback',
+                validator: 'nullable:function'
+            }
+        ],
+        hasOptions: true
+    };
+
+    constructor(text: string, callback: (() => void) | null, properties?: Readonly<LabelProperties>) {
         // default properties
         properties = {
             containerAlignment: <Alignment2D>{

@@ -1,5 +1,6 @@
 import { Icon, IconProperties } from './Icon';
 import { Button } from './Button';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link Button} with an {@link Icon}.
@@ -8,6 +9,22 @@ import { Button } from './Button';
  * @category Aggregate Widget
  */
 export class IconButton extends Button<Icon> {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'value',
+                name: 'image',
+                validator: 'image-source'
+            },
+            {
+                mode: 'value',
+                name: 'callback',
+                validator: 'nullable:function'
+            }
+        ],
+        hasOptions: true
+    };
+
     constructor(image: HTMLImageElement, callback: (() => void) | null, properties?: Readonly<IconProperties>) {
         super(
             new Icon(image, properties),

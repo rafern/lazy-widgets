@@ -12,6 +12,7 @@ import { DynMsg } from '../core/Strings';
 import { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import { TricklingEvent } from '../events/TricklingEvent';
+import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
 
 /**
  * Optional ViewportWidget constructor properties.
@@ -63,6 +64,8 @@ export interface ViewportWidgetProperties extends WidgetProperties {
  * @category Widget
  */
 export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
+    static override autoXML = SingleParentAutoXML;
+
     /** See {@link ViewportWidget#widthCoupling}. For internal use only */
     private _widthCoupling: AxisCoupling;
     /** See {@link ViewportWidget#heightCoupling}. For internal use only */

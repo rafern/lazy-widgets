@@ -1,5 +1,6 @@
 import type { Widget, WidgetProperties } from './Widget';
 import { MultiContainer } from './MultiContainer';
+import { MultiParentAutoXML } from '../xml/MultiParentAutoXML';
 
 /**
  * A vertical {@link MultiContainer}.
@@ -8,7 +9,9 @@ import { MultiContainer } from './MultiContainer';
  * @category Alias Widget
  */
 export class Column<W extends Widget = Widget> extends MultiContainer<W> {
-    constructor(properties?: Readonly<WidgetProperties>) {
-        super(true, properties);
+    static override autoXML = MultiParentAutoXML;
+
+    constructor(children?: Array<W>, properties?: Readonly<WidgetProperties>) {
+        super(true, children, properties);
     }
 }

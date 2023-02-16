@@ -1,5 +1,6 @@
 import type { Widget, WidgetProperties } from './Widget';
 import { BaseContainer } from './BaseContainer';
+import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
 
 /**
  * A {@link BaseContainer} which always propagates events. Use this widget if
@@ -11,6 +12,8 @@ import { BaseContainer } from './BaseContainer';
  * @category Alias Widget
  */
 export class Container<W extends Widget = Widget> extends BaseContainer<W> {
+    static override autoXML = SingleParentAutoXML;
+
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         super(child, true, properties);
     }

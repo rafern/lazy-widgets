@@ -6,15 +6,14 @@ import { BaseXMLUIParser } from './BaseXMLUIParser';
  * {@link WidgetAutoXMLConfig}.
  */
 export interface WidgetAutoXMLConfigParameter {
-    name: string;
     mode: 'value';
+    name: string;
     optional?: boolean;
-    validator?: (<T>(value: unknown) => T) | 'string' | 'number' | 'function' | 'nullable-string' | 'nullable-number' | 'nullable-function' | 'key-context';
+    validator?: ((value: unknown) => unknown) | 'array' | 'boolean' | 'function' | 'image-source' | 'key-context' | 'layout-constraints' | 'number' | 'object' | 'string' | 'theme' | 'validated-variable' | 'variable' | 'nullable:array' | 'nullable:boolean' | 'nullable:function' | 'nullable:image-source' | 'nullable:key-context' | 'nullable:layout-constraints' | 'nullable:number' | 'nullable:object' | 'nullable:string' | 'nullable:theme' | 'nullable:validated-variable' | 'nullable:variable';
 }
 
 /** A widget parameter for a {@link WidgetAutoXMLConfig}. */
 export interface WidgetAutoXMLConfigWidgetParameter {
-    name: string;
     mode: 'widget';
     optional?: boolean;
     isList?: boolean;
@@ -23,8 +22,8 @@ export interface WidgetAutoXMLConfigWidgetParameter {
 
 /** A layer list parameter for a {@link WidgetAutoXMLConfig}. */
 export interface WidgetAutoXMLConfigLayerParameter {
-    name: string;
     mode: 'layer';
+    isList: boolean;
 }
 
 /**
@@ -32,7 +31,7 @@ export interface WidgetAutoXMLConfigLayerParameter {
  * {@link BaseXMLUIParser#registerAutoFactory | auto-factory}.
  */
 export interface WidgetAutoXMLConfig {
-    parameters: Array<WidgetAutoXMLConfigParameter | WidgetAutoXMLConfigWidgetParameter>;
+    parameters: Array<WidgetAutoXMLConfigParameter | WidgetAutoXMLConfigWidgetParameter | WidgetAutoXMLConfigLayerParameter>;
     hasOptions: boolean;
 }
 

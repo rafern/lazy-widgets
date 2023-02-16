@@ -1,6 +1,6 @@
-import { WidgetAutoXMLConfig } from './WidgetAutoXML';
+import { WidgetAutoXML } from './WidgetAutoXML';
 
-export const SpecializedVirtualKeyAutoXML: WidgetAutoXMLConfig = {
+export const SpecializedVirtualKeyAutoXML: WidgetAutoXML = {
     parameters: [
         {
             name: 'key-context',

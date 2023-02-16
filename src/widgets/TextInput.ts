@@ -18,6 +18,7 @@ import type { Root } from '../core/Root';
 import { LeaveEvent } from '../events/LeaveEvent';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import { TricklingEvent } from '../events/TricklingEvent';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * Optional TextInput constructor properties.
@@ -50,6 +51,18 @@ export interface TextInputProperties extends WidgetProperties {
  * @category Widget
  */
 export class TextInput extends Widget {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'value',
+                name: 'variable',
+                validator: 'validated-variable',
+                optional: true
+            }
+        ],
+        hasOptions: true
+    };
+
     /**
      * At what timestamp did the blinking start. If 0, then the text cursor is
      * not blinking.

@@ -2,6 +2,7 @@ import { TextHelper, WrapMode } from '../helpers/TextHelper';
 import { layoutField } from '../decorators/FlagFields';
 import { Widget, WidgetProperties } from './Widget';
 import type { Rect } from '../helpers/Rect';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * Optional TextInput constructor properties.
@@ -19,6 +20,18 @@ export interface LabelProperties extends WidgetProperties {
  * @category Widget
  */
 export class Label extends Widget {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'value',
+                name: 'text',
+                validator: 'string',
+                optional: true
+            }
+        ],
+        hasOptions: true
+    };
+
     /** The helper for measuring/painting text */
     protected textHelper: TextHelper;
     /**

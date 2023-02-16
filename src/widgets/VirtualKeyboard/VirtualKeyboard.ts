@@ -1,4 +1,4 @@
-import type { KeyboardDriver } from '../../drivers/KeyboardDriver';
+import { KeyboardDriver } from '../../drivers/KeyboardDriver';
 import type { FlexAlignment2D } from '../../theme/FlexAlignment2D';
 import type { VirtualKeyRowTemplate } from './VirtualKeyRow';
 import { FlexAlignment } from '../../theme/FlexAlignment';
@@ -18,6 +18,8 @@ import { TabKey } from './TabKey';
 import { PointerPressEvent } from '../../events/PointerPressEvent';
 import { PointerReleaseEvent } from '../../events/PointerReleaseEvent';
 import { PointerMove } from '../../events/PointerMove';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
+import { validateInstanceOf } from '../../xml/validateInstanceOf';
 
 /**
  * A template for the keys in a {@link VirtualKeyboard}. Each member of the
@@ -98,6 +100,39 @@ export const defaultVirtualKeyboardTemplate: VirtualKeyboardTemplate = [
  * @category Alias Widget
  */
 export class VirtualKeyboard extends Column {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                name: 'keyboard-driver',
+                mode: 'value',
+                validator: validateInstanceOf(KeyboardDriver),
+            },
+            {
+                name: 'row-template',
+                mode: 'value',
+                validator: 'array',
+            },
+            {
+                name: 'key-context',
+                mode: 'value',
+                validator: 'key-context',
+            },
+            {
+                name: 'min-width',
+                mode: 'value',
+                validator: 'number',
+                optional: true,
+            },
+            {
+                name: 'min-height',
+                mode: 'value',
+                validator: 'number',
+                optional: true,
+            }
+        ],
+        hasOptions: true,
+    }
+
     /**
      * @param keyboardTemplate - By default, the virtual keyboard template is {@link defaultVirtualKeyboardTemplate}.
      * @param minWidth - The minWidth to use when creating {@link GlyphVirtualKey | GlyphVirtualKeys}.

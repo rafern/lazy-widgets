@@ -9,6 +9,7 @@ import type { Root } from '../core/Root';
 import type { Rect } from '../helpers/Rect';
 import { paintCircle } from '../helpers/paintCircle';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A radio button widget; used for selecting one of many options. Uses a shared
@@ -20,6 +21,21 @@ import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
  * @category Widget
  */
 export class RadioButton<V> extends Widget {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'value',
+                name: 'variable',
+                validator: 'variable'
+            },
+            {
+                mode: 'value',
+                name: 'value'
+            }
+        ],
+        hasOptions: true
+    };
+
     /** Horizontal offset. */
     private offsetX = 0;
     /** Vertical offset. */

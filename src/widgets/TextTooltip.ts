@@ -1,3 +1,4 @@
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import { Label } from './Label';
 import { Tooltip } from './Tooltip';
 import { TooltipContainer } from './TooltipContainer';
@@ -9,6 +10,20 @@ import type { Widget, WidgetProperties } from './Widget';
  * @category Widget
  */
 export class TextTooltip<W extends Widget = Widget> extends Tooltip<W, TooltipContainer<Label>> {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'widget'
+            },
+            {
+                mode: 'value',
+                name: 'tooltip-text',
+                validator: 'string'
+            }
+        ],
+        hasOptions: true
+    };
+
     constructor(child: W, tooltipText: string, properties?: Readonly<WidgetProperties>) {
         super(
             child,

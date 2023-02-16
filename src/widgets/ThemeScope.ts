@@ -1,6 +1,7 @@
 import { PassthroughWidget } from './PassthroughWidget';
 import type { Theme } from '../theme/Theme';
 import type { Widget } from './Widget';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link PassthroughWidget} which changes the theme of its child and
@@ -15,12 +16,26 @@ import type { Widget } from './Widget';
  * @category Widget
  */
 export class ThemeScope<W extends Widget = Widget> extends PassthroughWidget<W> {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'widget'
+            },
+            {
+                mode: 'value',
+                name: 'theme',
+                validator: 'theme'
+            }
+        ],
+        hasOptions: true
+    };
+
     /** The theme used for the child. */
     private scopeTheme: Theme;
 
-    constructor(child: W, themeOverride: Theme) {
+    constructor(child: W, theme: Theme) {
         super(child);
-        this.scopeTheme = themeOverride;
+        this.scopeTheme = theme;
     }
 
     override set inheritedTheme(_theme: Theme | undefined) {

@@ -1,4 +1,4 @@
-import { GlyphVirtualKeyAutoXML } from '../../xml/GlyphVirtualKeyAutoXML';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from './KeyContext';
 import { VirtualKey } from './VirtualKey';
@@ -14,7 +14,38 @@ import { VirtualKey } from './VirtualKey';
  * @category Aggregate Widget
  */
 export class GlyphVirtualKey extends VirtualKey {
-    static override autoXML = GlyphVirtualKeyAutoXML;
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                name: 'glyph',
+                mode: 'value',
+                validator: 'string',
+            },
+            {
+                name: 'alt-glyph',
+                mode: 'value',
+                validator: 'nullable-string',
+            },
+            {
+                name: 'key-context',
+                mode: 'value',
+                validator: 'key-context',
+            },
+            {
+                name: 'min-width',
+                mode: 'value',
+                validator: 'number',
+                optional: true,
+            },
+            {
+                name: 'min-height',
+                mode: 'value',
+                validator: 'number',
+                optional: true,
+            }
+        ],
+        hasOptions: true,
+    };
 
     readonly glyph: string;
     readonly altGlyph: string;

@@ -8,6 +8,7 @@ import { PassthroughWidget } from './PassthroughWidget';
 import { TooltipContainer } from './TooltipContainer';
 import type { Widget, WidgetProperties } from './Widget';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 const SENSITIVITY_RADIUS = 8;
 const HOVER_TIME = 1000;
@@ -25,6 +26,18 @@ const HOVER_TIME = 1000;
  * to detect hovering.
  */
 export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = TooltipContainer> extends PassthroughWidget<W> {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'widget'
+            },
+            {
+                mode: 'widget'
+            }
+        ],
+        hasOptions: true
+    };
+
     /** The top-most container in the current UI tree. Internal use only */
     private _topLayerContainer: LayeredContainer | null = null;
     /** The currently created layer for the {@link Tooltip#tooltipWidget} */

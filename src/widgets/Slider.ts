@@ -16,6 +16,7 @@ import { DynMsg } from '../core/Strings';
 import { LeaveEvent } from '../events/LeaveEvent';
 import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * Optional Slider constructor properties.
@@ -39,6 +40,30 @@ export interface SliderProperties extends WidgetProperties {
  * @category Widget
  */
 export class Slider extends Widget {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'value',
+                name: 'variable',
+                validator: 'variable',
+                optional: true
+            },
+            {
+                mode: 'value',
+                name: 'min-value',
+                validator: 'number',
+                optional: true
+            },
+            {
+                mode: 'value',
+                name: 'max-value',
+                validator: 'number',
+                optional: true
+            }
+        ],
+        hasOptions: true
+    };
+
     /** The slider's minimum value. */
     private minValue: number;
     /** The slider's maximum value. */

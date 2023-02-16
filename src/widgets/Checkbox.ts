@@ -8,6 +8,7 @@ import { Variable } from '../state/Variable';
 import type { Root } from '../core/Root';
 import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A checkbox widget; can be ticked or unticked.
@@ -15,6 +16,18 @@ import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
  * @category Widget
  */
 export class Checkbox extends Widget {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'value',
+                name: 'variable',
+                validator: 'variable',
+                optional: true
+            }
+        ],
+        hasOptions: true
+    };
+
     /** Horizontal offset. */
     private offsetX = 0;
     /** Vertical offset. */

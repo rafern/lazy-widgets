@@ -1,8 +1,11 @@
 import type { Rect } from '../helpers/Rect';
+import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
 import { BaseContainer } from './BaseContainer';
 import type { Widget, WidgetProperties } from './Widget';
 
 export class Background<W extends Widget = Widget> extends BaseContainer<W> {
+    static override autoXML = SingleParentAutoXML;
+
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         super(child, true, properties);
     }

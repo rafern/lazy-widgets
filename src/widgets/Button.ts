@@ -4,6 +4,7 @@ import type { FocusType } from '../core/FocusType';
 import { BaseContainer } from './BaseContainer';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { TricklingEvent } from '../events/TricklingEvent';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link BaseContainer} which can be {@link ClickHelper | clicked} as a
@@ -15,6 +16,20 @@ import type { TricklingEvent } from '../events/TricklingEvent';
  * @category Widget
  */
 export class Button<W extends Widget = Widget> extends BaseContainer<W> {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'widget'
+            },
+            {
+                mode: 'value',
+                name: 'callback',
+                validator: 'nullable:function'
+            }
+        ],
+        hasOptions: true
+    };
+
     /** The helper used for handling pointer clicks and enter presses */
     protected clickHelper: ButtonClickHelper;
     /**

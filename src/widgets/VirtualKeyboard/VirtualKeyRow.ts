@@ -4,6 +4,7 @@ import type { KeyContext } from './KeyContext';
 import type { VirtualKey } from './VirtualKey';
 import { DynMsg } from '../../core/Strings';
 import { Row } from '../Row';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 
 /**
  * A template for a single virtual keyboard key. A function that, when called
@@ -57,6 +58,34 @@ export type VirtualKeyRowTemplate = Array<GlyphVirtualKeysTemplate | VirtualKeyT
  * @category Aggregate Widget
  */
 export class VirtualKeyRow extends Row<VirtualKey> {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                name: 'row-template',
+                mode: 'value',
+                validator: 'array',
+            },
+            {
+                name: 'key-context',
+                mode: 'value',
+                validator: 'key-context',
+            },
+            {
+                name: 'min-width',
+                mode: 'value',
+                validator: 'number',
+                optional: true,
+            },
+            {
+                name: 'min-height',
+                mode: 'value',
+                validator: 'number',
+                optional: true,
+            }
+        ],
+        hasOptions: true,
+    }
+
     /**
      * @param rowTemplate - Template for this row of virtual keys.
      * @param keyContext - The {@link KeyContext} to be shared among all virtual keys in this row.

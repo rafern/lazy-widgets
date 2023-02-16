@@ -1,3 +1,4 @@
+import { BareWidgetAutoXML } from '../xml/BareWidgetAutoXML';
 import { Widget, WidgetProperties } from './Widget';
 
 /**
@@ -21,6 +22,8 @@ export interface SpacingProperties extends WidgetProperties {
  * @category Widget
  */
 export class Spacing extends Widget {
+    static override autoXML = BareWidgetAutoXML;
+
     /** The minimum width this will try to expand */
     minWidth: number;
     /** The minimum height this will try to expand */

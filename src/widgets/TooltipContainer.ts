@@ -7,6 +7,7 @@ import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
 import { Alignment2D } from '../theme/Alignment2D';
 import { safeRoundRect } from '../helpers/safeRoundRect';
 import { layoutArrayField, layoutField } from '../decorators/FlagFields';
+import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
 
 const startAlignment = <Alignment2D>{
     horizontal: Alignment.Start, vertical: Alignment.Start
@@ -19,6 +20,8 @@ const startAlignment = <Alignment2D>{
  * @category Widget
  */
 export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W> {
+    static override autoXML = SingleParentAutoXML;
+
     /**
      * The horizontal component of the cursor position to place this tooltip
      * around. Automatically set by {@link Tooltip} widget. Used for

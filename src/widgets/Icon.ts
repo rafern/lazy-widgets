@@ -2,6 +2,7 @@ import { damageField, layoutField, damageLayoutArrayField } from '../decorators/
 import { Widget, WidgetProperties } from './Widget';
 import { DynMsg, Msg } from '../core/Strings';
 import type { Rect } from '../helpers/Rect';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 const videoRegex = /^.*\.(webm|og[gv]|m(p4|4v|ov)|avi|qt)$/i;
 
@@ -53,6 +54,17 @@ export interface IconProperties extends WidgetProperties {
  * @category Widget
  */
 export class Icon extends Widget {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'value',
+                name: 'image',
+                validator: 'image-source'
+            }
+        ],
+        hasOptions: true
+    };
+
     /** The current image/video used by the icon. */
     private _image: HTMLImageElement | HTMLVideoElement;
     /**

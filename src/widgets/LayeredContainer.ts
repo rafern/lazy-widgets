@@ -4,6 +4,7 @@ import type { Root } from '../core/Root';
 import type { Viewport } from '../core/Viewport';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { Rect } from '../helpers/Rect';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import { Parent } from './Parent';
 import type { Widget, WidgetProperties } from './Widget';
 
@@ -57,6 +58,22 @@ function makeLayerIterator<W extends Widget>(startIndex: number, delta: number, 
  * @category Widget
  */
 export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
+    static override autoXML: WidgetAutoXML = {
+        parameters: [
+            {
+                mode: 'layer',
+                isList: true
+            },
+            {
+                mode: 'value',
+                name: 'default-layer-index',
+                validator: 'number',
+                optional: true
+            }
+        ],
+        hasOptions: true
+    };
+
     /** The default layer. Can't be removed */
     readonly defaultLayer: Layer<W>;
     /** The current index of the default layer */
@@ -70,13 +87,13 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
     private readonly layerNames = new Map<string, number>();
 
     /**
-     * @param defaultLayerIndex - The index of the default layer in the layersInit list
-     * @param layersInit - The list of layers to be added to this container
+     * @param layers - The list of layers to be added to this container
+     * @param defaultLayerIndex - The index of the default layer in the layers list
      */
-    constructor(defaultLayerIndex: number, layersInit: Array<LayerInit<W>>, properties?: Readonly<WidgetProperties>) {
+    constructor(layers: Array<LayerInit<W>>, defaultLayerIndex = 0, properties?: Readonly<WidgetProperties>) {
         super(true, properties);
 
-        const layerCount = layersInit.length;
+        const layerCount = layers.length;
 
         if (defaultLayerIndex < 0) {
             defaultLayerIndex += layerCount;
@@ -86,7 +103,7 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
             throw new Error('Default layer index is out of bounds');
         }
 
-        for (const layerInit of layersInit) {
+        for (const layerInit of layers) {
             const canExpand = layerInit.canExpand ?? true;
             const name = layerInit.name ?? null;
             const child = layerInit.child;
@@ -116,12 +133,12 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
      * layers list, and a default layer index of 0.
      */
     static fromDefaultLayerChild<W extends Widget>(defaultLayerChild: W, properties?: Readonly<WidgetProperties>) {
-        return new LayeredContainer(0, [
+        return new LayeredContainer([
             <LayerInit<W>>{
                 child: defaultLayerChild,
                 canExpand: true
             }
-        ], properties);
+        ], 0, properties);
     }
 
     override *[Symbol.iterator](): Iterator<W> {
