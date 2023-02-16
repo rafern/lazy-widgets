@@ -16,9 +16,8 @@ export class LabelledRadioButton<V> extends Row {
     static override autoXML: WidgetAutoXML = {
         parameters: [
             {
-                mode: 'value',
-                name: 'text',
-                validator: 'string'
+                mode: 'text',
+                optionalName: 'text'
             },
             {
                 mode: 'value',

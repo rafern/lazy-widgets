@@ -27,11 +27,21 @@ export interface WidgetAutoXMLConfigLayerParameter {
 }
 
 /**
+ * A string parameter for a {@link WidgetAutoXMLConfig}, passed as an XML text
+ * node.
+ */
+export interface WidgetAutoXMLConfigTextParameter {
+    mode: 'text';
+    optionalName?: string;
+    optional?: boolean;
+}
+
+/**
  * An input mapping for a {@link Widget | Widget's}
  * {@link BaseXMLUIParser#registerAutoFactory | auto-factory}.
  */
 export interface WidgetAutoXMLConfig {
-    parameters: Array<WidgetAutoXMLConfigParameter | WidgetAutoXMLConfigWidgetParameter | WidgetAutoXMLConfigLayerParameter>;
+    parameters: Array<WidgetAutoXMLConfigParameter | WidgetAutoXMLConfigWidgetParameter | WidgetAutoXMLConfigLayerParameter | WidgetAutoXMLConfigTextParameter>;
     hasOptions: boolean;
 }
 

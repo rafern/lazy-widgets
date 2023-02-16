@@ -17,9 +17,8 @@ export class GlyphVirtualKey extends VirtualKey {
     static override autoXML: WidgetAutoXML = {
         parameters: [
             {
-                name: 'glyph',
-                mode: 'value',
-                validator: 'string',
+                mode: 'text',
+                optionalName: 'glyph'
             },
             {
                 name: 'alt-glyph',

@@ -16,9 +16,8 @@ export class TextTooltip<W extends Widget = Widget> extends Tooltip<W, TooltipCo
                 mode: 'widget'
             },
             {
-                mode: 'value',
-                name: 'tooltip-text',
-                validator: 'string'
+                mode: 'text',
+                optionalName: 'tooltip-text'
             }
         ],
         hasOptions: true

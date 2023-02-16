@@ -13,9 +13,8 @@ export class BasicVirtualKey extends VirtualKey {
     static override autoXML: WidgetAutoXML = {
         parameters: [
             {
-                name: 'text',
-                mode: 'value',
-                validator: 'string',
+                mode: 'text',
+                optionalName: 'text'
             },
             {
                 name: 'key-code',

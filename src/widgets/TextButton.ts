@@ -17,9 +17,8 @@ export class TextButton extends FilledButton<Label> {
     static override autoXML: WidgetAutoXML = {
         parameters: [
             {
-                mode: 'value',
-                name: 'text',
-                validator: 'string'
+                mode: 'text',
+                optionalName: 'text'
             },
             {
                 mode: 'value',

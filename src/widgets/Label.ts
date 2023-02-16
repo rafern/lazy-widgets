@@ -23,9 +23,8 @@ export class Label extends Widget {
     static override autoXML: WidgetAutoXML = {
         parameters: [
             {
-                mode: 'value',
-                name: 'text',
-                validator: 'string',
+                mode: 'text',
+                optionalName: 'text',
                 optional: true
             }
         ],
