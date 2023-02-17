@@ -58,33 +58,30 @@ export type VirtualKeyRowTemplate = Array<GlyphVirtualKeysTemplate | VirtualKeyT
  * @category Aggregate Widget
  */
 export class VirtualKeyRow extends Row<VirtualKey> {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                name: 'row-template',
-                mode: 'value',
-                validator: 'array',
-            },
-            {
-                name: 'key-context',
-                mode: 'value',
-                validator: 'key-context',
-            },
-            {
-                name: 'min-width',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            },
-            {
-                name: 'min-height',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            }
-        ],
-        hasOptions: true,
-    }
+    static override autoXML: WidgetAutoXML = [
+        {
+            name: 'row-template',
+            mode: 'value',
+            validator: 'array',
+        },
+        {
+            name: 'key-context',
+            mode: 'value',
+            validator: 'key-context',
+        },
+        {
+            name: 'min-width',
+            mode: 'value',
+            validator: 'number',
+            optional: true,
+        },
+        {
+            name: 'min-height',
+            mode: 'value',
+            validator: 'number',
+            optional: true,
+        }
+    ];
 
     /**
      * @param rowTemplate - Template for this row of virtual keys.

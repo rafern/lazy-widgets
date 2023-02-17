@@ -16,7 +16,7 @@ import { validateString } from './validateString';
 import { validateTheme } from './validateTheme';
 import { validateValidatedVariable } from './validateValidatedVariable';
 import { validateVariable } from './validateVariable';
-import type { WidgetAutoXML, WidgetAutoXMLConfig, WidgetAutoXMLConfigLayerParameter, WidgetAutoXMLConfigParameterList, WidgetAutoXMLConfigValidator, WidgetAutoXMLConfigWidgetParameter } from './WidgetAutoXML';
+import type { WidgetAutoXML, WidgetAutoXMLConfigLayerParameter, WidgetAutoXMLConfig, WidgetAutoXMLConfigValidator, WidgetAutoXMLConfigWidgetParameter } from './WidgetAutoXML';
 import type { XMLUIParserConfig } from './XMLUIParserConfig';
 import type { XMLUIParserContext } from './XMLUIParserContext';
 import type { XMLUIParserScriptContext } from './XMLUIParserScriptContext';
@@ -54,7 +54,6 @@ const WHITESPACE_REGEX = /^\s*$/;
 
 const XML_NAMESPACE_BASE = 'lazy-widgets';
 const XML_NAMESPACE_OPTS = `${XML_NAMESPACE_BASE}:options`;
-const XML_NAMESPACE_META = `${XML_NAMESPACE_BASE}:metadata`;
 
 const RESERVED_NAMES = ['layer', 'script', 'ui-tree'];
 const RESERVED_IMPORTS = ['context', 'window', 'globalThis'];
@@ -72,7 +71,7 @@ function normalizeToMap(record: Record<string, unknown> | Map<string, unknown> =
     return record;
 }
 
-function findNextParamOfType(paramConfig: WidgetAutoXMLConfigParameterList, parametersSet: Array<boolean>, mode: string) {
+function findNextParamOfType(paramConfig: WidgetAutoXMLConfig, parametersSet: Array<boolean>, mode: string) {
     const paramCount = paramConfig.length;
 
     for (let i = 0; i < paramCount; i++) {
@@ -186,10 +185,10 @@ export class BaseXMLUIParser {
         let layerTrapReached = false;
         let hasTextNodeParam = false;
         const paramNames = new Map<string, number>();
-        const paramCount = autoConfig.parameters.length;
+        const paramCount = autoConfig.length;
 
         for (let i = 0; i < paramCount; i++) {
-            const param = autoConfig.parameters[i];
+            const param = autoConfig[i];
 
             if (param.mode === 'widget') {
                 if (widgetTrapReached) {
@@ -239,13 +238,11 @@ export class BaseXMLUIParser {
         // make factory
         this.registerFactory(widgetClass, (_parser: BaseXMLUIParser, context: XMLUIParserContext, elem: Element) => {
             // parse parameters and options
-            let options: Record<string, unknown> | null = autoConfig.hasOptions ? {} : null;
+            let options: Record<string, unknown> = {};
             let optionsReplaced = false;
             const parameters = new Array<unknown>(paramCount);
             const setParameters = new Array<boolean>(paramCount).fill(false);
             const setViaName = new Array<boolean>(paramCount).fill(false);
-            let id: string | null = null;
-            let meta: Map<string, unknown> | null = null;
 
             for (const attribute of elem.attributes) {
                 if (attribute.namespaceURI === XML_NAMESPACE_OPTS) {
@@ -278,30 +275,6 @@ export class BaseXMLUIParser {
 
                         options[nameConverted] = this.parseAttribute(attribute.value, context);
                     }
-                } else if (attribute.namespaceURI === XML_NAMESPACE_META) {
-                    // this attribute is a meta value
-                    const nameConverted = fromKebabCase(attribute.localName);
-                    const val = attribute.value;
-
-                    if (nameConverted === 'id') {
-                        if (context.idMap.has(nameConverted)) {
-                            throw new Error(`Widget ID "${val}" already taken`);
-                        } else if (id !== null) {
-                            throw new Error('Widget ID can only be set once');
-                        }
-
-                        id = val;
-                    } else {
-                        if (meta === null) {
-                            meta = new Map();
-                        } else {
-                            if (meta.has(nameConverted)) {
-                                throw new Error(`Metadata with key "${nameConverted}" already set`);
-                            }
-                        }
-
-                        meta.set(nameConverted, this.parseAttribute(val, context));
-                    }
                 } else if (attribute.namespaceURI === null || attribute.namespaceURI === XML_NAMESPACE_BASE) {
                     // this attribute sets a parameter's value
                     const index = paramNames.get(attribute.localName);
@@ -317,7 +290,7 @@ export class BaseXMLUIParser {
                     setViaName[index] = true;
 
                     const arg = this.parseAttribute(attribute.value, context);
-                    const paramConfig = autoConfig.parameters[index];
+                    const paramConfig = autoConfig[index];
 
                     if (paramConfig.mode === 'value') {
                         if (arg === undefined) {
@@ -426,19 +399,16 @@ export class BaseXMLUIParser {
                         if (childElem.namespaceURI === XML_NAMESPACE_OPTS) {
                             throw new Error(`Unexpected "${XML_NAMESPACE_OPTS}" namespace in XML element`);
                         }
-                        if (childElem.namespaceURI === XML_NAMESPACE_META) {
-                            throw new Error(`Unexpected "${XML_NAMESPACE_META}" namespace in XML element`);
-                        }
 
                         continue;
                     }
 
                     if (childElem.nodeName.toLowerCase() === 'layer') {
-                        const index = findNextParamOfType(autoConfig.parameters, setParameters, 'layer');
+                        const index = findNextParamOfType(autoConfig, setParameters, 'layer');
                         const layer = this.parseLayerElem(context, childElem);
                         setParameters[index] = true;
 
-                        if ((autoConfig.parameters[index] as WidgetAutoXMLConfigLayerParameter).list) {
+                        if ((autoConfig[index] as WidgetAutoXMLConfigLayerParameter).list) {
                             if (parameters[index] === undefined) {
                                 parameters[index] = [layer];
                             } else {
@@ -449,11 +419,11 @@ export class BaseXMLUIParser {
                         }
                     } else {
                         // validator
-                        const index = findNextParamOfType(autoConfig.parameters, setParameters, 'widget');
+                        const index = findNextParamOfType(autoConfig, setParameters, 'widget');
                         const childWidget = this.parseWidgetElem(context, childElem);
                         setParameters[index] = true;
 
-                        if ((autoConfig.parameters[index] as WidgetAutoXMLConfigWidgetParameter).list) {
+                        if ((autoConfig[index] as WidgetAutoXMLConfigWidgetParameter).list) {
                             if (parameters[index] === undefined) {
                                 parameters[index] = [childWidget];
                             } else {
@@ -467,7 +437,7 @@ export class BaseXMLUIParser {
             }
 
             // add text parameter if needed
-            const textIndex = findNextParamOfType(autoConfig.parameters, setParameters, 'text');
+            const textIndex = findNextParamOfType(autoConfig, setParameters, 'text');
             if (textIndex >= 0) {
                 parameters[textIndex] = textContent;
                 setParameters[textIndex] = true;
@@ -478,7 +448,7 @@ export class BaseXMLUIParser {
             // check if all required parameters are set
             for (let i = 0; i < paramCount; i++) {
                 if (!setParameters[i]) {
-                    const param = autoConfig.parameters[i];
+                    const param = autoConfig[i];
                     if (param.mode === 'value') {
                         if (!param.optional) {
                             throw new Error(`Parameter not set (${param.name})`);
@@ -505,13 +475,13 @@ export class BaseXMLUIParser {
                 instance = new widgetClass(...parameters, options);
             }
 
-            // map widget back to ID and save metadata
-            if (id !== null) {
-                context.idMap.set(id, instance);
-            }
+            // map widget back to ID
+            if (instance.id !== null) {
+                if (context.idMap.has(instance.id)) {
+                    throw new Error(`Widget ID "${instance.id}" is already taken`);
+                }
 
-            if (meta !== null) {
-                context.metaMap.set(instance, meta);
+                context.idMap.set(instance.id, instance);
             }
 
             return instance;
@@ -654,9 +624,6 @@ export class BaseXMLUIParser {
                     if (childElem.namespaceURI === XML_NAMESPACE_OPTS) {
                         throw new Error(`Unexpected "${XML_NAMESPACE_OPTS}" namespace in XML element`);
                     }
-                    if (childElem.namespaceURI === XML_NAMESPACE_META) {
-                        throw new Error(`Unexpected "${XML_NAMESPACE_META}" namespace in XML element`);
-                    }
 
                     continue;
                 }
@@ -670,8 +637,7 @@ export class BaseXMLUIParser {
 
                     const scriptContext: XMLUIParserScriptContext = {
                         variables: context.variableMap,
-                        ids: context.idMap,
-                        metadata: context.metaMap
+                        ids: context.idMap
                     };
 
                     this.executeScriptNode(childElem, scriptContext, context.scriptImports);
@@ -732,8 +698,7 @@ export class BaseXMLUIParser {
         const context: XMLUIParserContext = {
             scriptImports,
             variableMap,
-            idMap: new Map(),
-            metaMap: new Map()
+            idMap: new Map()
         };
 
         // parse UI trees

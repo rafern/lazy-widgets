@@ -26,19 +26,16 @@ const HOVER_TIME = 1000;
  * to detect hovering.
  */
 export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = TooltipContainer> extends PassthroughWidget<W> {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'widget',
-                name: 'child'
-            },
-            {
-                mode: 'widget',
-                name: 'tooltip-widget'
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'widget',
+            name: 'child'
+        },
+        {
+            mode: 'widget',
+            name: 'tooltip-widget'
+        }
+    ];
 
     /** The top-most container in the current UI tree. Internal use only */
     private _topLayerContainer: LayeredContainer | null = null;

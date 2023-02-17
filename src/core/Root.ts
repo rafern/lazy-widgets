@@ -62,6 +62,8 @@ export class Root implements WidgetEventEmitter {
     private untypedListeners: WidgetEventUntypedListenerList = [];
     /** Next user listener ID */
     private nextListener = 0;
+    /** A one-way map from an ID to a descendant Widget. Internal use only. */
+    private idMap = new Map<string, Widget>();
     /** The internal viewport. Manages drawing */
     protected viewport: CanvasViewport;
     /** The list of drivers registered to this root */
@@ -797,5 +799,26 @@ export class Root implements WidgetEventEmitter {
 
     offAny(listener: WidgetEventListener): boolean {
         return eventEmitterOffAny(this.untypedListeners, listener);
+    }
+
+    requestID(id: string, widget: Widget): void {
+        if (this.idMap.has(id)) {
+            throw new Error(`Can't request Widget ID "${id}"; already taken`);
+        }
+
+        this.idMap.set(id, widget);
+    }
+
+    dropID(id: string): void {
+        this.idMap.delete(id);
+    }
+
+    getWidgetByID(id: string): Widget {
+        const widget = this.idMap.get(id);
+        if (widget === undefined) {
+            throw new Error(`There is no descendant Widget with an ID "${id}" attached to this Root`);
+        }
+
+        return widget;
     }
 }

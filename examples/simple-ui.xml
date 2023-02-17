@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui-tree name="simple" xmlns="lazy-widgets" xmlns:option="lazy-widgets:options" xmlns:meta="lazy-widgets:metadata">
+<ui-tree name="simple" xmlns="lazy-widgets" xmlns:option="lazy-widgets:options">
     <script>
         context.variables.set('textVariable', new ValidatedVariable('', null, value => {
             context.ids.get('label').text = `Text input: ${value}`;
@@ -14,7 +14,7 @@
     <background>
         <margin>
             <column>
-                <label meta:id="label">Hello world!</label>
+                <label option:id="label">Hello world!</label>
                 <text-input variable="$textVariable" />
                 <row option:multi-container-alignment='@{ "main": 0.5, "cross": "stretch" }'>
                     <text-button callback="$button1Callback">Button 1</text-button>

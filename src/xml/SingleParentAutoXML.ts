@@ -1,11 +1,8 @@
 import { WidgetAutoXML } from './WidgetAutoXML';
 
-export const SingleParentAutoXML: WidgetAutoXML = {
-    parameters: [
-        {
-            mode: 'widget',
-            name: 'child'
-        }
-    ],
-    hasOptions: true,
-}
+export const SingleParentAutoXML: WidgetAutoXML = [
+    {
+        mode: 'widget',
+        name: 'child'
+    }
+];

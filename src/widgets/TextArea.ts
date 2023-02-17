@@ -19,16 +19,13 @@ import type { WidgetAutoXML } from "../xml/WidgetAutoXML";
  * @category Aggregate Widget
  */
 export class TextArea extends ScrollableViewportWidget<TextInput> {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'value',
-                name: 'variable',
-                validator: 'variable'
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'value',
+            name: 'variable',
+            validator: 'variable'
+        }
+    ];
 
     constructor(variable: ValidatedVariable<string, unknown>, properties?: Readonly<ScrollableViewportWidgetProperties & TextInputProperties>) {
         // default properties

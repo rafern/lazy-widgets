@@ -14,20 +14,17 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Aggregate Widget
  */
 export class TextButton extends FilledButton<Label> {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'text',
-                name: 'text'
-            },
-            {
-                mode: 'value',
-                name: 'callback',
-                validator: 'nullable:function'
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'text',
+            name: 'text'
+        },
+        {
+            mode: 'value',
+            name: 'callback',
+            validator: 'nullable:function'
+        }
+    ];
 
     constructor(text: string, callback: (() => void) | null, properties?: Readonly<LabelProperties>) {
         // default properties

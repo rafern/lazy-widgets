@@ -12,21 +12,18 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Aggregate Widget
  */
 export class LabelledCheckbox extends Row {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'text',
-                name: 'text'
-            },
-            {
-                mode: 'value',
-                name: 'variable',
-                validator: 'variable',
-                optional: true
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'text',
+            name: 'text'
+        },
+        {
+            mode: 'value',
+            name: 'variable',
+            validator: 'variable',
+            optional: true
+        }
+    ];
 
     constructor(text: string, variable?: Variable<boolean>, properties?: Readonly<LabelProperties & SpacingProperties>) {
         super([

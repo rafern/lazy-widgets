@@ -13,20 +13,17 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Widget
  */
 export class ArtificialConstraint<W extends Widget = Widget> extends PassthroughWidget<W> {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'widget',
-                name: 'child',
-            },
-            {
-                name: 'constraints',
-                mode: 'value',
-                validator: 'layout-constraints',
-            }
-        ],
-        hasOptions: true,
-    }
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'widget',
+            name: 'child',
+        },
+        {
+            name: 'constraints',
+            mode: 'value',
+            validator: 'layout-constraints',
+        }
+    ];
 
     /**
      * The further constraints given to the child. A 4-tuple containing,

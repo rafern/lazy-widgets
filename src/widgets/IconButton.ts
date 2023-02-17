@@ -9,21 +9,18 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Aggregate Widget
  */
 export class IconButton extends Button<Icon> {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'value',
-                name: 'image',
-                validator: 'image-source'
-            },
-            {
-                mode: 'value',
-                name: 'callback',
-                validator: 'nullable:function'
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'value',
+            name: 'image',
+            validator: 'image-source'
+        },
+        {
+            mode: 'value',
+            name: 'callback',
+            validator: 'nullable:function'
+        }
+    ];
 
     constructor(image: HTMLImageElement, callback: (() => void) | null, properties?: Readonly<IconProperties>) {
         super(

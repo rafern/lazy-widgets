@@ -26,6 +26,8 @@ export interface WidgetProperties extends ThemeProperties {
     enabled?: boolean;
     /** Sets {@link Widget#flex}. */
     flex?: number;
+    /** Sets {@link Widget#id}. */
+    id?: string | null;
 }
 
 /**
@@ -128,6 +130,8 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     private untypedListeners: WidgetEventUntypedListenerList = [];
     /** Next user listener ID */
     private nextListener = 0;
+    /** Internal field for {@link Widget#id}. */
+    private _id: string | null = null;
 
     /**
      * How much this widget will expand relative to other widgets in a flexbox
@@ -151,6 +155,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
 
         this._enabled = properties?.enabled ?? true;
         this._flex = properties?.flex ?? 0;
+        this.id = properties?.id ?? null;
     }
 
     /**
@@ -263,6 +268,37 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
      */
     get dimensionless(): boolean {
         return this.width == 0 || this.height == 0;
+    }
+
+    /**
+     * The unique ID of this Widget. If the Widget has no ID, this value will be
+     * null. Uniqueness is tested per-UI tree; ID uniqueness is enforced when
+     * the ID is changed or when the Widget is attached to a {@link Root}.
+     *
+     * If the ID is already taken, setting the ID will have no effect and an
+     * error will be thrown.
+     */
+    get id(): string | null {
+        return this._id;
+    }
+
+    set id(id: string | null) {
+        if (id === this._id) {
+            return;
+        }
+
+        // request/set id
+        const oldID = this._id;
+        if (id !== null && this._root) {
+            this._root.requestID(id, this);
+        }
+
+        this._id = id;
+
+        // drop id
+        if (this._root && oldID !== null) {
+            this._root.dropID(oldID);
+        }
     }
 
     /**
@@ -772,8 +808,12 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
      * @param parent - The new parent of this Widget. If `null`, then this Widget has no parent and is the {@link Root#child | root Widget}
      */
     attach(root: Root, viewport: Viewport, parent: Widget | null): void {
-        if(this.attached) {
+        if (this.attached) {
             throw new Error(DynMsg.INVALID_ATTACHMENT(true));
+        }
+
+        if (this._id !== null) {
+            root.requestID(this._id, this);
         }
 
         this._root = root;
@@ -795,11 +835,17 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
      * If the widget was not in a UI tree, then an exception is thrown.
      */
     detach(): void {
-        if(!this.attached) {
+        if (!this.attached) {
             throw new Error(DynMsg.INVALID_ATTACHMENT(false));
         }
 
-        (this._root as Root).dropFoci(this);
+        const root = this._root as Root;
+
+        if (this._id !== null) {
+            root.dropID(this._id);
+        }
+
+        root.dropFoci(this);
         this._root = null;
         this._viewport = null;
         this._parent = null;

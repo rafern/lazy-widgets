@@ -16,17 +16,14 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Widget
  */
 export class Checkbox extends Widget {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'value',
-                name: 'variable',
-                validator: 'variable',
-                optional: true
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'value',
+            name: 'variable',
+            validator: 'variable',
+            optional: true
+        }
+    ];
 
     /** Horizontal offset. */
     private offsetX = 0;

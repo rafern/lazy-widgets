@@ -13,24 +13,21 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Aggregate Widget
  */
 export class LabelledRadioButton<V> extends Row {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'text',
-                name: 'text'
-            },
-            {
-                mode: 'value',
-                name: 'variable',
-                validator: 'variable'
-            },
-            {
-                mode: 'value',
-                name: 'value'
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'text',
+            name: 'text'
+        },
+        {
+            mode: 'value',
+            name: 'variable',
+            validator: 'variable'
+        },
+        {
+            mode: 'value',
+            name: 'value'
+        }
+    ];
 
     constructor(text: string, variable: Variable<V>, value: V, properties?: Readonly<LabelProperties & SpacingProperties>) {
         super([

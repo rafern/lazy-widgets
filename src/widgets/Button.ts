@@ -16,20 +16,17 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Widget
  */
 export class Button<W extends Widget = Widget> extends BaseContainer<W> {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'widget',
-                name: 'child'
-            },
-            {
-                mode: 'value',
-                name: 'callback',
-                validator: 'nullable:function'
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'widget',
+            name: 'child'
+        },
+        {
+            mode: 'value',
+            name: 'callback',
+            validator: 'nullable:function'
+        }
+    ];
 
     /** The helper used for handling pointer clicks and enter presses */
     protected clickHelper: ButtonClickHelper;

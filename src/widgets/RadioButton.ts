@@ -21,20 +21,17 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Widget
  */
 export class RadioButton<V> extends Widget {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'value',
-                name: 'variable',
-                validator: 'variable'
-            },
-            {
-                mode: 'value',
-                name: 'value'
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'value',
+            name: 'variable',
+            validator: 'variable'
+        },
+        {
+            mode: 'value',
+            name: 'value'
+        }
+    ];
 
     /** Horizontal offset. */
     private offsetX = 0;

@@ -100,38 +100,35 @@ export const defaultVirtualKeyboardTemplate: VirtualKeyboardTemplate = [
  * @category Alias Widget
  */
 export class VirtualKeyboard extends Column {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                name: 'keyboard-driver',
-                mode: 'value',
-                validator: validateInstanceOf(KeyboardDriver),
-            },
-            {
-                name: 'row-template',
-                mode: 'value',
-                validator: 'array',
-            },
-            {
-                name: 'key-context',
-                mode: 'value',
-                validator: 'key-context',
-            },
-            {
-                name: 'min-width',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            },
-            {
-                name: 'min-height',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            }
-        ],
-        hasOptions: true,
-    }
+    static override autoXML: WidgetAutoXML = [
+        {
+            name: 'keyboard-driver',
+            mode: 'value',
+            validator: validateInstanceOf(KeyboardDriver),
+        },
+        {
+            name: 'row-template',
+            mode: 'value',
+            validator: 'array',
+        },
+        {
+            name: 'key-context',
+            mode: 'value',
+            validator: 'key-context',
+        },
+        {
+            name: 'min-width',
+            mode: 'value',
+            validator: 'number',
+            optional: true,
+        },
+        {
+            name: 'min-height',
+            mode: 'value',
+            validator: 'number',
+            optional: true,
+        }
+    ];
 
     /**
      * @param keyboardTemplate - By default, the virtual keyboard template is {@link defaultVirtualKeyboardTemplate}.

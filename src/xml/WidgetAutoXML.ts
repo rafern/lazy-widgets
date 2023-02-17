@@ -40,16 +40,11 @@ export interface WidgetAutoXMLConfigTextParameter {
     optional?: boolean;
 }
 
-export type WidgetAutoXMLConfigParameterList = Array<WidgetAutoXMLConfigParameter | WidgetAutoXMLConfigWidgetParameter | WidgetAutoXMLConfigLayerParameter | WidgetAutoXMLConfigTextParameter>;
-
 /**
  * An input mapping for a {@link Widget | Widget's}
  * {@link BaseXMLUIParser#registerAutoFactory | auto-factory}.
  */
-export interface WidgetAutoXMLConfig {
-    parameters: WidgetAutoXMLConfigParameterList;
-    hasOptions: boolean;
-}
+export type WidgetAutoXMLConfig = Array<WidgetAutoXMLConfigParameter | WidgetAutoXMLConfigWidgetParameter | WidgetAutoXMLConfigLayerParameter | WidgetAutoXMLConfigTextParameter>;
 
 /**
  * A function that, when called, should register a factory to a

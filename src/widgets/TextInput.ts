@@ -51,17 +51,14 @@ export interface TextInputProperties extends WidgetProperties {
  * @category Widget
  */
 export class TextInput extends Widget {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'value',
-                name: 'variable',
-                validator: 'validated-variable',
-                optional: true
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'value',
+            name: 'variable',
+            validator: 'validated-variable',
+            optional: true
+        }
+    ];
 
     /**
      * At what timestamp did the blinking start. If 0, then the text cursor is

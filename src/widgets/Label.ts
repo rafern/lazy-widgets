@@ -20,16 +20,13 @@ export interface LabelProperties extends WidgetProperties {
  * @category Widget
  */
 export class Label extends Widget {
-    static override autoXML: WidgetAutoXML = {
-        parameters: [
-            {
-                mode: 'text',
-                name: 'text',
-                optional: true
-            }
-        ],
-        hasOptions: true
-    };
+    static override autoXML: WidgetAutoXML = [
+        {
+            mode: 'text',
+            name: 'text',
+            optional: true
+        }
+    ];
 
     /** The helper for measuring/painting text */
     protected textHelper: TextHelper;
