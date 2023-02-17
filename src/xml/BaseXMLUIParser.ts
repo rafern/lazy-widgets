@@ -15,8 +15,11 @@ import { validateTheme } from './validateTheme';
 import { validateValidatedVariable } from './validateValidatedVariable';
 import { validateVariable } from './validateVariable';
 import type { WidgetAutoXML, WidgetAutoXMLConfig, WidgetAutoXMLConfigLayerParameter, WidgetAutoXMLConfigParameterList, WidgetAutoXMLConfigValidator, WidgetAutoXMLConfigWidgetParameter } from './WidgetAutoXML';
+import type { XMLUIParserConfig } from './XMLUIParserConfig';
+import type { XMLUIParserContext } from './XMLUIParserContext';
+import type { XMLUIParserScriptContext } from './XMLUIParserScriptContext';
 
-export type XMLWidgetFactory = (parser: BaseXMLUIParser, xmlNode: Node) => Widget;
+export type XMLWidgetFactory = (parser: BaseXMLUIParser, context: XMLUIParserContext, xmlElem: Element) => Widget;
 
 const VALIDATORS = new Map<string, WidgetAutoXMLConfigValidator>([
     ['array', validateArray],
@@ -47,6 +50,26 @@ const VALIDATORS = new Map<string, WidgetAutoXMLConfigValidator>([
 
 const WHITESPACE_REGEX = /^\s*$/;
 
+const XML_NAMESPACE_BASE = 'lazy-widgets';
+const XML_NAMESPACE_OPTS = `${XML_NAMESPACE_BASE}:options`;
+const XML_NAMESPACE_META = `${XML_NAMESPACE_BASE}:metadata`;
+
+const RESERVED_NAMES = ['layer', 'script', 'ui-tree'];
+const RESERVED_IMPORTS = ['context', 'window', 'globalThis'];
+
+function normalizeToMap(record: Record<string, unknown> | Map<string, unknown> = new Map()) {
+    if (!(record instanceof Map)) {
+        const orig = record;
+        record = new Map();
+
+        for (const key of Object.getOwnPropertyNames(orig)) {
+            record.set(key, orig[key]);
+        }
+    }
+
+    return record;
+}
+
 function findNextParamOfType(paramConfig: WidgetAutoXMLConfigParameterList, parametersSet: Array<boolean>, mode: string) {
     const paramCount = paramConfig.length;
 
@@ -74,6 +97,56 @@ export class BaseXMLUIParser {
     private factories = new Map<string, XMLWidgetFactory>();
     private domParser = new DOMParser();
 
+    parseAttribute(rawValue: string, context: XMLUIParserContext): unknown {
+        if (rawValue.length === 0) {
+            return rawValue;
+        }
+
+        if (rawValue[0] === '$') {
+            // maybe a variable
+            if (rawValue.length <= 1) {
+                // special case - only a $ was typed with no variable name;
+                // treat as a string
+                return rawValue;
+            }
+
+            const noPrefix = rawValue.slice(1);
+
+            if (noPrefix[0] === '$') {
+                // NOT a variable, the $ is escaped by having 2 $ instead of 1
+                return noPrefix;
+            } else {
+                // definitely a variable
+                if (!context.variableMap.has(noPrefix)) {
+                    throw new Error(`Variable "${noPrefix}" does not exist`);
+                }
+
+                return context.variableMap.get(noPrefix);
+            }
+        } else if (rawValue[0] === '@') {
+            // maybe a json-encoded value
+            if (rawValue.length <= 1) {
+                // special case - only an @ was typed with no json data
+                // afterwards; treat as a string
+                return rawValue;
+            }
+
+            const noPrefix = rawValue.slice(1);
+
+            if (noPrefix[0] === '@') {
+                // NOT a json-encoded value, the @ is escaped by having 2 @
+                // instead of 1
+                return noPrefix;
+            } else {
+                // definitely a json-encoded value
+                return JSON.parse(noPrefix);
+            }
+        } else {
+            // just a string
+            return rawValue;
+        }
+    }
+
     registerFactory(name: string, factory: XMLWidgetFactory): void;
     registerFactory<T extends Widget>(widgetClass: new (...args: unknown[]) => T, factory: XMLWidgetFactory): void;
     registerFactory<T extends Widget = Widget>(nameOrWidgetClass: string | (new (...args: unknown[]) => T), factory: XMLWidgetFactory) {
@@ -89,7 +162,7 @@ export class BaseXMLUIParser {
         name = toKebabCase(name);
 
         // make sure the name is not reserved
-        if (name === 'layer') {
+        if (RESERVED_NAMES.indexOf(name) >= 0) {
             throw new Error(`This factory name (${name}) is reserved`);
         }
 
@@ -111,8 +184,11 @@ export class BaseXMLUIParser {
         let layerTrapReached = false;
         let hasTextNodeParam = false;
         const paramNames = new Map<string, number>();
+        const paramCount = autoConfig.parameters.length;
 
-        for (const param of autoConfig.parameters) {
+        for (let i = 0; i < paramCount; i++) {
+            const param = autoConfig.parameters[i];
+
             if (param.mode === 'widget') {
                 if (widgetTrapReached) {
                     throw new Error('Cannot add another widget parameter; there is already a previous widget parameter that is optional or a list');
@@ -120,6 +196,10 @@ export class BaseXMLUIParser {
 
                 if (param.list || param.optional) {
                     widgetTrapReached = true;
+                }
+
+                if (param.name !== undefined) {
+                    paramNames.set(param.name, i);
                 }
             } else if (param.mode === 'layer') {
                 if (layerTrapReached) {
@@ -129,9 +209,17 @@ export class BaseXMLUIParser {
                 if (param.list) {
                     layerTrapReached = true;
                 }
+
+                if (param.name !== undefined) {
+                    paramNames.set(param.name, i);
+                }
             } else if (param.mode === 'text') {
                 if (hasTextNodeParam) {
                     throw new Error('Cannot add another text parameter; there can only be one text parameter. If you have more string parameters, add them as "value" mode parameters with a "string" validator, and only keep the most important string parameter as the "text" mode parameter');
+                }
+
+                if (param.name !== undefined) {
+                    paramNames.set(param.name, i);
                 }
 
                 hasTextNodeParam = true;
@@ -139,30 +227,26 @@ export class BaseXMLUIParser {
                 if (param.validator !== undefined && typeof param.validator !== 'function' && !VALIDATORS.has(param.validator)) {
                     throw new Error(`Unknown built-in validator name (${param.validator})`);
                 }
+
+                paramNames.set(param.name, i);
             } else {
                 throw new Error(`Unknown parameter mode (${(param as { mode: unknown }).mode})`);
             }
         }
 
         // make factory
-        this.registerFactory(widgetClass, (_parser: BaseXMLUIParser, xmlNode: Node) => {
-            if (xmlNode.nodeType !== Node.ELEMENT_NODE) {
-                throw new Error("Can't parse XML UI widget; XML node must be an element node");
-            }
-
-            const elem = xmlNode as Element;
-
+        this.registerFactory(widgetClass, (_parser: BaseXMLUIParser, context: XMLUIParserContext, elem: Element) => {
             // parse parameters and options
-            // TODO `meta:` prefix for metadata options. for example, a
-            //      `meta:id` attribute would map the widget to an ID
-            const paramCount = autoConfig.parameters.length;
             let options: Record<string, unknown> | null = autoConfig.hasOptions ? {} : null;
             let optionsReplaced = false;
             const parameters = new Array<unknown>(paramCount);
             const setParameters = new Array<boolean>(paramCount).fill(false);
+            const setViaName = new Array<boolean>(paramCount).fill(false);
+            let id: string | null = null;
+            let meta: Map<string, unknown> | null = null;
 
             for (const attribute of elem.attributes) {
-                if (attribute.prefix === 'option') {
+                if (attribute.namespaceURI === XML_NAMESPACE_OPTS) {
                     // this attribute sets an options object's field
                     if (options === null) {
                         throw new Error(`Can't add option "${attribute.localName}"; widget does not accept an options object`);
@@ -178,8 +262,8 @@ export class BaseXMLUIParser {
                         }
 
                         optionsReplaced = true;
-
-                        // TODO replace options object
+                        const optionsValue = this.parseAttribute(attribute.value, context);
+                        options = validateObject(optionsValue) as Record<string, unknown>;
                     } else {
                         if (optionsReplaced) {
                             throw new Error(`Can't add option "${attribute.localName}"; can't set individual options if the options object is replaced with "option:_"`);
@@ -190,10 +274,33 @@ export class BaseXMLUIParser {
                             throw new Error(`Can't add option "${attribute.localName}"; the option has already been set`);
                         }
 
-                        // TODO handle variables and json encoding prefixes
-                        options[nameConverted] = attribute.value;
+                        options[nameConverted] = this.parseAttribute(attribute.value, context);
                     }
-                } else if (attribute.prefix === null) {
+                } else if (attribute.namespaceURI === XML_NAMESPACE_META) {
+                    // this attribute is a meta value
+                    const nameConverted = fromKebabCase(attribute.localName);
+                    const val = attribute.value;
+
+                    if (nameConverted === 'id') {
+                        if (context.idMap.has(nameConverted)) {
+                            throw new Error(`Widget ID "${val}" already taken`);
+                        } else if (id !== null) {
+                            throw new Error('Widget ID can only be set once');
+                        }
+
+                        id = val;
+                    } else {
+                        if (meta === null) {
+                            meta = new Map();
+                        } else {
+                            if (meta.has(nameConverted)) {
+                                throw new Error(`Metadata with key "${nameConverted}" already set`);
+                            }
+                        }
+
+                        meta.set(nameConverted, this.parseAttribute(val, context));
+                    }
+                } else if (attribute.namespaceURI === null || attribute.namespaceURI === XML_NAMESPACE_BASE) {
                     // this attribute sets a parameter's value
                     const index = paramNames.get(attribute.localName);
                     if (index === undefined) {
@@ -205,9 +312,79 @@ export class BaseXMLUIParser {
                     }
 
                     setParameters[index] = true;
-                    // TODO handle variables and json encoding prefixes
-                    // TODO validate value
-                    parameters[index] = attribute.value;
+                    setViaName[index] = true;
+
+                    const arg = this.parseAttribute(attribute.value, context);
+                    const paramConfig = autoConfig.parameters[index];
+
+                    if (paramConfig.mode === 'value') {
+                        if (arg === undefined) {
+                            if (!paramConfig.optional) {
+                                throw new Error(`Required parameters (${paramConfig.name}) can't be undefined`);
+                            }
+                        } else {
+                            if (paramConfig.validator) {
+                                let validator = paramConfig.validator;
+                                if (typeof validator === 'string') {
+                                    const builtinValid = VALIDATORS.get(validator);
+                                    if (builtinValid === undefined) {
+                                        throw new Error(`No built-in validator with name "${validator}" exists`);
+                                    }
+
+                                    validator = builtinValid;
+                                }
+
+                                parameters[index] = validator(arg);
+                            } else {
+                                parameters[index] = arg;
+                            }
+                        }
+                    } else if (paramConfig.mode === 'widget') {
+                        if (arg === undefined) {
+                            if (!paramConfig.optional) {
+                                throw new Error(`Required parameters (${paramConfig.name}) can't be undefined`);
+                            }
+                        } else {
+                            if (paramConfig.list) {
+                                if (!Array.isArray(arg)) {
+                                    throw new Error(`Parameter "${paramConfig.name}" must be an array of Widgets`);
+                                }
+
+                                if (paramConfig.validator) {
+                                    const validArg = [];
+                                    for (const widget of arg) {
+                                        validArg.push(paramConfig.validator(widget));
+                                    }
+
+                                    parameters[index] = validArg;
+                                } else {
+                                    parameters[index] = arg;
+                                }
+                            } else {
+                                if (!(arg instanceof Widget)) {
+                                    throw new Error(`Parameter "${paramConfig.name}" must be a Widget`);
+                                }
+
+                                if (paramConfig.validator) {
+                                    parameters[index] = paramConfig.validator(arg);
+                                } else {
+                                    parameters[index] = arg;
+                                }
+                            }
+                        }
+                    } else if (paramConfig.mode === 'layer') {
+                        // TODO
+                    } else if (paramConfig.mode === 'text') {
+                        if (arg === undefined) {
+                            throw new Error(`Text parameters (${paramConfig.name}) can't be undefined`);
+                        } else {
+                            if (typeof arg !== 'string') {
+                                throw new Error(`Text parameters (${paramConfig.name}) must be strings`);
+                            }
+
+                            parameters[index] = arg;
+                        }
+                    }
                 }
             }
 
@@ -226,11 +403,23 @@ export class BaseXMLUIParser {
                     textContent += (childNode as CharacterData).data;
                 } else if (nodeType === Node.ELEMENT_NODE) {
                     const childElem = childNode as Element;
+                    if (childElem.namespaceURI !== XML_NAMESPACE_BASE) {
+                        if (childElem.namespaceURI === XML_NAMESPACE_OPTS) {
+                            throw new Error(`Unexpected "${XML_NAMESPACE_OPTS}" namespace in XML element`);
+                        }
+                        if (childElem.namespaceURI === XML_NAMESPACE_META) {
+                            throw new Error(`Unexpected "${XML_NAMESPACE_META}" namespace in XML element`);
+                        }
+
+                        continue;
+                    }
+
                     if (childElem.nodeName.toLowerCase() === 'layer') {
                         // TODO implement layer parsing
                     } else {
+                        // validator
                         const index = findNextParamOfType(autoConfig.parameters, setParameters, 'widget');
-                        const childWidget = this.parseNode(childElem);
+                        const childWidget = this.parseNode(context, childElem);
                         setParameters[index] = true;
 
                         if ((autoConfig.parameters[index] as WidgetAutoXMLConfigWidgetParameter).list) {
@@ -278,11 +467,23 @@ export class BaseXMLUIParser {
             }
 
             // instantiate widget
+            let instance;
             if (options === null) {
-                return new widgetClass(...parameters);
+                instance = new widgetClass(...parameters);
             } else {
-                return new widgetClass(...parameters, options);
+                instance = new widgetClass(...parameters, options);
             }
+
+            // map widget back to ID and save metadata
+            if (id !== null) {
+                context.idMap.set(id, instance);
+            }
+
+            if (meta !== null) {
+                context.metaMap.set(instance, meta);
+            }
+
+            return instance;
         });
     }
 
@@ -300,9 +501,19 @@ export class BaseXMLUIParser {
         }
     }
 
-    parseNode(xmlNode: Node): Widget {
+    parseNode(context: XMLUIParserContext, xmlNode: Node): Widget {
+        // validate node type
+        if (xmlNode.nodeType !== Node.ELEMENT_NODE) {
+            throw new Error('XML node must be an element');
+        }
+
+        const elem = xmlNode as Element;
+        if (elem.namespaceURI !== XML_NAMESPACE_BASE) {
+            throw new Error(`XML node must be using the "${XML_NAMESPACE_BASE}" namespace`);
+        }
+
         // get factory for this element name
-        const name = xmlNode.nodeName.toLowerCase();
+        const name = elem.nodeName.toLowerCase();
         const factory = this.factories.get(name);
 
         if (factory === undefined) {
@@ -310,43 +521,150 @@ export class BaseXMLUIParser {
         }
 
         // generate widget
-        // TODO id mapping
-        // TODO pre-parsed node attributes, to handle vue-like tag syntax
-        return factory(this, xmlNode);
+        return factory(this, context, elem);
     }
 
-    parseXMLDocument(xmlDoc: XMLDocument): Widget {
-        // iterate children. there should only be one element child
+    executeScriptNode(scriptNode: Element, scriptContext: XMLUIParserScriptContext, imports: Map<string, unknown>) {
+        // concatenate all text
+        let text = '';
+        for (const child of scriptNode.childNodes) {
+            const nodeType = child.nodeType;
+            if (nodeType === Node.TEXT_NODE || nodeType === Node.CDATA_SECTION_NODE) {
+                text += (child as CharacterData).data;
+            } else {
+                throw new Error('Unexpected XML non-text node inside script node');
+            }
+        }
+
+        // exec in the global scope, passing the script context and defining all
+        // imports
+        const params = ['context'];
+        const args: Array<unknown> = [scriptContext];
+
+        for (const [key, value] of imports) {
+            params.push(key);
+            args.push(value);
+        }
+
+        (new Function(...params, `"use strict"; ${String(text)}`))(...args);
+    }
+
+    parseUITreeNode(uiTreeNode: Element, context: XMLUIParserContext): Widget {
+        // iterate children. there should only be one child element with the
+        // wanted namespace that represents a widget. there can be many script
+        // elements
         let topWidget = null;
-        for (const child of xmlDoc.childNodes) {
+        for (const child of uiTreeNode.childNodes) {
             const nodeType = child.nodeType;
             if (nodeType === Node.ELEMENT_NODE) {
-                if (topWidget !== null) {
-                    throw new Error('XML UI tree can only have one top-most widget');
+                const childElem = child as Element;
+                if (childElem.namespaceURI !== XML_NAMESPACE_BASE) {
+                    if (childElem.namespaceURI === XML_NAMESPACE_OPTS) {
+                        throw new Error(`Unexpected "${XML_NAMESPACE_OPTS}" namespace in XML element`);
+                    }
+                    if (childElem.namespaceURI === XML_NAMESPACE_META) {
+                        throw new Error(`Unexpected "${XML_NAMESPACE_META}" namespace in XML element`);
+                    }
+
+                    continue;
                 }
 
-                topWidget = this.parseNode(child);
+                // is this a widget or a script?
+                if (childElem.localName === 'script') {
+                    // script, execute it
+                    if (context.scriptImports === null) {
+                        throw new Error('Scripts are disabled');
+                    }
+
+                    const scriptContext: XMLUIParserScriptContext = {
+                        variables: context.variableMap,
+                        ids: context.idMap,
+                        metadata: context.metaMap
+                    };
+
+                    this.executeScriptNode(childElem, scriptContext, context.scriptImports);
+                } else {
+                    // widget, parse it
+                    if (topWidget !== null) {
+                        throw new Error('XML UI tree can only have one top-most widget');
+                    }
+
+                    topWidget = this.parseNode(context, child);
+                }
             } else if (nodeType === Node.TEXT_NODE) {
                 if (!WHITESPACE_REGEX.test((child as CharacterData).data)) {
-                    throw new Error('Unexpected text node as XML document child');
+                    throw new Error('Unexpected text node as UI tree child');
                 }
             } else if (nodeType === Node.CDATA_SECTION_NODE) {
-                throw new Error('Unexpected CDATA node as XML document child');
+                throw new Error('Unexpected CDATA node as UI tree child');
             } else if (nodeType === Node.DOCUMENT_NODE) {
-                throw new Error('Unexpected document node as XML document child');
+                throw new Error('Unexpected document node as UI tree child');
             } else if (nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-                throw new Error('Unexpected document fragment node as XML document child');
+                throw new Error('Unexpected document fragment node as UI tree child');
             }
         }
 
         if (topWidget === null) {
-            throw new Error('Expected a XML widget definition in the document, none found');
+            throw new Error('Expected a XML widget definition in the UI tree, none found');
         }
 
         return topWidget;
     }
 
-    parseFromString(str: string): Widget {
+    parseFromXMLDocument(xmlDoc: XMLDocument, config?: XMLUIParserConfig): [Map<string, Widget>, XMLUIParserContext] {
+        // find all UI tree nodes
+        const uiTrees = xmlDoc.getElementsByTagNameNS(XML_NAMESPACE_BASE, 'ui-tree');
+        if (uiTrees.length === 0) {
+            throw new Error('No UI trees found in document');
+        }
+
+        // setup context
+        let scriptImports = null, variableMap;
+        if (config) {
+            if (config.allowScripts) {
+                scriptImports = normalizeToMap(config.scriptImports);
+
+                for (const name of scriptImports.keys()) {
+                    if (RESERVED_IMPORTS.indexOf(name) >= 0) {
+                        throw new Error(`The script import name "${name}" is reserved`);
+                    }
+                }
+            }
+
+            variableMap = normalizeToMap(config.variables);
+        } else {
+            scriptImports = new Map();
+            variableMap = new Map();
+        }
+
+        const context: XMLUIParserContext = {
+            scriptImports,
+            variableMap,
+            idMap: new Map(),
+            metaMap: new Map()
+        };
+
+        // parse UI trees
+        const trees = new Map<string, Widget>();
+        for (const uiTree of uiTrees) {
+            const nameAttr = uiTree.attributes.getNamedItemNS(null, 'name');
+            if (nameAttr === null) {
+                throw new Error('UI trees must be named with a "name" attribute');
+            }
+
+            const name = nameAttr.value;
+            if (trees.has(name)) {
+                throw new Error(`A UI tree with the name "${name}" already exists`);
+            }
+
+            const widget = this.parseUITreeNode(uiTree, context);
+            trees.set(name, widget);
+        }
+
+        return [trees, context];
+    }
+
+    parseFromString(str: string, config?: XMLUIParserConfig): [Map<string, Widget>, XMLUIParserContext] {
         const xmlDoc = this.domParser.parseFromString(str, 'text/xml');
 
         const errorNode = xmlDoc.querySelector('parsererror');
@@ -354,17 +672,17 @@ export class BaseXMLUIParser {
             throw new Error('Invalid XML');
         }
 
-        return this.parseXMLDocument(xmlDoc);
+        return this.parseFromXMLDocument(xmlDoc, config);
     }
 
-    async parseFromURL(resource: RequestInfo | URL, options?: RequestInit): Promise<Widget> {
-        const response = await fetch(resource, options);
+    async parseFromURL(resource: RequestInfo | URL, config?: XMLUIParserConfig, requestOptions?: RequestInit): Promise<[Map<string, Widget>, XMLUIParserContext]> {
+        const response = await fetch(resource, requestOptions);
 
         if (!response.ok) {
             throw new Error(`Response not OK (status code ${response.status})`);
         }
 
         const str = await response.text();
-        return this.parseFromString(str);
+        return this.parseFromString(str, config);
     }
 }

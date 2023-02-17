@@ -1,12 +1,26 @@
-<background xmlns:option="lazy-widgets">
-    <margin>
-        <column>
-            <label>Hello world!</label>
-            <text-input/>
-            <row>
-                <label option:body-text-fill="red">I'm totally a button</label>
-                <label option:body-text-fill="blue">Trust me, I'm a button</label>
-            </row>
-        </column>
-    </margin>
-</background>
+<?xml version="1.0" encoding="UTF-8"?>
+<ui-tree name="simple" xmlns="lazy-widgets" xmlns:option="lazy-widgets:options" xmlns:meta="lazy-widgets:metadata">
+    <script>
+        context.variables.set('textVariable', new lw.ValidatedVariable('', null, value => {
+            context.ids.get('label').text = `Text input: ${value}`;
+        }, false));
+        context.variables.set('button1Callback', () => {
+            context.ids.get('label').text = 'Button 1 clicked!';
+        });
+        context.variables.set('button2Callback', () => {
+            context.ids.get('label').text = 'Button 2 clicked!';
+        });
+    </script>
+    <background>
+        <margin>
+            <column>
+                <label meta:id="label">Hello world!</label>
+                <text-input variable="$textVariable" />
+                <row option:multi-container-alignment='@{ "main": 0.5, "cross": "stretch" }'>
+                    <text-button callback="$button1Callback">Button 1</text-button>
+                    <text-button callback="$button2Callback">Button 2</text-button>
+                </row>
+            </column>
+        </margin>
+    </background>
+</ui-tree>

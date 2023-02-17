@@ -5,13 +5,17 @@
             import {
                 DOMRoot, DOMKeyboardDriver, DOMPointerDriver, XMLUIParser
             } from '../dist/index.esm.js';
+            import * as lw from '../dist/index.esm.js';
 
             // Load top widget from XML file
             const xmlParser = new XMLUIParser();
-            const topWidget = await xmlParser.parseFromURL('example-ui.xml');
+            const [uiTrees, context] = await xmlParser.parseFromURL('example-ui.xml', {
+                scriptImports: { lw },
+                allowScripts: true
+            });
 
             // Create the root
-            const root = new DOMRoot(topWidget);
+            const root = new DOMRoot(uiTrees.get('simple'));
 
             // Create, bind DOM and register the keyboard driver
             const keyboardDriver = new DOMKeyboardDriver();
