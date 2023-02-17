@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui-tree name="layered" xmlns="lazy-widgets" xmlns:option="lazy-widgets:options" xmlns:meta="lazy-widgets:metadata">
+    <script>
+        context.variables.set('textVariable', new ValidatedVariable('', null, value => {
+            context.ids.get('label').text = `Text input: ${value}`;
+        }, false));
+        context.variables.set('button1Callback', () => {
+            context.ids.get('label').text = 'Button 1 clicked!';
+        });
+        context.variables.set('button2Callback', () => {
+            context.ids.get('label').text = 'Button 2 clicked!';
+        });
+    </script>
+    <layered-container>
+        <layer>
+            <background>
+                <margin>
+                    <column>
+                        <label meta:id="label">Hello world!</label>
+                        <text-input variable="$textVariable" />
+                        <row option:multi-container-alignment='@{ "main": 0.5, "cross": "stretch" }'>
+                            <text-button callback="$button1Callback">Button 1</text-button>
+                            <text-button callback="$button2Callback">Button 2</text-button>
+                        </row>
+                    </column>
+                </margin>
+            </background>
+        </layer>
+        <layer>
+            <label option:body-text-fill="red">I am superimposing the default layer!</label>
+        </layer>
+        <layer can-expand="@false">
+            <column option:multi-container-alignment='@{ "main": 1, "cross": "stretch" }'>
+                <label option:body-text-fill="red" option:body-text-align="@1">I am above all layers, but i can't expand the layout, because my layer's canExpand option is false!</label>
+            </column>
+        </layer>
+    </layered-container>
+</ui-tree>

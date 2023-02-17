@@ -9,13 +9,13 @@
 
             // Load top widget from XML file
             const xmlParser = new XMLUIParser();
-            const [uiTrees, context] = await xmlParser.parseFromURL('simple-ui.xml', {
+            const [uiTrees, context] = await xmlParser.parseFromURL('layered-ui.xml', {
                 scriptImports: lazyWidgets,
                 allowScripts: true
             });
 
             // Create the root
-            const root = new DOMRoot(uiTrees.get('simple'));
+            const root = new DOMRoot(uiTrees.get('layered'));
 
             // Create, bind DOM and register the keyboard driver
             const keyboardDriver = new DOMKeyboardDriver();

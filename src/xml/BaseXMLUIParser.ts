@@ -1,3 +1,4 @@
+import { LayerInit } from '../core/LayerInit';
 import { Widget } from '../widgets/Widget';
 import { fromKebabCase } from './fromKebabCase';
 import { toKebabCase } from './toKebabCase';
@@ -6,6 +7,7 @@ import { validateBoolean } from './validateBoolean';
 import { validateFunction } from './validateFunction';
 import { validateImageSource } from './validateImageSource';
 import { validateKeyContext } from './validateKeyContext';
+import { validateLayerInit } from './validateLayerInit';
 import { validateLayoutConstraints } from './validateLayoutConstraints';
 import { validateNullable } from './validateNullable';
 import { validateNumber } from './validateNumber';
@@ -373,7 +375,24 @@ export class BaseXMLUIParser {
                             }
                         }
                     } else if (paramConfig.mode === 'layer') {
-                        // TODO
+                        if (arg === undefined) {
+                            throw new Error(`Layer parameters (${paramConfig.name}) can't be undefined`);
+                        } else {
+                            if (paramConfig.list) {
+                                if (!Array.isArray(arg)) {
+                                    throw new Error(`Parameter "${paramConfig.name}" must be an array of layers`);
+                                }
+
+                                const validArg = [];
+                                for (const layer of arg) {
+                                    validArg.push(validateLayerInit(layer));
+                                }
+
+                                parameters[index] = validArg;
+                            } else {
+                                parameters[index] = validateLayerInit(arg);
+                            }
+                        }
                     } else if (paramConfig.mode === 'text') {
                         if (arg === undefined) {
                             throw new Error(`Text parameters (${paramConfig.name}) can't be undefined`);
@@ -415,11 +434,23 @@ export class BaseXMLUIParser {
                     }
 
                     if (childElem.nodeName.toLowerCase() === 'layer') {
-                        // TODO implement layer parsing
+                        const index = findNextParamOfType(autoConfig.parameters, setParameters, 'layer');
+                        const layer = this.parseLayerElem(context, childElem);
+                        setParameters[index] = true;
+
+                        if ((autoConfig.parameters[index] as WidgetAutoXMLConfigLayerParameter).list) {
+                            if (parameters[index] === undefined) {
+                                parameters[index] = [layer];
+                            } else {
+                                (parameters[index] as Array<LayerInit<Widget>>).push(layer);
+                            }
+                        } else {
+                            parameters[index] = layer;
+                        }
                     } else {
                         // validator
                         const index = findNextParamOfType(autoConfig.parameters, setParameters, 'widget');
-                        const childWidget = this.parseNode(context, childElem);
+                        const childWidget = this.parseWidgetElem(context, childElem);
                         setParameters[index] = true;
 
                         if ((autoConfig.parameters[index] as WidgetAutoXMLConfigWidgetParameter).list) {
@@ -501,17 +532,7 @@ export class BaseXMLUIParser {
         }
     }
 
-    parseNode(context: XMLUIParserContext, xmlNode: Node): Widget {
-        // validate node type
-        if (xmlNode.nodeType !== Node.ELEMENT_NODE) {
-            throw new Error('XML node must be an element');
-        }
-
-        const elem = xmlNode as Element;
-        if (elem.namespaceURI !== XML_NAMESPACE_BASE) {
-            throw new Error(`XML node must be using the "${XML_NAMESPACE_BASE}" namespace`);
-        }
-
+    parseWidgetElem(context: XMLUIParserContext, elem: Element): Widget {
         // get factory for this element name
         const name = elem.nodeName.toLowerCase();
         const factory = this.factories.get(name);
@@ -522,6 +543,77 @@ export class BaseXMLUIParser {
 
         // generate widget
         return factory(this, context, elem);
+    }
+
+    parseLayerElem(context: XMLUIParserContext, elem: Element): LayerInit<Widget> {
+        // parse attributes
+        let child, name, canExpand;
+        for (const attr of elem.attributes) {
+            // ignore attributes that arent using the default/wanted namespace
+            if (attr.namespaceURI !== null && attr.namespaceURI !== XML_NAMESPACE_BASE) {
+                continue;
+            }
+
+            // parse values
+            if (attr.localName === 'child') {
+                if (child !== undefined) {
+                    throw new Error('Only one child can be specified per layer');
+                }
+
+                child = this.parseAttribute(attr.value, context);
+                if (!(child instanceof Widget)) {
+                    throw new Error('Layer child must be a Widget');
+                }
+            } else if (attr.localName === 'name') {
+                if (name !== undefined) {
+                    throw new Error('Only one name can be specified per layer');
+                }
+
+                name = validateString(this.parseAttribute(attr.value, context));
+            } else if (attr.localName === 'can-expand') {
+                if (canExpand !== undefined) {
+                    throw new Error('Only one can-expand option can be specified per layer');
+                }
+
+                canExpand = validateBoolean(this.parseAttribute(attr.value, context));
+            } else {
+                throw new Error(`Unknown layer attribute "${attr.localName}"`);
+            }
+        }
+
+        // parse children
+        for (const childNode of elem.childNodes) {
+            const nodeType = childNode.nodeType;
+            if (nodeType === Node.ELEMENT_NODE) {
+                // ignore non-lazy-widgets nodes
+                const childElem = childNode as Element;
+                if (childElem.namespaceURI !== XML_NAMESPACE_BASE) {
+                    continue;
+                }
+
+                if (child !== undefined) {
+                    throw new Error('Only one child can be specified per layer');
+                }
+
+                child = this.parseWidgetElem(context, childElem);
+            } else if (nodeType === Node.COMMENT_NODE) {
+                continue;
+            } else if (nodeType === Node.TEXT_NODE) {
+                if (!WHITESPACE_REGEX.test((childNode as CharacterData).data)) {
+                    throw new Error('Unexpected text node as layer child');
+                }
+            } else {
+                console.log(childNode)
+                throw new Error('Unexpected junk as layer node child');
+            }
+        }
+
+        // done
+        if (child === undefined) {
+            throw new Error('Layer must have a child. Either add it as an XML node, or pass it as the "child" attribute via a variable');
+        }
+
+        return { child, name, canExpand };
     }
 
     executeScriptNode(scriptNode: Element, scriptContext: XMLUIParserScriptContext, imports: Map<string, unknown>) {
@@ -589,7 +681,7 @@ export class BaseXMLUIParser {
                         throw new Error('XML UI tree can only have one top-most widget');
                     }
 
-                    topWidget = this.parseNode(context, child);
+                    topWidget = this.parseWidgetElem(context, childElem);
                 }
             } else if (nodeType === Node.TEXT_NODE) {
                 if (!WHITESPACE_REGEX.test((child as CharacterData).data)) {
