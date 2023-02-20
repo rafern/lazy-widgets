@@ -1,6 +1,6 @@
 import type { KeyContext } from '../widgets/VirtualKeyboard/KeyContext';
 
-export function validateKeyContext(value: unknown): KeyContext {
+export function validateKeyContext(value: unknown): [value: KeyContext, stop: boolean] {
     if (typeof value !== 'object') {
         throw new Error('Invalid KeyContext; not an object');
     }
@@ -24,5 +24,5 @@ export function validateKeyContext(value: unknown): KeyContext {
         throw new Error('Invalid KeyContext; alt is not a boolean');
     }
 
-    return kc;
+    return [kc, false];
 }

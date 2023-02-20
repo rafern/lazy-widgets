@@ -16,6 +16,7 @@ import { validateString } from './validateString';
 import { validateTheme } from './validateTheme';
 import { validateValidatedVariable } from './validateValidatedVariable';
 import { validateVariable } from './validateVariable';
+import { validateWidget } from './validateWidget';
 import type { WidgetAutoXML, WidgetAutoXMLConfigLayerParameter, WidgetAutoXMLConfig, WidgetAutoXMLConfigValidator, WidgetAutoXMLConfigWidgetParameter } from './WidgetAutoXML';
 import type { XMLUIParserConfig } from './XMLUIParserConfig';
 import type { XMLUIParserContext } from './XMLUIParserContext';
@@ -23,32 +24,7 @@ import type { XMLUIParserScriptContext } from './XMLUIParserScriptContext';
 
 export type XMLWidgetFactory = (parser: BaseXMLUIParser, context: XMLUIParserContext, xmlElem: Element) => Widget;
 
-const VALIDATORS = new Map<string, WidgetAutoXMLConfigValidator>([
-    ['array', validateArray],
-    ['boolean', validateBoolean],
-    ['function', validateFunction],
-    ['image-source', validateImageSource],
-    ['key-context', validateKeyContext],
-    ['layout-constraints', validateLayoutConstraints],
-    ['number', validateNumber],
-    ['object', validateObject],
-    ['string', validateString],
-    ['theme', validateTheme],
-    ['validated-variable', validateValidatedVariable],
-    ['variable', validateVariable],
-    ['nullable:array', validateNullable(validateArray)],
-    ['nullable:boolean', validateNullable(validateBoolean)],
-    ['nullable:function', validateNullable(validateFunction)],
-    ['nullable:image-source', validateNullable(validateImageSource)],
-    ['nullable:key-context', validateNullable(validateKeyContext)],
-    ['nullable:layout-constraints', validateNullable(validateLayoutConstraints)],
-    ['nullable:number', validateNullable(validateNumber)],
-    ['nullable:object', validateNullable(validateObject)],
-    ['nullable:string', validateNullable(validateString)],
-    ['nullable:theme', validateNullable(validateTheme)],
-    ['nullable:validated-variable', validateNullable(validateValidatedVariable)],
-    ['nullable:variable', validateNullable(validateVariable)],
-]);
+export type XMLMergedValidator = (inputValue: unknown) => unknown;
 
 const WHITESPACE_REGEX = /^\s*$/;
 
@@ -95,8 +71,26 @@ function findNextParamOfType(paramConfig: WidgetAutoXMLConfig, parametersSet: Ar
 }
 
 export class BaseXMLUIParser {
-    private factories = new Map<string, XMLWidgetFactory>();
     private domParser = new DOMParser();
+    private factories = new Map<string, XMLWidgetFactory>();
+    private validators = new Map<string, WidgetAutoXMLConfigValidator>();
+
+    constructor() {
+        this.validators.set('array', validateArray);
+        this.validators.set('boolean', validateBoolean);
+        this.validators.set('function', validateFunction);
+        this.validators.set('image-source', validateImageSource);
+        this.validators.set('key-context', validateKeyContext);
+        this.validators.set('layout-constraints', validateLayoutConstraints);
+        this.validators.set('nullable', validateNullable);
+        this.validators.set('number', validateNumber);
+        this.validators.set('object', validateObject);
+        this.validators.set('string', validateString);
+        this.validators.set('theme', validateTheme);
+        this.validators.set('validated-variable', validateValidatedVariable);
+        this.validators.set('variable', validateVariable);
+        this.validators.set('widget', validateWidget);
+    }
 
     parseAttribute(rawValue: string, context: XMLUIParserContext): unknown {
         if (rawValue.length === 0) {
@@ -184,6 +178,7 @@ export class BaseXMLUIParser {
         let widgetTrapReached = false;
         let layerTrapReached = false;
         let hasTextNodeParam = false;
+        const paramValidators = new Map<number, XMLMergedValidator>();
         const paramNames = new Map<string, number>();
         const paramCount = autoConfig.length;
 
@@ -225,8 +220,57 @@ export class BaseXMLUIParser {
 
                 hasTextNodeParam = true;
             } else if (param.mode === 'value') {
-                if (param.validator !== undefined && typeof param.validator !== 'function' && !VALIDATORS.has(param.validator)) {
-                    throw new Error(`Unknown built-in validator name (${param.validator})`);
+                if (param.validator !== undefined) {
+                    let validators: Array<WidgetAutoXMLConfigValidator | string>;
+
+                    // split validators into validation functions and strings
+                    if (typeof param.validator === 'string') {
+                        validators = param.validator.split(':');
+                    } else if (typeof param.validator === 'function') {
+                        validators = [param.validator];
+                    } else if (Array.isArray(param.validator)) {
+                        validators = [];
+
+                        for (const subValidator of param.validator) {
+                            if (typeof subValidator === 'string') {
+                                validators.push(...subValidator.split(':'));
+                            } else if (typeof subValidator === 'function') {
+                                validators.push(subValidator);
+                            } else {
+                                throw new Error(`Invalid validator type: ${typeof subValidator}`);
+                            }
+                        }
+                    } else {
+                        throw new Error(`Invalid validator type: ${typeof param.validator}`);
+                    }
+
+                    // convert built-in validators (strings) to functions
+                    const validatorCount = validators.length;
+                    if (validatorCount > 0) {
+                        for (let v = 0; v < validatorCount; v++) {
+                            const rawValidator = validators[v];
+                            if (rawValidator === '') {
+                                throw new Error('Leading or trailing ":" in validator list');
+                            } else if (typeof rawValidator === 'string') {
+                                const func = this.validators.get(rawValidator);
+                                if (func === undefined) {
+                                    throw new Error(`Built-in validator "${rawValidator}" does not exist`);
+                                }
+
+                                validators[v] = func;
+                            }
+                        }
+
+                        // merge validators into a single validator
+                        paramValidators.set(i, (inputValue: unknown) =>  {
+                            let value = inputValue;
+                            for (let v = 0, stop = false; !stop && v < validatorCount; v++) {
+                                [value, stop] = (validators[v] as WidgetAutoXMLConfigValidator)(value);
+                            }
+
+                            return value;
+                        });
+                    }
                 }
 
                 paramNames.set(param.name, i);
@@ -262,7 +306,7 @@ export class BaseXMLUIParser {
 
                         optionsReplaced = true;
                         const optionsValue = this.parseAttribute(attribute.value, context);
-                        options = validateObject(optionsValue) as Record<string, unknown>;
+                        options = validateObject(optionsValue)[0] as Record<string, unknown>;
                     } else {
                         if (optionsReplaced) {
                             throw new Error(`Can't add option "${attribute.localName}"; can't set individual options if the options object is replaced with "option:_"`);
@@ -298,20 +342,11 @@ export class BaseXMLUIParser {
                                 throw new Error(`Required parameters (${paramConfig.name}) can't be undefined`);
                             }
                         } else {
-                            if (paramConfig.validator) {
-                                let validator = paramConfig.validator;
-                                if (typeof validator === 'string') {
-                                    const builtinValid = VALIDATORS.get(validator);
-                                    if (builtinValid === undefined) {
-                                        throw new Error(`No built-in validator with name "${validator}" exists`);
-                                    }
-
-                                    validator = builtinValid;
-                                }
-
-                                parameters[index] = validator(arg);
-                            } else {
+                            const validator = paramValidators.get(index);
+                            if (validator === undefined) {
                                 parameters[index] = arg;
+                            } else {
+                                parameters[index] = validator(arg);
                             }
                         }
                     } else if (paramConfig.mode === 'widget') {
@@ -517,7 +552,7 @@ export class BaseXMLUIParser {
 
     parseLayerElem(context: XMLUIParserContext, elem: Element): LayerInit<Widget> {
         // parse attributes
-        let child, name, canExpand;
+        let child: Widget | undefined, name: string | undefined, canExpand: boolean | undefined;
         for (const attr of elem.attributes) {
             // ignore attributes that arent using the default/wanted namespace
             if (attr.namespaceURI !== null && attr.namespaceURI !== XML_NAMESPACE_BASE) {
@@ -530,22 +565,19 @@ export class BaseXMLUIParser {
                     throw new Error('Only one child can be specified per layer');
                 }
 
-                child = this.parseAttribute(attr.value, context);
-                if (!(child instanceof Widget)) {
-                    throw new Error('Layer child must be a Widget');
-                }
+                child = validateWidget(this.parseAttribute(attr.value, context))[0];
             } else if (attr.localName === 'name') {
                 if (name !== undefined) {
                     throw new Error('Only one name can be specified per layer');
                 }
 
-                name = validateString(this.parseAttribute(attr.value, context));
+                name = validateString(this.parseAttribute(attr.value, context))[0];
             } else if (attr.localName === 'can-expand') {
                 if (canExpand !== undefined) {
                     throw new Error('Only one can-expand option can be specified per layer');
                 }
 
-                canExpand = validateBoolean(this.parseAttribute(attr.value, context));
+                canExpand = validateBoolean(this.parseAttribute(attr.value, context))[0];
             } else {
                 throw new Error(`Unknown layer attribute "${attr.localName}"`);
             }

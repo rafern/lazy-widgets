@@ -1,7 +1,7 @@
 import type { Widget } from '../widgets/Widget';
 import type { BaseXMLUIParser, XMLWidgetFactory } from './BaseXMLUIParser';
 
-export type WidgetAutoXMLConfigValidator = (value: unknown) => unknown;
+export type WidgetAutoXMLConfigValidator = (inputValue: unknown) => [transformedValue: unknown, stop: boolean];
 
 /**
  * A parameter for the constructor of a Widget class, configured in a
@@ -11,7 +11,7 @@ export interface WidgetAutoXMLConfigParameter {
     mode: 'value';
     name: string;
     optional?: boolean;
-    validator?: WidgetAutoXMLConfigValidator | 'array' | 'boolean' | 'function' | 'image-source' | 'key-context' | 'layout-constraints' | 'number' | 'object' | 'string' | 'theme' | 'validated-variable' | 'variable' | 'nullable:array' | 'nullable:boolean' | 'nullable:function' | 'nullable:image-source' | 'nullable:key-context' | 'nullable:layout-constraints' | 'nullable:number' | 'nullable:object' | 'nullable:string' | 'nullable:theme' | 'nullable:validated-variable' | 'nullable:variable';
+    validator?: WidgetAutoXMLConfigValidator | string | Array<WidgetAutoXMLConfigValidator | string>;
 }
 
 /** A widget parameter for a {@link WidgetAutoXMLConfig}. */

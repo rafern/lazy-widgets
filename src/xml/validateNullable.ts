@@ -1,9 +1,3 @@
-export function validateNullable<T>(validator: (value: unknown) => T): (value: unknown) => T | null {
-    return (value: unknown) => {
-        if (value === null) {
-            return null;
-        } else {
-            return validator(value);
-        }
-    }
+export function validateNullable(value: unknown): [value: unknown | null, stop: boolean] {
+    return [value, value === null];
 }

@@ -1,4 +1,4 @@
-export function validateObject(value: unknown): object {
+export function validateObject(value: unknown): [value: object, stop: boolean] {
     if (typeof value !== 'object') {
         throw new Error('Invalid object; not an object type');
     }
@@ -7,5 +7,5 @@ export function validateObject(value: unknown): object {
         throw new Error('Invalid object; null');
     }
 
-    return value;
+    return [value, false];
 }

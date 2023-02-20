@@ -1,9 +1,9 @@
-import { Variable, VariableCallback } from '../state/Variable';
+import { Variable } from '../state/Variable';
 
-export function validateVariable<V, C extends CallableFunction = VariableCallback<V>>(value: unknown): Variable<V, C> {
+export function validateVariable(value: unknown): [value: Variable<unknown>, stop: boolean] {
     if (!(value instanceof Variable)) {
         throw new Error('Invalid Variable; not a Variable instance');
     }
 
-    return value;
+    return [value, false];
 }

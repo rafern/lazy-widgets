@@ -1,4 +1,4 @@
-export function validateNumber(value: unknown): number {
+export function validateNumber(value: unknown): [value: number, stop: boolean] {
     if (typeof value !== 'number') {
         throw new Error('Invalid number; not a number type');
     }
@@ -7,5 +7,5 @@ export function validateNumber(value: unknown): number {
         throw new Error('Invalid number; not a number (NaN)');
     }
 
-    return value;
+    return [value, false];
 }

@@ -1,7 +1,7 @@
 import type { LayerInit } from '../core/LayerInit';
 import { Widget } from '../widgets/Widget';
 
-export function validateLayerInit(value: unknown): LayerInit<Widget> {
+export function validateLayerInit(value: unknown): [value: LayerInit<Widget>, stop: boolean] {
     if (typeof value !== 'object') {
         throw new Error('Invalid LayerInit; not an object');
     }
@@ -22,5 +22,5 @@ export function validateLayerInit(value: unknown): LayerInit<Widget> {
         throw new Error('Invalid LayerInit; canExpand was provided but is not a boolean');
     }
 
-    return li;
+    return [li, false];
 }

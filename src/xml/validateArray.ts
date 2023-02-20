@@ -1,11 +1,7 @@
-export function validateArray<T>(value: unknown): Array<T> {
-    if (typeof value !== 'object') {
-        throw new Error('Invalid array; not an object type');
-    }
-
+export function validateArray(value: unknown): [value: Array<unknown>, stop: boolean] {
     if (!Array.isArray(value)) {
         throw new Error('Invalid array; Array.isArray is false');
     }
 
-    return value;
+    return [value, false];
 }
