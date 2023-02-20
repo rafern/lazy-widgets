@@ -19,7 +19,6 @@ import { PointerPressEvent } from '../../events/PointerPressEvent';
 import { PointerReleaseEvent } from '../../events/PointerReleaseEvent';
 import { PointerMove } from '../../events/PointerMove';
 import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
-import { makeInstanceOfValidator } from '../../xml/makeInstanceOfValidator';
 
 /**
  * A template for the keys in a {@link VirtualKeyboard}. Each member of the
@@ -104,7 +103,7 @@ export class VirtualKeyboard extends Column {
         {
             name: 'keyboard-driver',
             mode: 'value',
-            validator: makeInstanceOfValidator(KeyboardDriver),
+            validator: 'keyboard-driver',
         },
         {
             name: 'row-template',

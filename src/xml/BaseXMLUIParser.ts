@@ -6,6 +6,7 @@ import { validateArray } from './validateArray';
 import { validateBoolean } from './validateBoolean';
 import { validateFunction } from './validateFunction';
 import { validateImageSource } from './validateImageSource';
+import { validateKeyboardDriver } from './validateKeyboardDriver';
 import { validateKeyContext } from './validateKeyContext';
 import { validateLayerInit } from './validateLayerInit';
 import { validateLayoutConstraints } from './validateLayoutConstraints';
@@ -80,6 +81,7 @@ export class BaseXMLUIParser {
         this.validators.set('boolean', validateBoolean);
         this.validators.set('function', validateFunction);
         this.validators.set('image-source', validateImageSource);
+        this.validators.set('keyboard-driver', validateKeyboardDriver);
         this.validators.set('key-context', validateKeyContext);
         this.validators.set('layout-constraints', validateLayoutConstraints);
         this.validators.set('nullable', validateNullable);
