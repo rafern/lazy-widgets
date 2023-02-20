@@ -15,7 +15,7 @@ export enum PointerWheelMode {
     /**
      * In this mode, delta values are measured in line heights. The height of a
      * line is supplied as an argument to the
-     * {@link PointerWheel#getDeltaPixels} method.
+     * {@link PointerWheelEvent#getDeltaPixels} method.
      */
     Line,
     /**
@@ -73,7 +73,7 @@ export class PointerWheelEvent extends PointerEvent {
     readonly deltaZ: number;
     /**
      * The mode of the delta values; how the delta values should be
-     * interpreted. See {@link PointerWheelEventMode}
+     * interpreted. See {@link PointerWheelMode}
      */
     readonly deltaMode: PointerWheelMode;
     /** Was this wheel event created from a pointer drag? */

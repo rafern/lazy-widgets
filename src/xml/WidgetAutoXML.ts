@@ -1,11 +1,19 @@
 import type { Widget } from '../widgets/Widget';
-import type { BaseXMLUIParser, XMLWidgetFactory } from './BaseXMLUIParser';
+import type { XMLWidgetFactory } from './XMLWidgetFactory';
 
+/**
+ * A generic validator function which can transform a value and be chained with
+ * other validators. If an input value is invalid, an error must be thrown.
+ *
+ * @category XML
+ */
 export type WidgetAutoXMLConfigValidator = (inputValue: unknown) => [transformedValue: unknown, stop: boolean];
 
 /**
  * A value parameter for the constructor of a Widget class, configured in a
  * {@link WidgetAutoXMLConfig}.
+ *
+ * @category XML
  */
 export interface WidgetAutoXMLConfigValueParameter extends WidgetAutoXMLConfigParameter {
     mode: 'value';
@@ -14,7 +22,11 @@ export interface WidgetAutoXMLConfigValueParameter extends WidgetAutoXMLConfigPa
     validator?: WidgetAutoXMLConfigValidator | string | Array<WidgetAutoXMLConfigValidator | string>;
 }
 
-/** A widget parameter for a {@link WidgetAutoXMLConfig}. */
+/**
+ * A widget parameter for a {@link WidgetAutoXMLConfig}.
+ *
+ * @category XML
+ */
 export interface WidgetAutoXMLConfigWidgetParameter {
     mode: 'widget';
     name: string;
@@ -26,6 +38,8 @@ export interface WidgetAutoXMLConfigWidgetParameter {
 /**
  * A string parameter for a {@link WidgetAutoXMLConfig}, which can be passed as
  * an XML text node. There can only be one text parameter.
+ *
+ * @category XML
  */
 export interface WidgetAutoXMLConfigTextParameter {
     mode: 'text';
@@ -34,7 +48,11 @@ export interface WidgetAutoXMLConfigTextParameter {
     list?: boolean;
 }
 
-/** A parameter with a custom mode for a {@link WidgetAutoXMLConfig}. */
+/**
+ * A parameter with a custom mode for a {@link WidgetAutoXMLConfig}.
+ *
+ * @category XML
+ */
 export interface WidgetAutoXMLConfigParameter {
     mode: string;
     name: string;
@@ -45,6 +63,8 @@ export interface WidgetAutoXMLConfigParameter {
 /**
  * An input mapping for a {@link Widget | Widget's}
  * {@link BaseXMLUIParser#registerAutoFactory | auto-factory}.
+ *
+ * @category XML
  */
 export type WidgetAutoXMLConfig = Array<WidgetAutoXMLConfigValueParameter | WidgetAutoXMLConfigWidgetParameter | WidgetAutoXMLConfigTextParameter | WidgetAutoXMLConfigParameter>;
 
@@ -54,13 +74,9 @@ export interface WidgetAutoXMLConfigWithFactory {
 }
 
 /**
- * A function that, when called, should register a factory to a
- * {@link BaseXMLUIParser}
- */
-export type WidgetAutoXMLSelfRegister = (parser: BaseXMLUIParser) => void;
-
-/**
- * Widget factory auto-register object. Can be a config object, or an XML widget
- * factory which will be self-registered.
+ * A configuration object which will be used for auto-registering a Widget's
+ * factory.
+ *
+ * @category XML
  */
 export type WidgetAutoXML = WidgetAutoXMLConfig | WidgetAutoXMLConfigWithFactory;

@@ -27,7 +27,7 @@ export interface KeyboardDriverGroup {
     /**
      * The list of {@link Root | Roots} assigned to this group, in the order
      * they were added to this group. Not to be confused with
-     * {@link KeyboardDriverGroup#accessList}.
+     * {@link KeyboardDriver#accessList}.
      */
     roots: Array<Root>;
     /**

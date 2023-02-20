@@ -1,6 +1,12 @@
 import type { LayerInit } from '../core/LayerInit';
 import { Widget } from '../widgets/Widget';
 
+/**
+ * A validator function which checks whether an input value is a
+ * {@link LayerInit}. Doesn't stop the validator chain.
+ *
+ * @category XML
+ */
 export function validateLayerInit(value: unknown): [value: LayerInit<Widget>, stop: boolean] {
     if (typeof value !== 'object') {
         throw new Error('Invalid LayerInit; not an object');

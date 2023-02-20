@@ -20,7 +20,7 @@ import { validateVariable } from './validateVariable';
 import { validateWidget } from './validateWidget';
 import type { XMLUIParserContext } from './XMLUIParserContext';
 import type { LayerInit } from '../core/LayerInit';
-import { fromKebabCase } from './fromKebabCase';
+import { fromKebabCase } from '../helpers/fromKebabCase';
 import { WidgetEventListener } from '../events/WidgetEventEmitter';
 
 /** A layer parameter for a {@link WidgetAutoXMLConfig}. */
@@ -32,6 +32,9 @@ export interface WidgetAutoXMLConfigLayerParameter {
     validator?: <W extends Widget>(value: LayerInit<Widget>) => LayerInit<W>;
 }
 
+/**
+ * Deserializes an XML element
+ */
 export function deserializeLayerElement(parser: BaseXMLUIParser, context: XMLUIParserContext, elem: Element) {
     // parse attributes
     let child: Widget | undefined, name: string | undefined, canExpand: boolean | undefined;
@@ -209,12 +212,12 @@ export class XMLUIParser extends BaseXMLUIParser {
         // register attribute namespace deserializers
         // allow options namespace to pass values to the options object. this
         // also requires registering a parameter modifier
-        this.registerAttributeNamespaceDeserializer(`${XML_NAMESPACE_BASE}:options`, deserializeOptionsAttribute);
+        this.registerAttributeNamespaceHandler(`${XML_NAMESPACE_BASE}:options`, deserializeOptionsAttribute);
         this.registerParameterModifier(addOptionsObjectToParameters);
         // allow the on and once namespaces to add an event listener. this also
         // requires registering a post-init hook
-        this.registerAttributeNamespaceDeserializer(`${XML_NAMESPACE_BASE}:on`, deserializeEventAttribute.bind(this, false));
-        this.registerAttributeNamespaceDeserializer(`${XML_NAMESPACE_BASE}:once`, deserializeEventAttribute.bind(this, true));
+        this.registerAttributeNamespaceHandler(`${XML_NAMESPACE_BASE}:on`, deserializeEventAttribute.bind(this, false));
+        this.registerAttributeNamespaceHandler(`${XML_NAMESPACE_BASE}:once`, deserializeEventAttribute.bind(this, true));
         this.registerPostInitHook(addEventListenersToWidget);
 
         // register built-in validators

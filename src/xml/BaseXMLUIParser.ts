@@ -1,19 +1,16 @@
 import { Widget } from '../widgets/Widget';
-import { toKebabCase } from './toKebabCase';
+import { toKebabCase } from '../helpers/toKebabCase';
 import type { WidgetAutoXML, WidgetAutoXMLConfig, WidgetAutoXMLConfigParameter, WidgetAutoXMLConfigTextParameter, WidgetAutoXMLConfigValidator, WidgetAutoXMLConfigValueParameter, WidgetAutoXMLConfigWidgetParameter } from './WidgetAutoXML';
 import type { XMLUIParserConfig } from './XMLUIParserConfig';
 import type { XMLUIParserContext } from './XMLUIParserContext';
 import type { XMLUIParserScriptContext } from './XMLUIParserScriptContext';
-
-export type XMLWidgetFactory = (...args: unknown[]) => Widget;
-export type XMLBoundWidgetFactory = (context: XMLUIParserContext, elem: Element) => Widget;
-export type XMLMergedValidator = (inputValue: unknown) => unknown;
-export type XMLAttributeValueDeserializer = (parser: BaseXMLUIParser, context: XMLUIParserContext, value: string) => unknown;
-export type XMLAttributeNamespaceDeserializer = (parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, attribute: Attr) => void;
-export type XMLElementDeserializer = (parser: BaseXMLUIParser, context: XMLUIParserContext, xmlElem: Element) => unknown;
-export type XMLParameterModeValidator = (parser: BaseXMLUIParser, context: XMLUIParserContext, parameterConfig: WidgetAutoXMLConfigParameter, value: unknown) => unknown;
-export type XMLParameterModifier = (parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, parameters: Array<unknown>) => void;
-export type XMLPostInitHook = (parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, instance: Widget) => void;
+import type { XMLWidgetFactory } from './XMLWidgetFactory';
+import type { XMLAttributeValueDeserializer } from './XMLAttributeValueDeserializer';
+import type { XMLAttributeNamespaceHandler } from './XMLAttributeNamespaceHandler';
+import type { XMLElementDeserializer } from './XMLElementDeserializer';
+import type { XMLParameterModeValidator } from './XMLParameterModeValidator';
+import type { XMLParameterModifier } from './XMLParameterModifier';
+import type { XMLPostInitHook } from './XMLPostInitHook';
 
 export const WHITESPACE_REGEX = /^\s*$/;
 export const XML_NAMESPACE_BASE = 'lazy-widgets';
@@ -22,6 +19,13 @@ const RESERVED_PARAMETER_MODES = ['value', 'text', 'widget'];
 const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
 const RESERVED_IMPORTS = ['context', 'window', 'globalThis'];
 
+/**
+ * Makes sure a map-like value, such as a Record, is transformed to a Map.
+ *
+ * @param record - The map-like value to transform. If nothing is supplied, then an empty Map is created automatically
+ * @returns Returns a new Map that is equivalent to the input, or the input if the input is already a Map
+ * @internal
+ */
 function normalizeToMap(record: Record<string, unknown> | Map<string, unknown> = new Map()) {
     if (!(record instanceof Map)) {
         const orig = record;
@@ -35,12 +39,24 @@ function normalizeToMap(record: Record<string, unknown> | Map<string, unknown> =
     return record;
 }
 
+/**
+ * A bare-bones XML UI parser. This must not be used directly as this is an
+ * extensible parser; you are supported to create a subclass of this and add all
+ * the features/validators that you need.
+ *
+ * You won't need to create your own parser unless you have an XML format that
+ * is not compatible with the default format. Most times it's enough to use
+ * {@link XMLUIParser} and register new features if necessary.
+ *
+ * @category XML
+ */
 export abstract class BaseXMLUIParser {
+    /** The DOMParser to actually parse the XML into nodes */
     private domParser = new DOMParser();
-    private factories = new Map<string, XMLBoundWidgetFactory>();
+    private factories = new Map<string, (context: XMLUIParserContext, elem: Element) => Widget>();
     private validators = new Map<string, WidgetAutoXMLConfigValidator>();
     private attributeValueDeserializers = new Map<string, XMLAttributeValueDeserializer>();
-    private attributeNamespaceDeserializers = new Map<string, XMLAttributeNamespaceDeserializer>();
+    private attributeNamespaceDeserializers = new Map<string, XMLAttributeNamespaceHandler>();
     private elementDeserializers = new Map<string, [elementDeserializer: XMLElementDeserializer, parameterMode: string]>();
     private parameterModes = new Map<string, [validator: XMLParameterModeValidator | null, canBeList: boolean, canBeOptional: boolean]>;
     private parameterModifiers = new Array<XMLParameterModifier>;
@@ -87,7 +103,7 @@ export abstract class BaseXMLUIParser {
         return -1;
     }
 
-    private instantiateWidget(inputConfig: WidgetAutoXMLConfig, paramNames: Map<string, number>, paramValidators: Map<number, XMLMergedValidator>, factory: XMLWidgetFactory, context: XMLUIParserContext, elem: Element) {
+    private instantiateWidget(inputConfig: WidgetAutoXMLConfig, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown>, factory: XMLWidgetFactory, context: XMLUIParserContext, elem: Element) {
         // parse parameters and options
         const paramCount = inputConfig.length;
         const instantiationContext: Record<string, unknown> = {};
@@ -361,7 +377,7 @@ export abstract class BaseXMLUIParser {
         // validate parameter config and build parameter name map
         let hasTextNodeParam = false;
         const traps = new Set<string>();
-        const paramValidators = new Map<number, XMLMergedValidator>();
+        const paramValidators = new Map<number, (inputValue: unknown) => unknown>();
         const paramNames = new Map<string, number>();
         const paramCount = inputConfig.length;
 
@@ -512,7 +528,7 @@ export abstract class BaseXMLUIParser {
         this.attributeValueDeserializers.set(prefix, deserializer);
     }
 
-    registerAttributeNamespaceDeserializer(namespace: string, deserializer: XMLAttributeNamespaceDeserializer) {
+    registerAttributeNamespaceHandler(namespace: string, deserializer: XMLAttributeNamespaceHandler) {
         if (namespace.length === 0) {
             throw new Error('Namespace must not be empty');
         }

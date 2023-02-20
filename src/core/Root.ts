@@ -783,24 +783,63 @@ export class Root implements WidgetEventEmitter {
         this.textInputHandler = null;
     }
 
+    /**
+     * Listen to a specific event with a user listener.
+     *
+     * Only events that pass through the Root will be listened; all trickling
+     * events that start at the root will be listened, sticky events will only
+     * be listened if they are dispatched at the Root, and bubbling events will
+     * only be listened if none of the child widgets capture the event.
+     *
+     * @param eventType - The {@link WidgetEvent#"type"} to listen to
+     * @param listener - The user-provided callback that will be invoked when the event is listened
+     * @param once - Should the listener only be invoked once? False by default
+     */
     on(eventType: string, listener: WidgetEventListener, once = false): void {
         eventEmitterOn(this.nextListener, this.typedListeners, eventType, listener, once);
         this.nextListener++;
     }
 
+    /**
+     * Similar to {@link Root#on}, but any event type invokes the user-provided
+     * callback, the listener can't be invoked only once, and the listener is
+     * called with a lower priority than specific event listeners.
+     *
+     * @param listener - The user-provided callback that will be invoked when a event is listened
+     */
     onAny(listener: WidgetEventListener): void {
         eventEmitterOnAny(this.nextListener, this.untypedListeners, listener);
         this.nextListener++;
     }
 
+    /**
+     * Remove an event listeners added with {@link Root#on}.
+     *
+     * @param eventType - The {@link WidgetEvent#"type"} to stop listening to
+     * @param listener - The user-provided callback that was used in {@link Root#on}
+     * @param once - Was the listener only meant to be invoked once? Must match what was used in {@link Root#on}
+     */
     off(eventType: string, listener: WidgetEventListener, once = false): boolean {
         return eventEmitterOff(this.typedListeners, eventType, listener, once);
     }
 
+    /**
+     * Remove an event listeners added with {@link Root#onAny}.
+     *
+     * @param listener - The user-provided callback that was used in {@link Root#onAny}
+     */
     offAny(listener: WidgetEventListener): boolean {
         return eventEmitterOffAny(this.untypedListeners, listener);
     }
 
+    /**
+     * Request that a specific ID is assigned to a specific {@link Widget} that
+     * is attached to this Root. Must not be called manually; Widget will
+     * automatically manage its ID when needed.
+     *
+     * @param id - The wanted ID
+     * @param widget - The widget that the ID will be assigned to
+     */
     requestID(id: string, widget: Widget): void {
         if (this.idMap.has(id)) {
             throw new Error(`Can't request Widget ID "${id}"; already taken`);
@@ -809,10 +848,21 @@ export class Root implements WidgetEventEmitter {
         this.idMap.set(id, widget);
     }
 
+    /**
+     * Stop assigning a specific widget ID. Must not be called manually.
+     *
+     * @param id - The ID to stop assigning
+     */
     dropID(id: string): void {
         this.idMap.delete(id);
     }
 
+    /**
+     * Get the widget that an ID is assigned to. If no widget is assigned to a
+     * given ID, an error is thrown.
+     *
+     * @param id - The ID of the wanted {@link Widget}
+     */
     getWidgetByID(id: string): Widget {
         const widget = this.idMap.get(id);
         if (widget === undefined) {

@@ -1,7 +1,7 @@
 /**
- * Converts a string to kebab-case.
+ * Converts a string to lower kebab-case.
  *
- * @internal
+ * @category Helper
  */
 export function toKebabCase(str: string): string {
     // handle empty strings
