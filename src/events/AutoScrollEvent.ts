@@ -12,12 +12,10 @@ import { UntargetableTricklingEvent } from './UntargetableTricklingEvent';
  *
  * Note that this event is handled via {@link Widget#dispatchEvent} in a special
  * case; widgets will auto-capture the event if they are
- * {@link AutoScrollEvent#originallyRelativeTo}, and {@link Widget#handleEvent}
- * will only be called if {@link Widget#propagatesEvents} is true. The event
- * must be re-captured by scrollable containers if a child of those containers
- * captured the event, and {@link AutoScrollEvent#bounds} must be updated
- * accordingly. See {@link ScrollableViewportWidget#handleEvent} for an example
- * of this.
+ * {@link AutoScrollEvent#originallyRelativeTo}. The event must be re-captured
+ * by scrollable containers if a child of those containers captured the event,
+ * and {@link AutoScrollEvent#bounds} must be updated accordingly. See
+ * {@link ScrollableViewportWidget#handleEvent} for an example of this.
  *
  * @category Event
  */

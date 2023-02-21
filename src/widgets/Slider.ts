@@ -99,7 +99,7 @@ export class Slider extends Widget {
     constructor(variable: Variable<number> = new Variable(0), minValue = 0, maxValue = 1, properties?: Readonly<SliderProperties>) {
         // Sliders need a clear background, have no children and don't propagate
         // events
-        super(false, properties);
+        super(properties);
 
         if(maxValue < minValue) {
             throw new Error(DynMsg.SWAPPED_MIN_MAX(minValue, maxValue));

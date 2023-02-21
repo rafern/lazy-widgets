@@ -11,8 +11,8 @@ export abstract class SingleParent<W extends Widget = Widget> extends Parent<W> 
     /**
      * @param child - The mandatory single child of this widget. Cannot be changed later.
      */
-    constructor(readonly child: W, propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
-        super(propagatesEvents, properties);
+    constructor(readonly child: W, properties?: Readonly<WidgetProperties>) {
+        super(properties);
     }
 
     override [Symbol.iterator](): Iterator<W> {

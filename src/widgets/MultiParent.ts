@@ -19,8 +19,8 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
      */
     protected readonly _children: Array<W>;
 
-    constructor(children: Array<W>, propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
-        super(propagatesEvents, properties);
+    constructor(children: Array<W>, properties?: Readonly<WidgetProperties>) {
+        super(properties);
 
         this._children = [...children];
     }

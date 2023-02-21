@@ -91,7 +91,7 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
      * @param defaultLayerIndex - The index of the default layer in the layers list
      */
     constructor(layers: Array<LayerInit<W>>, defaultLayerIndex = 0, properties?: Readonly<WidgetProperties>) {
-        super(true, properties);
+        super(properties);
 
         const layerCount = layers.length;
 

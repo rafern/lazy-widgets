@@ -37,7 +37,7 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
     callback: (() => void) | null;
 
     constructor(child: W, callback: (() => void) | null, properties?: Readonly<WidgetProperties>) {
-        super(child, false, properties);
+        super(child, properties);
 
         this.clickHelper = new ButtonClickHelper(this);
         this.callback = callback;

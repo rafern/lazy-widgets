@@ -44,7 +44,7 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
     tooltipRect: Rect = [0, 0, 0, 0];
 
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
-        super(child, false, properties);
+        super(child, properties);
     }
 
     protected override onThemeUpdated(property: string | null = null): void {

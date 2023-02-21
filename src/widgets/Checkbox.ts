@@ -46,7 +46,7 @@ export class Checkbox extends Widget {
     constructor(variable: Variable<boolean> = new Variable(false), properties?: Readonly<WidgetProperties>) {
         // Checkboxes need a clear background, have no children and don't
         // propagate events
-        super(false, properties);
+        super(properties);
 
         this.tabFocusable = true;
         this.variable = variable;

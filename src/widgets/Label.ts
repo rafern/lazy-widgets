@@ -44,7 +44,7 @@ export class Label extends Widget {
     constructor(text = '', properties?: Readonly<LabelProperties>) {
         // Labels need a clear background, have no children and don't propagate
         // events
-        super(false, properties);
+        super(properties);
 
         this.wrapText = properties?.wrapText ?? true;
         this.textHelper = new TextHelper();

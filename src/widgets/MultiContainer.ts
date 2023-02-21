@@ -43,7 +43,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
     constructor(vertical: boolean, children?: Array<W>, properties?: Readonly<WidgetProperties>) {
         // MultiContainers clear their own background, have children and
         // propagate events
-        super([], true, properties);
+        super([], properties);
 
         this.vertical = vertical;
 

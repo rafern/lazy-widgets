@@ -14,10 +14,10 @@ import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
  * @category Widget
  */
 export abstract class BaseContainer<W extends Widget = Widget> extends SingleParent<W> {
-    constructor(child: W, propagateEvents: boolean, properties?: Readonly<WidgetProperties>) {
+    constructor(child: W, properties?: Readonly<WidgetProperties>) {
         // Containers clear their own background, have a child and may propagate
         // events
-        super(child, propagateEvents, properties);
+        super(child, properties);
     }
 
     protected override onThemeUpdated(property: string | null = null): void {

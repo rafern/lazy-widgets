@@ -14,6 +14,6 @@ export class Container<W extends Widget = Widget> extends BaseContainer<W> {
     static override autoXML = SingleParentAutoXML;
 
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
-        super(child, true, properties);
+        super(child, properties);
     }
 }

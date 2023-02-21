@@ -58,11 +58,6 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
      * container, propagate this up.
      */
     protected _layoutDirty = true;
-    /**
-     * Widget will get targeted events even if the target is not itself if it
-     * this is true. Useful for implementing container widgets.
-     */
-    readonly propagatesEvents: boolean;
     /** Width of widget in pixels. */
     protected width = 0;
     /** Height of widget in pixels. */
@@ -148,10 +143,8 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         }
     }
 
-    constructor(propagatesEvents: boolean, properties?: Readonly<WidgetProperties>) {
+    constructor(properties?: Readonly<WidgetProperties>) {
         super(properties);
-
-        this.propagatesEvents = propagatesEvents;
 
         this._enabled = properties?.enabled ?? true;
         this._flex = properties?.flex ?? 0;
@@ -390,29 +383,40 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
             return null;
         }
 
-        // dispatch to user event listeners
-        if (eventEmitterHandleEvent(this.typedListeners, this.untypedListeners, baseEvent)) {
-            return this;
-        }
-
         if (baseEvent.propagation === PropagationModel.Trickling) {
             const event = baseEvent as TricklingEvent;
-
-            // handle special cases
+            // ignore event if the event is targetted but not a descendant of
+            // this widget (or not this widget), or if the event is an
+            // untargetted pointer event outside the bounds of the widget
             if(event.target === null) {
-                if(event instanceof PointerEvent) {
-                    if(event.x < this.x || event.y < this.y || event.x >= this.x + this.width || event.y >= this.y + this.height) {
-                        return null;
-                    }
-                } else if(event instanceof AutoScrollEvent) {
-                    if(event.originallyRelativeTo === this) {
-                        return this;
-                    } else if(!this.propagatesEvents) {
-                        return null;
-                    }
+                if((event instanceof PointerEvent) && (event.x < this.x || event.y < this.y || event.x >= this.x + this.width || event.y >= this.y + this.height)) {
+                    return null;
                 }
-            } else if(event.target !== this && !this.propagatesEvents) {
-                return null;
+            } else if(event.target !== this) {
+                // XXX trace back the event target. if we are an ascendant of
+                // the target, continue, otherwise, stop and don't capture. this
+                // is probably going to be a bottleneck, however, we shouldn't
+                // cache the "trace" of the event, since the tree can change
+                // while traversing the ui tree
+                let head = event.target._parent;
+
+                while (head !== this) {
+                    if (head === null) {
+                        return null;
+                    }
+
+                    head = head._parent;
+                }
+            }
+
+            // dispatch to user event listeners
+            if (eventEmitterHandleEvent(this.typedListeners, this.untypedListeners, baseEvent)) {
+                return this;
+            }
+
+            // handle special case for auto-scroll event
+            if(event.type === AutoScrollEvent.type && (event as AutoScrollEvent).originallyRelativeTo === this) {
+                return this;
             }
 
             // handle event
@@ -437,6 +441,11 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
 
             return capturer;
         } else {
+            // dispatch to user event listeners
+            if (eventEmitterHandleEvent(this.typedListeners, this.untypedListeners, baseEvent)) {
+                return this;
+            }
+
             return this.handleEvent(baseEvent);
         }
     }
