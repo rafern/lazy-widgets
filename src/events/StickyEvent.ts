@@ -1,4 +1,3 @@
-import type { Widget } from '../widgets/Widget';
 import { WidgetEvent, PropagationModel } from './WidgetEvent';
 
 /**
@@ -15,10 +14,4 @@ export abstract class StickyEvent extends WidgetEvent {
         super();
         this.propagation = PropagationModel.Sticky;
     }
-
-    /**
-     * Create a new StickyEvent with the same properties as this, except with a
-     * new given target.
-     */
-    abstract cloneWithTarget(target: Widget | null): StickyEvent;
 }
