@@ -4,6 +4,7 @@ import { Label, LabelProperties } from './Label';
 import { Checkbox } from './Checkbox';
 import { Row } from './Row';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
 /**
  * A {@link Row} with a {@link Label}, {@link Spacing} and a {@link Checkbox}.
@@ -24,7 +25,7 @@ export class LabelledCheckbox extends Row {
         }
     ];
 
-    constructor(text: string, variable?: Variable<boolean>, properties?: Readonly<LabelProperties & SpacingProperties>) {
+    constructor(text: string, variable?: Variable<boolean>, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
         super([
             new Label(text, properties),
             new Spacing(properties),

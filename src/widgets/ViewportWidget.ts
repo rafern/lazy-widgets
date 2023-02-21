@@ -17,7 +17,7 @@ import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
 /**
  * Optional ViewportWidget constructor properties.
  *
- * @category Widget
+ * @category Core
  */
 export interface ViewportWidgetProperties extends WidgetProperties {
     /** Sets {@link ViewportWidget#widthCoupling}. */

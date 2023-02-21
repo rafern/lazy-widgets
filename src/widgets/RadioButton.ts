@@ -1,5 +1,5 @@
 import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
-import { Widget, WidgetProperties } from './Widget';
+import { Widget } from './Widget';
 import { ClickState } from '../helpers/ClickState';
 import type { FocusType } from '../core/FocusType';
 import type { Variable } from '../state/Variable';
@@ -10,6 +10,7 @@ import type { Rect } from '../helpers/Rect';
 import { paintCircle } from '../helpers/paintCircle';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
 /**
  * A radio button widget; used for selecting one of many options. Uses a shared
@@ -52,16 +53,19 @@ export class RadioButton<V> extends Widget {
     private readonly callback: () => void;
     /** Was the radio button selected in the last paint? */
     private _wasSelected = false;
+    /** See {@link RadioButton#clickable} */
+    private _clickable: boolean;
 
     /**
      * @param variable - The shared variable that radio buttons will save the value to when selected.
      * @param value - The value that will be used to set the {@link RadioButton#"variable"} when the radio button is clicked
      */
-    constructor(variable: Variable<V>, value: V, properties?: Readonly<WidgetProperties>) {
+    constructor(variable: Variable<V>, value: V, properties?: Readonly<ClickableWidgetProperties>) {
         // Radio buttons need a clear background, have no children and don't
         // propagate events
         super(properties);
 
+        this._clickable = properties?.clickable ?? true;
         this.tabFocusable = true;
         this.variable = variable;
         this.value = value;
@@ -130,7 +134,7 @@ export class RadioButton<V> extends Widget {
         const [wasClick, capture] = this.clickHelper.handleEvent(
             event as TricklingEvent,
             this.root,
-            true,
+            this._clickable,
             [x, x + this.actualLength, y, y + this.actualLength]
         );
 
@@ -225,5 +229,23 @@ export class RadioButton<V> extends Widget {
     protected override activate(): void {
         super.activate();
         this.clickHelper.reset();
+    }
+
+    /**
+     * Is the radio button clickable? True by default. Used for disabling the
+     * radio button without hiding it.
+     */
+    get clickable() {
+        return this._clickable;
+    }
+
+    set clickable(clickable: boolean) {
+        if(this._clickable === clickable) {
+            return;
+        }
+
+        this._clickable = clickable;
+        this.clickHelper.reset();
+        this.markWholeAsDirty();
     }
 }

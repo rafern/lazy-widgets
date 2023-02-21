@@ -26,8 +26,8 @@
                                                 label.text = `Text input: ${value}`;
                                             }, false)),
                                             new Row([
-                                                new TextButton('Button 1', () => label.text = 'Button 1 clicked!'),
-                                                new TextButton('Button 2', () => label.text = 'Button 2 clicked!'),
+                                                new TextButton('Button 1').on('click', () => label.text = 'Button 1 clicked!'),
+                                                new TextButton('Button 2').on('click', () => label.text = 'Button 2 clicked!'),
                                             ], {
                                                 multiContainerAlignment: {
                                                     main: FlexAlignment.Center,

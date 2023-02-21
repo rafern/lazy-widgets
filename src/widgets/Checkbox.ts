@@ -1,5 +1,5 @@
 import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
-import { Widget, WidgetProperties } from './Widget';
+import { Widget } from './Widget';
 import { ClickState } from '../helpers/ClickState';
 import type { FocusType } from '../core/FocusType';
 import type { Viewport } from '../core/Viewport';
@@ -9,6 +9,7 @@ import type { Root } from '../core/Root';
 import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
 /**
  * A checkbox widget; can be ticked or unticked.
@@ -38,16 +39,17 @@ export class Checkbox extends Widget {
     /** The callback used for the {@link Checkbox#"variable"} */
     private readonly callback: () => void;
     /** See {@link Checkbox#clickable} */
-    private _clickable = true;
+    private _clickable: boolean;
 
     /**
      * @param variable - The {@link Variable} where the value will be stored.
      */
-    constructor(variable: Variable<boolean> = new Variable(false), properties?: Readonly<WidgetProperties>) {
+    constructor(variable: Variable<boolean> = new Variable(false), properties?: Readonly<ClickableWidgetProperties>) {
         // Checkboxes need a clear background, have no children and don't
         // propagate events
         super(properties);
 
+        this._clickable = properties?.clickable ?? true;
         this.tabFocusable = true;
         this.variable = variable;
         this.callback = this.handleChange.bind(this);
@@ -119,7 +121,7 @@ export class Checkbox extends Widget {
         const [wasClick, capture] = this.clickHelper.handleEvent(
             event as TricklingEvent,
             this.root,
-            this.clickable,
+            this._clickable,
             [x, x + this.actualLength, y, y + this.actualLength]
         );
 

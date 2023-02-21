@@ -13,10 +13,8 @@
             // test video: 320x240.ogg
             const icon = new Icon('320x240.ogg');
             const video = icon.image;
-            const button = new TextButton(
-                'Play',
-                () => video.paused ? video.play() : video.pause()
-            );
+            const button = new TextButton('Play');
+            button.on('click', () => video.paused ? video.play() : video.pause());
             video.addEventListener('play', () => button.child.text = 'Pause');
             video.addEventListener('pause', () => button.child.text = 'Play');
 

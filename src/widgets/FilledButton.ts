@@ -9,6 +9,7 @@ import { Theme } from '../theme/Theme';
 import { Button } from './Button';
 import type { Rect } from '../helpers/Rect';
 import type { WidgetEvent } from '../events/WidgetEvent';
+import { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
 /**
  * Optional FilledButton constructor properties.
@@ -45,8 +46,8 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
     /** The inherited theme for the child */
     private childTheme: Theme;
 
-    constructor(child: W, callback: (() => void) | null, properties?: Readonly<FilledButtonProperties>) {
-        super(child, callback, properties);
+    constructor(child: W, properties?: Readonly<FilledButtonProperties & ClickableWidgetProperties>) {
+        super(child, properties);
 
         this.forced = properties?.forced ?? false;
 

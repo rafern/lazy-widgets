@@ -1,6 +1,7 @@
 import { Icon, IconProperties } from './Icon';
 import { Button } from './Button';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
 /**
  * A {@link Button} with an {@link Icon}.
@@ -13,18 +14,10 @@ export class IconButton extends Button<Icon> {
             mode: 'value',
             name: 'image',
             validator: 'image-source'
-        },
-        {
-            mode: 'value',
-            name: 'callback',
-            validator: 'nullable:function'
         }
     ];
 
-    constructor(image: HTMLImageElement, callback: (() => void) | null, properties?: Readonly<IconProperties>) {
-        super(
-            new Icon(image, properties),
-            callback, properties
-        );
+    constructor(image: HTMLImageElement, properties?: Readonly<IconProperties & ClickableWidgetProperties>) {
+        super(new Icon(image, properties), properties);
     }
 }

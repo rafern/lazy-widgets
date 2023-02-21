@@ -4,6 +4,7 @@ import { Label, LabelProperties } from './Label';
 import { Alignment } from '../theme/Alignment';
 import { FilledButton } from './FilledButton';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
 /**
  * A {@link FilledButton} with a {@link Label}. Alignment is forced to be
@@ -17,15 +18,10 @@ export class TextButton extends FilledButton<Label> {
         {
             mode: 'text',
             name: 'text'
-        },
-        {
-            mode: 'value',
-            name: 'callback',
-            validator: 'nullable:function'
         }
     ];
 
-    constructor(text: string, callback: (() => void) | null, properties?: Readonly<LabelProperties>) {
+    constructor(text: string, properties?: Readonly<LabelProperties & ClickableWidgetProperties>) {
         // default properties
         properties = {
             containerAlignment: <Alignment2D>{
@@ -36,6 +32,6 @@ export class TextButton extends FilledButton<Label> {
             ...properties
         };
 
-        super(new Label(text, properties), callback, properties);
+        super(new Label(text, properties), properties);
     }
 }

@@ -8,7 +8,6 @@ future. Planned features/changes:
 - Rewrite flexbox system to distribute final space instead of remaining space
 - Rewrite layout system to no longer use 2 stages, or to not unnecessarily mark widgets as dirty
 - Add decoration system
-- Replace callbacks with events
 - Rich text
 
 ## Contributing

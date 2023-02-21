@@ -61,13 +61,13 @@
                             new ArtificialConstraint(icon, [0, 256, 0, 256]),
                             new Label('The icon should change between a banana and an apple'),
                             new Row([
-                                new TextButton('Change Icon.image.src', () => changeImage(false, false)),
-                                new TextButton('Change Icon.image', () => changeImage(false, true))
+                                new TextButton('Change Icon.image.src').on('click', () => changeImage(false, false)),
+                                new TextButton('Change Icon.image').on('click', () => changeImage(false, true))
                             ]),
                             new Label('The video should change between a test video and the big buck bunny trailer'),
                             new Row([
-                                new TextButton('Change Icon.image.src', () => changeImage(true, false)),
-                                new TextButton('Change Icon.image', () => changeImage(true, true))
+                                new TextButton('Change Icon.image.src').on('click', () => changeImage(true, false)),
+                                new TextButton('Change Icon.image').on('click', () => changeImage(true, true))
                             ]),
                             new Label('Note that changing from an image to a video or vice versa can\'t be done by setting Icon.image.src, therefore, changing will be done with Icon.image if needed')
                         ])

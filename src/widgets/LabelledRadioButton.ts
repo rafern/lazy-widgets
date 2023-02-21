@@ -4,6 +4,7 @@ import { Label, LabelProperties } from './Label';
 import { RadioButton } from './RadioButton';
 import { Row } from './Row';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
 /**
  * A {@link Row} with a {@link Label}, {@link Spacing} and a
@@ -28,7 +29,7 @@ export class LabelledRadioButton<V> extends Row {
         }
     ];
 
-    constructor(text: string, variable: Variable<V>, value: V, properties?: Readonly<LabelProperties & SpacingProperties>) {
+    constructor(text: string, variable: Variable<V>, value: V, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
         super([
             new Label(text, properties),
             new Spacing(properties),

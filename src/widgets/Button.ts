@@ -1,10 +1,12 @@
 import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
-import type { Widget, WidgetProperties } from './Widget';
+import type { Widget } from './Widget';
 import type { FocusType } from '../core/FocusType';
 import { BaseContainer } from './BaseContainer';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { TricklingEvent } from '../events/TricklingEvent';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
+import { ClickEvent } from '../events/ClickEvent';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
 /**
  * A {@link BaseContainer} which can be {@link ClickHelper | clicked} as a
@@ -16,46 +18,27 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Widget
  */
 export class Button<W extends Widget = Widget> extends BaseContainer<W> {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'widget',
-            name: 'child'
-        },
-        {
-            mode: 'value',
-            name: 'callback',
-            validator: 'nullable:function'
-        }
-    ];
+    static override autoXML = SingleParentAutoXML;
 
     /** The helper used for handling pointer clicks and enter presses */
     protected clickHelper: ButtonClickHelper;
-    /**
-     * The callback for clicking this button. If null, the button is not
-     * clickable but will still absorb events.
-     */
-    callback: (() => void) | null;
+    /** See {@link Button#clickable} */
+    private _clickable: boolean;
 
-    constructor(child: W, callback: (() => void) | null, properties?: Readonly<WidgetProperties>) {
+    constructor(child: W, properties?: Readonly<ClickableWidgetProperties>) {
         super(child, properties);
 
+        this._clickable = properties?.clickable ?? true;
         this.clickHelper = new ButtonClickHelper(this);
-        this.callback = callback;
         this.tabFocusable = true;
     }
 
     /**
-     * Click the button. If there is a callback, then the callback will be
-     * called
+     * Click the button. If the button is {@link Button#clickable}, then a
+     * {@link ClickEvent} will be fired.
      */
     click(): void {
-        if(this.callback !== null) {
-            try {
-                this.callback();
-            } catch(e) {
-                console.error('Exception in Icon callback:', e);
-            }
-        }
+        this.dispatchEvent(new ClickEvent());
     }
 
     protected override activate(): void {
@@ -77,8 +60,7 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
         }
 
         const [wasClick, capture] = this.clickHelper.handleEvent(
-            event as TricklingEvent, this.root, this.callback !== null,
-            this.bounds
+            event as TricklingEvent, this.root, this._clickable, this.bounds
         );
 
         if(wasClick) {
@@ -86,5 +68,23 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
         }
 
         return capture ? this : null;
+    }
+
+    /**
+     * Is the button clickable? True by default. Used for disabling the button
+     * without hiding it.
+     */
+    get clickable() {
+        return this._clickable;
+    }
+
+    set clickable(clickable: boolean) {
+        if(this._clickable === clickable) {
+            return;
+        }
+
+        this._clickable = clickable;
+        this.clickHelper.reset();
+        this.markWholeAsDirty();
     }
 }
