@@ -829,7 +829,10 @@ export class TextInput extends Widget {
                         this.tabModeEnabled = !this.tabModeEnabled;
                     }
                 } else {
-                    return this;
+                    // XXX don't capture keys when pressing ctrl. chances are
+                    // that this is a keyboard shortcut that does something
+                    // special (like ctrl+v for pasting)
+                    return null;
                 }
 
                 // Reset blink time for better feedback
