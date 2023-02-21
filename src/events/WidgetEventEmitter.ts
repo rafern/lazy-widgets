@@ -52,21 +52,21 @@ export type WidgetEventUntypedListenerList = Array<WidgetEventUntypedListenerPai
  */
 export interface WidgetEventEmitter {
     /**
-     * Add event listener for a specific event type.
+     * Add event listener for a specific event type. Chainable.
      *
      * @param eventType - The event type to listen to. Any other event type will not invoke this listener callback.
      * @param listener - The listener/callback to invoke when the event is emitted.
      * @param once - Should the listener be removed after being invoked once? False by default.
      */
-    on(eventType: string, listener: WidgetEventListener, once?: boolean): void;
+    on(eventType: string, listener: WidgetEventListener, once?: boolean): this;
     /**
      * Similar to {@link WidgetEventEmitter#on}, but listens to any event type.
      * Untyped event listeners have a lower priority than typed event listeners.
-     * Does not support listening only once.
+     * Does not support listening only once. Chainable.
      *
      * @param listener - The listener/callback to invoke when an event is emitted.
      */
-    onAny(listener: WidgetEventListener): void;
+    onAny(listener: WidgetEventListener): this;
     /**
      * Remove a specific event listener for a specific type. Note that if the
      * same listener callback is reused only the first one is removed. The once

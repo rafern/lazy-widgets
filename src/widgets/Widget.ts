@@ -1083,31 +1083,34 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
 
     /**
      * Listen to a specific event with a user listener. Only events that pass
-     * through this widget will be listened.
+     * through this widget will be listened. Chainable.
      *
      * @param eventType - The {@link WidgetEvent#"type"} to listen to
      * @param listener - The user-provided callback that will be invoked when the event is listened
      * @param once - Should the listener only be invoked once? False by default
      */
-    on(eventType: string, listener: WidgetEventListener, once = false): void {
+    on(eventType: string, listener: WidgetEventListener, once = false): this {
         eventEmitterOn(this.nextListener, this.typedListeners, eventType, listener, once);
         this.nextListener++;
+        return this;
     }
 
     /**
      * Similar to {@link Widget#on}, but any event type invokes the
      * user-provided callback, the listener can't be invoked only once, and the
      * listener is called with a lower priority than specific event listeners.
+     * Chainable.
      *
      * @param listener - The user-provided callback that will be invoked when a event is listened
      */
-    onAny(listener: WidgetEventListener): void {
+    onAny(listener: WidgetEventListener): this {
         eventEmitterOnAny(this.nextListener, this.untypedListeners, listener);
         this.nextListener++;
+        return this;
     }
 
     /**
-     * Remove an event listeners added with {@link Widget#on}.
+     * Remove an event listeners added with {@link Widget#on}. Not chainable.
      *
      * @param eventType - The {@link WidgetEvent#"type"} to stop listening to
      * @param listener - The user-provided callback that was used in {@link Widget#on}
@@ -1118,7 +1121,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     }
 
     /**
-     * Remove an event listeners added with {@link Widget#onAny}.
+     * Remove an event listeners added with {@link Widget#onAny}. Not chainable.
      *
      * @param listener - The user-provided callback that was used in {@link Widget#onAny}
      */

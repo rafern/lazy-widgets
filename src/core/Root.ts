@@ -784,7 +784,7 @@ export class Root implements WidgetEventEmitter {
     }
 
     /**
-     * Listen to a specific event with a user listener.
+     * Listen to a specific event with a user listener. Chainable.
      *
      * Only events that pass through the Root will be listened; all trickling
      * events that start at the root will be listened, sticky events will only
@@ -795,25 +795,27 @@ export class Root implements WidgetEventEmitter {
      * @param listener - The user-provided callback that will be invoked when the event is listened
      * @param once - Should the listener only be invoked once? False by default
      */
-    on(eventType: string, listener: WidgetEventListener, once = false): void {
+    on(eventType: string, listener: WidgetEventListener, once = false): this {
         eventEmitterOn(this.nextListener, this.typedListeners, eventType, listener, once);
         this.nextListener++;
+        return this;
     }
 
     /**
      * Similar to {@link Root#on}, but any event type invokes the user-provided
      * callback, the listener can't be invoked only once, and the listener is
-     * called with a lower priority than specific event listeners.
+     * called with a lower priority than specific event listeners. Chainable.
      *
      * @param listener - The user-provided callback that will be invoked when a event is listened
      */
-    onAny(listener: WidgetEventListener): void {
+    onAny(listener: WidgetEventListener): this {
         eventEmitterOnAny(this.nextListener, this.untypedListeners, listener);
         this.nextListener++;
+        return this;
     }
 
     /**
-     * Remove an event listeners added with {@link Root#on}.
+     * Remove an event listeners added with {@link Root#on}. Not chainable.
      *
      * @param eventType - The {@link WidgetEvent#"type"} to stop listening to
      * @param listener - The user-provided callback that was used in {@link Root#on}
@@ -824,7 +826,7 @@ export class Root implements WidgetEventEmitter {
     }
 
     /**
-     * Remove an event listeners added with {@link Root#onAny}.
+     * Remove an event listeners added with {@link Root#onAny}. Not chainable.
      *
      * @param listener - The user-provided callback that was used in {@link Root#onAny}
      */
