@@ -8,6 +8,8 @@ import type { SourcePointer } from '../drivers/SourcePointer';
  * The scrolling mode that determines how the {@link PointerWheelEvent#deltaX},
  * {@link PointerWheelEvent#deltaY} and {@link PointerWheelEvent#deltaZ} values
  * are interpreted.
+ *
+ * @category Event
  */
 export enum PointerWheelMode {
     /** In this mode, delta values are measured in pixels. */
@@ -31,6 +33,8 @@ export enum PointerWheelMode {
 /**
  * Convert DOM WheelEvent.deltaMode to {@link PointerWheelMode}, or null if the
  * DOM delta mode is unknown.
+ *
+ * @category Event
  */
 export function parseDOMDeltaMode(domDeltaMode: number): PointerWheelMode | null {
     switch(domDeltaMode) {

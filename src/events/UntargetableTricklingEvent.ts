@@ -1,7 +1,11 @@
 import type { Widget } from '../widgets/Widget';
 import { TricklingEvent } from './TricklingEvent';
 
-/** A {@link TricklingEvent} which cannot be targeted. */
+/**
+ * A {@link TricklingEvent} which cannot be targeted.
+ *
+ * @category Event
+ */
 export abstract class UntargetableTricklingEvent extends TricklingEvent {
     /**
      * The target of this event. Since this is an untargetable event, this will

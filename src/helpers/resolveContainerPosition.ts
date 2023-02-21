@@ -4,6 +4,11 @@ import type { Alignment2D } from '../theme/Alignment2D';
 import type { Padding } from '../theme/Padding';
 import type { Widget } from '../widgets/Widget';
 
+/**
+ * Reusable function for resolving container positions.
+ *
+ * @category Helper
+ */
 export function resolveContainerPosition<W extends Widget>(x: number, y: number, idealWidth: number, idealHeight: number, padding: Padding, alignment: Alignment2D, child: W) {
     // Calculate used space
     const [childWidth, childHeight] = child.idealDimensions;

@@ -8,7 +8,7 @@
  * the same length. If two axes are uni-directionally coupled, then one axis
  * will affect the length of another axis, but not the other way around.
  *
- * @category Widget
+ * @category Core
  */
 export enum AxisCoupling {
     /**

@@ -39,7 +39,7 @@ export interface WidgetProperties extends ThemeProperties {
 export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     /**
      * Input mapping for automatically generating a widget factory for a
-     * {@link BaseXMLUIParser} with {@link BaseXMLUIParser#registerAutoFactory}.
+     * {@link BaseXMLUIParser} with {@link BaseXMLUIParser#autoRegisterFactory}.
      * If null, then {@link BaseXMLUIParser#registerFactory} must be manually
      * called by the user.
      *
@@ -1072,20 +1072,47 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         }
     }
 
+    /**
+     * Listen to a specific event with a user listener. Only events that pass
+     * through this widget will be listened.
+     *
+     * @param eventType - The {@link WidgetEvent#"type"} to listen to
+     * @param listener - The user-provided callback that will be invoked when the event is listened
+     * @param once - Should the listener only be invoked once? False by default
+     */
     on(eventType: string, listener: WidgetEventListener, once = false): void {
         eventEmitterOn(this.nextListener, this.typedListeners, eventType, listener, once);
         this.nextListener++;
     }
 
+    /**
+     * Similar to {@link Widget#on}, but any event type invokes the
+     * user-provided callback, the listener can't be invoked only once, and the
+     * listener is called with a lower priority than specific event listeners.
+     *
+     * @param listener - The user-provided callback that will be invoked when a event is listened
+     */
     onAny(listener: WidgetEventListener): void {
         eventEmitterOnAny(this.nextListener, this.untypedListeners, listener);
         this.nextListener++;
     }
 
+    /**
+     * Remove an event listeners added with {@link Widget#on}.
+     *
+     * @param eventType - The {@link WidgetEvent#"type"} to stop listening to
+     * @param listener - The user-provided callback that was used in {@link Widget#on}
+     * @param once - Was the listener only meant to be invoked once? Must match what was used in {@link Widget#on}
+     */
     off(eventType: string, listener: WidgetEventListener, once = false): boolean {
         return eventEmitterOff(this.typedListeners, eventType, listener, once);
     }
 
+    /**
+     * Remove an event listeners added with {@link Widget#onAny}.
+     *
+     * @param listener - The user-provided callback that was used in {@link Widget#onAny}
+     */
     offAny(listener: WidgetEventListener): boolean {
         return eventEmitterOffAny(this.untypedListeners, listener);
     }

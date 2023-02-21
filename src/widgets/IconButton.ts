@@ -6,7 +6,6 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * A {@link Button} with an {@link Icon}.
  *
  * @category Widget
- * @category Aggregate Widget
  */
 export class IconButton extends Button<Icon> {
     static override autoXML: WidgetAutoXML = [

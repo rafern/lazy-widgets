@@ -9,7 +9,6 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * A {@link Row} with a {@link Label}, {@link Spacing} and a {@link Checkbox}.
  *
  * @category Widget
- * @category Aggregate Widget
  */
 export class LabelledCheckbox extends Row {
     static override autoXML: WidgetAutoXML = [

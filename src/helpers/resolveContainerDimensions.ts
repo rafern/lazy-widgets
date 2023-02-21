@@ -4,6 +4,12 @@ import type { Alignment2D } from '../theme/Alignment2D';
 import type { Padding } from '../theme/Padding';
 import type { Widget } from '../widgets/Widget';
 
+/**
+ * Reusable function for resolving container dimensions given layout
+ * constraints, padding, alignment and a child widget.
+ *
+ * @category Helper
+ */
 export function resolveContainerDimensions<W extends Widget>(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number, padding: Padding, alignment: Alignment2D, child: W) {
     // Get padding
     const hPadding = padding.left + padding.right;

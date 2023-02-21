@@ -2,7 +2,7 @@ import type { LayoutConstraints } from '../core/LayoutConstraints';
 import { ClippedViewport } from '../core/ClippedViewport';
 import { CanvasViewport } from '../core/CanvasViewport';
 import { layoutField } from '../decorators/FlagFields';
-import { AxisCoupling } from '../widgets/AxisCoupling';
+import { AxisCoupling } from '../core/AxisCoupling';
 import { Widget, WidgetProperties } from './Widget';
 import type { Viewport } from '../core/Viewport';
 import type { Bounds } from '../helpers/Bounds';

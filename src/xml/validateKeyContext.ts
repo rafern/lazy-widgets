@@ -1,4 +1,4 @@
-import type { KeyContext } from '../widgets/VirtualKeyboard/KeyContext';
+import type { KeyContext } from '../core/KeyContext';
 
 /**
  * A validator function which checks whether an input value is a

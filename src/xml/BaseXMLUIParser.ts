@@ -9,15 +9,21 @@ import type { XMLAttributeValueDeserializer } from './XMLAttributeValueDeseriali
 import type { XMLAttributeNamespaceHandler } from './XMLAttributeNamespaceHandler';
 import type { XMLElementDeserializer } from './XMLElementDeserializer';
 import type { XMLParameterModeValidator } from './XMLParameterModeValidator';
-import type { XMLParameterModifier } from './XMLParameterModifier';
+import type { XMLArgumentModifier } from './XMLArgumentModifier';
 import type { XMLPostInitHook } from './XMLPostInitHook';
-
-export const WHITESPACE_REGEX = /^\s*$/;
-export const XML_NAMESPACE_BASE = 'lazy-widgets';
+import { WHITESPACE_REGEX } from '../helpers/whitespace-regex';
 
 const RESERVED_PARAMETER_MODES = ['value', 'text', 'widget'];
 const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
 const RESERVED_IMPORTS = ['context', 'window', 'globalThis'];
+
+/**
+ * The base lazy-widgets XML namespace. All lazy-widgets namespaces will be
+ * prefixed with this. lazy-widgets elements must use this namespace.
+ *
+ * @category XML
+ */
+export const XML_NAMESPACE_BASE = 'lazy-widgets';
 
 /**
  * Makes sure a map-like value, such as a Record, is transformed to a Map.
@@ -53,15 +59,40 @@ function normalizeToMap(record: Record<string, unknown> | Map<string, unknown> =
 export abstract class BaseXMLUIParser {
     /** The DOMParser to actually parse the XML into nodes */
     private domParser = new DOMParser();
+    /** A map which assigns a factory function to an element name. */
     private factories = new Map<string, (context: XMLUIParserContext, elem: Element) => Widget>();
+    /**
+     * A map which assigns a validator function to a unique name, allowing a
+     * validator to be referred to by string. Referred to as built-in
+     * validators.
+     */
     private validators = new Map<string, WidgetAutoXMLConfigValidator>();
+    /**
+     * A map which assigns a single character string prefix to a string
+     * deserializer.
+     */
     private attributeValueDeserializers = new Map<string, XMLAttributeValueDeserializer>();
-    private attributeNamespaceDeserializers = new Map<string, XMLAttributeNamespaceHandler>();
+    /** A map which assigns an attribute namespace to a handler function. */
+    private attributeNamespaceHandlers = new Map<string, XMLAttributeNamespaceHandler>();
+    /** A map which assigns an element name to a an XML element deserializer. */
     private elementDeserializers = new Map<string, [elementDeserializer: XMLElementDeserializer, parameterMode: string]>();
+    /** A map which defines custom parameter modes. */
     private parameterModes = new Map<string, [validator: XMLParameterModeValidator | null, canBeList: boolean, canBeOptional: boolean]>;
-    private parameterModifiers = new Array<XMLParameterModifier>;
+    /** A list of functions that modify a factory's parameter list. */
+    private argumentModifiers = new Array<XMLArgumentModifier>;
+    /**
+     * A list of functions that are invoked after a widget is instanced, so that
+     * the instance can be modified post-initialization.
+     */
     private postInitHooks = new Array<XMLPostInitHook>;
 
+    /**
+     * Parse a value in an attribute. The value will be deserialized according
+     * to its prefix. If there is no prefix, the value is treated as a string.
+     *
+     * @param rawValue - The value in the attribute, with the prefix included
+     * @param context - The current parser context, which will be passed to a deserializer if the value is prefixed with a registered deserializer prefix
+     */
     parseAttributeValue(rawValue: string, context: XMLUIParserContext): unknown {
         if (rawValue.length === 0) {
             return rawValue;
@@ -77,6 +108,14 @@ export abstract class BaseXMLUIParser {
         }
     }
 
+    /**
+     * Find the next unset parameter of a given mode.
+     *
+     * @param paramConfig - The input mapping of the widget being built
+     * @param parametersSet - A list containing which of the parameters in the input mapping are already set
+     * @param mode - The parameter mode to find
+     * @returns Returns the index of the next unset parameter of the wanted mode. If none are found, -1 is returned.
+     */
     findNextParamOfType(paramConfig: WidgetAutoXMLConfig, parametersSet: Array<boolean>, mode: string) {
         const paramCount = paramConfig.length;
         let canBeList = false;
@@ -103,6 +142,7 @@ export abstract class BaseXMLUIParser {
         return -1;
     }
 
+    /** Create a new widget instance given a config and context */
     private instantiateWidget(inputConfig: WidgetAutoXMLConfig, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown>, factory: XMLWidgetFactory, context: XMLUIParserContext, elem: Element) {
         // parse parameters and options
         const paramCount = inputConfig.length;
@@ -224,7 +264,7 @@ export abstract class BaseXMLUIParser {
                     }
                 }
             } else {
-                const deserializer = this.attributeNamespaceDeserializers.get(namespace);
+                const deserializer = this.attributeNamespaceHandlers.get(namespace);
                 if (deserializer) {
                     deserializer(this, context, instantiationContext, attribute);
                 }
@@ -262,6 +302,10 @@ export abstract class BaseXMLUIParser {
 
                     const canBeList = parameterModeTuple[1];
                     const index = this.findNextParamOfType(inputConfig, setParameters, parameterMode);
+                    if (index < 0) {
+                        throw new Error(`Too many parameters passed as XML child elements; tried to find next unset parameter of mode "${parameterMode}", but none found`);
+                    }
+
                     const value = deserializer(this, context, childElem);
                     setParameters[index] = true;
 
@@ -277,6 +321,10 @@ export abstract class BaseXMLUIParser {
                 } else {
                     // validator
                     const index = this.findNextParamOfType(inputConfig, setParameters, 'widget');
+                    if (index < 0) {
+                        throw new Error('Too many widgets passed as XML child elements');
+                    }
+
                     const childWidget = this.parseWidgetElem(context, childElem);
                     setParameters[index] = true;
 
@@ -325,7 +373,7 @@ export abstract class BaseXMLUIParser {
         }
 
         // modify parameters
-        for (const modifier of this.parameterModifiers) {
+        for (const modifier of this.argumentModifiers) {
             modifier(this, context, instantiationContext, parameters);
         }
 
@@ -349,9 +397,14 @@ export abstract class BaseXMLUIParser {
         return instance;
     }
 
-    registerFactory(name: string, inputConfig: WidgetAutoXMLConfig, factory: XMLWidgetFactory): void;
-    registerFactory<T extends Widget>(widgetClass: new (...args: unknown[]) => T, inputConfig: WidgetAutoXMLConfig, factory: XMLWidgetFactory): void;
-    registerFactory<T extends Widget = Widget>(nameOrWidgetClass: string | (new (...args: unknown[]) => T), inputConfig: WidgetAutoXMLConfig, factory: XMLWidgetFactory) {
+    /**
+     * Register a widget factory to an element name, with a given input mapping.
+     *
+     * @param nameOrWidgetClass - The camelCase or PascalCase name of the widget, which will be converted to kebab-case and be used as the element name for the widget. If a widget class is passed, then the class name will be used and converted to kebab-case.
+     * @param inputMapping - The input mapping for the widget factory
+     * @param factory - A function which creates a new instance of a widget
+     */
+    registerFactory<T extends Widget = Widget>(nameOrWidgetClass: string | (new (...args: unknown[]) => T), inputMapping: WidgetAutoXMLConfig, factory: XMLWidgetFactory) {
         // handle constructors as names
         let factoryName = nameOrWidgetClass;
         if (typeof factoryName !== 'string') {
@@ -379,10 +432,10 @@ export abstract class BaseXMLUIParser {
         const traps = new Set<string>();
         const paramValidators = new Map<number, (inputValue: unknown) => unknown>();
         const paramNames = new Map<string, number>();
-        const paramCount = inputConfig.length;
+        const paramCount = inputMapping.length;
 
         for (let i = 0; i < paramCount; i++) {
-            const paramGeneric = inputConfig[i];
+            const paramGeneric = inputMapping[i];
 
             if (paramGeneric.mode === 'value') {
                 const param = paramGeneric as WidgetAutoXMLConfigValueParameter;
@@ -501,14 +554,31 @@ export abstract class BaseXMLUIParser {
 
         // register factory
         this.factories.set(factoryName, this.instantiateWidget.bind(
-            this, inputConfig, paramNames, paramValidators, factory
+            this, inputMapping, paramNames, paramValidators, factory
         ));
     }
 
-    registerFactoryFromClass<T extends Widget>(widgetClass: new (...args: unknown[]) => T, autoConfig: WidgetAutoXMLConfig): void {
-        this.registerFactory(widgetClass, autoConfig, (...args) => new widgetClass(...args));
+    /**
+     * Similar to {@link BaseXMLUIParser#registerFactory}, except only a widget
+     * class and an input mapping need to be supplied. The widget class will be
+     * used to create a new factory; the factory will call the class constructor
+     * with the `new` keyword.
+     *
+     * @param widgetClass - The class of the widget that will be instantiated. The class name will be used for the element name, and the class constructor will be used for making the factory function.
+     * @param inputMapping - The input mapping for the widget factory
+     */
+    registerFactoryFromClass<T extends Widget>(widgetClass: new (...args: unknown[]) => T, inputMapping: WidgetAutoXMLConfig): void {
+        this.registerFactory(widgetClass, inputMapping, (...args) => new widgetClass(...args));
     }
 
+    /**
+     * Register a built-in validator; assigns a string to a validator function,
+     * so that the validator function can be referred to via a string instead of
+     * via a function.
+     *
+     * @param key - The validator key - the string that will be used instead of the function
+     * @param validator - A function which can throw an error on an invalid value, and transform an input value. Can be chained
+     */
     registerValidator(key: string, validator: WidgetAutoXMLConfigValidator) {
         if (this.validators.has(key)) {
             throw new Error(`Built-in validator key "${key}" already taken`);
@@ -517,6 +587,14 @@ export abstract class BaseXMLUIParser {
         this.validators.set(key, validator);
     }
 
+    /**
+     * Register a attribute value deserializer; assigns a deserializer function
+     * to a single character prefix. The value will be passed to the
+     * deserializer without the prefix.
+     *
+     * @param prefix - A single character prefix that decides which deserializer to use. Must be unique
+     * @param deserializer - A function that transforms a string without the prefix into any value
+     */
     registerAttributeValueDeserializer(prefix: string, deserializer: XMLAttributeValueDeserializer) {
         if (prefix.length !== 1) {
             throw new Error('Attribute deserializer prefix must be a single character');
@@ -528,20 +606,37 @@ export abstract class BaseXMLUIParser {
         this.attributeValueDeserializers.set(prefix, deserializer);
     }
 
-    registerAttributeNamespaceHandler(namespace: string, deserializer: XMLAttributeNamespaceHandler) {
+    /**
+     * Register a attribute namespace handler; assigns a handler function to a
+     * unique namespace. The attribute object will be passed to the handler
+     * function.
+     *
+     * @param namespace - A unique namespace. When this namespace is found in an attribute, instead of ignoring the attribute, the attribute will be passed to the handler
+     * @param handler - A function that provides custom functionality when an attribute with the wanted namespace is used
+     */
+    registerAttributeNamespaceHandler(namespace: string, handler: XMLAttributeNamespaceHandler) {
         if (namespace.length === 0) {
             throw new Error('Namespace must not be empty');
         }
         if (namespace === XML_NAMESPACE_BASE) {
             throw new Error(`Namespace must not be the base namespace ("${XML_NAMESPACE_BASE}")`);
         }
-        if (this.attributeNamespaceDeserializers.has(namespace)) {
+        if (this.attributeNamespaceHandlers.has(namespace)) {
             throw new Error(`Attribute namespace "${namespace}" already taken`);
         }
 
-        this.attributeNamespaceDeserializers.set(namespace, deserializer);
+        this.attributeNamespaceHandlers.set(namespace, handler);
     }
 
+    /**
+     * Register an element deserializer function; elements with the wanted name
+     * will be treated as parameters serialized as an element instead of an
+     * attribute.
+     *
+     * @param nodeName - A unique node name. Widgets will not be able to be registered with this name
+     * @param parameterMode - The parameter mode to treat the value as
+     * @param deserializer - The deserializer function that turns the XML element into a value
+     */
     registerElementDeserializer(nodeName: string, parameterMode: string, deserializer: XMLElementDeserializer) {
         if (nodeName.length === 0) {
             throw new Error('Element deserializer node name must not be an empty string');
@@ -556,6 +651,15 @@ export abstract class BaseXMLUIParser {
         this.elementDeserializers.set(nodeName, [deserializer, parameterMode]);
     }
 
+    /**
+     * Registers a parameter mode; defines whether the parameter mode can be a
+     * list, can be optional and how it's validated.
+     *
+     * @param parameterMode - A string that is used as a key for this parameter mode
+     * @param validator - A function that validates whether a deserialized value is valid for this mode
+     * @param canBeList - If true, when a parameter with this mode has a config with a `list` field set to true, the parameter will be treated as a list
+     * @param canBeOptional - If true, when a parameter with this mode has a config with a `optional` field set to true, the parameter will be optional (no error thrown if undefined)
+     */
     registerParameterMode(parameterMode: string, validator: XMLParameterModeValidator, canBeList: boolean, canBeOptional: boolean) {
         if (parameterMode.length === 0) {
             throw new Error('Parameter mode must not be an empty string');
@@ -567,7 +671,14 @@ export abstract class BaseXMLUIParser {
         this.parameterModes.set(parameterMode, [validator, canBeList, canBeOptional]);
     }
 
-    registerAutoFactory<T extends Widget = Widget>(widgetClass: (new () => T) & { autoXML: WidgetAutoXML }) {
+    /**
+     * Auto-register a factory for a given widget. Instead of passing an input
+     * mapping, the input mapping is supplied in the {@link Widget.autoXML}
+     * field of the widget class. If it's null, an error is thrown.
+     *
+     * @param widgetClass - The class to auto-register
+     */
+    autoRegisterFactory<T extends Widget = Widget>(widgetClass: (new () => T) & { autoXML: WidgetAutoXML }) {
         if (widgetClass.autoXML === null) {
             throw new Error('Widget class does not have an automatic XML factory config object set. Must be manually registered');
         }
@@ -580,14 +691,33 @@ export abstract class BaseXMLUIParser {
         }
     }
 
-    registerParameterModifier(modifier: XMLParameterModifier) {
-        this.parameterModifiers.push(modifier);
+    /**
+     * Register an argument modifier.
+     *
+     * @param modifier - A function that modifies an argument list passed to a factory. The function will be added to the end of the modifier list
+     */
+    registerArgumentModifier(modifier: XMLArgumentModifier) {
+        this.argumentModifiers.push(modifier);
     }
 
+    /**
+     * Register a post-initialization hook.
+     *
+     * @param hook - A function that will be called after a widget instance is created. The instance will be passed to the function, so it can be used to modify the instance post-initialization
+     */
     registerPostInitHook(hook: XMLPostInitHook) {
         this.postInitHooks.push(hook);
     }
 
+    /**
+     * Parse an XML element which is expected to represent a widget. If the XML
+     * element doesn't represent a widget, then an error is thrown; this will
+     * happen if no factory is registered to the element name.
+     *
+     * @param context - The current parser context, shared with all other initializations
+     * @param elem - The element to parse
+     * @returns Returns the new widget instance
+     */
     parseWidgetElem(context: XMLUIParserContext, elem: Element): Widget {
         // get factory for this element name
         const name = elem.nodeName.toLowerCase();
@@ -601,12 +731,21 @@ export abstract class BaseXMLUIParser {
         return factory(context, elem);
     }
 
-    parseUITreeNode(uiTreeNode: Element, context: XMLUIParserContext): Widget {
+    /**
+     * Parse a <ui-tree> element. Expected to contain at least one widget
+     * element, and can contain <script> elements. Scripts must finish execution
+     * or this will never return.
+     *
+     * @param uiTreeElem - The <ui-tree> element to parse
+     * @param context - The current parser context, shared with all other initializations
+     * @returns Returns the new widget instance. All scripts are finished executing when the widget is returned.
+     */
+    parseUITreeElem(uiTreeElem: Element, context: XMLUIParserContext): Widget {
         // iterate children. there should only be one child element with the
         // wanted namespace that represents a widget. there can be many script
         // elements
         let topWidget = null;
-        for (const child of uiTreeNode.childNodes) {
+        for (const child of uiTreeElem.childNodes) {
             const nodeType = child.nodeType;
             if (nodeType === Node.ELEMENT_NODE) {
                 const childElem = child as Element;
@@ -677,6 +816,13 @@ export abstract class BaseXMLUIParser {
         return topWidget;
     }
 
+    /**
+     * Parse an XML document which can contain multiple <ui-tree> descendants.
+     *
+     * @param xmlDoc - The XML document to parse
+     * @param config - The configuration object to use for the parser
+     * @returns Returns a pair containing, respectively, a Map which maps a UI tree name to a widget, and the parser context after all UI trees are parsed
+     */
     parseFromXMLDocument(xmlDoc: XMLDocument, config?: XMLUIParserConfig): [Map<string, Widget>, XMLUIParserContext] {
         // find all UI tree nodes
         const uiTrees = xmlDoc.getElementsByTagNameNS(XML_NAMESPACE_BASE, 'ui-tree');
@@ -722,13 +868,21 @@ export abstract class BaseXMLUIParser {
                 throw new Error(`A UI tree with the name "${name}" already exists`);
             }
 
-            const widget = this.parseUITreeNode(uiTree, context);
+            const widget = this.parseUITreeElem(uiTree, context);
             trees.set(name, widget);
         }
 
         return [trees, context];
     }
 
+    /**
+     * Parse an XML string. {@link BaseXMLUIParser#parseFromXMLDocument} will be
+     * called.
+     *
+     * @param str - A string containing an XML document
+     * @param config - The configuration object to use for the parser
+     * @returns Returns a pair containing, respectively, a Map which maps a UI tree name to a widget, and the parser context after all UI trees are parsed
+     */
     parseFromString(str: string, config?: XMLUIParserConfig): [Map<string, Widget>, XMLUIParserContext] {
         const xmlDoc = this.domParser.parseFromString(str, 'text/xml');
 
@@ -740,6 +894,15 @@ export abstract class BaseXMLUIParser {
         return this.parseFromXMLDocument(xmlDoc, config);
     }
 
+    /**
+     * Parse an XML string from a URL. {@link BaseXMLUIParser#parseFromString}
+     * will be called.
+     *
+     * @param resource - The URL to download the XML from
+     * @param config - The configuration object to use for the parser
+     * @param requestOptions - Options to use for the HTTP request
+     * @returns Returns a pair containing, respectively, a Map which maps a UI tree name to a widget, and the parser context after all UI trees are parsed. Returned asynchronously as a promise
+     */
     async parseFromURL(resource: RequestInfo | URL, config?: XMLUIParserConfig, requestOptions?: RequestInit): Promise<[Map<string, Widget>, XMLUIParserContext]> {
         const response = await fetch(resource, requestOptions);
 

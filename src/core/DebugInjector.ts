@@ -22,6 +22,8 @@ const features: Map<string, [enabled: boolean, description: string] | [enabled: 
  *
  * @param debugFeature - The debug feature name, for example, "watchflag.Widget._layoutDirty"
  * @returns Returns true if the debug feature is enabled. If the feature doesn't exist or ins't enabled, returns false.
+ *
+ * @category Debug
  */
 export function isDebugFeatureEnabled(debugFeature: string): boolean {
     const featureConfig = features.get(debugFeature);
@@ -38,6 +40,8 @@ export function isDebugFeatureEnabled(debugFeature: string): boolean {
  *
  * @param debugFeature - The debug feature name, for example, "watchflag.Widget._layoutDirty"
  * @param enabled - Should the feature be enabled or disabled? If undefined, toggles the feature
+ *
+ * @category Debug
  */
 export function toggleDebugFeature(debugFeature: string, enabled?: boolean): void {
     const featureConfig = features.get(debugFeature);
@@ -62,7 +66,11 @@ export function toggleDebugFeature(debugFeature: string, enabled?: boolean): voi
     }
 }
 
-/** List all debug features in the console. */
+/**
+ * List all debug features in the console.
+ *
+ * @category Debug
+ */
 export function listDebugFeatures(): void {
     for(const [feature, featureConfig] of features) {
         console.info(`[lazy-widgets] "${feature}" (${featureConfig[0] ? 'en' : 'dis'}abled): ${featureConfig[1]}`);
@@ -75,6 +83,8 @@ export function listDebugFeatures(): void {
  *
  * @param classObj - The class. Widget for example
  * @param flagKey - The key of the property to watch. "_layoutDirty" for example
+ *
+ * @category Debug
  */
 export function injectWatchflagFeature(classObj: any, flagKey: string): void {
     const propertyPath = `${classObj.name}.${flagKey}`;
@@ -126,6 +136,8 @@ export function injectWatchflagFeature(classObj: any, flagKey: string): void {
  * @param classObj - The class. Widget for example
  * @param methodKey - The key of the property to watch. "paint" for example
  * @param messageGenerator - A function that returns a string with extra information about the function call. For example, a function which returns " (forced)" if Widget.paint is called with forced set to true
+ *
+ * @category Debug
  */
 export function injectTraceFeature(classObj: any, methodKey: string, messageGenerator: ((...args: any[]) => string) | null = null): void {
     const methodPath = `${classObj.name}.${methodKey}`;
@@ -202,6 +214,8 @@ export function injectTraceFeature(classObj: any, methodKey: string, messageGene
  *
  * @param classObj - The class. BaseTheme for example
  * @param themePropertyKey - The key of the property to override. "canvasFill" for example
+ *
+ * @category Debug
  */
 export function injectRandomFillFeature(classObj: any, themePropertyKey: string): void {
     const propertyPath = `${classObj.name}.${themePropertyKey}`;
@@ -236,6 +250,8 @@ export function injectRandomFillFeature(classObj: any, themePropertyKey: string)
  *
  * @param classObj - The class. Widget for example
  * @param methodKey - The key of the property to watch. "paint" for example
+ *
+ * @category Debug
  */
 export function injectStackTraceFeature(classObj: any, methodKey: string): void {
     const methodPath = `${classObj.name}.${methodKey}`;
@@ -263,6 +279,8 @@ export function injectStackTraceFeature(classObj: any, methodKey: string): void 
  * Check if a given number is whole, given a minimum distance from the nearest
  * whole number. If sensitivity is 0, then the number must be an integer. If
  * not, the it can be near an integer and still count as whole.
+ *
+ * @internal
  */
 function isWhole(val: number, sensitivity: number) {
     const clamped = Math.abs(val) % 1;
@@ -280,6 +298,8 @@ let injected = false;
 /**
  * Inject all default debug code. Call this before doing anything if you want to
  * enable debugging. Has no effect when called more than once.
+ *
+ * @category Debug
  */
 export function injectDebugCode(): void {
     if(injected) {

@@ -1,5 +1,5 @@
-import { VirtualKeyboard, defaultVirtualKeyboardTemplate } from '../widgets/VirtualKeyboard/VirtualKeyboard';
-import type { VirtualKeyboardTemplate } from '../widgets/VirtualKeyboard/VirtualKeyboard';
+import { VirtualKeyboard } from '../widgets/VirtualKeyboard/VirtualKeyboard';
+import { VirtualKeyboardTemplate, defaultVirtualKeyboardTemplate } from './VirtualKeyboardTemplate';
 import type { KeyboardDriver } from '../drivers/KeyboardDriver';
 import { Root, RootProperties } from './Root';
 import { Margin } from '../widgets/Margin';

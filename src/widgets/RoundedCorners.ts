@@ -3,6 +3,11 @@ import { safeRoundRect } from '../helpers/safeRoundRect';
 import { PassthroughWidget } from './PassthroughWidget';
 import type { Widget, WidgetProperties } from './Widget';
 
+/**
+ * A container widget that rounds the corners of a child widget.
+ *
+ * @category Widget
+ */
 export class RoundedCorners<W extends Widget = Widget> extends PassthroughWidget<W> {
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         super(child, properties);

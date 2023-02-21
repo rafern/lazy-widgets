@@ -11,7 +11,6 @@ import { Container } from './Container';
  * Can be constrained to a specific type of children.
  *
  * @category Widget
- * @category Alias Widget
  */
 export class Center<W extends Widget = Widget> extends Container<W> {
     constructor(child: W, properties?: Readonly<WidgetProperties>) {

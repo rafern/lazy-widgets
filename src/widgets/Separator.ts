@@ -7,7 +7,6 @@ import type { Rect } from '../helpers/Rect';
  * the theme's text color.
  *
  * @category Widget
- * @category Alias Widget
  */
 export class Separator extends Spacing {
     constructor(properties?: Readonly<SpacingProperties>) {

@@ -8,4 +8,4 @@ import type { XMLUIParserContext } from './XMLUIParserContext';
  *
  * @category XML
  */
-export type XMLParameterModifier = (parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, parameters: Array<unknown>) => void;
+export type XMLArgumentModifier = (parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, parameters: Array<unknown>) => void;

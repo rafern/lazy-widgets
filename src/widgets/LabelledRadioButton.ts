@@ -10,7 +10,6 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * {@link RadioButton}.
  *
  * @category Widget
- * @category Aggregate Widget
  */
 export class LabelledRadioButton<V> extends Row {
     static override autoXML: WidgetAutoXML = [

@@ -1,7 +1,7 @@
 import { ScrollableViewportWidget, ScrollableViewportWidgetProperties, ScrollbarMode } from "./ScrollableViewportWidget";
 import type { ValidatedVariable } from "../state/ValidatedVariable";
 import { TextInput, TextInputProperties } from "./TextInput";
-import { AxisCoupling } from "../widgets/AxisCoupling";
+import { AxisCoupling } from "../core/AxisCoupling";
 import type { WidgetAutoXML } from "../xml/WidgetAutoXML";
 
 /**
@@ -16,7 +16,6 @@ import type { WidgetAutoXML } from "../xml/WidgetAutoXML";
  * borders.
  *
  * @category Widget
- * @category Aggregate Widget
  */
 export class TextArea extends ScrollableViewportWidget<TextInput> {
     static override autoXML: WidgetAutoXML = [

@@ -2,7 +2,7 @@
  * The focus type of a {@link TricklingEvent}. Used to categorise events when
  * focusing {@link Widget | widgets} in {@link Root | roots}.
  *
- * @category Core
+ * @category Event
  */
 export enum FocusType {
     /** Used for widgets that need pointer input, such as {@link Button} */

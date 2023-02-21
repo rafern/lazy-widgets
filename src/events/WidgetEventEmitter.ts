@@ -6,6 +6,8 @@ import type { WidgetEvent } from './WidgetEvent';
  * captured. If false, or nothing, is returned, then the event is not captured.
  * If the event is not user-capturable, but true is returned anyway, the capture
  * will be ignored and a warning will be printed to the console once.
+ *
+ * @category Event
  */
 export type WidgetEventListener = (event: WidgetEvent) => boolean | undefined;
 
@@ -13,30 +15,40 @@ export type WidgetEventListener = (event: WidgetEvent) => boolean | undefined;
  * For implementers of the {@link WidgetEventEmitter} interface. A tuple
  * containing an ID, an event listener and a boolean which, if true, marks the
  * listener as only being called once.
+ *
+ * @category Event
  */
 export type WidgetEventTypedListenerTuple = [id: number, listener: WidgetEventListener, callOnce: boolean];
 
 /**
  * For implementers of the {@link WidgetEventEmitter} interface. A map which
  * maps an event type to a list of listeners.
+ *
+ * @category Event
  */
 export type WidgetEventTypedListenerMap = Map<string, Array<WidgetEventTypedListenerTuple>>;
 
 /**
  * For implementers of the {@link WidgetEventEmitter} interface. A pair
  * containing an ID and an event listener.
+ *
+ * @category Event
  */
 export type WidgetEventUntypedListenerPair = [id: number, listener: WidgetEventListener];
 
 /**
  * For implementers of the {@link WidgetEventEmitter} interface. A list of
  * listeners that listen to any event type.
+ *
+ * @category Event
  */
 export type WidgetEventUntypedListenerList = Array<WidgetEventUntypedListenerPair>;
 
 /**
  * An interface for UI classes that can emit events, such as a {@link Widget} or
  * a {@link Root}.
+ *
+ * @category Event
  */
 export interface WidgetEventEmitter {
     /**

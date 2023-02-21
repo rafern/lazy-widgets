@@ -1,13 +1,12 @@
 import { BasicVirtualKey } from './BasicVirtualKey';
 import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from './KeyContext';
+import type { KeyContext } from '../../core/KeyContext';
 import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAutoXML';
 
 /**
  * A {@link BasicVirtualKey} which emits ' ' key presses.
  *
  * @category Widget
- * @category Alias Widget
  */
 export class SpaceKey extends BasicVirtualKey {
     static override autoXML = SpecializedVirtualKeyAutoXML;

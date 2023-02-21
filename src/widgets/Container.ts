@@ -9,7 +9,6 @@ import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
  * Can be constrained to a specific type of children.
  *
  * @category Widget
- * @category Alias Widget
  */
 export class Container<W extends Widget = Widget> extends BaseContainer<W> {
     static override autoXML = SingleParentAutoXML;

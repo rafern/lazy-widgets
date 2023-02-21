@@ -24,6 +24,8 @@ const HOVER_TIME = 1000;
  *
  * Has a tolerance for small movements, so that shaky pointers can still be used
  * to detect hovering.
+ *
+ * @category Widget
  */
 export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = TooltipContainer> extends PassthroughWidget<W> {
     static override autoXML: WidgetAutoXML = [

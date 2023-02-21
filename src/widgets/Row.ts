@@ -6,7 +6,6 @@ import { MultiParentAutoXML } from '../xml/MultiParentAutoXML';
  * A horizontal {@link MultiContainer}.
  *
  * @category Widget
- * @category Alias Widget
  */
 export class Row<W extends Widget = Widget> extends MultiContainer<W> {
     static override autoXML = MultiParentAutoXML;

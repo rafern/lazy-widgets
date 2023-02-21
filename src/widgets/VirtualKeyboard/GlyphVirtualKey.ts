@@ -1,6 +1,6 @@
 import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from './KeyContext';
+import type { KeyContext } from '../../core/KeyContext';
 import { VirtualKey } from './VirtualKey';
 
 /**
@@ -11,7 +11,6 @@ import { VirtualKey } from './VirtualKey';
  * For other specific keys, see {@link BasicVirtualKey}.
  *
  * @category Widget
- * @category Aggregate Widget
  */
 export class GlyphVirtualKey extends VirtualKey {
     static override autoXML: WidgetAutoXML = [

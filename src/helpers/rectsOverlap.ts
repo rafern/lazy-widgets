@@ -4,6 +4,8 @@ import type { Rect } from './Rect';
  * Check if 2 rectangles overlap.
  *
  * @returns Returns true if the rectangles overlap, false otherwise
+ *
+ * @category Helper
  */
 export function rectsOverlap(first: Rect, second: Rect) {
     // X test

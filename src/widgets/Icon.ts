@@ -9,6 +9,8 @@ const videoRegex = /^.*\.(webm|og[gv]|m(p4|4v|ov)|avi|qt)$/i;
 /**
  * The image fitting mode for {@link Icon} widgets; describes how an image is
  * transformed if its dimensions don't match the output dimensions.
+ *
+ * @category Widget
  */
 export enum IconFit {
     /**

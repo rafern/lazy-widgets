@@ -2,7 +2,7 @@ import type { LayoutConstraints } from '../core/LayoutConstraints';
 
 /**
  * A validator function which checks whether an input value is a
- * {@link LayoutConstraint}. Doesn't stop the validator chain.
+ * {@link LayoutConstraints}. Doesn't stop the validator chain.
  *
  * @category XML
  */

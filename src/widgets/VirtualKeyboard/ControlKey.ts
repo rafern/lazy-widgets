@@ -1,5 +1,5 @@
 import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from './KeyContext';
+import type { KeyContext } from '../../core/KeyContext';
 import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAutoXML';
 import { VirtualKey } from './VirtualKey';
 
@@ -8,7 +8,6 @@ import { VirtualKey } from './VirtualKey';
  * {@link KeyContext#ctrl} on click.
  *
  * @category Widget
- * @category Alias Widget
  */
 export class ControlKey extends VirtualKey {
     static override autoXML = SpecializedVirtualKeyAutoXML;

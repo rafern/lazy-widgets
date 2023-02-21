@@ -6,6 +6,8 @@ import { rectsOverlap } from './rectsOverlap';
  * Similar to {@link mergeRects}, except only overlapping rectangles are merged.
  *
  * @returns Returns a list containing all merged rectangles
+ *
+ * @category Helper
  */
 export function mergeOverlappingRects(rects: Array<Rect>) {
     if (rects.length === 0) {

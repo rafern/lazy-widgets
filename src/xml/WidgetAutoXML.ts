@@ -62,20 +62,25 @@ export interface WidgetAutoXMLConfigParameter {
 
 /**
  * An input mapping for a {@link Widget | Widget's}
- * {@link BaseXMLUIParser#registerAutoFactory | auto-factory}.
+ * {@link BaseXMLUIParser#registerFactory | factory}.
  *
  * @category XML
  */
 export type WidgetAutoXMLConfig = Array<WidgetAutoXMLConfigValueParameter | WidgetAutoXMLConfigWidgetParameter | WidgetAutoXMLConfigTextParameter | WidgetAutoXMLConfigParameter>;
 
+/**
+ * An object that contains an input mapping and a factory function for
+ * {@link BaseXMLUIParser#registerFactory}.
+ *
+ * @category XML
+ */
 export interface WidgetAutoXMLConfigWithFactory {
     inputConfig: WidgetAutoXMLConfig,
     factory: XMLWidgetFactory
 }
 
 /**
- * A configuration object which will be used for auto-registering a Widget's
- * factory.
+ * A configuration object which will be used for registering a Widget's factory.
  *
  * @category XML
  */

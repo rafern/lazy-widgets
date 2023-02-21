@@ -1,4 +1,8 @@
-/** Which event propagation model is an event type using? */
+/**
+ * Which event propagation model is an event type using?
+ *
+ * @category Event
+ */
 export enum PropagationModel {
     /**
      * This event is propagated down the UI tree, in depth-first order. The
@@ -17,7 +21,11 @@ export enum PropagationModel {
     Sticky,
 }
 
-/** An event fired to/from a {@link Widget} in a UI tree. */
+/**
+ * An event fired to/from a {@link Widget} in a UI tree.
+ *
+ * @category Event
+ */
 export abstract class WidgetEvent {
     /**
      * The type of this event class. Each event type should be unique, and have

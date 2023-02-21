@@ -1,87 +1,18 @@
 import { KeyboardDriver } from '../../drivers/KeyboardDriver';
 import type { FlexAlignment2D } from '../../theme/FlexAlignment2D';
-import type { VirtualKeyRowTemplate } from './VirtualKeyRow';
 import { FlexAlignment } from '../../theme/FlexAlignment';
 import type { Widget, WidgetProperties } from '../Widget';
 import { Alignment } from '../../theme/Alignment';
 import { VirtualKeyRow } from './VirtualKeyRow';
-import type { KeyContext } from './KeyContext';
-import { BackspaceKey } from './BackspaceKey';
-import { EscapeKey } from './EscapeKey';
-import { EnterKey } from './EnterKey';
-import { ShiftKey } from './ShiftKey';
-import { SpaceKey } from './SpaceKey';
+import type { KeyContext } from '../../core/KeyContext';
 import { Column } from '../Column';
 import type { WidgetEvent } from '../../events/WidgetEvent';
 import { LeaveEvent } from '../../events/LeaveEvent';
-import { TabKey } from './TabKey';
 import { PointerPressEvent } from '../../events/PointerPressEvent';
 import { PointerReleaseEvent } from '../../events/PointerReleaseEvent';
 import { PointerMove } from '../../events/PointerMove';
 import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
-
-/**
- * A template for the keys in a {@link VirtualKeyboard}. Each member of the
- * array contains the template for a row of keys, from top to bottom.
- *
- * @category Widget
- */
-export type VirtualKeyboardTemplate = Array<VirtualKeyRowTemplate>;
-
-function EnterKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): EnterKey {
-    return new EnterKey(
-        keyContext, undefined, undefined, properties,
-    );
-}
-
-function ShiftKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): ShiftKey {
-    return new ShiftKey(
-        keyContext, undefined, undefined, properties,
-    );
-}
-
-function BackspaceKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): BackspaceKey {
-    return new BackspaceKey(
-        keyContext, undefined, undefined, properties,
-    );
-}
-
-function SpaceKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): SpaceKey {
-    return new SpaceKey(
-        keyContext, undefined, undefined, properties,
-    );
-}
-
-function EscapeKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): EscapeKey {
-    return new EscapeKey(
-        keyContext, undefined, undefined, properties,
-    );
-}
-
-function TabKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): TabKey {
-    return new TabKey(
-        keyContext, undefined, undefined, properties,
-    );
-}
-
-/**
- * The default template for the keys in a {@link VirtualKeyboard}; A QWERTY
- * keyboard with US layout.
- *
- * @category Widget
- */
-export const defaultVirtualKeyboardTemplate: VirtualKeyboardTemplate = [
-    // First row
-    [['`1234567890-=', '~!@#$%^&*()_+']],
-    // Second row
-    [['qwertyuiop[]\\', 'QWERTYUIOP{}|']],
-    // Third row
-    [['asdfghjkl;\'', 'ASDFGHJKL:"'], EnterKeyTemplate],
-    // Fourth row
-    [ShiftKeyTemplate, ['zxcvbnm,./', 'ZXCVBNM<>?']],
-    // Fifth row
-    [BackspaceKeyTemplate, SpaceKeyTemplate, TabKeyTemplate, EscapeKeyTemplate],
-];
+import { defaultVirtualKeyboardTemplate, VirtualKeyboardTemplate } from '../../core/VirtualKeyboardTemplate';
 
 /**
  * A virtual keyboard widget.
@@ -96,7 +27,6 @@ export const defaultVirtualKeyboardTemplate: VirtualKeyboardTemplate = [
  * gets the keyboard or tab focus.
  *
  * @category Widget
- * @category Alias Widget
  */
 export class VirtualKeyboard extends Column {
     static override autoXML: WidgetAutoXML = [

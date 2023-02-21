@@ -11,7 +11,6 @@ import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
  * class for virtual keyboard key widgets.
  *
  * @category Widget
- * @category Aggregate Widget
  */
 export class VirtualKey extends ArtificialConstraint<TextButton> {
     static override autoXML: WidgetAutoXML = [

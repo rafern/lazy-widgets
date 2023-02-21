@@ -11,6 +11,8 @@ import type { Widget, WidgetProperties } from './Widget';
 /**
  * A tuple with a layer and the name of that layer (or null if it is an unnamed
  * layer). For internal use only.
+ *
+ * @category Core
  */
 export type LayerIteratorNextType<W extends Widget> = [layer: Layer<W>, layerName: string | null];
 

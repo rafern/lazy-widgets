@@ -4,7 +4,7 @@
  * as an input. Used by virtual keyboard key widgets and stored in a
  * {@link KeyContext}.
  *
- * @category Widget
+ * @category Core
  */
 export type KeyContextCallback = (key: string) => void;
 
@@ -12,7 +12,7 @@ export type KeyContextCallback = (key: string) => void;
  * An object shared by virtual keyboard key widgets to tell which modifier keys
  * are being pressed and to store the callback for when a key is pressed.
  *
- * @category Widget
+ * @category Core
  */
 export interface KeyContext {
     callback: KeyContextCallback,

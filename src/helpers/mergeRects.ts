@@ -6,6 +6,8 @@ import type { Rect } from "./Rect";
  * is supplied, that same rectangle is returned without copying.
  *
  * @returns Returns the merged rectangle, or null if there are no input rectangles
+ *
+ * @category Helper
  */
 export function mergeRects(rects: [Rect, ...Rect[]]): Rect;
 export function mergeRects(rects: []): null;

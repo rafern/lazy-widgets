@@ -1,61 +1,17 @@
 import { GlyphVirtualKey } from './GlyphVirtualKey';
 import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from './KeyContext';
+import type { KeyContext } from '../../core/KeyContext';
 import type { VirtualKey } from './VirtualKey';
 import { DynMsg } from '../../core/Strings';
 import { Row } from '../Row';
 import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
-
-/**
- * A template for a single virtual keyboard key. A function that, when called
- * given a {@link KeyContext} and theme override, returns a {@link VirtualKey}
- * which can be used as a virtual keyboard key widget.
- *
- * Example:
- * ```typescript
- * const template: VirtualKeyTemplate = (keyContext, properties) => new BackspaceKey(keyContext, properties);
- * ```
- *
- * @category Widget
- */
-export type VirtualKeyTemplate = (keyContext: KeyContext, properties?: Readonly<WidgetProperties>) => VirtualKey;
-
-/**
- * A template for multiple {@link GlyphVirtualKey} virtual keyboard keys. A
- * 2-tuple of strings, where each string has the same length. Each character of
- * the string represents a glyph to add to a keyboard row. The first string of
- * the tuple has the regular glyphs, while the second string string of the tuple
- * has the alternative glyphs.
- *
- * Example:
- * ```typescript
- * const template: GlyphVirtualKeysTemplate = ['qwertyuiop', 'QWERTYUIOP'];
- * ```
- *
- * @category Widget
- */
-export type GlyphVirtualKeysTemplate = [string, string];
-
-/**
- * A template for a single row of virtual keyboard keys. An array of
- * {@link GlyphVirtualKeysTemplate} and {@link VirtualKeyTemplate}.
- *
- * Example:
- * ```typescript
- * const backspaceTemplate: VirtualKeyTemplate = (keyContext, themeProperties) => new BackspaceKey(keyContext, themeProperties);
- * const rowTemplate: VirtualKeyRowTemplate = [['`1234567890-=', '~!@#$%^&*()_+'], backspaceTemplate];
- * ```
- *
- * @category Widget
- */
-export type VirtualKeyRowTemplate = Array<GlyphVirtualKeysTemplate | VirtualKeyTemplate>;
+import type { VirtualKeyRowTemplate } from '../../core/VirtualKeyboardTemplate';
 
 /**
  * A {@link Row} of {@link VirtualKey | virtual keys}. Generates given a
  * template.
  *
  * @category Widget
- * @category Aggregate Widget
  */
 export class VirtualKeyRow extends Row<VirtualKey> {
     static override autoXML: WidgetAutoXML = [

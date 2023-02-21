@@ -1,6 +1,6 @@
 import { BasicVirtualKey } from './BasicVirtualKey';
 import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from './KeyContext';
+import type { KeyContext } from '../../core/KeyContext';
 import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAutoXML';
 
 /**
@@ -8,7 +8,6 @@ import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAut
  * selection.
  *
  * @category Widget
- * @category Alias Widget
  */
 export class TabKey extends BasicVirtualKey {
     static override autoXML = SpecializedVirtualKeyAutoXML;

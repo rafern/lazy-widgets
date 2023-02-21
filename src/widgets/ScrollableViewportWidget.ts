@@ -1,5 +1,5 @@
 import { ViewportWidget, ViewportWidgetProperties } from './ViewportWidget';
-import { AxisCoupling } from '../widgets/AxisCoupling';
+import { AxisCoupling } from '../core/AxisCoupling';
 import { PointerEvent } from '../events/PointerEvent';
 import { PointerWheelEvent } from '../events/PointerWheelEvent';
 import { ClickHelper } from '../helpers/ClickHelper';

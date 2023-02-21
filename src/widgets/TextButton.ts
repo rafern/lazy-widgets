@@ -11,7 +11,6 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * Text-wrapping is disabled so that text is centered properly.
  *
  * @category Widget
- * @category Aggregate Widget
  */
 export class TextButton extends FilledButton<Label> {
     static override autoXML: WidgetAutoXML = [

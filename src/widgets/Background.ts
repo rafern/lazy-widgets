@@ -3,6 +3,11 @@ import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
 import { BaseContainer } from './BaseContainer';
 import type { Widget, WidgetProperties } from './Widget';
 
+/**
+ * A container widget that adds a background color.
+ *
+ * @category Widget
+ */
 export class Background<W extends Widget = Widget> extends BaseContainer<W> {
     static override autoXML = SingleParentAutoXML;
 

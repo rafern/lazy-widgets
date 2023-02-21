@@ -1,4 +1,4 @@
-import { BaseXMLUIParser, WHITESPACE_REGEX, XML_NAMESPACE_BASE } from './BaseXMLUIParser';
+import { BaseXMLUIParser, XML_NAMESPACE_BASE } from './BaseXMLUIParser';
 import * as widgets from '../widgets/concrete-widgets';
 import { WidgetAutoXML } from './WidgetAutoXML';
 import type { Widget } from '../widgets/Widget';
@@ -22,8 +22,13 @@ import type { XMLUIParserContext } from './XMLUIParserContext';
 import type { LayerInit } from '../core/LayerInit';
 import { fromKebabCase } from '../helpers/fromKebabCase';
 import { WidgetEventListener } from '../events/WidgetEventEmitter';
+import { WHITESPACE_REGEX } from '../helpers/whitespace-regex';
 
-/** A layer parameter for a {@link WidgetAutoXMLConfig}. */
+/**
+ * A layer parameter for a {@link WidgetAutoXMLConfig}.
+ *
+ * @category XML
+ */
 export interface WidgetAutoXMLConfigLayerParameter {
     mode: 'layer';
     name: string;
@@ -33,9 +38,16 @@ export interface WidgetAutoXMLConfigLayerParameter {
 }
 
 /**
- * Deserializes an XML element
+ * Deserializes an XML <layer> element, as a {@link LayerInit} value.
+ *
+ * @param parser - The parser that is calling this deserializer
+ * @param context - The current parser context, shared with all other initializations
+ * @param elem - The element to deserialize
+ * @returns Returns a new LayerInit instance, to be used as a parameter
+ *
+ * @category XML
  */
-export function deserializeLayerElement(parser: BaseXMLUIParser, context: XMLUIParserContext, elem: Element) {
+export function deserializeLayerElement(parser: BaseXMLUIParser, context: XMLUIParserContext, elem: Element): LayerInit<Widget> {
     // parse attributes
     let child: Widget | undefined, name: string | undefined, canExpand: boolean | undefined;
     for (const attr of elem.attributes) {
@@ -103,6 +115,17 @@ export function deserializeLayerElement(parser: BaseXMLUIParser, context: XMLUIP
     return { child, name, canExpand };
 }
 
+/**
+ * Deserializes an attribute with an options prefix. The value will be added as
+ * a field in an options object, or completely replace the options object.
+ *
+ * @param parser - The parser that is calling this deserializer
+ * @param context - The current parser context, shared with all other initializations
+ * @param instantiationContext - The current parser context, only available to this instantiation
+ * @param attribute - The attribute to deserialize - the attribute name decides the options object field, but `_` replaces the options object
+ *
+ * @category XML
+ */
 export function deserializeOptionsAttribute(parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, attribute: Attr) {
     // this attribute sets an options object's field. record it in the
     // instantiation context so it can be added to the parameters list later
@@ -140,6 +163,19 @@ export function deserializeOptionsAttribute(parser: BaseXMLUIParser, context: XM
     }
 }
 
+/**
+ * Deserializes an attribute with an event on/once prefix. The attribute will
+ * decide which event listener to add to the instance post-initialization. The
+ * listeners will be added to the instantiation context for later use.
+ *
+ * @param once - Should `once` be set to true in {@link Widget#on}?
+ * @param parser - The parser that is calling this deserializer
+ * @param context - The current parser context, shared with all other initializations
+ * @param instantiationContext - The current parser context, only available to this instantiation
+ * @param attribute - The attribute to deserialize - the attribute name decides the event type to listen to
+ *
+ * @category XML
+ */
 export function deserializeEventAttribute(once: boolean, parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, attribute: Attr) {
     // get listener callback
     const callback = validateFunction(parser.parseAttributeValue(attribute.value, context))[0];
@@ -154,15 +190,36 @@ export function deserializeEventAttribute(once: boolean, parser: BaseXMLUIParser
     }
 }
 
-export function addOptionsObjectToParameters(_parser: BaseXMLUIParser, _context: XMLUIParserContext, instantiationContext: Record<string, unknown>, parameters: Array<unknown>) {
-    // add options object to end of parameters list
+/**
+ * Adds an options object to the end of an argument list.
+ *
+ * @param _parser - The parser that is calling this deserializer (unused)
+ * @param _context - The current parser context, shared with all other initializations (unused)
+ * @param instantiationContext - The current parser context, only available to this instantiation
+ * @param args - The argument list that will be modified
+ *
+ * @category XML
+ */
+export function addOptionsObjectToArguments(_parser: BaseXMLUIParser, _context: XMLUIParserContext, instantiationContext: Record<string, unknown>, args: Array<unknown>) {
+    // add options object to end of argument list
     if ('options' in instantiationContext) {
-        parameters.push(instantiationContext.options);
+        args.push(instantiationContext.options);
     } else {
-        parameters.push({});
+        args.push({});
     }
 }
 
+/**
+ * Adds a list of event listeners to a widget instance. The event listeners will
+ * be retrieved from the instantiation context.
+ *
+ * @param _parser - The parser that is calling this deserializer (unused)
+ * @param _context - The current parser context, shared with all other initializations (unused)
+ * @param instantiationContext - The current parser context, only available to this instantiation
+ * @param instance - The widget instance for which the event listeners will be added to
+ *
+ * @category XML
+ */
 export function addEventListenersToWidget(_parser: BaseXMLUIParser, _context: XMLUIParserContext, instantiationContext: Record<string, unknown>, instance: Widget) {
     // add listeners to instance
     if ('listeners' in instantiationContext) {
@@ -174,6 +231,23 @@ export function addEventListenersToWidget(_parser: BaseXMLUIParser, _context: XM
     }
 }
 
+/**
+ * An XML UI parser.
+ *
+ * Unlike {@link BaseXMLUIParser}:
+ *
+ * - All default widgets are pre-registered
+ * - `<layer>` elements are treated as LayerInit parameters ("layer" parameter mode)
+ * - Attribute values starting with a backslash are always treated as strings, with the backslash removed
+ * - Attribute values starting with a dollar sign are always treated as variables
+ * - Attribute values starting with an at sign are always treated as JSON-encoded values
+ * - Attributes with the `lazy-widgets:options` namespace will be added to an options object and passed to a widget factory
+ * - Attributes with the `lazy-widgets:on` namespace will add event listeners to a widget
+ * - Similarly, attributes with the `lazy-widgets:once` namespace will add event listeners to a widget, but with `once` set to true
+ * - A lot of built-in validators are pre-registered
+ *
+ * @category XML
+ */
 export class XMLUIParser extends BaseXMLUIParser {
     constructor() {
         super();
@@ -213,7 +287,7 @@ export class XMLUIParser extends BaseXMLUIParser {
         // allow options namespace to pass values to the options object. this
         // also requires registering a parameter modifier
         this.registerAttributeNamespaceHandler(`${XML_NAMESPACE_BASE}:options`, deserializeOptionsAttribute);
-        this.registerParameterModifier(addOptionsObjectToParameters);
+        this.registerArgumentModifier(addOptionsObjectToArguments);
         // allow the on and once namespaces to add an event listener. this also
         // requires registering a post-init hook
         this.registerAttributeNamespaceHandler(`${XML_NAMESPACE_BASE}:on`, deserializeEventAttribute.bind(this, false));
@@ -240,7 +314,7 @@ export class XMLUIParser extends BaseXMLUIParser {
 
         // register factories for default widgets
         for (const ctor of Object.values(widgets)) {
-            this.registerAutoFactory(ctor as ((new () => Widget) & { autoXML: WidgetAutoXML }));
+            this.autoRegisterFactory(ctor as ((new () => Widget) & { autoXML: WidgetAutoXML }));
         }
     }
 }

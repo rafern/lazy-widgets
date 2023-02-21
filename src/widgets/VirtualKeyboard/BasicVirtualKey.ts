@@ -1,13 +1,12 @@
 import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from './KeyContext';
+import type { KeyContext } from '../../core/KeyContext';
 import { VirtualKey } from './VirtualKey';
 
 /**
  * A {@link VirtualKey} which emits key presses of a given key code.
  *
  * @category Widget
- * @category Alias Widget
  */
 export class BasicVirtualKey extends VirtualKey {
     static override autoXML: WidgetAutoXML = [
