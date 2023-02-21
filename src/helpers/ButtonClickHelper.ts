@@ -89,7 +89,7 @@ export class ButtonClickHelper extends CompoundClickHelper {
      * @returns Returns a 2-tuple containing, respective, whether a click occurred, and whether the event should be captured
      */
     handleEvent(event: TricklingEvent, root: Root, enabled: boolean, bounds: Bounds): [wasClick: boolean, capture: boolean] {
-        if(event instanceof PointerWheelEvent) {
+        if(event.isa(PointerWheelEvent)) {
             // Ignore wheel events
             return [false, false];
         } else if(event instanceof KeyEvent) {
@@ -99,7 +99,7 @@ export class ButtonClickHelper extends CompoundClickHelper {
             if(event.key !== 'Enter') {
                 return [false, false];
             }
-        } else if(!(event instanceof PointerEvent || event instanceof LeaveEvent)) {
+        } else if(!(event.isa(LeaveEvent) || event instanceof PointerEvent)) {
             // Discard unhandled events
             return [false, false];
         }
@@ -112,11 +112,11 @@ export class ButtonClickHelper extends CompoundClickHelper {
         }
 
         // Update button state
-        if(event instanceof KeyPressEvent) {
+        if(event.isa(KeyPressEvent)) {
             this.pointerClickHelper.clickStateChanged = false;
             this.keyboardClickHelper.setClickState(ClickState.Hold, true);
             this.widget.autoScroll();
-        } else if(event instanceof KeyReleaseEvent) {
+        } else if(event.isa(KeyReleaseEvent)) {
             this.pointerClickHelper.clickStateChanged = false;
             this.keyboardClickHelper.setClickState(ClickState.Hover, true);
         } else {

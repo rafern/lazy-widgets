@@ -340,7 +340,7 @@ export class Root implements WidgetEventEmitter {
                 // special case for tab key with no currently focused widget;
                 // try to do tab selection. does not apply to virtual tab
                 // presses
-                if(event instanceof KeyPressEvent && !event.virtual && event.key === 'Tab') {
+                if(event.isa(KeyPressEvent) && !event.virtual && event.key === 'Tab') {
                     return [
                         [event, false],
                         ...this.dispatchEvent(new TabSelectEvent(this.getFocus(FocusType.Tab), event.shift))
@@ -355,7 +355,7 @@ export class Root implements WidgetEventEmitter {
         }
 
         // Clear pointer style. This will be set by children if neccessary
-        if((event instanceof PointerEvent && !(event instanceof PointerWheelEvent)) || event instanceof LeaveEvent) {
+        if(event.isa(LeaveEvent) || (!event.isa(PointerWheelEvent) && event instanceof PointerEvent)) {
             this.pointerStyle = 'default';
         }
 
@@ -364,7 +364,7 @@ export class Root implements WidgetEventEmitter {
         const captureList: CaptureList = [[originalEvent, captured !== null]];
 
         if(captured === null) {
-            if(event instanceof KeyPressEvent) {
+            if(event.isa(KeyPressEvent)) {
                 if(event.key === 'Tab' && !event.virtual) {
                     // special case for tab key; try to do tab selection. does
                     // not apply to virtual tab presses
@@ -380,13 +380,13 @@ export class Root implements WidgetEventEmitter {
             // If this was a tab selection relative to a widget, but the widget
             // was not found, try again but with no relative widget. This
             // happens when a removed widget still has tab focus
-            if(event instanceof TabSelectEvent && event.relativeTo !== null) {
+            if(event.isa(TabSelectEvent) && event.relativeTo !== null) {
                 event = new TabSelectEvent(null, event.reversed);
                 captured = this.child.dispatchEvent(event);
             }
         }
 
-        if(event instanceof TabSelectEvent) {
+        if(event.isa(TabSelectEvent)) {
             if(captured) {
                 if(!event.reachedRelative && !Root.badTabCaptureWarned) {
                     Root.badTabCaptureWarned = true;

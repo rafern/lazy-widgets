@@ -227,19 +227,19 @@ export class Slider extends Widget {
         }
 
         // Ignore unhandled events
-        if(event instanceof PointerWheelEvent || !(event instanceof PointerEvent || event instanceof KeyEvent || event instanceof LeaveEvent)) {
+        if(event.isa(PointerWheelEvent) || !(event.isa(LeaveEvent) || event instanceof PointerEvent || event instanceof KeyEvent)) {
             return null;
         }
 
         // Ignore tab key presses so tab selection works, and escape so widget
         // unfocusing works
-        if(event instanceof KeyPressEvent && (event.key === 'Tab' || event.key === 'Escape')) {
+        if(event.isa(KeyPressEvent) && (event.key === 'Tab' || event.key === 'Escape')) {
             return null;
         }
 
         // Handle key presses
         if(event instanceof KeyEvent) {
-            if(event instanceof KeyPressEvent) {
+            if(event.isa(KeyPressEvent)) {
                 const incMul = event.shift ? 10 : 1;
                 if(event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
                     this.stepValue(false, incMul);
@@ -254,7 +254,7 @@ export class Slider extends Widget {
         // Save slider bounds so that the slider doesn't glitch out if dragged
         // while the layout changes. To handle hovering properly, also update if
         // moving pointer, but drag hasn't been initiated
-        if(event instanceof PointerPressEvent || this.clickHelper.clickState !== ClickState.Hold) {
+        if(event.isa(PointerPressEvent) || this.clickHelper.clickState !== ClickState.Hold) {
             const x = this.idealX + this.offsetX;
             const y = this.idealY + this.offsetY;
             this.dragBounds = [ x, x + this.actualWidth, y, y + this.actualHeight ];

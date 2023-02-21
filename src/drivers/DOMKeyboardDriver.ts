@@ -212,7 +212,7 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
                 for (; i >= 0 && i < rootCount; i += delta) {
                     const captureList = group.enabledRoots[i].dispatchEvent(new TabSelectEvent(null, directionReversed));
                     for (const [event, captured] of captureList) {
-                        if (captured && event instanceof TabSelectEvent) {
+                        if (captured && event.isa(TabSelectEvent)) {
                             return;
                         }
                     }

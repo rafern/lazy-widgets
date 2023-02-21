@@ -363,7 +363,7 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
                 for (let i = 0; i < capListLen; i++) {
                     const [cEvent, captured] = captureList[i];
 
-                    if (!captured && cEvent instanceof TabSelectEvent) {
+                    if (!captured && cEvent.isa(TabSelectEvent)) {
                         let iNext = i + (cEvent.reversed ? -1 : 1);
                         if (iNext < 0 || iNext >= rootCount) {
                             if (group.wrapsAround) {

@@ -666,13 +666,13 @@ export class TextInput extends Widget {
         const event = baseEvent as TricklingEvent;
         const root = this.root;
 
-        if(event instanceof LeaveEvent) {
+        if(event.isa(LeaveEvent)) {
             // Stop dragging if the pointer leaves the text input, since it
             // won't receive pointer release events outside the widget
             this.dragging = false;
             this.lastClick = 0;
             return this;
-        } else if(event instanceof PointerWheelEvent) {
+        } else if(event.isa(PointerWheelEvent)) {
             // Don't capture wheel events
             return null;
         } else if(event instanceof PointerEvent) {
@@ -681,8 +681,9 @@ export class TextInput extends Widget {
 
             // Request keyboard focus if this is a pointer press with the
             // primary button
-            if(event instanceof PointerPressEvent || event instanceof PointerMove) {
-                const isPress = event instanceof PointerPressEvent && event.isPrimary;
+            const isPressEvent = event.isa(PointerPressEvent);
+            if(isPressEvent || event.isa(PointerMove)) {
+                const isPress = isPressEvent && event.isPrimary;
                 if(isPress) {
                     this.dragging = true;
                     const clickTime = (new Date()).getTime();
@@ -763,7 +764,7 @@ export class TextInput extends Widget {
 
                 // Request focus
                 root.requestFocus(FocusType.Keyboard, this);
-            } else if(event instanceof PointerReleaseEvent && event.isPrimary) {
+            } else if(event.isa(PointerReleaseEvent) && event.isPrimary) {
                 // Stop dragging
                 this.dragging = false;
 
@@ -783,7 +784,7 @@ export class TextInput extends Widget {
             }
 
             return this;
-        } else if(event instanceof KeyPressEvent) {
+        } else if(event.isa(KeyPressEvent)) {
             // Stop dragging
             this.dragging = false;
             this.lastClick = 0;
@@ -884,7 +885,7 @@ export class TextInput extends Widget {
 
             // Reset blink time for better feedback
             this.blinkStart = Date.now();
-        } else if(event instanceof TextPasteEvent) {
+        } else if(event.isa(TextPasteEvent)) {
             if(event.target === this) {
                 // Insert pasted text
                 this.insertText(event.text);

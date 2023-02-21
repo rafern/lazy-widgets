@@ -441,7 +441,7 @@ export class PointerDriver implements Driver {
                 }
             }
 
-            if(event instanceof PointerReleaseEvent) {
+            if(event.isa(PointerReleaseEvent)) {
                 state.dragLast = null;
             } else {
                 state.dragLast[0] = event.x;
@@ -456,7 +456,7 @@ export class PointerDriver implements Driver {
         if(root.dispatchEvent(event)) {
             state.dragLast = null;
             return true;
-        } else if(dragToScroll && event instanceof PointerPressEvent) {
+        } else if(dragToScroll && event.isa(PointerPressEvent)) {
             state.dragLast = [event.x, event.y];
             state.dragOrigin[0] = event.x;
             state.dragOrigin[1] = event.y;

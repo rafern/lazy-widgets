@@ -53,4 +53,14 @@ export abstract class WidgetEvent {
     abstract readonly userCapturable: boolean;
     /** Which event propagation model is this event type using? */
     abstract readonly propagation: PropagationModel;
+    /**
+     * Check if the type of this event instance matches the type of a given
+     * event class, asserting that the instance is of the class' type.
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    isa<E extends WidgetEvent>(clazz: new (...args: any[]) => E): this is E {
+        // XXX this is really ugly, but i'm not sure how this can be done
+        // properly
+        return (clazz as unknown as { type: string }).type === this.type;
+    }
 }

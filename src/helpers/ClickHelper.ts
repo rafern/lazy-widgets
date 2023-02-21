@@ -88,7 +88,7 @@ export class ClickHelper extends GenericClickHelper {
      * @param bounds - A 4-tuple containing, respectively, left coordinate, right coordinate, top coordinate and bottom coordinate of clickable area, in pixels
      */
     handleClickEvent(event: TricklingEvent, root: Root, bounds: Bounds): void {
-        if(event instanceof LeaveEvent) {
+        if(event.isa(LeaveEvent)) {
             // Drop focus on this widget if this is a leave event
             root.dropFocus(FocusType.Pointer, this.widget);
             this.pointerPos = null;
@@ -109,14 +109,14 @@ export class ClickHelper extends GenericClickHelper {
 
             // If this is a press event, request focus and set starting
             // pointer coordinates. Ignore if wrong button
-            if(event instanceof PointerPressEvent && event.button === this.pointerButton) {
+            if(event.isa(PointerPressEvent) && event.button === this.pointerButton) {
                 this.startingPointerPos = this.pointerPos;
                 root.requestFocus(FocusType.Pointer, this.widget);
                 return this.setClickState(ClickState.Hold, inside);
             }
 
             // If this is a release event, drop focus. Ignore if wrong button
-            if(event instanceof PointerReleaseEvent && event.button === this.pointerButton) {
+            if(event.isa(PointerReleaseEvent) && event.button === this.pointerButton) {
                 root.dropFocus(FocusType.Pointer, this.widget);
                 if(inside) {
                     return this.setClickState(ClickState.Hover, inside);

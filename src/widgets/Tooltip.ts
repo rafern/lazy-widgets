@@ -110,7 +110,7 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
         }
 
         // check if this event should count as a hover/unhover
-        if (event instanceof PointerMove) {
+        if (event.isa(PointerMove)) {
             if (this._hoverStart === 0) {
                 this._hoverStart = Date.now();
                 this._hoverStartX = event.x;
@@ -125,7 +125,7 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
                     this._hoverStartY = event.y;
                 }
             }
-        } else if (event instanceof LeaveEvent) {
+        } else if (event.isa(LeaveEvent)) {
             this._hoverStart = 0;
 
             if (this._layer) {

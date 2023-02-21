@@ -425,7 +425,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
                 capturer = this.handleEvent(event);
             }
 
-            if(event instanceof TabSelectEvent) {
+            if(event.isa(TabSelectEvent)) {
                 if(event.reachedRelative) {
                     if(this.tabFocusable && (capturer === this || capturer === null)) {
                         return this;

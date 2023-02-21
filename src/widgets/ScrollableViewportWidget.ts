@@ -383,7 +383,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         const heightBiCoupled = this.heightCoupling === AxisCoupling.Bi;
 
         if(this._scrollbarMode !== ScrollbarMode.Hidden &&
-           (event instanceof LeaveEvent || event instanceof PointerEvent) &&
+           (event.isa(LeaveEvent) || event instanceof PointerEvent) &&
            (event.target === null || event.target === this)) {
             const [childWidth, childHeight] = this.child.idealDimensions;
             const overlay = this._scrollbarMode === ScrollbarMode.Overlay;
@@ -408,7 +408,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             // If the event was grabbed by either scrollbar, capture it
             if(grabbedEvent) {
                 // If this is a wheel event, handle it
-                if(event instanceof PointerWheelEvent) {
+                if(event.isa(PointerWheelEvent)) {
                     this.handleWheelEvent(event);
                 }
 
@@ -422,7 +422,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         // If this is an auto-scroll event and it's been captured, then scroll
         // to the capturer's wanted bounds, make the event relative to this
         // scrollable viewport and re-capture it
-        if(capturer !== null && event instanceof AutoScrollEvent) {
+        if(capturer !== null && event.isa(AutoScrollEvent)) {
             const reserve = this._scrollbarMode === ScrollbarMode.Layout;
             const reserveX = reserve && !heightBiCoupled;
             const reserveY = reserve && !widthBiCoupled;
@@ -521,7 +521,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
 
         // If this is a wheel event and nobody captured the event, try
         // scrolling. If scrolling did indeed occur, then capture the event.
-        if(capturer === null && event instanceof PointerWheelEvent && this.handleWheelEvent(event)) {
+        if(capturer === null && event.isa(PointerWheelEvent) && this.handleWheelEvent(event)) {
             return this;
         }
 
