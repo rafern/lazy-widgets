@@ -2,7 +2,6 @@ import type { LayoutConstraints } from './LayoutConstraints';
 import type { Widget } from '../widgets/Widget';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Rect } from '../helpers/Rect';
-import { BubblingEvent } from '../events/BubblingEvent';
 
 /**
  * Viewports are constrained rectangles that can be painted to. Viewports have a

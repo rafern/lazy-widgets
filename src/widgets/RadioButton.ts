@@ -1,7 +1,6 @@
 import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
 import { Widget } from './Widget';
 import { ClickState } from '../helpers/ClickState';
-import type { FocusType } from '../core/FocusType';
 import type { Variable } from '../state/Variable';
 import type { Viewport } from '../core/Viewport';
 import type { TricklingEvent } from '../events/TricklingEvent';
