@@ -13,6 +13,8 @@ import type { Widget } from './Widget';
 import { Root } from '../core/Root';
 import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import { FocusEvent } from '../events/FocusEvent';
+import { BlurEvent } from '../events/BlurEvent';
 
 /**
  * The mode for how a scrollbar is shown in a {@link ScrollableViewportWidget}.
@@ -374,7 +376,11 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
 
     protected override handleEvent(event: WidgetEvent): Widget | null {
         if (event.propagation !== PropagationModel.Trickling) {
-            return super.handleEvent(event);
+            if (event.isa(FocusEvent) || event.isa(BlurEvent)) {
+                return this;
+            } else {
+                return super.handleEvent(event);
+            }
         }
 
         // Try to drag a scrollbar if this is a pointer or leave event with no
