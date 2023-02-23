@@ -82,7 +82,7 @@ export function eventEmitterOffAny(untypedListeners: WidgetEventUntypedListenerL
 }
 
 const invalidUserCaptures = new WeakSet();
-function assertCapturable(captured: boolean | undefined, event: WidgetEvent): boolean {
+function assertCapturable(captured: boolean | void, event: WidgetEvent): boolean {
     if (captured && !event.userCapturable) {
         if (!invalidUserCaptures.has(event.constructor)) {
             invalidUserCaptures.add(event.constructor);

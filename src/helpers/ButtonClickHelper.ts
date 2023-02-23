@@ -44,11 +44,11 @@ export class ButtonClickHelper extends CompoundClickHelper {
     }
 
     /**
-     * Handle focus grabbing from {@link Widget#onFocusGrabbed}. If keyboard
-     * focus is gained, then the button is hovered via the
+     * Handle focus grabbing from a {@link FocusEvent}. If keyboard focus is
+     * gained, then the button is hovered via the
      * {@link ButtonClickHelper#keyboardClickHelper} click helper
      *
-     * @param focusType - The focus type from {@link Widget#onFocusGrabbed}
+     * @param focusType - The focus type from the {@link FocusEvent}
      * @returns Returns true if the focus type was the keyboard focus (and therefore the button probably needs to be re-painted)
      */
     onFocusGrabbed(focusType: FocusType): boolean {
@@ -62,11 +62,11 @@ export class ButtonClickHelper extends CompoundClickHelper {
     }
 
     /**
-     * Handle focus dropping from {@link Widget#onFocusDropped}. If keyboard
-     * focus is dropped, then the button is released via the
+     * Handle focus dropping from a {@link BlurEvent}. If keyboard focus is
+     * dropped, then the button is released via the
      * {@link ButtonClickHelper#keyboardClickHelper} click helper
      *
-     * @param focusType - The focus type from {@link Widget#onFocusDropped}
+     * @param focusType - The focus type from the {@link BlurEvent}
      * @returns Returns true if the focus type was the keyboard focus (and therefore the button probably needs to be re-painted)
      */
     onFocusDropped(focusType: FocusType): boolean {

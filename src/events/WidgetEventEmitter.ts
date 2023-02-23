@@ -1,5 +1,9 @@
 import type { WidgetEvent } from './WidgetEvent';
 
+// TODO once typescript decides that functions should return undefined instead
+// of void by default (https://github.com/microsoft/TypeScript/issues/36239),
+// the return type of the listener should be `boolean | undefined` instead of
+// `boolean | void`
 /**
  * An event listener. Handles an event from a {@link WidgetEventEmitter}. If the
  * listener returns true and the event is user-capturable, then the event is
@@ -9,7 +13,7 @@ import type { WidgetEvent } from './WidgetEvent';
  *
  * @category Event
  */
-export type WidgetEventListener = (event: WidgetEvent, handler: WidgetEventEmitter) => boolean | undefined;
+export type WidgetEventListener = (event: WidgetEvent, handler: WidgetEventEmitter) => boolean | void;
 
 /**
  * For implementers of the {@link WidgetEventEmitter} interface. A tuple

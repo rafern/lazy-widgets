@@ -43,7 +43,7 @@ export class VirtualKey extends ArtificialConstraint<TextButton> {
      * @param minWidth - Minimum width constraint. Will be passed to ArtificialConstraint base class.
      * @param minHeight - Minimum width constraint. Will be passed to ArtificialConstraint base class.
      */
-    constructor(text: string, callback: () => undefined, minWidth = 24, minHeight = 24, properties?: Readonly<WidgetProperties>) {
+    constructor(text: string, callback: () => void, minWidth = 24, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super(
             new TextButton(text, properties).on('click', callback),
             [minWidth, Infinity, minHeight, Infinity],

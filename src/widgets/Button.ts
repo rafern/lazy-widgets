@@ -1,6 +1,5 @@
 import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
 import type { Widget } from './Widget';
-import type { FocusType } from '../core/FocusType';
 import { BaseContainer } from './BaseContainer';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { TricklingEvent } from '../events/TricklingEvent';
