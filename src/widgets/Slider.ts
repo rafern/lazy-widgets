@@ -17,6 +17,8 @@ import { LeaveEvent } from '../events/LeaveEvent';
 import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import { FocusEvent } from '../events/FocusEvent';
+import { BlurEvent } from '../events/BlurEvent';
 
 /**
  * Optional Slider constructor properties.
@@ -209,21 +211,23 @@ export class Slider extends Widget {
         }
     }
 
-    override onFocusGrabbed(focusType: FocusType): void {
-        if(focusType === FocusType.Keyboard) {
-            this.keyboardFocused = true;
-        }
-    }
-
-    override onFocusDropped(focusType: FocusType): void {
-        if(focusType === FocusType.Keyboard) {
-            this.keyboardFocused = false;
-        }
-    }
-
     protected override handleEvent(event: WidgetEvent): Widget | null {
         if (event.propagation !== PropagationModel.Trickling) {
-            return super.handleEvent(event);
+            if (event.isa(FocusEvent)) {
+                if(event.focusType === FocusType.Keyboard) {
+                    this.keyboardFocused = true;
+                }
+
+                return this;
+            } else if (event.isa(BlurEvent)) {
+                if(event.focusType === FocusType.Keyboard) {
+                    this.keyboardFocused = false;
+                }
+
+                return this;
+            } else {
+                return super.handleEvent(event);
+            }
         }
 
         // Ignore unhandled events

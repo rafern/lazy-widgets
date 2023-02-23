@@ -295,24 +295,6 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     }
 
     /**
-     * Called when a focus type has been grabbed by this Widget. Does nothing by
-     * default. Can be overridden.
-     */
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-    onFocusGrabbed(focusType: FocusType): void {}
-
-    /**
-     * Called when a focus type owned by this Widget has been dropped. Does
-     * nothing by default. Can be overridden.
-     */
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars
-    onFocusDropped(focusType: FocusType): void {}
-
-    /**
      * Widget event handling callback. If the event is to be captured, the
      * capturer is returned, else, null.
      *

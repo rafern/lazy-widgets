@@ -10,6 +10,8 @@ import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
+import { FocusEvent } from '../events/FocusEvent';
+import { BlurEvent } from '../events/BlurEvent';
 
 /**
  * A checkbox widget; can be ticked or unticked.
@@ -99,21 +101,23 @@ export class Checkbox extends Widget {
         return this.variable.value;
     }
 
-    override onFocusGrabbed(focusType: FocusType): void {
-        if(this.clickHelper.onFocusGrabbed(focusType)) {
-            this.markWholeAsDirty();
-        }
-    }
-
-    override onFocusDropped(focusType: FocusType): void {
-        if(this.clickHelper.onFocusDropped(focusType)) {
-            this.markWholeAsDirty();
-        }
-    }
-
     protected override handleEvent(event: WidgetEvent): Widget | null {
         if (event.propagation !== PropagationModel.Trickling) {
-            return super.handleEvent(event);
+            if (event.isa(FocusEvent)) {
+                if (this.clickHelper.onFocusGrabbed(event.focusType)) {
+                    this.markWholeAsDirty();
+                }
+
+                return this;
+            } else if (event.isa(BlurEvent)) {
+                if (this.clickHelper.onFocusDropped(event.focusType)) {
+                    this.markWholeAsDirty();
+                }
+
+                return this;
+            } else {
+                return super.handleEvent(event);
+            }
         }
 
         const x = this.idealX + this.offsetX;

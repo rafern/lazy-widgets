@@ -7,6 +7,8 @@ import type { TricklingEvent } from '../events/TricklingEvent';
 import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
 import { ClickEvent } from '../events/ClickEvent';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
+import { FocusEvent } from '../events/FocusEvent';
+import { BlurEvent } from '../events/BlurEvent';
 
 /**
  * A {@link BaseContainer} which can be {@link ClickHelper | clicked} as a
@@ -46,17 +48,17 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
         this.clickHelper.reset();
     }
 
-    override onFocusGrabbed(focusType: FocusType): void {
-        this.clickHelper.onFocusGrabbed(focusType);
-    }
-
-    override onFocusDropped(focusType: FocusType): void {
-        this.clickHelper.onFocusDropped(focusType);
-    }
-
     protected override handleEvent(event: WidgetEvent): Widget | null {
         if (event.propagation !== PropagationModel.Trickling) {
-            return super.handleEvent(event);
+            if (event.isa(FocusEvent)) {
+                this.clickHelper.onFocusGrabbed(event.focusType);
+                return this;
+            } else if (event.isa(BlurEvent)) {
+                this.clickHelper.onFocusDropped(event.focusType);
+                return this;
+            } else {
+                return super.handleEvent(event);
+            }
         }
 
         const [wasClick, capture] = this.clickHelper.handleEvent(

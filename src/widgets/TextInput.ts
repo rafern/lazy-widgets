@@ -19,6 +19,8 @@ import { LeaveEvent } from '../events/LeaveEvent';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import { TricklingEvent } from '../events/TricklingEvent';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import { FocusEvent } from '../events/FocusEvent';
+import { BlurEvent } from '../events/BlurEvent';
 
 /**
  * Optional TextInput constructor properties.
@@ -632,30 +634,32 @@ export class TextInput extends Widget {
         return [startPos, pos];
     }
 
-    override onFocusGrabbed(focusType: FocusType): void {
-        // If keyboard focus is gained and the caret isn't shown yet, select the
-        // last character and start blinking the caret
-        if(focusType === FocusType.Keyboard && this.blinkStart === 0) {
-            this.blinkStart = Date.now();
-            this.selectPos = this.variable.value.length;
-            this.cursorPos = this.selectPos;
-            this.cursorOffsetDirty = true;
-            this.tabModeEnabled = false;
-            this.autoScrollCaret();
-        }
-    }
-
-    override onFocusDropped(focusType: FocusType): void {
-        // Stop blinking cursor if keyboard focus lost and stop dragging if
-        // pointer focus is lost
-        if(focusType === FocusType.Keyboard) {
-            this.blinkStart = 0;
-        }
-    }
-
     protected override handleEvent(baseEvent: WidgetEvent): Widget | null {
         if (baseEvent.propagation !== PropagationModel.Trickling) {
-            return super.handleEvent(baseEvent);
+            if (baseEvent.isa(FocusEvent)) {
+                // If keyboard focus is gained and the caret isn't shown yet, select the
+                // last character and start blinking the caret
+                if(baseEvent.focusType === FocusType.Keyboard && this.blinkStart === 0) {
+                    this.blinkStart = Date.now();
+                    this.selectPos = this.variable.value.length;
+                    this.cursorPos = this.selectPos;
+                    this.cursorOffsetDirty = true;
+                    this.tabModeEnabled = false;
+                    this.autoScrollCaret();
+                }
+
+                return this;
+            } else if (baseEvent.isa(BlurEvent)) {
+                // Stop blinking cursor if keyboard focus lost and stop dragging if
+                // pointer focus is lost
+                if(baseEvent.focusType === FocusType.Keyboard) {
+                    this.blinkStart = 0;
+                }
+
+                return this;
+            } else {
+                return super.handleEvent(baseEvent);
+            }
         }
 
         // If editing is disabled, abort

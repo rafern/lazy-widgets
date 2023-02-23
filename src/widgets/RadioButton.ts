@@ -11,6 +11,8 @@ import { paintCircle } from '../helpers/paintCircle';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
+import { FocusEvent } from '../events/FocusEvent';
+import { BlurEvent } from '../events/BlurEvent';
 
 /**
  * A radio button widget; used for selecting one of many options. Uses a shared
@@ -112,21 +114,23 @@ export class RadioButton<V> extends Widget {
         return this.variable.value === this.value;
     }
 
-    override onFocusGrabbed(focusType: FocusType): void {
-        if(this.clickHelper.onFocusGrabbed(focusType)) {
-            this.markWholeAsDirty();
-        }
-    }
-
-    override onFocusDropped(focusType: FocusType): void {
-        if(this.clickHelper.onFocusDropped(focusType)) {
-            this.markWholeAsDirty();
-        }
-    }
-
     protected override handleEvent(event: WidgetEvent): Widget | null {
         if (event.propagation !== PropagationModel.Trickling) {
-            return super.handleEvent(event);
+            if (event.isa(FocusEvent)) {
+                if (this.clickHelper.onFocusGrabbed(event.focusType)) {
+                    this.markWholeAsDirty();
+                }
+
+                return this;
+            } else if (event.isa(BlurEvent)) {
+                if (this.clickHelper.onFocusDropped(event.focusType)) {
+                    this.markWholeAsDirty();
+                }
+
+                return this;
+            } else {
+                return super.handleEvent(event);
+            }
         }
 
         const x = this.idealX + this.offsetX;

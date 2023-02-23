@@ -357,8 +357,6 @@ export function injectDebugCode(): void {
     injectStackTraceFeature(Root, 'getTextInput');
     // stacktrace.Widget.onThemeUpdated
     injectStackTraceFeature(Widget, 'onThemeUpdated');
-    // stacktrace.Widget.onFocusDropped
-    injectStackTraceFeature(Widget, 'onFocusDropped');
     // stacktrace.Widget.handleEvent
     injectStackTraceFeature(Widget, 'handleEvent');
     // stacktrace.Widget.dispatchEvent

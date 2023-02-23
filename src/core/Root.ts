@@ -17,6 +17,8 @@ import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
 import { TricklingEvent } from '../events/TricklingEvent';
 import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions';
+import { FocusEvent } from '../events/FocusEvent';
+import { BlurEvent } from '../events/BlurEvent';
 
 /**
  * Optional Root constructor properties.
@@ -492,41 +494,54 @@ export class Root implements WidgetEventEmitter {
     }
 
     /**
+     * Internal method similar to {@link requestFocus}, except only a specific
+     * focus is given; no partner foci are added.
+     */
+    private giveFocus(focusType: FocusType, widget: Widget): Widget | null {
+        const currentFocus = this._foci.get(focusType);
+        if(widget === currentFocus) {
+            return widget;
+        }
+
+        const capturer = widget.dispatchEvent(new FocusEvent(focusType));
+
+        this.clearFocus(focusType);
+        this._foci.set(focusType, capturer);
+
+        for(const driver of this.drivers) {
+            driver.onFocusChanged(this, focusType, capturer);
+        }
+
+        return capturer;
+    }
+
+    /**
      * Sets the current {@link Root#_foci | focus} of a given type to a given
      * widget. If the focus changes, {@link Root#clearFocus} is called and
      * {@link Root#drivers} are notified by calling
      * {@link Driver#onFocusChanged}.
+     *
+     * If the target widget doesn't capture the dispatched {@link FocusEvent},
+     * then the focus is not changed.
      */
     requestFocus(focusType: FocusType, widget: Widget): void {
         if(widget !== null) {
             // Replace focus if current focus is not the desired one
-            const currentFocus = this._foci.get(focusType);
-            if(widget !== currentFocus) {
-                this.clearFocus(focusType);
-                this._foci.set(focusType, widget);
-                widget.onFocusGrabbed(focusType);
-                for(const driver of this.drivers) {
-                    driver.onFocusChanged(this, focusType, widget);
+            const capturer = this.giveFocus(focusType, widget);
+            if (capturer) {
+                // special cases for keyboard and tab foci, since they are
+                // usually together. a focus that is implied by another focus is
+                // called a partner focus
+                let partnerFocus = null;
+                if(focusType === FocusType.Keyboard) {
+                    partnerFocus = FocusType.Tab;
                 }
-            }
+                if(focusType === FocusType.Tab) {
+                    partnerFocus = FocusType.Keyboard;
+                }
 
-            // special cases for keyboard and tab foci, since they are
-            // usually together. a focus that is implied by another focus is
-            // called a partner focus
-            let partnerFocus = null;
-            if(focusType === FocusType.Keyboard) {
-                partnerFocus = FocusType.Tab;
-            }
-            if(focusType === FocusType.Tab) {
-                partnerFocus = FocusType.Keyboard;
-            }
-
-            if(partnerFocus !== null && widget !== this._foci.get(partnerFocus)) {
-                this.clearFocus(partnerFocus);
-                this._foci.set(partnerFocus, widget);
-                widget.onFocusGrabbed(partnerFocus);
-                for(const driver of this.drivers) {
-                    driver.onFocusChanged(this, partnerFocus, widget);
+                if(partnerFocus !== null) {
+                    this.giveFocus(partnerFocus, capturer);
                 }
             }
         }
@@ -564,7 +579,7 @@ export class Root implements WidgetEventEmitter {
     clearFocus(focusType: FocusType): void {
         const currentFocus = this._foci.get(focusType);
         if(currentFocus) {
-            currentFocus.onFocusDropped(focusType);
+            currentFocus.dispatchEvent(new BlurEvent(focusType));
 
             this._foci.set(focusType, null);
             for(const driver of this.drivers) {

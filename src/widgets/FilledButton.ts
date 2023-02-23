@@ -10,6 +10,8 @@ import { Button } from './Button';
 import type { Rect } from '../helpers/Rect';
 import type { WidgetEvent } from '../events/WidgetEvent';
 import { ClickableWidgetProperties } from './ClickableWidgetProperties';
+import { FocusEvent } from '../events/FocusEvent';
+import { BlurEvent } from '../events/BlurEvent';
 
 /**
  * Optional FilledButton constructor properties.
@@ -143,26 +145,10 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
         }
     }
 
-    override onFocusGrabbed(focusType: FocusType): void {
-        super.onFocusGrabbed(focusType);
-
-        if(focusType === FocusType.Keyboard) {
-            this.updateBackground();
-        }
-    }
-
-    override onFocusDropped(focusType: FocusType): void {
-        super.onFocusDropped(focusType);
-
-        if(focusType === FocusType.Keyboard) {
-            this.updateBackground();
-        }
-    }
-
     protected override handleEvent(event: WidgetEvent): Widget | null {
         const capturer = super.handleEvent(event);
 
-        if(this.clickHelper.clickStateChanged) {
+        if (this.clickHelper.clickStateChanged || (capturer === this && (event.isa(FocusEvent) || event.isa(BlurEvent)) && event.focusType === FocusType.Keyboard)) {
             this.updateBackground();
         }
 
