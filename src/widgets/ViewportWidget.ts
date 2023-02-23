@@ -227,7 +227,6 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     }
 
     protected override handleEvent(event: WidgetEvent): Widget | null {
-        // TODO transform
         if (event.propagation === PropagationModel.Trickling) {
             return this.internalViewport.dispatchTricklingEvent(event as TricklingEvent);
         } else {

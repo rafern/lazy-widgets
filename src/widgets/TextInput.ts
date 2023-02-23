@@ -884,7 +884,7 @@ export class TextInput extends Widget {
                     return null; // don't capture, let tab select another widget
                 }
             } else {
-                return this; // Ignore key if it is unknown
+                return null; // Ignore key if it is unknown
             }
 
             // Reset blink time for better feedback
