@@ -40,7 +40,7 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
      * {@link ClickEvent} will be fired.
      */
     click(): void {
-        this.dispatchEvent(new ClickEvent());
+        this.dispatchEvent(new ClickEvent(this));
     }
 
     protected override activate(): void {

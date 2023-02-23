@@ -4,11 +4,8 @@
         context.variables.set('textVariable', new ValidatedVariable('', null, value => {
             context.ids.get('label').text = `Text input: ${value}`;
         }, false));
-        context.variables.set('button1Callback', () => {
-            context.ids.get('label').text = 'Button 1 clicked!';
-        });
-        context.variables.set('button2Callback', () => {
-            context.ids.get('label').text = 'Button 2 clicked!';
+        context.variables.set('buttonCallback', (ev) => {
+            context.ids.get('label').text = `${ev.origin.child.text} clicked!`;
         });
     </script>
     <background>
@@ -16,9 +13,9 @@
             <column>
                 <label option:id="label">Hello world!</label>
                 <text-input variable="$textVariable" />
-                <row option:multi-container-alignment='@{ "main": 0.5, "cross": "stretch" }'>
-                    <text-button on:click="$button1Callback">Button 1</text-button>
-                    <text-button on:click="$button2Callback">Button 2</text-button>
+                <row on:click="$buttonCallback" option:multi-container-alignment='@{ "main": 0.5, "cross": "stretch" }'>
+                    <text-button>Button 1</text-button>
+                    <text-button>Button 2</text-button>
                 </row>
             </column>
         </margin>

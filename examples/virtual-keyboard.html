@@ -32,14 +32,14 @@
                                 label.text = `Text input: ${value}`;
                             }, false)),
                             new Row([
-                                new TextButton('Button 1').on('click', () => label.text = 'Button 1 clicked!'),
-                                new TextButton('Button 2').on('click', () => label.text = 'Button 2 clicked!'),
+                                new TextButton('Button 1'),
+                                new TextButton('Button 2'),
                             ], {
                                 multiContainerAlignment: {
                                     main: FlexAlignment.Center,
                                     cross: Alignment.Stretch
                                 },
-                            })
+                            }).on('click', (ev) => label.text = `${ev.origin.child.text} clicked!`)
                         ])
                     )
                 )

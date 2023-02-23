@@ -314,7 +314,7 @@ export class Root implements WidgetEventEmitter {
         }
 
         // Dispatch to user event listeners
-        if (eventEmitterHandleEvent(this.typedListeners, this.untypedListeners, baseEvent)) {
+        if (eventEmitterHandleEvent(this, this.typedListeners, this.untypedListeners, baseEvent)) {
             return [[baseEvent, true]];
         }
 

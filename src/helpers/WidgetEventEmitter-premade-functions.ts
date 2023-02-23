@@ -1,5 +1,5 @@
 import type { WidgetEvent } from '../events/WidgetEvent';
-import type { WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
+import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
 
 /**
  * Helper function for implementing the {@link WidgetEventEmitter#on} method.
@@ -102,7 +102,7 @@ function assertCapturable(captured: boolean | undefined, event: WidgetEvent): bo
  * @returns Returns true if the user captured the event.
  * @category Helper
  */
-export function eventEmitterHandleEvent(typedListenersMap: WidgetEventTypedListenerMap, untypedListeners: WidgetEventUntypedListenerList, event: WidgetEvent): boolean {
+export function eventEmitterHandleEvent(handler: WidgetEventEmitter, typedListenersMap: WidgetEventTypedListenerMap, untypedListeners: WidgetEventUntypedListenerList, event: WidgetEvent): boolean {
     // invoke typed handlers first, they have priority
     const typedListeners = typedListenersMap.get(event.type);
     if (typedListeners !== undefined) {
@@ -111,7 +111,7 @@ export function eventEmitterHandleEvent(typedListenersMap: WidgetEventTypedListe
         for (let i = 0; i < typedListeners.length;) {
             // call listener
             const [id, listener, remove] = typedListeners[i];
-            let captured = listener(event);
+            let captured = listener(event, handler);
 
             if (assertCapturable(captured, event)) {
                 captured = false;
@@ -169,7 +169,7 @@ export function eventEmitterHandleEvent(typedListenersMap: WidgetEventTypedListe
     for (let i = 0; i < untypedListeners.length;) {
         // call listener
         const [id, listener] = untypedListeners[i];
-        let captured = listener(event);
+        let captured = listener(event, handler);
 
         if (assertCapturable(captured, event)) {
             captured = false;

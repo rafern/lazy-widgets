@@ -9,7 +9,7 @@ import type { WidgetEvent } from './WidgetEvent';
  *
  * @category Event
  */
-export type WidgetEventListener = (event: WidgetEvent) => boolean | undefined;
+export type WidgetEventListener = (event: WidgetEvent, handler: WidgetEventEmitter) => boolean | undefined;
 
 /**
  * For implementers of the {@link WidgetEventEmitter} interface. A tuple

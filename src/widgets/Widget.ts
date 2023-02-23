@@ -5,7 +5,6 @@ import type { Viewport } from '../core/Viewport';
 import { TabSelectEvent } from '../events/TabSelectEvent';
 import type { Bounds } from '../helpers/Bounds';
 import { BaseTheme } from '../theme/BaseTheme';
-import { FocusType } from '../core/FocusType';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Theme } from '../theme/Theme';
 import type { Rect } from '../helpers/Rect';
@@ -392,7 +391,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
             }
 
             // dispatch to user event listeners
-            if (eventEmitterHandleEvent(this.typedListeners, this.untypedListeners, baseEvent)) {
+            if (eventEmitterHandleEvent(this, this.typedListeners, this.untypedListeners, baseEvent)) {
                 return this;
             }
 
@@ -424,7 +423,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
             return capturer;
         } else {
             // dispatch to user event listeners
-            if (eventEmitterHandleEvent(this.typedListeners, this.untypedListeners, baseEvent)) {
+            if (eventEmitterHandleEvent(this, this.typedListeners, this.untypedListeners, baseEvent)) {
                 return this;
             }
 

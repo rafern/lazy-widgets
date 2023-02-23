@@ -1,3 +1,4 @@
+import { Widget } from '../widgets/Widget';
 import { WidgetEvent, PropagationModel } from './WidgetEvent';
 
 /**
@@ -9,8 +10,12 @@ import { WidgetEvent, PropagationModel } from './WidgetEvent';
 export abstract class BubblingEvent extends WidgetEvent {
     override readonly propagation: PropagationModel.Bubbling;
 
-    constructor() {
+    /** The origin of this event; where it was dispatched */
+    readonly origin: Widget;
+
+    constructor(origin: Widget) {
         super();
         this.propagation = PropagationModel.Bubbling;
+        this.origin = origin;
     }
 }

@@ -1,3 +1,4 @@
+import type { Widget } from '../widgets/Widget';
 import { BubblingEvent } from './BubblingEvent';
 
 /**
@@ -11,8 +12,8 @@ export class ClickEvent extends BubblingEvent {
     override readonly type: typeof ClickEvent.type;
     override readonly userCapturable: true;
 
-    constructor() {
-        super();
+    constructor(origin: Widget) {
+        super(origin);
 
         this.type = ClickEvent.type;
         this.userCapturable = true;
