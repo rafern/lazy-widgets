@@ -4,4 +4,3 @@ node_modules/
 lazy-widgets-*.tgz
 dist/
 docs/
-package-lock.json
