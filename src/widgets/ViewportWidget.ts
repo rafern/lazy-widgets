@@ -13,6 +13,7 @@ import { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import { TricklingEvent } from '../events/TricklingEvent';
 import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
+import { ScrollEvent } from '../events/ScrollEvent';
 
 /**
  * Optional ViewportWidget constructor properties.
@@ -153,9 +154,18 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
 
     set offset(offset: [number, number]) {
         // Not using @damageArrayField so that accessor can be overridden
-        if(this.internalViewport.offset[0] !== offset[0] || this.internalViewport.offset[1] !== offset[1]) {
+        const [oldX, oldY] = this.internalViewport.offset;
+        if(oldX !== offset[0] || oldY !== offset[1]) {
             this.internalViewport.offset = [offset[0], offset[1]];
             this.markWholeAsDirty();
+
+            const [newX, newY] = this.internalViewport.offset;
+            const deltaX = newX - oldX;
+            const deltaY = newY - oldY;
+
+            if (deltaX !== 0 || deltaY !== 0) {
+                this.dispatchEvent(new ScrollEvent(this, newX, newY, deltaX, deltaY));
+            }
         }
     }
 
