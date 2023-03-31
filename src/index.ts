@@ -131,6 +131,7 @@ export * from './widgets/LabelledCheckbox';
 export * from './widgets/LabelledRadioButton';
 export * from './widgets/LayeredContainer';
 export * from './widgets/LiveLabel';
+export * from './widgets/LiveTextButton';
 export * from './widgets/Margin';
 export * from './widgets/MultiContainer';
 export * from './widgets/MultiParent';
