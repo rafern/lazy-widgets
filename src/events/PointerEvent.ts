@@ -1,5 +1,6 @@
-import type { Widget } from '../widgets/Widget';
 import { ModifierEvent } from './ModifierEvent';
+
+import type { Widget } from '../widgets/Widget';
 import type { SourcePointer } from '../drivers/SourcePointer';
 
 /**

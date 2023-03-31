@@ -1,7 +1,8 @@
 import { BasicVirtualKey } from './BasicVirtualKey';
+import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAutoXML';
+
 import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from '../../core/KeyContext';
-import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAutoXML';
 
 /**
  * A {@link BasicVirtualKey} which emits 'Escape' key presses.

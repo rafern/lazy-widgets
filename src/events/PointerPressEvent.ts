@@ -1,5 +1,6 @@
 import { PointerButtonEvent } from './PointerButtonEvent';
 import { Widget } from '../widgets/Widget';
+
 import type { SourcePointer } from '../drivers/SourcePointer';
 
 /**

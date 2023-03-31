@@ -1,11 +1,12 @@
 import { Layer } from '../core/Layer';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import { Parent } from './Parent';
+
 import type { LayerInit } from '../core/LayerInit';
 import type { Root } from '../core/Root';
 import type { Viewport } from '../core/Viewport';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { Rect } from '../helpers/Rect';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import { Parent } from './Parent';
 import type { Widget, WidgetProperties } from './Widget';
 
 /**

@@ -1,5 +1,6 @@
-import type { ThemeProperties } from './ThemeProperties';
 import { BaseTheme } from './BaseTheme';
+
+import type { ThemeProperties } from './ThemeProperties';
 
 /**
  * Provides styling for {@link Widget | Widgets}.

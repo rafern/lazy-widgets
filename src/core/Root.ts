@@ -1,24 +1,25 @@
-import type { PointerStyleHandler } from './PointerStyleHandler';
-import type { LayoutConstraints } from './LayoutConstraints';
-import type { TextInputHandler } from './TextInputHandler';
 import { DynMsg, groupedStackTrace } from './Strings';
 import { PointerEvent } from '../events/PointerEvent';
 import { PointerWheelEvent } from '../events/PointerWheelEvent';
 import { CanvasViewport } from './CanvasViewport';
-import type { Widget } from '../widgets/Widget';
 import { TabSelectEvent } from '../events/TabSelectEvent';
 import { KeyPressEvent } from '../events/KeyPressEvent';
 import { FocusType } from './FocusType';
 import { LeaveEvent } from '../events/LeaveEvent';
-import type { Driver } from './Driver';
 import { Theme } from '../theme/Theme';
-import type { CaptureList } from './CaptureList';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
 import { TricklingEvent } from '../events/TricklingEvent';
 import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions';
 import { FocusEvent } from '../events/FocusEvent';
 import { BlurEvent } from '../events/BlurEvent';
+
+import type { PointerStyleHandler } from './PointerStyleHandler';
+import type { LayoutConstraints } from './LayoutConstraints';
+import type { TextInputHandler } from './TextInputHandler';
+import type { Widget } from '../widgets/Widget';
+import type { Driver } from './Driver';
+import type { CaptureList } from './CaptureList';
+import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
 
 /**
  * Optional Root constructor properties.

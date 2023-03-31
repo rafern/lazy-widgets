@@ -5,6 +5,7 @@ import { ShiftKey } from '../widgets/VirtualKeyboard/ShiftKey';
 import { SpaceKey } from '../widgets/VirtualKeyboard/SpaceKey';
 import { TabKey } from '../widgets/VirtualKeyboard/TabKey';
 import { VirtualKey } from '../widgets/VirtualKeyboard/VirtualKey';
+
 import type { WidgetProperties } from '../widgets/Widget';
 import type { KeyContext } from './KeyContext';
 

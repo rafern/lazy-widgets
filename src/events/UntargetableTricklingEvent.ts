@@ -1,5 +1,6 @@
-import type { Widget } from '../widgets/Widget';
 import { TricklingEvent } from './TricklingEvent';
+
+import type { Widget } from '../widgets/Widget';
 
 /**
  * A {@link TricklingEvent} which cannot be targeted.

@@ -3,13 +3,14 @@ import { PointerReleaseEvent } from '../events/PointerReleaseEvent';
 import { PointerEvent } from '../events/PointerEvent';
 import { PointerPressEvent } from '../events/PointerPressEvent';
 import { PointerMove } from '../events/PointerMove';
-import type { Widget } from '../widgets/Widget';
 import { FocusType } from '../core/FocusType';
+import { PointerHint } from './PointerHint';
+import { LeaveEvent } from '../events/LeaveEvent';
+
+import type { Widget } from '../widgets/Widget';
 import type { Driver } from '../core/Driver';
 import type { TricklingEvent } from '../events/TricklingEvent';
-import { PointerHint } from './PointerHint';
 import type { Root } from '../core/Root';
-import { LeaveEvent } from '../events/LeaveEvent';
 import type { SourcePointer } from './SourcePointer';
 
 /**

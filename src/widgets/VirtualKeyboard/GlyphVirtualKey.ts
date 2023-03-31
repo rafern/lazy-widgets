@@ -1,7 +1,8 @@
+import { VirtualKey } from './VirtualKey';
+
 import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from '../../core/KeyContext';
-import { VirtualKey } from './VirtualKey';
 
 /**
  * A {@link VirtualKey} which emits key presses for a given glyph (character),

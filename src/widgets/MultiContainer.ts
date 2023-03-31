@@ -1,10 +1,11 @@
 import { FlexAlignment } from '../theme/FlexAlignment';
 import { Widget, WidgetProperties } from './Widget';
 import { Alignment } from '../theme/Alignment';
-import type { TricklingEvent } from '../events/TricklingEvent';
 import { MultiParent } from './MultiParent';
-import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+
+import type { TricklingEvent } from '../events/TricklingEvent';
+import type { Rect } from '../helpers/Rect';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**

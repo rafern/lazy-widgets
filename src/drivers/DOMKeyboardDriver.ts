@@ -1,9 +1,10 @@
 import { KeyboardDriver } from './KeyboardDriver';
+import { getTabKeyHelper } from '../helpers/TabKeyHelper';
+import { TabSelectEvent } from '../events/TabSelectEvent';
+
 import type { KeyboardDriverGroup, KeyboardDriverGroupOptions } from './KeyboardDriver';
 import type { CaptureList } from '../core/CaptureList';
 import type { TabKeyHelper } from '../helpers/TabKeyHelper';
-import { getTabKeyHelper } from '../helpers/TabKeyHelper';
-import { TabSelectEvent } from '../events/TabSelectEvent';
 
 /**
  * Unpack a KeyboardEvent into a 4-tuple containing the event's key and modifier

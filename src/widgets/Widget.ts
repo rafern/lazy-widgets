@@ -1,18 +1,19 @@
 import { ThemeProperties } from "../theme/ThemeProperties";
 import { PointerEvent } from '../events/PointerEvent';
 import { AutoScrollEvent } from '../events/AutoScrollEvent';
-import type { Viewport } from '../core/Viewport';
 import { TabSelectEvent } from '../events/TabSelectEvent';
-import type { Bounds } from '../helpers/Bounds';
 import { BaseTheme } from '../theme/BaseTheme';
+import { DynMsg } from '../core/Strings';
+import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions';
+import { PropagationModel, WidgetEvent } from "../events/WidgetEvent";
+
+import type { Viewport } from '../core/Viewport';
+import type { Bounds } from '../helpers/Bounds';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Theme } from '../theme/Theme';
 import type { Rect } from '../helpers/Rect';
 import type { Root } from '../core/Root';
-import { DynMsg } from '../core/Strings';
 import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
-import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions';
-import { PropagationModel, WidgetEvent } from "../events/WidgetEvent";
 import type { WidgetAutoXML } from "../xml/WidgetAutoXML";
 
 /**

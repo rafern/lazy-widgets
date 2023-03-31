@@ -5,20 +5,21 @@ import { damageField } from '../decorators/FlagFields';
 import { ClickHelper } from '../helpers/ClickHelper';
 import { Widget, WidgetProperties } from './Widget';
 import { ClickState } from '../helpers/ClickState';
-import type { Viewport } from '../core/Viewport';
-import type { Bounds } from '../helpers/Bounds';
 import { KeyPressEvent } from '../events/KeyPressEvent';
 import { FocusType } from '../core/FocusType';
 import { KeyEvent } from '../events/KeyEvent';
 import { Variable } from '../state/Variable';
-import type { Root } from '../core/Root';
 import { DynMsg } from '../core/Strings';
 import { LeaveEvent } from '../events/LeaveEvent';
-import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import { FocusEvent } from '../events/FocusEvent';
 import { BlurEvent } from '../events/BlurEvent';
+
+import type { Viewport } from '../core/Viewport';
+import type { Bounds } from '../helpers/Bounds';
+import type { Root } from '../core/Root';
+import type { Rect } from '../helpers/Rect';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * Optional Slider constructor properties.

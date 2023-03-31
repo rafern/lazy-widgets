@@ -6,15 +6,16 @@ import { ClickHelper } from '../helpers/ClickHelper';
 import { ClickState } from '../helpers/ClickState';
 import { TextHelper } from '../helpers/TextHelper';
 import { AutoScrollEvent } from '../events/AutoScrollEvent';
-import type { Bounds } from '../helpers/Bounds';
-import type { TricklingEvent } from '../events/TricklingEvent';
 import { LeaveEvent } from '../events/LeaveEvent';
-import type { Widget } from './Widget';
 import { Root } from '../core/Root';
-import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import { FocusEvent } from '../events/FocusEvent';
 import { BlurEvent } from '../events/BlurEvent';
+
+import type { Bounds } from '../helpers/Bounds';
+import type { TricklingEvent } from '../events/TricklingEvent';
+import type { Widget } from './Widget';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * The mode for how a scrollbar is shown in a {@link ScrollableViewportWidget}.

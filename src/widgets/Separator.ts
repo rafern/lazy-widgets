@@ -1,4 +1,5 @@
 import { Spacing } from './Spacing';
+
 import type { SpacingProperties } from './Spacing';
 import type { Rect } from '../helpers/Rect';
 

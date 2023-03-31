@@ -1,13 +1,14 @@
 import { Layer } from '../core/Layer';
-import type { Root } from '../core/Root';
-import type { Viewport } from '../core/Viewport';
 import { LeaveEvent } from '../events/LeaveEvent';
 import { PointerMove } from '../events/PointerMove';
 import { LayeredContainer } from './LayeredContainer';
 import { PassthroughWidget } from './PassthroughWidget';
 import { TooltipContainer } from './TooltipContainer';
-import type { Widget, WidgetProperties } from './Widget';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+
+import type { Root } from '../core/Root';
+import type { Viewport } from '../core/Viewport';
+import type { Widget, WidgetProperties } from './Widget';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 const SENSITIVITY_RADIUS = 8;

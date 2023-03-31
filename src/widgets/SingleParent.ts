@@ -1,5 +1,6 @@
-import type { Widget, WidgetProperties } from '../widgets/Widget';
 import { Parent } from './Parent';
+
+import type { Widget, WidgetProperties } from '../widgets/Widget';
 
 /**
  * A specialised version of the {@link Parent} class for parents with a single

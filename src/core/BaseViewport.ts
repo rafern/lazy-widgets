@@ -1,6 +1,7 @@
-import type { LayoutConstraints } from './LayoutConstraints';
 import { watchArrayField } from '../decorators/FlagFields';
 import { PointerEvent } from '../events/PointerEvent';
+
+import type { LayoutConstraints } from './LayoutConstraints';
 import type { Widget } from '../widgets/Widget';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Rect } from '../helpers/Rect';

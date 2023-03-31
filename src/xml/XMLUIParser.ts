@@ -1,7 +1,6 @@
 import { BaseXMLUIParser, XML_NAMESPACE_BASE } from './BaseXMLUIParser';
 import * as widgets from '../widgets/concrete-widgets';
 import { WidgetAutoXML } from './WidgetAutoXML';
-import type { Widget } from '../widgets/Widget';
 import { validateArray } from './validateArray';
 import { validateBoolean } from './validateBoolean';
 import { validateFunction } from './validateFunction';
@@ -18,11 +17,13 @@ import { validateTheme } from './validateTheme';
 import { validateValidatedVariable } from './validateValidatedVariable';
 import { validateVariable } from './validateVariable';
 import { validateWidget } from './validateWidget';
-import type { XMLUIParserContext } from './XMLUIParserContext';
-import type { LayerInit } from '../core/LayerInit';
 import { fromKebabCase } from '../helpers/fromKebabCase';
 import { WidgetEventListener } from '../events/WidgetEventEmitter';
 import { WHITESPACE_REGEX } from '../helpers/whitespace-regex';
+
+import type { Widget } from '../widgets/Widget';
+import type { XMLUIParserContext } from './XMLUIParserContext';
+import type { LayerInit } from '../core/LayerInit';
 
 /**
  * A layer parameter for a {@link WidgetAutoXMLConfig}.

@@ -1,4 +1,5 @@
 import { PassthroughWidget } from './PassthroughWidget';
+
 import type { Theme } from '../theme/Theme';
 import type { Widget } from './Widget';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';

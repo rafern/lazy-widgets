@@ -3,15 +3,16 @@ import { GenericClickHelper } from "./GenericClickHelper";
 import { PointerEvent } from "../events/PointerEvent";
 import { PointerWheelEvent } from "../events/PointerWheelEvent";
 import { KeyReleaseEvent } from "../events/KeyReleaseEvent";
-import type { Widget } from "../widgets/Widget";
 import { KeyEvent } from "../events/KeyEvent";
 import { KeyPressEvent } from "../events/KeyPressEvent";
 import { FocusType } from "../core/FocusType";
-import type { TricklingEvent } from "../events/TricklingEvent";
 import { ClickHelper } from "./ClickHelper";
 import { ClickState } from "./ClickState";
-import type { Root } from "../core/Root";
 import { LeaveEvent } from "../events/LeaveEvent";
+
+import type { Widget } from "../widgets/Widget";
+import type { TricklingEvent } from "../events/TricklingEvent";
+import type { Root } from "../core/Root";
 import type { Bounds } from "./Bounds";
 
 /**

@@ -1,10 +1,11 @@
 import { VirtualKeyboard } from '../widgets/concrete-widgets';
-import type { VirtualKeyboardRootProperties } from './VirtualKeyboardRoot';
-import type { KeyboardDriver } from '../drivers/KeyboardDriver';
 import { Margin } from '../widgets/Margin';
 import { DOMRoot } from './DOMRoot';
 import { Background } from '../widgets/Background';
 import { defaultVirtualKeyboardTemplate } from './VirtualKeyboardTemplate';
+
+import type { VirtualKeyboardRootProperties } from './VirtualKeyboardRoot';
+import type { KeyboardDriver } from '../drivers/KeyboardDriver';
 
 /**
  * A {@link DOMRoot} with similar functionality to {@link VirtualKeyboardRoot}.

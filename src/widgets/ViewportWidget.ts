@@ -1,19 +1,20 @@
-import type { LayoutConstraints } from '../core/LayoutConstraints';
 import { ClippedViewport } from '../core/ClippedViewport';
 import { CanvasViewport } from '../core/CanvasViewport';
 import { layoutField } from '../decorators/FlagFields';
 import { AxisCoupling } from '../core/AxisCoupling';
 import { Widget, WidgetProperties } from './Widget';
-import type { Viewport } from '../core/Viewport';
-import type { Bounds } from '../helpers/Bounds';
 import { SingleParent } from './SingleParent';
-import type { Root } from '../core/Root';
 import { DynMsg } from '../core/Strings';
 import { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import { TricklingEvent } from '../events/TricklingEvent';
 import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
 import { ScrollEvent } from '../events/ScrollEvent';
+
+import type { LayoutConstraints } from '../core/LayoutConstraints';
+import type { Viewport } from '../core/Viewport';
+import type { Bounds } from '../helpers/Bounds';
+import type { Root } from '../core/Root';
 
 /**
  * Optional ViewportWidget constructor properties.

@@ -1,5 +1,3 @@
-import type { ThemeProperties } from '../theme/ThemeProperties';
-import type { Widget, WidgetProperties } from './Widget';
 import { watchField } from '../decorators/FlagFields';
 import { ClickState } from '../helpers/ClickState';
 import { FillStyle } from '../theme/FillStyle';
@@ -7,11 +5,14 @@ import { FocusType } from '../core/FocusType';
 import { DynMsg } from '../core/Strings';
 import { Theme } from '../theme/Theme';
 import { Button } from './Button';
-import type { Rect } from '../helpers/Rect';
-import type { WidgetEvent } from '../events/WidgetEvent';
 import { ClickableWidgetProperties } from './ClickableWidgetProperties';
 import { FocusEvent } from '../events/FocusEvent';
 import { BlurEvent } from '../events/BlurEvent';
+
+import type { ThemeProperties } from '../theme/ThemeProperties';
+import type { Widget, WidgetProperties } from './Widget';
+import type { Rect } from '../helpers/Rect';
+import type { WidgetEvent } from '../events/WidgetEvent';
 
 /**
  * Optional FilledButton constructor properties.

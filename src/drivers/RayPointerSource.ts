@@ -1,4 +1,5 @@
 import { RayPointerDriver } from './RayPointerDriver';
+
 import type { PointerHint } from './PointerHint';
 
 /**

@@ -1,11 +1,12 @@
+import { TextAlignMode } from '../helpers/TextHelper';
+import { FlexAlignment } from './FlexAlignment';
+import { Alignment } from './Alignment';
+
 import type { FlexAlignment2D } from './FlexAlignment2D';
 import type { ThemeProperties } from './ThemeProperties';
-import { TextAlignMode } from '../helpers/TextHelper';
 import type { Alignment2D } from './Alignment2D';
-import { FlexAlignment } from './FlexAlignment';
 import type { FillStyle } from './FillStyle';
 import type { Padding } from './Padding';
-import { Alignment } from './Alignment';
 import type { Theme } from './Theme';
 import type { CornerRadii } from '../widgets/CornerRadii';
 

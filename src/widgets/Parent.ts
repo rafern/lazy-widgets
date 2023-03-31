@@ -1,4 +1,5 @@
 import { Widget } from '../widgets/Widget';
+
 import type { Viewport } from '../core/Viewport';
 import type { Theme } from '../theme/Theme';
 import type { Root } from '../core/Root';

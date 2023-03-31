@@ -1,8 +1,9 @@
+import { Alignment } from '../theme/Alignment';
+import { Container } from './Container';
+
 import type { Widget, WidgetProperties } from './Widget';
 import type { Alignment2D } from '../theme/Alignment2D';
 import type { Padding } from '../theme/Padding';
-import { Alignment } from '../theme/Alignment';
-import { Container } from './Container';
 
 /**
  * A {@link Container} with center alignment on both axes and no padding by

@@ -1,6 +1,7 @@
-import type { Rect } from '../helpers/Rect';
 import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
 import { BaseContainer } from './BaseContainer';
+
+import type { Rect } from '../helpers/Rect';
 import type { Widget, WidgetProperties } from './Widget';
 
 /**

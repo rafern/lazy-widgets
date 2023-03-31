@@ -3,10 +3,11 @@ import { GenericClickHelper } from './GenericClickHelper';
 import { PointerPressEvent } from '../events/PointerPressEvent';
 import { PointerEvent } from '../events/PointerEvent';
 import { FocusType } from '../core/FocusType';
-import type { TricklingEvent } from '../events/TricklingEvent';
 import { ClickState } from './ClickState';
-import type { Root } from '../core/Root';
 import { LeaveEvent } from '../events/LeaveEvent';
+
+import type { TricklingEvent } from '../events/TricklingEvent';
+import type { Root } from '../core/Root';
 import type { Bounds } from './Bounds';
 
 /**

@@ -1,8 +1,9 @@
 import { Widget, WidgetProperties } from './Widget';
 import { SingleParent } from './SingleParent';
-import type { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
+
+import type { Rect } from '../helpers/Rect';
 
 /**
  * A {@link SingleParent} which contains a single child and does nothing,

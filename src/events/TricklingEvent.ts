@@ -1,6 +1,7 @@
+import { WidgetEvent, PropagationModel } from './WidgetEvent';
+
 import type { FocusType } from '../core/FocusType';
 import type { Widget } from '../widgets/Widget';
-import { WidgetEvent, PropagationModel } from './WidgetEvent';
 
 /**
  * A generic event that trickles down a UI tree. This is an abstract class and

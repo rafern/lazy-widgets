@@ -1,6 +1,7 @@
 import { mergeRects } from './mergeRects';
-import type { Rect } from './Rect';
 import { rectsOverlap } from './rectsOverlap';
+
+import type { Rect } from './Rect';
 
 /**
  * Similar to {@link mergeRects}, except only overlapping rectangles are merged.

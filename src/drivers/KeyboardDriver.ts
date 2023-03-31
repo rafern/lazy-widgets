@@ -1,12 +1,13 @@
 import { KeyReleaseEvent } from '../events/KeyReleaseEvent';
-import type { Widget } from '../widgets/Widget';
 import { KeyPressEvent } from '../events/KeyPressEvent';
 import { FocusType } from '../core/FocusType';
+import { KeyEvent } from '../events/KeyEvent';
+import { TabSelectEvent } from '../events/TabSelectEvent';
+
+import type { Widget } from '../widgets/Widget';
 import type { Driver } from '../core/Driver';
 import type { Root } from '../core/Root';
 import type { CaptureList } from '../core/CaptureList';
-import { KeyEvent } from '../events/KeyEvent';
-import { TabSelectEvent } from '../events/TabSelectEvent';
 
 /**
  * A group of Roots. When a {@link TabSelectEvent} is not captured by a

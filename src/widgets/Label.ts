@@ -1,6 +1,7 @@
 import { TextHelper, WrapMode } from '../helpers/TextHelper';
 import { layoutField } from '../decorators/FlagFields';
 import { Widget, WidgetProperties } from './Widget';
+
 import type { Rect } from '../helpers/Rect';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 

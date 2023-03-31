@@ -1,7 +1,8 @@
-import type { LayoutConstraints } from '../core/LayoutConstraints';
 import { layoutArrayField } from '../decorators/FlagFields';
-import type { Widget, WidgetProperties } from './Widget';
 import { PassthroughWidget } from './PassthroughWidget';
+
+import type { LayoutConstraints } from '../core/LayoutConstraints';
+import type { Widget, WidgetProperties } from './Widget';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**

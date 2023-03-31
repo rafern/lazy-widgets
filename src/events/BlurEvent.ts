@@ -1,5 +1,6 @@
-import type { FocusType } from '../core/FocusType';
 import { StickyEvent } from './StickyEvent';
+
+import type { FocusType } from '../core/FocusType';
 
 /**
  * A sticky event that is fired when a {@link Widget} loses a specific

@@ -1,7 +1,8 @@
-import type { Rect } from '../helpers/Rect';
-import type { Widget } from "../widgets/Widget";
 import { BaseViewport } from "./BaseViewport";
 import { Msg } from './Strings';
+
+import type { Rect } from '../helpers/Rect';
+import type { Widget } from "../widgets/Widget";
 
 /**
  * A {@link Viewport} which inherits a rendering context from the closest parent

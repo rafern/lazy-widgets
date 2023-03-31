@@ -1,5 +1,7 @@
 import { Widget } from '../widgets/Widget';
 import { toKebabCase } from '../helpers/toKebabCase';
+import { WHITESPACE_REGEX } from '../helpers/whitespace-regex';
+
 import type { WidgetAutoXML, WidgetAutoXMLConfig, WidgetAutoXMLConfigParameter, WidgetAutoXMLConfigTextParameter, WidgetAutoXMLConfigValidator, WidgetAutoXMLConfigValueParameter, WidgetAutoXMLConfigWidgetParameter } from './WidgetAutoXML';
 import type { XMLUIParserConfig } from './XMLUIParserConfig';
 import type { XMLUIParserContext } from './XMLUIParserContext';
@@ -11,7 +13,6 @@ import type { XMLElementDeserializer } from './XMLElementDeserializer';
 import type { XMLParameterModeValidator } from './XMLParameterModeValidator';
 import type { XMLArgumentModifier } from './XMLArgumentModifier';
 import type { XMLPostInitHook } from './XMLPostInitHook';
-import { WHITESPACE_REGEX } from '../helpers/whitespace-regex';
 
 const RESERVED_PARAMETER_MODES = ['value', 'text', 'widget'];
 const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];

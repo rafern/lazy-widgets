@@ -1,5 +1,6 @@
-import type { Widget } from '../widgets/Widget';
 import { TargetableTricklingEvent } from './TargetableTricklingEvent';
+
+import type { Widget } from '../widgets/Widget';
 
 /**
  * An event which contains the state of modifier keys. This is an abstract class

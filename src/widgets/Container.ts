@@ -1,6 +1,7 @@
-import type { Widget, WidgetProperties } from './Widget';
 import { BaseContainer } from './BaseContainer';
 import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
+
+import type { Widget, WidgetProperties } from './Widget';
 
 /**
  * A {@link BaseContainer} which always propagates events. Use this widget if

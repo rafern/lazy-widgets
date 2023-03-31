@@ -1,7 +1,8 @@
 import { TextPasteEvent } from '../events/TextPasteEvent';
-import type { Widget } from '../widgets/Widget';
 import { Root, RootProperties } from './Root';
 import { Msg } from './Strings';
+
+import type { Widget } from '../widgets/Widget';
 
 /**
  * Like Root, but for easy use in an HTML page.

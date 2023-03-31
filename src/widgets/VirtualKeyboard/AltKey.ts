@@ -1,7 +1,8 @@
-import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from '../../core/KeyContext';
 import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAutoXML';
 import { VirtualKey } from './VirtualKey';
+
+import type { WidgetProperties } from '../Widget';
+import type { KeyContext } from '../../core/KeyContext';
 
 /**
  * A {@link VirtualKey} which acts as an alt key; toggles

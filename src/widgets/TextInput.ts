@@ -9,18 +9,19 @@ import { Widget, WidgetProperties } from './Widget';
 import { PointerMove } from '../events/PointerMove';
 import { TextHelper } from '../helpers/TextHelper';
 import { AutoScrollEvent } from '../events/AutoScrollEvent';
-import type { Viewport } from '../core/Viewport';
-import type { Bounds } from '../helpers/Bounds';
 import { KeyPressEvent } from '../events/KeyPressEvent';
 import { FocusType } from '../core/FocusType';
-import type { Rect } from '../helpers/Rect';
-import type { Root } from '../core/Root';
 import { LeaveEvent } from '../events/LeaveEvent';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import { TricklingEvent } from '../events/TricklingEvent';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import { FocusEvent } from '../events/FocusEvent';
 import { BlurEvent } from '../events/BlurEvent';
+
+import type { Viewport } from '../core/Viewport';
+import type { Bounds } from '../helpers/Bounds';
+import type { Rect } from '../helpers/Rect';
+import type { Root } from '../core/Root';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * Optional TextInput constructor properties.

@@ -1,6 +1,7 @@
-import type { Widget, WidgetProperties } from './Widget';
 import { MultiContainer } from './MultiContainer';
 import { MultiParentAutoXML } from '../xml/MultiParentAutoXML';
+
+import type { Widget, WidgetProperties } from './Widget';
 
 /**
  * A vertical {@link MultiContainer}.

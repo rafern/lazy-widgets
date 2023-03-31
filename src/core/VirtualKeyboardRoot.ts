@@ -1,9 +1,10 @@
 import { VirtualKeyboard } from '../widgets/VirtualKeyboard/VirtualKeyboard';
 import { VirtualKeyboardTemplate, defaultVirtualKeyboardTemplate } from './VirtualKeyboardTemplate';
-import type { KeyboardDriver } from '../drivers/KeyboardDriver';
 import { Root, RootProperties } from './Root';
 import { Margin } from '../widgets/Margin';
 import { Background } from '../widgets/Background';
+
+import type { KeyboardDriver } from '../drivers/KeyboardDriver';
 
 /**
  * Optional VirtualKeyboardRoot constructor properties.

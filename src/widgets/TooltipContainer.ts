@@ -1,13 +1,14 @@
 import { Widget, WidgetProperties } from './Widget';
 import { Alignment } from '../theme/Alignment';
 import { SingleParent } from './SingleParent';
-import type { Rect } from '../helpers/Rect';
 import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions';
 import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
 import { Alignment2D } from '../theme/Alignment2D';
 import { safeRoundRect } from '../helpers/safeRoundRect';
 import { layoutArrayField, layoutField } from '../decorators/FlagFields';
 import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
+
+import type { Rect } from '../helpers/Rect';
 
 const startAlignment = <Alignment2D>{
     horizontal: Alignment.Start, vertical: Alignment.Start

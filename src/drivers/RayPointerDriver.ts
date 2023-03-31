@@ -1,7 +1,8 @@
-import type { RayPointerSource } from './RayPointerSource';
-import type { PointerHint } from './PointerHint';
 import { PointerDriver } from './PointerDriver';
 import { Root } from '../core/Root';
+
+import type { RayPointerSource } from './RayPointerSource';
+import type { PointerHint } from './PointerHint';
 
 /**
  * A {@link PointerDriver} which gets pointer events from raycasts in a 3D

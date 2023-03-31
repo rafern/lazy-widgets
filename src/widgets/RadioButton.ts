@@ -1,17 +1,18 @@
 import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
 import { Widget } from './Widget';
 import { ClickState } from '../helpers/ClickState';
+import { paintCircle } from '../helpers/paintCircle';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
+import { FocusEvent } from '../events/FocusEvent';
+import { BlurEvent } from '../events/BlurEvent';
+
 import type { Variable } from '../state/Variable';
 import type { Viewport } from '../core/Viewport';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Root } from '../core/Root';
 import type { Rect } from '../helpers/Rect';
-import { paintCircle } from '../helpers/paintCircle';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
-import { FocusEvent } from '../events/FocusEvent';
-import { BlurEvent } from '../events/BlurEvent';
 
 /**
  * A radio button widget; used for selecting one of many options. Uses a shared

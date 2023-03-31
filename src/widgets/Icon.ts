@@ -1,6 +1,7 @@
 import { damageField, layoutField, damageLayoutArrayField } from '../decorators/FlagFields';
 import { Widget, WidgetProperties } from './Widget';
 import { DynMsg, Msg } from '../core/Strings';
+
 import type { Rect } from '../helpers/Rect';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 

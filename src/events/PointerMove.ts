@@ -1,6 +1,7 @@
 import { FocusType } from '../core/FocusType';
 import { PointerEvent } from './PointerEvent';
 import { Widget } from '../widgets/Widget';
+
 import type { SourcePointer } from '../drivers/SourcePointer';
 
 /**

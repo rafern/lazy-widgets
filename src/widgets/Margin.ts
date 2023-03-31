@@ -1,7 +1,8 @@
-import type { ThemeProperties } from '../theme/ThemeProperties';
-import type { Alignment2D } from '../theme/Alignment2D';
 import { Alignment } from '../theme/Alignment';
 import { Container } from './Container';
+
+import type { ThemeProperties } from '../theme/ThemeProperties';
+import type { Alignment2D } from '../theme/Alignment2D';
 import type { Widget } from './Widget';
 
 /**

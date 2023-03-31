@@ -2,6 +2,7 @@ import { FocusType } from '../core/FocusType';
 import { PointerEvent } from './PointerEvent';
 import { Widget } from '../widgets/Widget';
 import { DynMsg } from '../core/Strings';
+
 import type { SourcePointer } from '../drivers/SourcePointer';
 
 /**

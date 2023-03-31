@@ -1,13 +1,14 @@
 import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
-import type { Widget } from './Widget';
 import { BaseContainer } from './BaseContainer';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import type { TricklingEvent } from '../events/TricklingEvent';
 import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
 import { ClickEvent } from '../events/ClickEvent';
-import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 import { FocusEvent } from '../events/FocusEvent';
 import { BlurEvent } from '../events/BlurEvent';
+
+import type { Widget } from './Widget';
+import type { TricklingEvent } from '../events/TricklingEvent';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
 /**
  * A {@link BaseContainer} which can be {@link ClickHelper | clicked} as a

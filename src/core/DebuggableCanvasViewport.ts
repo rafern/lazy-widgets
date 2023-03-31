@@ -1,7 +1,8 @@
-import type { Rect } from '../helpers/Rect';
-import type { Widget } from '../widgets/Widget';
 import { CanvasViewport } from './CanvasViewport';
 import { Msg } from './Strings';
+
+import type { Rect } from '../helpers/Rect';
+import type { Widget } from '../widgets/Widget';
 
 type DebugEvent = [ rect: Rect, timestamp: number, isMerged: boolean ];
 const DEBUG_EVENT_TIMEOUT = 1000;

@@ -1,11 +1,12 @@
 import { flagField } from '../decorators/FlagFields';
 import { roundToPower2 } from '../helpers/roundToPower2';
-import type { Widget } from '../widgets/Widget';
 import { isPower2 } from '../helpers/isPower2';
 import { BaseViewport } from './BaseViewport';
 import { Msg } from './Strings';
-import type { Rect } from '../helpers/Rect';
 import { mergeOverlappingRects } from '../helpers/mergeOverlappingRects';
+
+import type { Widget } from '../widgets/Widget';
+import type { Rect } from '../helpers/Rect';
 
 /**
  * A {@link Viewport} with an internal canvas, where the rendering context used

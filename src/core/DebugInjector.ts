@@ -2,16 +2,17 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { TextRenderGroup } from '../helpers/TextHelper';
-import type { FillStyle } from '../theme/FillStyle';
 import { TextHelper } from '../helpers/TextHelper';
 import { BaseTheme } from '../theme/BaseTheme';
 import { Widget } from '../widgets/Widget';
 import { Msg } from './Strings';
 import { Root } from './Root';
+import { DebuggableCanvasViewport } from './DebuggableCanvasViewport';
+
+import type { TextRenderGroup } from '../helpers/TextHelper';
+import type { FillStyle } from '../theme/FillStyle';
 import type { RootProperties } from './Root';
 import type { CanvasViewport } from './CanvasViewport';
-import { DebuggableCanvasViewport } from './DebuggableCanvasViewport';
 
 type ToggleCallback = (enabled: boolean) => void;
 

@@ -1,6 +1,7 @@
-import type { Rect } from '../helpers/Rect';
 import { safeRoundRect } from '../helpers/safeRoundRect';
 import { PassthroughWidget } from './PassthroughWidget';
+
+import type { Rect } from '../helpers/Rect';
 import type { Widget, WidgetProperties } from './Widget';
 
 /**

@@ -1,6 +1,7 @@
-import type { Widget } from '../widgets/Widget';
 import { ModifierEvent } from './ModifierEvent';
 import { FocusType } from '../core/FocusType';
+
+import type { Widget } from '../widgets/Widget';
 
 /**
  * A keyboard {@link ModifierEvent}. This is an abstract class and is

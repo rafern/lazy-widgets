@@ -1,9 +1,10 @@
 import { Widget, WidgetProperties } from './Widget';
 import { SingleParent } from './SingleParent';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import type { Rect } from '../helpers/Rect';
 import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions';
 import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
+
+import type { Rect } from '../helpers/Rect';
 
 /**
  * A {@link SingleParent} which contains a single child and automatically paints

@@ -1,8 +1,9 @@
 import { getPointerEventNormPos } from '../helpers/getPointerEventNormPos';
 import { parseDOMDeltaMode } from '../events/PointerWheelEvent';
 import { PointerDriver } from './PointerDriver';
-import type { Root } from '../core/Root';
 import { Msg } from '../core/Strings';
+
+import type { Root } from '../core/Root';
 
 /**
  * A container which has all the event listeners for a {@link Root} DOM bind to
