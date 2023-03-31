@@ -1,5 +1,5 @@
 import { BasicVirtualKey } from './BasicVirtualKey';
-import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAutoXML';
+import { SpecializedVirtualKeyXMLInputConfig } from '../../xml/SpecializedVirtualKeyXMLInputConfig';
 
 import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from '../../core/KeyContext';
@@ -10,7 +10,7 @@ import type { KeyContext } from '../../core/KeyContext';
  * @category Widget
  */
 export class SpaceKey extends BasicVirtualKey {
-    static override autoXML = SpecializedVirtualKeyAutoXML;
+    static override autoXML = SpecializedVirtualKeyXMLInputConfig;
 
     constructor(keyContext: KeyContext, minWidth = 84, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         properties = {

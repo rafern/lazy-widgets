@@ -1,7 +1,7 @@
 import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
 import { BaseContainer } from './BaseContainer';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 import { ClickEvent } from '../events/ClickEvent';
 import { FocusEvent } from '../events/FocusEvent';
 import { BlurEvent } from '../events/BlurEvent';
@@ -20,7 +20,7 @@ import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
  * @category Widget
  */
 export class Button<W extends Widget = Widget> extends BaseContainer<W> {
-    static override autoXML = SingleParentAutoXML;
+    static override autoXML = SingleParentXMLInputConfig;
 
     /** The helper used for handling pointer clicks and enter presses */
     protected clickHelper: ButtonClickHelper;

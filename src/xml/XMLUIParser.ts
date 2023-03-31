@@ -26,11 +26,11 @@ import type { XMLUIParserContext } from './XMLUIParserContext';
 import type { LayerInit } from '../core/LayerInit';
 
 /**
- * A layer parameter for a {@link WidgetAutoXMLConfig}.
+ * A layer parameter for a {@link WidgetXMLInputConfig}.
  *
  * @category XML
  */
-export interface WidgetAutoXMLConfigLayerParameter {
+export interface WidgetXMLInputConfigLayerParameter {
     mode: 'layer';
     name: string;
     optional?: boolean;
@@ -257,7 +257,7 @@ export class XMLUIParser extends BaseXMLUIParser {
         // allow passing 'layer' mode parameters
         this.registerParameterMode('layer', (_p, _c, paramConfig, value) => {
             const layerInit = validateLayerInit(value)[0];
-            const validator = (paramConfig as WidgetAutoXMLConfigLayerParameter).validator;
+            const validator = (paramConfig as WidgetXMLInputConfigLayerParameter).validator;
 
             if (validator) {
                 return validator(layerInit);

@@ -1,5 +1,5 @@
 import { BasicVirtualKey } from './BasicVirtualKey';
-import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAutoXML';
+import { SpecializedVirtualKeyXMLInputConfig } from '../../xml/SpecializedVirtualKeyXMLInputConfig';
 
 import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from '../../core/KeyContext';
@@ -11,7 +11,7 @@ import type { KeyContext } from '../../core/KeyContext';
  * @category Widget
  */
 export class TabKey extends BasicVirtualKey {
-    static override autoXML = SpecializedVirtualKeyAutoXML;
+    static override autoXML = SpecializedVirtualKeyXMLInputConfig;
 
     constructor(keyContext: KeyContext, minWidth = 48, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super('Tab', 'Tab', keyContext, minWidth, minHeight, properties);

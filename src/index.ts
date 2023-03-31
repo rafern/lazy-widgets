@@ -153,12 +153,12 @@ export * from './widgets/TooltipContainer';
 export * from './widgets/ViewportWidget';
 export * from './widgets/Widget';
 // xml
-export * from './xml/BareWidgetAutoXML';
+export * from './xml/BareWidgetXMLInputConfig';
 export * from './xml/BaseXMLUIParser';
 export * from './xml/makeInstanceOfValidator';
-export * from './xml/MultiParentAutoXML';
-export * from './xml/SingleParentAutoXML';
-export * from './xml/SpecializedVirtualKeyAutoXML';
+export * from './xml/MultiParentXMLInputConfig';
+export * from './xml/SingleParentXMLInputConfig';
+export * from './xml/SpecializedVirtualKeyXMLInputConfig';
 export * from './xml/validateArray';
 export * from './xml/validateBoolean';
 export * from './xml/validateFunction';

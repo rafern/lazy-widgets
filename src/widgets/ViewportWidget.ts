@@ -8,7 +8,7 @@ import { DynMsg } from '../core/Strings';
 import { Rect } from '../helpers/Rect';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import { TricklingEvent } from '../events/TricklingEvent';
-import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 import { ScrollEvent } from '../events/ScrollEvent';
 
 import type { LayoutConstraints } from '../core/LayoutConstraints';
@@ -66,7 +66,7 @@ export interface ViewportWidgetProperties extends WidgetProperties {
  * @category Widget
  */
 export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
-    static override autoXML = SingleParentAutoXML;
+    static override autoXML = SingleParentXMLInputConfig;
 
     /** See {@link ViewportWidget#widthCoupling}. For internal use only */
     private _widthCoupling: AxisCoupling;

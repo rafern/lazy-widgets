@@ -1,5 +1,5 @@
 import { BaseContainer } from './BaseContainer';
-import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { Widget, WidgetProperties } from './Widget';
 
@@ -12,7 +12,7 @@ import type { Widget, WidgetProperties } from './Widget';
  * @category Widget
  */
 export class Container<W extends Widget = Widget> extends BaseContainer<W> {
-    static override autoXML = SingleParentAutoXML;
+    static override autoXML = SingleParentXMLInputConfig;
 
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         super(child, properties);

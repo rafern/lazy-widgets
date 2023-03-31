@@ -1,5 +1,5 @@
 import type { BaseXMLUIParser } from './BaseXMLUIParser';
-import type { WidgetAutoXMLConfigParameter } from './WidgetAutoXML';
+import type { WidgetXMLInputConfigParameter } from './WidgetAutoXML';
 import type { XMLUIParserContext } from './XMLUIParserContext';
 
 /**
@@ -8,4 +8,4 @@ import type { XMLUIParserContext } from './XMLUIParserContext';
  *
  * @category XML
  */
-export type XMLParameterModeValidator = (parser: BaseXMLUIParser, context: XMLUIParserContext, parameterConfig: WidgetAutoXMLConfigParameter, value: unknown) => unknown;
+export type XMLParameterModeValidator = (parser: BaseXMLUIParser, context: XMLUIParserContext, parameterConfig: WidgetXMLInputConfigParameter, value: unknown) => unknown;

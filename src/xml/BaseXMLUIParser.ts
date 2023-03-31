@@ -2,7 +2,7 @@ import { Widget } from '../widgets/Widget';
 import { toKebabCase } from '../helpers/toKebabCase';
 import { WHITESPACE_REGEX } from '../helpers/whitespace-regex';
 
-import type { WidgetAutoXML, WidgetAutoXMLConfig, WidgetAutoXMLConfigParameter, WidgetAutoXMLConfigTextParameter, WidgetAutoXMLConfigValidator, WidgetAutoXMLConfigValueParameter, WidgetAutoXMLConfigWidgetParameter } from './WidgetAutoXML';
+import type { WidgetAutoXML, WidgetXMLInputConfig, WidgetXMLInputConfigParameter, WidgetXMLInputConfigTextParameter, WidgetAutoXMLConfigValidator, WidgetXMLInputConfigValueParameter, WidgetXMLInputConfigWidgetParameter } from './WidgetAutoXML';
 import type { XMLUIParserConfig } from './XMLUIParserConfig';
 import type { XMLUIParserContext } from './XMLUIParserContext';
 import type { XMLUIParserScriptContext } from './XMLUIParserScriptContext';
@@ -117,7 +117,7 @@ export abstract class BaseXMLUIParser {
      * @param mode - The parameter mode to find
      * @returns Returns the index of the next unset parameter of the wanted mode. If none are found, -1 is returned.
      */
-    findNextParamOfType(paramConfig: WidgetAutoXMLConfig, parametersSet: Array<boolean>, mode: string) {
+    findNextParamOfType(paramConfig: WidgetXMLInputConfig, parametersSet: Array<boolean>, mode: string) {
         const paramCount = paramConfig.length;
         let canBeList = false;
 
@@ -144,7 +144,7 @@ export abstract class BaseXMLUIParser {
     }
 
     /** Create a new widget instance given a config and context */
-    private instantiateWidget(inputConfig: WidgetAutoXMLConfig, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown>, factory: XMLWidgetFactory, context: XMLUIParserContext, elem: Element) {
+    private instantiateWidget(inputConfig: WidgetXMLInputConfig, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown>, factory: XMLWidgetFactory, context: XMLUIParserContext, elem: Element) {
         // parse parameters and options
         const paramCount = inputConfig.length;
         const instantiationContext: Record<string, unknown> = {};
@@ -190,7 +190,7 @@ export abstract class BaseXMLUIParser {
                             throw new Error(`Required parameters (${paramConfig.name}) can't be undefined`);
                         }
                     } else {
-                        const validator = (paramConfig as WidgetAutoXMLConfigWidgetParameter).validator;
+                        const validator = (paramConfig as WidgetXMLInputConfigWidgetParameter).validator;
 
                         if (paramConfig.list) {
                             if (!Array.isArray(arg)) {
@@ -329,7 +329,7 @@ export abstract class BaseXMLUIParser {
                     const childWidget = this.parseWidgetElem(context, childElem);
                     setParameters[index] = true;
 
-                    if ((inputConfig[index] as WidgetAutoXMLConfigWidgetParameter).list) {
+                    if ((inputConfig[index] as WidgetXMLInputConfigWidgetParameter).list) {
                         if (parameters[index] === undefined) {
                             parameters[index] = [childWidget];
                         } else {
@@ -405,7 +405,7 @@ export abstract class BaseXMLUIParser {
      * @param inputMapping - The input mapping for the widget factory
      * @param factory - A function which creates a new instance of a widget
      */
-    registerFactory<T extends Widget = Widget>(nameOrWidgetClass: string | (new (...args: unknown[]) => T), inputMapping: WidgetAutoXMLConfig, factory: XMLWidgetFactory) {
+    registerFactory<T extends Widget = Widget>(nameOrWidgetClass: string | (new (...args: unknown[]) => T), inputMapping: WidgetXMLInputConfig, factory: XMLWidgetFactory) {
         // handle constructors as names
         let factoryName = nameOrWidgetClass;
         if (typeof factoryName !== 'string') {
@@ -439,7 +439,7 @@ export abstract class BaseXMLUIParser {
             const paramGeneric = inputMapping[i];
 
             if (paramGeneric.mode === 'value') {
-                const param = paramGeneric as WidgetAutoXMLConfigValueParameter;
+                const param = paramGeneric as WidgetXMLInputConfigValueParameter;
 
                 if (param.validator !== undefined) {
                     let validators: Array<WidgetAutoXMLConfigValidator | string>;
@@ -496,7 +496,7 @@ export abstract class BaseXMLUIParser {
 
                 paramNames.set(param.name, i);
             } else if (paramGeneric.mode === 'text') {
-                const param = paramGeneric as WidgetAutoXMLConfigTextParameter;
+                const param = paramGeneric as WidgetXMLInputConfigTextParameter;
 
                 if (hasTextNodeParam) {
                     throw new Error('Cannot add another "text" mode parameter; there can only be one text parameter. If you have more string parameters, add them as "value" mode parameters with a "string" validator, and only keep the most important string parameter as the "text" mode parameter');
@@ -508,7 +508,7 @@ export abstract class BaseXMLUIParser {
 
                 hasTextNodeParam = true;
             } else if (paramGeneric.mode === 'widget') {
-                const param = paramGeneric as WidgetAutoXMLConfigWidgetParameter;
+                const param = paramGeneric as WidgetXMLInputConfigWidgetParameter;
                 if (traps.has('widget')) {
                     throw new Error('Cannot add another "widget" mode parameter; there is already a previous widget parameter that is optional or a list');
                 }
@@ -521,7 +521,7 @@ export abstract class BaseXMLUIParser {
                     paramNames.set(param.name, i);
                 }
             } else {
-                const param = paramGeneric as WidgetAutoXMLConfigParameter;
+                const param = paramGeneric as WidgetXMLInputConfigParameter;
                 const paramMode = param.mode;
                 const paramConfig = this.parameterModes.get(paramMode);
 
@@ -568,7 +568,7 @@ export abstract class BaseXMLUIParser {
      * @param widgetClass - The class of the widget that will be instantiated. The class name will be used for the element name, and the class constructor will be used for making the factory function.
      * @param inputMapping - The input mapping for the widget factory
      */
-    registerFactoryFromClass<T extends Widget>(widgetClass: new (...args: unknown[]) => T, inputMapping: WidgetAutoXMLConfig): void {
+    registerFactoryFromClass<T extends Widget>(widgetClass: new (...args: unknown[]) => T, inputMapping: WidgetXMLInputConfig): void {
         this.registerFactory(widgetClass, inputMapping, (...args) => new widgetClass(...args));
     }
 
@@ -679,7 +679,7 @@ export abstract class BaseXMLUIParser {
      *
      * @param widgetClass - The class to auto-register
      */
-    autoRegisterFactory<T extends Widget = Widget>(widgetClass: (new () => T) & { autoXML: WidgetAutoXML }) {
+    autoRegisterFactory<T extends Widget = Widget>(widgetClass: (new (...args: unknown[]) => T) & { autoXML: WidgetAutoXML }) {
         if (widgetClass.autoXML === null) {
             throw new Error('Widget class does not have an automatic XML factory config object set. Must be manually registered');
         }
@@ -688,7 +688,9 @@ export abstract class BaseXMLUIParser {
             this.registerFactoryFromClass(widgetClass, widgetClass.autoXML);
         } else {
             const config = widgetClass.autoXML;
-            this.registerFactory(widgetClass, config.inputConfig, config.factory);
+            const nameOrClass = config.name ?? widgetClass;
+            const factory = config.factory ?? ((...args) => new widgetClass(...args));
+            this.registerFactory(nameOrClass, config.inputConfig, factory);
         }
     }
 

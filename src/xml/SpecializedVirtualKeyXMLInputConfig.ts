@@ -1,12 +1,12 @@
-import { WidgetAutoXML } from './WidgetAutoXML';
+import { WidgetXMLInputConfig } from './WidgetAutoXML';
 
 /**
- * {@link WidgetAutoXML} for {@link VirtualKey} widgets with keyContext,
+ * {@link WidgetXMLInputConfig} for {@link VirtualKey} widgets with keyContext,
  * minWidth (optional) and minHeight (optional) parameters.
  *
  * @category XML
  */
-export const SpecializedVirtualKeyAutoXML: WidgetAutoXML = [
+export const SpecializedVirtualKeyXMLInputConfig: WidgetXMLInputConfig = [
     {
         name: 'key-context',
         mode: 'value',

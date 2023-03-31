@@ -6,7 +6,7 @@ import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
 import { Alignment2D } from '../theme/Alignment2D';
 import { safeRoundRect } from '../helpers/safeRoundRect';
 import { layoutArrayField, layoutField } from '../decorators/FlagFields';
-import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { Rect } from '../helpers/Rect';
 
@@ -21,7 +21,7 @@ const startAlignment = <Alignment2D>{
  * @category Widget
  */
 export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W> {
-    static override autoXML = SingleParentAutoXML;
+    static override autoXML = SingleParentXMLInputConfig;
 
     /**
      * The horizontal component of the cursor position to place this tooltip

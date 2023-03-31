@@ -1,4 +1,4 @@
-import { SpecializedVirtualKeyAutoXML } from '../../xml/SpecializedVirtualKeyAutoXML';
+import { SpecializedVirtualKeyXMLInputConfig } from '../../xml/SpecializedVirtualKeyXMLInputConfig';
 import { VirtualKey } from './VirtualKey';
 
 import type { WidgetProperties } from '../Widget';
@@ -11,7 +11,7 @@ import type { KeyContext } from '../../core/KeyContext';
  * @category Widget
  */
 export class AltKey extends VirtualKey {
-    static override autoXML = SpecializedVirtualKeyAutoXML;
+    static override autoXML = SpecializedVirtualKeyXMLInputConfig;
 
     constructor(keyContext: KeyContext, minWidth = 42, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super(

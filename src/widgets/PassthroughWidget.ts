@@ -1,7 +1,7 @@
 import { Widget, WidgetProperties } from './Widget';
 import { SingleParent } from './SingleParent';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { SingleParentAutoXML } from '../xml/SingleParentAutoXML';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { Rect } from '../helpers/Rect';
 
@@ -19,7 +19,7 @@ import type { Rect } from '../helpers/Rect';
  * @category Widget
  */
 export class PassthroughWidget<W extends Widget = Widget> extends SingleParent<W> {
-    static override autoXML = SingleParentAutoXML;
+    static override autoXML = SingleParentXMLInputConfig;
 
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         // Passthrough widgets dont need a clear background, have a child and

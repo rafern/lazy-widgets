@@ -11,11 +11,11 @@ export type WidgetAutoXMLConfigValidator = (inputValue: unknown) => [transformed
 
 /**
  * A value parameter for the constructor of a Widget class, configured in a
- * {@link WidgetAutoXMLConfig}.
+ * {@link WidgetXMLInputConfig}.
  *
  * @category XML
  */
-export interface WidgetAutoXMLConfigValueParameter extends WidgetAutoXMLConfigParameter {
+export interface WidgetXMLInputConfigValueParameter extends WidgetXMLInputConfigParameter {
     mode: 'value';
     name: string;
     optional?: boolean;
@@ -23,11 +23,11 @@ export interface WidgetAutoXMLConfigValueParameter extends WidgetAutoXMLConfigPa
 }
 
 /**
- * A widget parameter for a {@link WidgetAutoXMLConfig}.
+ * A widget parameter for a {@link WidgetXMLInputConfig}.
  *
  * @category XML
  */
-export interface WidgetAutoXMLConfigWidgetParameter {
+export interface WidgetXMLInputConfigWidgetParameter {
     mode: 'widget';
     name: string;
     optional?: boolean;
@@ -36,12 +36,12 @@ export interface WidgetAutoXMLConfigWidgetParameter {
 }
 
 /**
- * A string parameter for a {@link WidgetAutoXMLConfig}, which can be passed as
+ * A string parameter for a {@link WidgetXMLInputConfig}, which can be passed as
  * an XML text node. There can only be one text parameter.
  *
  * @category XML
  */
-export interface WidgetAutoXMLConfigTextParameter {
+export interface WidgetXMLInputConfigTextParameter {
     mode: 'text';
     name: string;
     optional?: boolean;
@@ -49,11 +49,11 @@ export interface WidgetAutoXMLConfigTextParameter {
 }
 
 /**
- * A parameter with a custom mode for a {@link WidgetAutoXMLConfig}.
+ * A parameter with a custom mode for a {@link WidgetXMLInputConfig}.
  *
  * @category XML
  */
-export interface WidgetAutoXMLConfigParameter {
+export interface WidgetXMLInputConfigParameter {
     mode: string;
     name: string;
     optional?: boolean;
@@ -66,7 +66,7 @@ export interface WidgetAutoXMLConfigParameter {
  *
  * @category XML
  */
-export type WidgetAutoXMLConfig = Array<WidgetAutoXMLConfigValueParameter | WidgetAutoXMLConfigWidgetParameter | WidgetAutoXMLConfigTextParameter | WidgetAutoXMLConfigParameter>;
+export type WidgetXMLInputConfig = Array<WidgetXMLInputConfigValueParameter | WidgetXMLInputConfigWidgetParameter | WidgetXMLInputConfigTextParameter | WidgetXMLInputConfigParameter>;
 
 /**
  * An object that contains an input mapping and a factory function for
@@ -75,8 +75,9 @@ export type WidgetAutoXMLConfig = Array<WidgetAutoXMLConfigValueParameter | Widg
  * @category XML
  */
 export interface WidgetAutoXMLConfigWithFactory {
-    inputConfig: WidgetAutoXMLConfig,
-    factory: XMLWidgetFactory
+    inputConfig: WidgetXMLInputConfig,
+    factory?: XMLWidgetFactory,
+    name?: string
 }
 
 /**
@@ -84,4 +85,4 @@ export interface WidgetAutoXMLConfigWithFactory {
  *
  * @category XML
  */
-export type WidgetAutoXML = WidgetAutoXMLConfig | WidgetAutoXMLConfigWithFactory;
+export type WidgetAutoXML = WidgetXMLInputConfig | WidgetAutoXMLConfigWithFactory;
