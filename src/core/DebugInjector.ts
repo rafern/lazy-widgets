@@ -356,36 +356,22 @@ export function injectDebugCode(): void {
     injectStackTraceFeature(Root, 'clearDrivers');
     // stacktrace.Root.getTextInput
     injectStackTraceFeature(Root, 'getTextInput');
-    // stacktrace.Widget.onThemeUpdated
-    injectStackTraceFeature(Widget, 'onThemeUpdated');
-    // stacktrace.Widget.handleEvent
-    injectStackTraceFeature(Widget, 'handleEvent');
     // stacktrace.Widget.dispatchEvent
     injectStackTraceFeature(Widget, 'dispatchEvent');
-    // stacktrace.Widget.handlePreLayoutUpdate
-    injectStackTraceFeature(Widget, 'handlePreLayoutUpdate');
     // stacktrace.Widget.preLayoutUpdate
     injectStackTraceFeature(Widget, 'preLayoutUpdate');
-    // stacktrace.Widget.handleResolveDimensions
-    injectStackTraceFeature(Widget, 'handleResolveDimensions');
     // stacktrace.Widget.resolveDimensions
     injectStackTraceFeature(Widget, 'resolveDimensions');
     // stacktrace.Widget.resolveDimensionsAsTop
     injectStackTraceFeature(Widget, 'resolveDimensionsAsTop');
     // stacktrace.Widget.resolvePosition
     injectStackTraceFeature(Widget, 'resolvePosition');
-    // stacktrace.Widget.handlePostLayoutUpdate
-    injectStackTraceFeature(Widget, 'handlePostLayoutUpdate');
     // stacktrace.Widget.postLayoutUpdate
     injectStackTraceFeature(Widget, 'postLayoutUpdate');
-    // stacktrace.Widget.roundRect
-    injectStackTraceFeature(Widget, 'roundRect');
-    // stacktrace.Widget.handlePainting
-    injectStackTraceFeature(Widget, 'handlePainting');
     // stacktrace.Widget.paint
     injectStackTraceFeature(Widget, 'paint');
-    // watchflag.Widget._layoutDirty
-    injectWatchflagFeature(Widget, '_layoutDirty');
+    // stacktrace.Widget.propagateDirtyRect
+    injectStackTraceFeature(Widget, 'propagateDirtyRect');
     // randomfill.BaseTheme.canvasFill
     injectRandomFillFeature(BaseTheme, 'canvasFill');
     // randomfill.BaseTheme.primaryFill
