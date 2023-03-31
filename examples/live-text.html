@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Margin, Column, LabelledRadioButton, DOMPointerDriver,
+                Background, LiveLabel, Spacing, Variable
+            } from '../dist/index.esm.js';
+
+            // Create the root
+            const helloText = new Variable('');
+            const languageText = new Variable('');
+
+            function changeLanguage(lang) {
+                if (lang === 'en') {
+                    helloText.value = 'Hello!';
+                    languageText.value = 'Language:';
+                } else if (lang === 'pt') {
+                    helloText.value = 'Olá!';
+                    languageText.value = 'Idioma:';
+                } else if (lang === 'fr') {
+                    helloText.value = 'Bonjour!';
+                    languageText.value = 'Langue:';
+                }
+            }
+
+            const languageVariable = new Variable('en');
+            languageVariable.watch(changeLanguage, true);
+
+            const root = new DOMRoot(
+                new Background(
+                    new Margin(
+                        new Column([
+                            new LiveLabel(helloText),
+                            new Spacing({
+                                flex: 0,
+                                minHeight: 24,
+                            }),
+                            new LiveLabel(languageText),
+                            new LabelledRadioButton('English (en)', languageVariable, 'en'),
+                            new LabelledRadioButton('Português (pt)', languageVariable, 'pt'),
+                            new LabelledRadioButton('Français (fr)', languageVariable, 'fr'),
+                        ]),
+                    ),
+                ),
+            );
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>
