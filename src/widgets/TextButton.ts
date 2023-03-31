@@ -1,5 +1,5 @@
 import { TextAlignMode } from '../helpers/TextHelper';
-import { Label, LabelProperties } from './Label';
+import { Label } from './Label';
 import { Alignment } from '../theme/Alignment';
 import { FilledButton } from './FilledButton';
 import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
@@ -7,6 +7,7 @@ import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
 import type { Alignment2D } from '../theme/Alignment2D';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
+import type { LabelProperties } from './BaseLabel';
 
 /**
  * A {@link FilledButton} with a {@link Label}. Alignment is forced to be

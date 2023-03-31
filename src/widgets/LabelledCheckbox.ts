@@ -1,5 +1,5 @@
 import { Spacing, SpacingProperties } from './Spacing';
-import { Label, LabelProperties } from './Label';
+import { Label } from './Label';
 import { Checkbox } from './Checkbox';
 import { Row } from './Row';
 import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
@@ -7,6 +7,7 @@ import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
 import type { Variable } from '../state/Variable';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
+import type { LabelProperties } from './BaseLabel';
 
 /**
  * A {@link Row} with a {@link Label}, {@link Spacing} and a {@link Checkbox}.
