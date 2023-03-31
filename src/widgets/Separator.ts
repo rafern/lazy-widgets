@@ -1,7 +1,9 @@
 import { Spacing } from './Spacing';
+import { BareWidgetXMLInputConfig } from '../xml/BareWidgetXMLInputConfig';
 
 import type { SpacingProperties } from './Spacing';
 import type { Rect } from '../helpers/Rect';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link Spacing} with a colored background, where the color is the same as
@@ -10,6 +12,11 @@ import type { Rect } from '../helpers/Rect';
  * @category Widget
  */
 export class Separator extends Spacing {
+    static override autoXML: WidgetAutoXML = {
+        name: 'separator',
+        inputConfig: BareWidgetXMLInputConfig
+    };
+
     constructor(properties?: Readonly<SpacingProperties>) {
         super({
             minWidth: 1,

@@ -8,11 +8,13 @@ import { Button } from './Button';
 import { ClickableWidgetProperties } from './ClickableWidgetProperties';
 import { FocusEvent } from '../events/FocusEvent';
 import { BlurEvent } from '../events/BlurEvent';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { ThemeProperties } from '../theme/ThemeProperties';
 import type { Widget, WidgetProperties } from './Widget';
 import type { Rect } from '../helpers/Rect';
 import type { WidgetEvent } from '../events/WidgetEvent';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * Optional FilledButton constructor properties.
@@ -37,6 +39,11 @@ export interface FilledButtonProperties extends WidgetProperties {
  * @category Widget
  */
 export class FilledButton<W extends Widget = Widget> extends Button<W> {
+    static override autoXML: WidgetAutoXML = {
+        name: 'filled-button',
+        inputConfig: SingleParentXMLInputConfig
+    };
+
     /** Theme property used for overriding the canvas colour. */
     private backgroundProperty = 'backgroundFill';
     /**

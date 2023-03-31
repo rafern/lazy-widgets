@@ -9,6 +9,7 @@ import { BlurEvent } from '../events/BlurEvent';
 import type { Widget } from './Widget';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link BaseContainer} which can be {@link ClickHelper | clicked} as a
@@ -20,7 +21,10 @@ import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
  * @category Widget
  */
 export class Button<W extends Widget = Widget> extends BaseContainer<W> {
-    static override autoXML = SingleParentXMLInputConfig;
+    static override autoXML: WidgetAutoXML = {
+        name: 'button',
+        inputConfig: SingleParentXMLInputConfig
+    };
 
     /** The helper used for handling pointer clicks and enter presses */
     protected clickHelper: ButtonClickHelper;

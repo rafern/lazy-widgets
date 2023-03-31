@@ -1,8 +1,8 @@
 import { VirtualKey } from './VirtualKey';
 
-import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from '../../core/KeyContext';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 
 /**
  * A {@link VirtualKey} which emits key presses of a given key code.
@@ -10,34 +10,37 @@ import type { KeyContext } from '../../core/KeyContext';
  * @category Widget
  */
 export class BasicVirtualKey extends VirtualKey {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'text',
-            name: 'text'
-        },
-        {
-            name: 'key-code',
-            mode: 'value',
-            validator: 'string',
-        },
-        {
-            name: 'key-context',
-            mode: 'value',
-            validator: 'key-context',
-        },
-        {
-            name: 'min-width',
-            mode: 'value',
-            validator: 'number',
-            optional: true,
-        },
-        {
-            name: 'min-height',
-            mode: 'value',
-            validator: 'number',
-            optional: true,
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'basic-virtual-key',
+        inputConfig: [
+            {
+                mode: 'text',
+                name: 'text'
+            },
+            {
+                name: 'key-code',
+                mode: 'value',
+                validator: 'string',
+            },
+            {
+                name: 'key-context',
+                mode: 'value',
+                validator: 'key-context',
+            },
+            {
+                name: 'min-width',
+                mode: 'value',
+                validator: 'number',
+                optional: true,
+            },
+            {
+                name: 'min-height',
+                mode: 'value',
+                validator: 'number',
+                optional: true,
+            }
+        ]
+    };
 
     /**
      * @param text - The text to display in the virtual key.

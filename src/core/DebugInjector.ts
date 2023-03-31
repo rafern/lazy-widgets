@@ -88,7 +88,7 @@ export function listDebugFeatures(): void {
  * @category Debug
  */
 export function injectWatchflagFeature(classObj: any, flagKey: string): void {
-    const propertyPath = `${classObj.name}.${flagKey}`;
+    const propertyPath = `${extractWidgetName(classObj)}.${flagKey}`;
     const featureName = `watchflag.${propertyPath}`;
     if(features.has(featureName)) {
         console.warn(`[lazy-widgets] Already injected debug feature with name ${featureName}; ignored`);
@@ -110,7 +110,7 @@ export function injectWatchflagFeature(classObj: any, flagKey: string): void {
             if(isDebugFeatureEnabled(featureName)) {
                 const oldVal = valueMap.get(this);
                 if(!oldVal && newValue) {
-                    const msg = `[lazy-widgets ${featureName}] ${this.constructor.name}.${flagKey} set to true`;
+                    const msg = `[lazy-widgets ${featureName}] ${extractWidgetName(this.constructor)}.${flagKey} set to true`;
                     if(isDebugFeatureEnabled(featureNameStrace)) {
                         console.groupCollapsed(msg);
                         console.trace();
@@ -141,7 +141,7 @@ export function injectWatchflagFeature(classObj: any, flagKey: string): void {
  * @category Debug
  */
 export function injectTraceFeature(classObj: any, methodKey: string, messageGenerator: ((...args: any[]) => string) | null = null): void {
-    const methodPath = `${classObj.name}.${methodKey}`;
+    const methodPath = `${extractWidgetName(classObj)}.${methodKey}`;
     const featureName = `trace.${methodPath}`;
     if(features.has(featureName)) {
         console.warn(`[lazy-widgets] Already injected debug feature with name ${featureName}; ignored`);
@@ -179,7 +179,7 @@ export function injectTraceFeature(classObj: any, methodKey: string, messageGene
                 prefix = '';
             }
 
-            msgStack.push(`${prefix}${this.constructor.name}`);
+            msgStack.push(`${prefix}${extractWidgetName(this.constructor)}`);
         } else {
             msgStack[msgIndex] += ', recall';
         }
@@ -219,7 +219,7 @@ export function injectTraceFeature(classObj: any, methodKey: string, messageGene
  * @category Debug
  */
 export function injectRandomFillFeature(classObj: any, themePropertyKey: string): void {
-    const propertyPath = `${classObj.name}.${themePropertyKey}`;
+    const propertyPath = `${extractWidgetName(classObj)}.${themePropertyKey}`;
     const featureName = `randomfill.${propertyPath}`;
     if(features.has(featureName)) {
         console.warn(`[lazy-widgets] Already injected debug feature with name ${featureName}; ignored`);
@@ -255,7 +255,7 @@ export function injectRandomFillFeature(classObj: any, themePropertyKey: string)
  * @category Debug
  */
 export function injectStackTraceFeature(classObj: any, methodKey: string): void {
-    const methodPath = `${classObj.name}.${methodKey}`;
+    const methodPath = `${extractWidgetName(classObj)}.${methodKey}`;
     const featureName = `stacktrace.${methodPath}`;
     if(features.has(featureName)) {
         console.warn(`[lazy-widgets] Already injected debug feature with name ${featureName}; ignored`);
@@ -265,7 +265,7 @@ export function injectStackTraceFeature(classObj: any, methodKey: string): void 
     const methodOrig = classObj.prototype[methodKey];
     classObj.prototype[methodKey] = function(...args: any[]) {
         if(isDebugFeatureEnabled(featureName)) {
-            console.groupCollapsed(`[lazy-widgets ${featureName}] ${classObj.name}.${methodKey} called`);
+            console.groupCollapsed(`[lazy-widgets ${featureName}] ${extractWidgetName(this.constructor)}.${methodKey} called`);
             console.trace();
             console.groupEnd();
         }
@@ -324,7 +324,7 @@ export function injectDebugCode(): void {
     });
     // trace.Widget.dispatchEvent
     injectTraceFeature(Widget, 'dispatchEvent', (event) => {
-        return ` (${event.constructor.name})`;
+        return ` (${event.type})`;
     });
     // stacktrace.Root.resolveLayout
     injectStackTraceFeature(Root, 'resolveLayout');
@@ -378,20 +378,12 @@ export function injectDebugCode(): void {
     injectStackTraceFeature(Widget, 'handlePostLayoutUpdate');
     // stacktrace.Widget.postLayoutUpdate
     injectStackTraceFeature(Widget, 'postLayoutUpdate');
-    // stacktrace.Widget.clear
-    injectStackTraceFeature(Widget, 'clear');
-    // stacktrace.Widget.clearStart
-    injectStackTraceFeature(Widget, 'clearStart');
-    // stacktrace.Widget.clearEnd
-    injectStackTraceFeature(Widget, 'clearEnd');
     // stacktrace.Widget.roundRect
     injectStackTraceFeature(Widget, 'roundRect');
     // stacktrace.Widget.handlePainting
     injectStackTraceFeature(Widget, 'handlePainting');
     // stacktrace.Widget.paint
     injectStackTraceFeature(Widget, 'paint');
-    // stacktrace.Widget.scaleFont
-    injectStackTraceFeature(Widget, 'scaleFont');
     // watchflag.Widget._layoutDirty
     injectWatchflagFeature(Widget, '_layoutDirty');
     // randomfill.BaseTheme.canvasFill
@@ -483,7 +475,7 @@ export function injectDebugCode(): void {
     const finalizeBoundsOrig = Widget.prototype.finalizeBounds;
     Widget.prototype.finalizeBounds = function(): void {
         finalizeBoundsOrig.apply(this);
-        const typeName = this.constructor.name;
+        const typeName = extractWidgetName(this.constructor);
 
         if(isDebugFeatureEnabled('warnsubpixels')) {
             const [scaleX, scaleY] = this.root.effectiveScale;
@@ -555,4 +547,16 @@ export function injectDebugCode(): void {
     console.info('[lazy-widgets] Check if a debug feature is enabled in the console with canvasDebug.enabled(debugFeature: string)');
     console.info('[lazy-widgets] Enable a debug feature in the console with canvasDebug.toggle(debugFeature: string, enabled?: boolean)');
     console.info('[lazy-widgets] List debug features in the console with canvasDebug.list()');
+}
+
+/**
+ * Extract a human-readable name from a Widget class
+ * @internal
+ */
+function extractWidgetName(classObj: any) {
+    if (classObj.autoXML && ('name' in classObj.autoXML)) {
+        return classObj.autoXML.name;
+    } else {
+        return classObj.name;
+    }
 }

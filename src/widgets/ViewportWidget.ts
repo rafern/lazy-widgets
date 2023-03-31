@@ -15,6 +15,7 @@ import type { LayoutConstraints } from '../core/LayoutConstraints';
 import type { Viewport } from '../core/Viewport';
 import type { Bounds } from '../helpers/Bounds';
 import type { Root } from '../core/Root';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * Optional ViewportWidget constructor properties.
@@ -66,7 +67,10 @@ export interface ViewportWidgetProperties extends WidgetProperties {
  * @category Widget
  */
 export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
-    static override autoXML = SingleParentXMLInputConfig;
+    static override autoXML: WidgetAutoXML = {
+        name: 'viewport-widget',
+        inputConfig: SingleParentXMLInputConfig
+    };
 
     /** See {@link ViewportWidget#widthCoupling}. For internal use only */
     private _widthCoupling: AxisCoupling;

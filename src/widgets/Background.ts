@@ -3,6 +3,7 @@ import { BaseContainer } from './BaseContainer';
 
 import type { Rect } from '../helpers/Rect';
 import type { Widget, WidgetProperties } from './Widget';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A container widget that adds a background color.
@@ -10,7 +11,10 @@ import type { Widget, WidgetProperties } from './Widget';
  * @category Widget
  */
 export class Background<W extends Widget = Widget> extends BaseContainer<W> {
-    static override autoXML = SingleParentXMLInputConfig;
+    static override autoXML: WidgetAutoXML = {
+        name: 'background',
+        inputConfig: SingleParentXMLInputConfig
+    };
 
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         super(child, properties);

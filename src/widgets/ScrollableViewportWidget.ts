@@ -11,11 +11,13 @@ import { Root } from '../core/Root';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
 import { FocusEvent } from '../events/FocusEvent';
 import { BlurEvent } from '../events/BlurEvent';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { Bounds } from '../helpers/Bounds';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Widget } from './Widget';
 import type { Rect } from '../helpers/Rect';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * The mode for how a scrollbar is shown in a {@link ScrollableViewportWidget}.
@@ -51,6 +53,11 @@ export interface ScrollableViewportWidgetProperties extends ViewportWidgetProper
  * @category Widget
  */
 export class ScrollableViewportWidget<W extends Widget = Widget> extends ViewportWidget<W> {
+    static override autoXML: WidgetAutoXML = {
+        name: 'scrollable-viewport-widget',
+        inputConfig: SingleParentXMLInputConfig
+    };
+
     /**
      * See {@link ScrollableViewportWidget#scrollbarMode}. For internal use only
      */

@@ -1,8 +1,10 @@
 import { Alignment } from '../theme/Alignment';
 import { Container } from './Container';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { Widget, WidgetProperties } from './Widget';
 import type { Alignment2D } from '../theme/Alignment2D';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link Margin} which stretches on the vertical axis. Useful for
@@ -14,6 +16,11 @@ import type { Alignment2D } from '../theme/Alignment2D';
  * @category Widget
  */
 export class TextMargin<W extends Widget = Widget> extends Container<W> {
+    static override autoXML: WidgetAutoXML = {
+        name: 'text-margin',
+        inputConfig: SingleParentXMLInputConfig
+    };
+
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         // default properties
         properties = {

@@ -1,6 +1,8 @@
 import { BareWidgetXMLInputConfig } from '../xml/BareWidgetXMLInputConfig';
 import { Widget, WidgetProperties } from './Widget';
 
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+
 /**
  * Optional TextInput constructor properties.
  *
@@ -22,7 +24,10 @@ export interface SpacingProperties extends WidgetProperties {
  * @category Widget
  */
 export class Spacing extends Widget {
-    static override autoXML = BareWidgetXMLInputConfig;
+    static override autoXML: WidgetAutoXML = {
+        name: 'spacing',
+        inputConfig: BareWidgetXMLInputConfig
+    };
 
     /** The minimum width this will try to expand */
     minWidth: number;

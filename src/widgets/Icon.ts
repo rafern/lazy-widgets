@@ -57,13 +57,16 @@ export interface IconProperties extends WidgetProperties {
  * @category Widget
  */
 export class Icon extends Widget {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'value',
-            name: 'image',
-            validator: 'image-source'
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'icon',
+        inputConfig: [
+            {
+                mode: 'value',
+                name: 'image',
+                validator: 'image-source'
+            }
+        ]
+    };
 
     /** The current image/video used by the icon. */
     private _image: HTMLImageElement | HTMLVideoElement;

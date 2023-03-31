@@ -43,26 +43,29 @@ export interface SliderProperties extends WidgetProperties {
  * @category Widget
  */
 export class Slider extends Widget {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'value',
-            name: 'variable',
-            validator: 'variable',
-            optional: true
-        },
-        {
-            mode: 'value',
-            name: 'min-value',
-            validator: 'number',
-            optional: true
-        },
-        {
-            mode: 'value',
-            name: 'max-value',
-            validator: 'number',
-            optional: true
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'slider',
+        inputConfig: [
+            {
+                mode: 'value',
+                name: 'variable',
+                validator: 'variable',
+                optional: true
+            },
+            {
+                mode: 'value',
+                name: 'min-value',
+                validator: 'number',
+                optional: true
+            },
+            {
+                mode: 'value',
+                name: 'max-value',
+                validator: 'number',
+                optional: true
+            }
+        ]
+    };
 
     /** The slider's minimum value. */
     private minValue: number;

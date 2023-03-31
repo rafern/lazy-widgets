@@ -61,19 +61,22 @@ function makeLayerIterator<W extends Widget>(startIndex: number, delta: number, 
  * @category Widget
  */
 export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'layer',
-            name: 'layers',
-            list: true
-        },
-        {
-            mode: 'value',
-            name: 'default-layer-index',
-            validator: 'number',
-            optional: true
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'layered-container',
+        inputConfig: [
+            {
+                mode: 'layer',
+                name: 'layers',
+                list: true
+            },
+            {
+                mode: 'value',
+                name: 'default-layer-index',
+                validator: 'number',
+                optional: true
+            }
+        ]
+    };
 
     /** The default layer. Can't be removed */
     readonly defaultLayer: Layer<W>;

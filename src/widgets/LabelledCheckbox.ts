@@ -14,18 +14,21 @@ import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
  * @category Widget
  */
 export class LabelledCheckbox extends Row {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'text',
-            name: 'text'
-        },
-        {
-            mode: 'value',
-            name: 'variable',
-            validator: 'variable',
-            optional: true
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'labelled-checkbox',
+        inputConfig: [
+            {
+                mode: 'text',
+                name: 'text'
+            },
+            {
+                mode: 'value',
+                name: 'variable',
+                validator: 'variable',
+                optional: true
+            }
+        ]
+    };
 
     constructor(text: string, variable?: Variable<boolean>, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
         const propertiesNoID = filterIDFromProperties(properties);

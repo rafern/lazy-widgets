@@ -11,13 +11,16 @@ import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
  * @category Widget
  */
 export class IconButton extends Button<Icon> {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'value',
-            name: 'image',
-            validator: 'image-source'
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'icon-button',
+        inputConfig: [
+            {
+                mode: 'value',
+                name: 'image',
+                validator: 'image-source'
+            }
+        ]
+    };
 
     constructor(image: HTMLImageElement, properties?: Readonly<IconProperties & ClickableWidgetProperties>) {
         super(new Icon(image, filterIDFromProperties(properties)), properties);

@@ -9,6 +9,7 @@ import { layoutArrayField, layoutField } from '../decorators/FlagFields';
 import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { Rect } from '../helpers/Rect';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 const startAlignment = <Alignment2D>{
     horizontal: Alignment.Start, vertical: Alignment.Start
@@ -21,7 +22,10 @@ const startAlignment = <Alignment2D>{
  * @category Widget
  */
 export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W> {
-    static override autoXML = SingleParentXMLInputConfig;
+    static override autoXML: WidgetAutoXML = {
+        name: 'tooltip-container',
+        inputConfig: SingleParentXMLInputConfig
+    };
 
     /**
      * The horizontal component of the cursor position to place this tooltip

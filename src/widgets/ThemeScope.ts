@@ -17,17 +17,20 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Widget
  */
 export class ThemeScope<W extends Widget = Widget> extends PassthroughWidget<W> {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'widget',
-            name: 'child'
-        },
-        {
-            mode: 'value',
-            name: 'theme',
-            validator: 'theme'
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'theme-scope',
+        inputConfig: [
+            {
+                mode: 'widget',
+                name: 'child'
+            },
+            {
+                mode: 'value',
+                name: 'theme',
+                validator: 'theme'
+            }
+        ]
+    };
 
     /** The theme used for the child. */
     private scopeTheme: Theme;

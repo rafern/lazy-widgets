@@ -29,16 +29,19 @@ const HOVER_TIME = 1000;
  * @category Widget
  */
 export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = TooltipContainer> extends PassthroughWidget<W> {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'widget',
-            name: 'child'
-        },
-        {
-            mode: 'widget',
-            name: 'tooltip-widget'
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'tooltip',
+        inputConfig: [
+            {
+                mode: 'widget',
+                name: 'child'
+            },
+            {
+                mode: 'widget',
+                name: 'tooltip-widget'
+            }
+        ]
+    };
 
     /** The top-most container in the current UI tree. Internal use only */
     private _topLayerContainer: LayeredContainer | null = null;

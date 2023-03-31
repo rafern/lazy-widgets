@@ -16,12 +16,15 @@ import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
  * @category Widget
  */
 export class TextButton extends FilledButton<Label> {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'text',
-            name: 'text'
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'text-button',
+        inputConfig: [
+            {
+                mode: 'text',
+                name: 'text'
+            }
+        ]
+    };
 
     constructor(text: string, properties?: Readonly<LabelProperties & ClickableWidgetProperties>) {
         // default properties

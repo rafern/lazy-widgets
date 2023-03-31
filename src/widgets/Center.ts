@@ -1,9 +1,11 @@
 import { Alignment } from '../theme/Alignment';
 import { Container } from './Container';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { Widget, WidgetProperties } from './Widget';
 import type { Alignment2D } from '../theme/Alignment2D';
 import type { Padding } from '../theme/Padding';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link Container} with center alignment on both axes and no padding by
@@ -14,6 +16,11 @@ import type { Padding } from '../theme/Padding';
  * @category Widget
  */
 export class Center<W extends Widget = Widget> extends Container<W> {
+    static override autoXML: WidgetAutoXML = {
+        name: 'center',
+        inputConfig: SingleParentXMLInputConfig
+    };
+
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         properties = {
             containerAlignment: <Alignment2D>{

@@ -20,19 +20,22 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
  * @category Widget
  */
 export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'value',
-            name: 'vertical',
-            validator: 'boolean',
-        },
-        {
-            mode: 'widget',
-            name: 'children',
-            list: true,
-            optional: true,
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'multi-container',
+        inputConfig: [
+            {
+                mode: 'value',
+                name: 'vertical',
+                validator: 'boolean',
+            },
+            {
+                mode: 'widget',
+                name: 'children',
+                list: true,
+                optional: true,
+            }
+        ]
+    };
 
     /** Is this container vertical? */
     private vertical: boolean;

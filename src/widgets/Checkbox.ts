@@ -19,14 +19,17 @@ import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
  * @category Widget
  */
 export class Checkbox extends Widget {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'value',
-            name: 'variable',
-            validator: 'variable',
-            optional: true
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'checkbox',
+        inputConfig: [
+            {
+                mode: 'value',
+                name: 'variable',
+                validator: 'variable',
+                optional: true
+            }
+        ]
+    };
 
     /** Horizontal offset. */
     private offsetX = 0;

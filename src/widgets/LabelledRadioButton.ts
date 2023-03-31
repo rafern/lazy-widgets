@@ -15,21 +15,24 @@ import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
  * @category Widget
  */
 export class LabelledRadioButton<V> extends Row {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'text',
-            name: 'text'
-        },
-        {
-            mode: 'value',
-            name: 'variable',
-            validator: 'variable'
-        },
-        {
-            mode: 'value',
-            name: 'value'
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'labelled-radio-button',
+        inputConfig: [
+            {
+                mode: 'text',
+                name: 'text'
+            },
+            {
+                mode: 'value',
+                name: 'variable',
+                validator: 'variable'
+            },
+            {
+                mode: 'value',
+                name: 'value'
+            }
+        ]
+    };
 
     constructor(text: string, variable: Variable<V>, value: V, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
         const propertiesNoID = filterIDFromProperties(properties);

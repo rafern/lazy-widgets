@@ -1,8 +1,10 @@
 import { safeRoundRect } from '../helpers/safeRoundRect';
 import { PassthroughWidget } from './PassthroughWidget';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { Rect } from '../helpers/Rect';
 import type { Widget, WidgetProperties } from './Widget';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A container widget that rounds the corners of a child widget.
@@ -10,6 +12,11 @@ import type { Widget, WidgetProperties } from './Widget';
  * @category Widget
  */
 export class RoundedCorners<W extends Widget = Widget> extends PassthroughWidget<W> {
+    static override autoXML: WidgetAutoXML = {
+        name: 'rounded-corners',
+        inputConfig: SingleParentXMLInputConfig
+    };
+
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         super(child, properties);
     }

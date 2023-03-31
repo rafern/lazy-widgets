@@ -24,17 +24,20 @@ import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
  * @category Widget
  */
 export class RadioButton<V> extends Widget {
-    static override autoXML: WidgetAutoXML = [
-        {
-            mode: 'value',
-            name: 'variable',
-            validator: 'variable'
-        },
-        {
-            mode: 'value',
-            name: 'value'
-        }
-    ];
+    static override autoXML: WidgetAutoXML = {
+        name: 'radio-button',
+        inputConfig: [
+            {
+                mode: 'value',
+                name: 'variable',
+                validator: 'variable'
+            },
+            {
+                mode: 'value',
+                name: 'value'
+            }
+        ]
+    };
 
     /** Horizontal offset. */
     private offsetX = 0;

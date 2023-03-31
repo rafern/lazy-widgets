@@ -3,6 +3,7 @@ import { VirtualKey } from './VirtualKey';
 
 import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from '../../core/KeyContext';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 
 /**
  * A {@link VirtualKey} which acts as a shift key; toggles
@@ -11,7 +12,10 @@ import type { KeyContext } from '../../core/KeyContext';
  * @category Widget
  */
 export class ShiftKey extends VirtualKey {
-    static override autoXML = SpecializedVirtualKeyXMLInputConfig;
+    static override autoXML: WidgetAutoXML = {
+        name: 'shift-key',
+        inputConfig: SpecializedVirtualKeyXMLInputConfig
+    };
 
     constructor(keyContext: KeyContext, minWidth = 84, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super(

@@ -2,6 +2,7 @@ import { BaseContainer } from './BaseContainer';
 import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { Widget, WidgetProperties } from './Widget';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
  * A {@link BaseContainer} which always propagates events. Use this widget if
@@ -12,7 +13,10 @@ import type { Widget, WidgetProperties } from './Widget';
  * @category Widget
  */
 export class Container<W extends Widget = Widget> extends BaseContainer<W> {
-    static override autoXML = SingleParentXMLInputConfig;
+    static override autoXML: WidgetAutoXML = {
+        name: 'container',
+        inputConfig: SingleParentXMLInputConfig
+    };
 
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         super(child, properties);
