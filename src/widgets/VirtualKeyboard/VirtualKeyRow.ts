@@ -1,9 +1,11 @@
 import { GlyphVirtualKey } from './GlyphVirtualKey';
+import { DynMsg } from '../../core/Strings';
+import { Row } from '../Row';
+import { filterIDFromProperties } from '../../helpers/filterIDFromProperties';
+
 import type { WidgetProperties } from '../Widget';
 import type { KeyContext } from '../../core/KeyContext';
 import type { VirtualKey } from './VirtualKey';
-import { DynMsg } from '../../core/Strings';
-import { Row } from '../Row';
 import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 import type { VirtualKeyRowTemplate } from '../../core/VirtualKeyboardTemplate';
 
@@ -48,11 +50,13 @@ export class VirtualKeyRow extends Row<VirtualKey> {
     constructor(rowTemplate: VirtualKeyRowTemplate, keyContext: KeyContext, minWidth = 24, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super([], properties);
 
+        const propertiesNoID = filterIDFromProperties(properties);
+
         for(const entry of rowTemplate) {
             if(typeof entry === 'function') {
                 // Entry is in template function format
                 const templateFunction = entry;
-                this.add(templateFunction(keyContext, properties));
+                this.add(templateFunction(keyContext, propertiesNoID));
             } else if(typeof entry[0] === 'string' && typeof entry[1] === 'string') {
                 // Entry is in multiple glyphs format
                 const glyphs = entry[0];
@@ -69,7 +73,7 @@ export class VirtualKeyRow extends Row<VirtualKey> {
                         keyContext,
                         minWidth,
                         minHeight,
-                        properties,
+                        propertiesNoID,
                     ));
                 }
             } else {

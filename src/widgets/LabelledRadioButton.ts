@@ -1,8 +1,10 @@
 import { Spacing, SpacingProperties } from './Spacing';
-import type { Variable } from '../state/Variable';
 import { Label, LabelProperties } from './Label';
 import { RadioButton } from './RadioButton';
 import { Row } from './Row';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
+
+import type { Variable } from '../state/Variable';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
@@ -30,10 +32,12 @@ export class LabelledRadioButton<V> extends Row {
     ];
 
     constructor(text: string, variable: Variable<V>, value: V, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
+        const propertiesNoID = filterIDFromProperties(properties);
+
         super([
-            new Label(text, properties),
-            new Spacing(properties),
-            new RadioButton(variable, value, properties),
+            new Label(text, propertiesNoID),
+            new Spacing(propertiesNoID),
+            new RadioButton(variable, value, propertiesNoID),
         ], properties);
     }
 }

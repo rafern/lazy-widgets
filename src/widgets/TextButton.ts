@@ -1,8 +1,10 @@
-import type { Alignment2D } from '../theme/Alignment2D';
 import { TextAlignMode } from '../helpers/TextHelper';
 import { Label, LabelProperties } from './Label';
 import { Alignment } from '../theme/Alignment';
 import { FilledButton } from './FilledButton';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
+
+import type { Alignment2D } from '../theme/Alignment2D';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
@@ -32,6 +34,6 @@ export class TextButton extends FilledButton<Label> {
             ...properties
         };
 
-        super(new Label(text, properties), properties);
+        super(new Label(text, filterIDFromProperties(properties)), properties);
     }
 }

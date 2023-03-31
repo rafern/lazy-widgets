@@ -1,18 +1,20 @@
 import { KeyboardDriver } from '../../drivers/KeyboardDriver';
-import type { FlexAlignment2D } from '../../theme/FlexAlignment2D';
 import { FlexAlignment } from '../../theme/FlexAlignment';
-import type { Widget, WidgetProperties } from '../Widget';
 import { Alignment } from '../../theme/Alignment';
 import { VirtualKeyRow } from './VirtualKeyRow';
-import type { KeyContext } from '../../core/KeyContext';
 import { Column } from '../Column';
-import type { WidgetEvent } from '../../events/WidgetEvent';
 import { LeaveEvent } from '../../events/LeaveEvent';
 import { PointerPressEvent } from '../../events/PointerPressEvent';
 import { PointerReleaseEvent } from '../../events/PointerReleaseEvent';
 import { PointerMove } from '../../events/PointerMove';
-import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 import { defaultVirtualKeyboardTemplate, VirtualKeyboardTemplate } from '../../core/VirtualKeyboardTemplate';
+import { filterIDFromProperties } from '../../helpers/filterIDFromProperties';
+
+import type { FlexAlignment2D } from '../../theme/FlexAlignment2D';
+import type { Widget, WidgetProperties } from '../Widget';
+import type { KeyContext } from '../../core/KeyContext';
+import type { WidgetEvent } from '../../events/WidgetEvent';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 
 /**
  * A virtual keyboard widget.
@@ -90,10 +92,11 @@ export class VirtualKeyboard extends Column {
             alt: false,
         };
 
+        const propertiesNoID = filterIDFromProperties(properties);
         for(const rowTemplate of keyboardTemplate) {
             this.add(new VirtualKeyRow(
                 rowTemplate, keyContext, minWidth, minHeight,
-                properties,
+                propertiesNoID,
             ));
         }
     }

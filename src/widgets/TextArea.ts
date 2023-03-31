@@ -1,7 +1,9 @@
 import { ScrollableViewportWidget, ScrollableViewportWidgetProperties, ScrollbarMode } from "./ScrollableViewportWidget";
-import type { ValidatedVariable } from "../state/ValidatedVariable";
 import { TextInput, TextInputProperties } from "./TextInput";
 import { AxisCoupling } from "../core/AxisCoupling";
+import { filterIDFromProperties } from "../helpers/filterIDFromProperties";
+
+import type { ValidatedVariable } from "../state/ValidatedVariable";
 import type { WidgetAutoXML } from "../xml/WidgetAutoXML";
 
 /**
@@ -36,7 +38,7 @@ export class TextArea extends ScrollableViewportWidget<TextInput> {
             ...properties
         };
 
-        super(new TextInput(variable, properties), properties)
+        super(new TextInput(variable, filterIDFromProperties(properties)), properties)
     }
 
     /**

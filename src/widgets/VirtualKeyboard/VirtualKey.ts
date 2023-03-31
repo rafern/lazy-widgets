@@ -1,6 +1,8 @@
 import { ArtificialConstraint } from '../ArtificialConstraint';
-import type { WidgetProperties } from '../Widget';
 import { TextButton } from '../TextButton';
+import { filterIDFromProperties } from '../../helpers/filterIDFromProperties';
+
+import type { WidgetProperties } from '../Widget';
 import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
 
 /**
@@ -45,7 +47,7 @@ export class VirtualKey extends ArtificialConstraint<TextButton> {
      */
     constructor(text: string, callback: () => void, minWidth = 24, minHeight = 24, properties?: Readonly<WidgetProperties>) {
         super(
-            new TextButton(text, properties).on('click', callback),
+            new TextButton(text, filterIDFromProperties(properties)).on('click', callback),
             [minWidth, Infinity, minHeight, Infinity],
             properties,
         );

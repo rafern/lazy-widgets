@@ -1,7 +1,9 @@
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
 import { Label } from './Label';
 import { Tooltip } from './Tooltip';
 import { TooltipContainer } from './TooltipContainer';
+
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { Widget, WidgetProperties } from './Widget';
 
 /**
@@ -22,15 +24,19 @@ export class TextTooltip<W extends Widget = Widget> extends Tooltip<W, TooltipCo
     ];
 
     constructor(child: W, tooltipText: string, properties?: Readonly<WidgetProperties>) {
+        const propertiesNoID = filterIDFromProperties(properties);
+
         super(
             child,
             new TooltipContainer(
                 new Label(
                     tooltipText,
                     {
+                        ...propertiesNoID,
                         wrapText: false
                     }
-                )
+                ),
+                propertiesNoID
             ),
             properties
         )

@@ -1,5 +1,7 @@
 import { Icon, IconProperties } from './Icon';
 import { Button } from './Button';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
+
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
@@ -18,6 +20,6 @@ export class IconButton extends Button<Icon> {
     ];
 
     constructor(image: HTMLImageElement, properties?: Readonly<IconProperties & ClickableWidgetProperties>) {
-        super(new Icon(image, properties), properties);
+        super(new Icon(image, filterIDFromProperties(properties)), properties);
     }
 }

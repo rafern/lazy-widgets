@@ -1,8 +1,10 @@
 import { Spacing, SpacingProperties } from './Spacing';
-import type { Variable } from '../state/Variable';
 import { Label, LabelProperties } from './Label';
 import { Checkbox } from './Checkbox';
 import { Row } from './Row';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
+
+import type { Variable } from '../state/Variable';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 
@@ -26,10 +28,12 @@ export class LabelledCheckbox extends Row {
     ];
 
     constructor(text: string, variable?: Variable<boolean>, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
+        const propertiesNoID = filterIDFromProperties(properties);
+
         super([
-            new Label(text, properties),
-            new Spacing(properties),
-            new Checkbox(variable, properties),
+            new Label(text, propertiesNoID),
+            new Spacing(propertiesNoID),
+            new Checkbox(variable, propertiesNoID),
         ], properties);
     }
 }
