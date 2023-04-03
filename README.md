@@ -12,18 +12,18 @@ future. Planned features/changes:
 
 ## Contributing
 
-To build this project, run `npm run build`. To build in watch mode and with
-unminified output run `npm run dev`; the `http-server` package must be
+To build this project, run `pnpm run build`. To build in watch mode and with
+unminified output run `pnpm run dev`; the `http-server` package must be
 installed.
 
-To check for linter errors, run `npm run lint`.
+To check for linter errors, run `pnpm run lint`.
 
 To add/modify theme properties, modify the `theme_properties.json` file and run
-`npm run generate_theme`.
+`pnpm run generate_theme`.
 
 ## Documentation
 
-Documentation can be generated locally with the command `npm run docs`. Output
+Documentation can be generated locally with the command `pnpm run docs`. Output
 will be in a new `docs` folder. The documentation is also served on
 [Github Pages](https://rafern.github.io/lazy-widgets).
 
