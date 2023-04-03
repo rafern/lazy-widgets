@@ -10,12 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
       - run: tar -czf build.tar.gz dist/
       - uses: actions/upload-artifact@v3
         with:
@@ -27,13 +30,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run test
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+      - run: pnpm run test
 
   generate-docs:
     needs: [build, test]
@@ -41,12 +47,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run docs
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run docs
       - name: Download build artifact
         uses: actions/download-artifact@v3
         with:
@@ -82,17 +91,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
+          cache: 'pnpm'
           registry-url: https://registry.npmjs.org/
       - name: Download build artifact
         uses: actions/download-artifact@v3
         with:
           name: build
       - run: tar -xf build.tar.gz dist/
-      - run: npm ci
-      - run: npm publish
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
