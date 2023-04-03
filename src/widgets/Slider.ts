@@ -174,15 +174,15 @@ export class Slider extends Widget {
         return value;
     }
 
-    /** Set the slider's value, optionally disabling callback */
-    setValue(value: number, doCallback = true): void {
+    /** Set the slider's value, optionally using an observer group */
+    setValue(value: number, group?: unknown): void {
         // Snap to increments if needed
         if(this.snapIncrement > 0) {
             value = Math.round(value / this.snapIncrement) * this.snapIncrement;
         }
 
         // Update value in variable
-        this.variable.setValue(this.clamp(value), doCallback);
+        this.variable.setValue(this.clamp(value), group);
     }
 
     protected stepValue(add: boolean, incMul: number): void {

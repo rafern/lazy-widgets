@@ -13,15 +13,6 @@ import { Variable } from "./Variable";
 export type Validator<U, V> = (value: U) => [true, V] | [false, unknown];
 
 /**
- * A callback used for when a {@link ValidatedVariable} has its value changed.
- * Functionally equivalent to {@link VariableCallback}; only used for type
- * correctness.
- *
- * @category State Management
- */
-export type ValidatedVariableCallback<V, T> = (value?: V, variable?: ValidatedVariable<V, T>) => void;
-
-/**
  * Similar to {@link Variable}, except the variable's value can optionally be
  * validated by a {@link Validator | validator function}.
  *
@@ -30,7 +21,7 @@ export type ValidatedVariableCallback<V, T> = (value?: V, variable?: ValidatedVa
  *
  * @category State Management
  */
-export class ValidatedVariable<V, T = V, C extends CallableFunction = ValidatedVariableCallback<V, T>> extends Variable<V, C> {
+export class ValidatedVariable<V, T = V> extends Variable<V> {
     /** See {@link ValidatedVariable#valid}. For internal use only */
     private _valid = true;
     /** See {@link ValidatedVariable#validValue}. For internal use only */
@@ -42,15 +33,11 @@ export class ValidatedVariable<V, T = V, C extends CallableFunction = ValidatedV
      */
     readonly validator: Validator<V, T> | null;
 
-    constructor(initialValue: V, validator: Validator<V, T> | null = null, callback?: C, callNow = true) {
-        super(initialValue, callback, false);
+    constructor(initialValue: V, validator: Validator<V, T> | null = null) {
+        super(initialValue);
 
         this.validator = validator;
         this.validate(initialValue);
-
-        if(callback && callNow) {
-            this.doCallback(callback);
-        }
     }
 
     /** If true, then the current value is valid. */
@@ -66,14 +53,14 @@ export class ValidatedVariable<V, T = V, C extends CallableFunction = ValidatedV
         return this._validValue as T;
     }
 
-    override setValue(value: V, notify = true): boolean {
+    override setValue(value: V, group?: unknown): boolean {
         if(this.value === value) {
             return false;
         }
 
         this.validate(value);
 
-        return super.setValue(value, notify);
+        return super.setValue(value, group);
     }
 
     private validate(value: V): void {

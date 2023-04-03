@@ -3,10 +3,10 @@ import { BaseLabel } from './BaseLabel';
 import type { Variable } from '../state/Variable';
 import type { LabelProperties } from './BaseLabel';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { VariableCallback } from '../state/Variable';
 import type { Root } from '../core/Root';
 import type { Viewport } from '../core/Viewport';
 import type { Widget } from './Widget';
+import type { ObservableCallback } from '../state/ObservableCallback';
 
 /**
  * A widget which displays a line of text.
@@ -39,7 +39,7 @@ export class LiveLabel extends BaseLabel {
      * The watch callback for the variable. For internal use only, used for
      * cleaning up the watcher.
      */
-    protected _textVariableWatcher: VariableCallback<string> | null = null;
+    protected _textVariableWatcher: ObservableCallback<string> | null = null;
 
     /**
      * @param textVariable - The variable to get the text for the label.
