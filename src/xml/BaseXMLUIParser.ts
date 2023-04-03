@@ -144,7 +144,7 @@ export abstract class BaseXMLUIParser {
     }
 
     /** Create a new widget instance given a config and context */
-    private instantiateWidget(inputConfig: WidgetXMLInputConfig, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown>, factory: XMLWidgetFactory, context: XMLUIParserContext, elem: Element) {
+    private instantiateWidget(inputConfig: WidgetXMLInputConfig, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown>, factory: XMLWidgetFactory, factoryName: string, context: XMLUIParserContext, elem: Element) {
         // parse parameters and options
         const paramCount = inputConfig.length;
         const instantiationContext: Record<string, unknown> = {};
@@ -158,11 +158,11 @@ export abstract class BaseXMLUIParser {
                 // this attribute sets a parameter's value
                 const index = paramNames.get(attribute.localName);
                 if (index === undefined) {
-                    throw new Error(`Can't set parameter "${attribute.localName}"; parameter does not exist for this widget`);
+                    throw new Error(`Can't set parameter "${attribute.localName}"; parameter does not exist in "${factoryName}" widget`);
                 }
 
                 if (setParameters[index]) {
-                    throw new Error(`Can't set parameter "${attribute.localName}"; parameter was already set`);
+                    throw new Error(`Can't set parameter "${attribute.localName}"; parameter was already set in "${factoryName}" widget`);
                 }
 
                 setParameters[index] = true;
@@ -174,7 +174,7 @@ export abstract class BaseXMLUIParser {
                 if (paramConfig.mode === 'value') {
                     if (arg === undefined) {
                         if (!paramConfig.optional) {
-                            throw new Error(`Required parameters (${paramConfig.name}) can't be undefined`);
+                            throw new Error(`Required parameters (${paramConfig.name}) can't be undefined in "${factoryName}" widget`);
                         }
                     } else {
                         const validator = paramValidators.get(index);
@@ -187,14 +187,14 @@ export abstract class BaseXMLUIParser {
                 } else if (paramConfig.mode === 'widget') {
                     if (arg === undefined) {
                         if (!paramConfig.optional) {
-                            throw new Error(`Required parameters (${paramConfig.name}) can't be undefined`);
+                            throw new Error(`Required parameters (${paramConfig.name}) can't be undefined in "${factoryName}" widget`);
                         }
                     } else {
                         const validator = (paramConfig as WidgetXMLInputConfigWidgetParameter).validator;
 
                         if (paramConfig.list) {
                             if (!Array.isArray(arg)) {
-                                throw new Error(`Parameter "${paramConfig.name}" must be an array of Widgets`);
+                                throw new Error(`Parameter "${paramConfig.name}" must be an array of Widgets in "${factoryName}" widget`);
                             }
 
                             if (validator) {
@@ -209,7 +209,7 @@ export abstract class BaseXMLUIParser {
                             }
                         } else {
                             if (!(arg instanceof Widget)) {
-                                throw new Error(`Parameter "${paramConfig.name}" must be a Widget`);
+                                throw new Error(`Parameter "${paramConfig.name}" must be a Widget in "${factoryName}" widget`);
                             }
 
                             if (validator) {
@@ -221,10 +221,10 @@ export abstract class BaseXMLUIParser {
                     }
                 } else if (paramConfig.mode === 'text') {
                     if (arg === undefined) {
-                        throw new Error(`Text parameters (${paramConfig.name}) can't be undefined`);
+                        throw new Error(`Text parameters (${paramConfig.name}) can't be undefined in "${factoryName}" widget`);
                     } else {
                         if (typeof arg !== 'string') {
-                            throw new Error(`Text parameters (${paramConfig.name}) must be strings`);
+                            throw new Error(`Text parameters (${paramConfig.name}) must be strings in "${factoryName}" widget`);
                         }
 
                         parameters[index] = arg;
@@ -239,12 +239,12 @@ export abstract class BaseXMLUIParser {
 
                     if (arg === undefined) {
                         if (!canBeOptional || !paramConfig.optional) {
-                            throw new Error(`Required parameters (${paramConfig.name}) can't be undefined`);
+                            throw new Error(`Required parameters (${paramConfig.name}) can't be undefined in "${factoryName}" widget`);
                         }
                     } else {
                         if (canBeList && paramConfig.list) {
                             if (!Array.isArray(arg)) {
-                                throw new Error(`Parameter "${paramConfig.name}" must be an array`);
+                                throw new Error(`Parameter "${paramConfig.name}" must be an array in "${factoryName}" widget`);
                             }
 
                             if (validator) {
@@ -278,11 +278,11 @@ export abstract class BaseXMLUIParser {
             const nodeType = childNode.nodeType;
 
             if (nodeType === Node.DOCUMENT_NODE) {
-                throw new Error('Unexpected document node in XML file');
+                throw new Error(`Unexpected document node as child of "${factoryName}" widget in XML file`);
             } else if (nodeType === Node.DOCUMENT_TYPE_NODE) {
-                throw new Error('Unexpected document type node in XML file');
+                throw new Error(`Unexpected document type node as child of "${factoryName}" widget in XML file`);
             } else if (nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-                throw new Error('Unexpected document fragment node in XML file');
+                throw new Error(`Unexpected document fragment node as child of "${factoryName}" widget in XML file`);
             } else if (nodeType === Node.TEXT_NODE || nodeType === Node.CDATA_SECTION_NODE) {
                 textContent += (childNode as CharacterData).data;
             } else if (nodeType === Node.ELEMENT_NODE) {
@@ -304,7 +304,7 @@ export abstract class BaseXMLUIParser {
                     const canBeList = parameterModeTuple[1];
                     const index = this.findNextParamOfType(inputConfig, setParameters, parameterMode);
                     if (index < 0) {
-                        throw new Error(`Too many parameters passed as XML child elements; tried to find next unset parameter of mode "${parameterMode}", but none found`);
+                        throw new Error(`Too many parameters passed as XML child elements; tried to find next unset parameter of mode "${parameterMode}" in "${factoryName}" widget, but none found`);
                     }
 
                     const value = deserializer(this, context, childElem);
@@ -323,7 +323,7 @@ export abstract class BaseXMLUIParser {
                     // validator
                     const index = this.findNextParamOfType(inputConfig, setParameters, 'widget');
                     if (index < 0) {
-                        throw new Error('Too many widgets passed as XML child elements');
+                        throw new Error(`Too many widgets passed as XML child elements for "${factoryName}" widget`);
                     }
 
                     const childWidget = this.parseWidgetElem(context, childElem);
@@ -348,7 +348,7 @@ export abstract class BaseXMLUIParser {
             parameters[textIndex] = textContent;
             setParameters[textIndex] = true;
         } else if (!WHITESPACE_REGEX.test(textContent)) {
-            throw new Error('XML widget has a child text node, but there are no text parameters left to fill');
+            throw new Error(`XML "${factoryName}" widget has a child text node, but there are no text parameters left to fill`);
         }
 
         // check if all required parameters are set
@@ -358,7 +358,7 @@ export abstract class BaseXMLUIParser {
                 const mode = param.mode;
                 if (mode === 'value' || mode === 'text') {
                     if (!param.optional) {
-                        throw new Error(`Parameter "${param.name}" with mode "${mode}" is not set`);
+                        throw new Error(`Parameter "${param.name}" with mode "${mode}" is not set in "${factoryName}" widget`);
                     }
                 } else {
                     const modeConfig = this.parameterModes.get(mode);
@@ -367,7 +367,7 @@ export abstract class BaseXMLUIParser {
                     }
 
                     if (!modeConfig[2] || !(param as { optional: boolean }).optional) {
-                        throw new Error(`Required parameter "${param.name}"`);
+                        throw new Error(`Required parameter "${param.name}" not set in "${factoryName}" widget`);
                     }
                 }
             }
@@ -384,7 +384,7 @@ export abstract class BaseXMLUIParser {
         // map widget back to ID
         if (instance.id !== null) {
             if (context.idMap.has(instance.id)) {
-                throw new Error(`Widget ID "${instance.id}" is already taken`);
+                throw new Error(`Widget ID "${instance.id}" is already taken in "${factoryName}" widget`);
             }
 
             context.idMap.set(instance.id, instance);
@@ -554,9 +554,13 @@ export abstract class BaseXMLUIParser {
         }
 
         // register factory
-        this.factories.set(factoryName, this.instantiateWidget.bind(
-            this, inputMapping, paramNames, paramValidators, factory
-        ));
+        this.factories.set(
+            factoryName,
+            (context, elem) => this.instantiateWidget(
+                inputMapping, paramNames, paramValidators, factory,
+                factoryName as string, context, elem
+            ),
+        );
     }
 
     /**
