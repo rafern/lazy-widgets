@@ -12,6 +12,7 @@ import { validateLayoutConstraints } from './validateLayoutConstraints';
 import { validateNullable } from './validateNullable';
 import { validateNumber } from './validateNumber';
 import { validateObject } from './validateObject';
+import { validateObservable } from './validateObservable';
 import { validateString } from './validateString';
 import { validateTheme } from './validateTheme';
 import { validateValidatedVariable } from './validateValidatedVariable';
@@ -307,6 +308,7 @@ export class XMLUIParser extends BaseXMLUIParser {
         this.registerValidator('nullable', validateNullable);
         this.registerValidator('number', validateNumber);
         this.registerValidator('object', validateObject);
+        this.registerValidator('observable', validateObservable);
         this.registerValidator('string', validateString);
         this.registerValidator('theme', validateTheme);
         this.registerValidator('validated-variable', validateValidatedVariable);

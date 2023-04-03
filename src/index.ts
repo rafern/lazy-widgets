@@ -181,6 +181,7 @@ export * from './xml/validateLayoutConstraints';
 export * from './xml/validateNullable';
 export * from './xml/validateNumber';
 export * from './xml/validateObject';
+export * from './xml/validateObservable';
 export * from './xml/validateString';
 export * from './xml/validateTheme';
 export * from './xml/validateValidatedVariable';
