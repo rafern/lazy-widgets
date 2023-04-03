@@ -8,6 +8,7 @@ import type { Variable } from '../state/Variable';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 import type { LabelProperties } from './BaseLabel';
+import type { Observable } from '../state/Observable';
 
 /**
  * A {@link Row} with a {@link LiveLabel}, {@link Spacing} and a
@@ -21,8 +22,8 @@ export class LiveLabelledCheckbox extends Row {
         inputConfig: [
             {
                 mode: 'value',
-                name: 'textVariable',
-                validator: 'variable'
+                name: 'text-source',
+                validator: 'observable'
             },
             {
                 mode: 'value',
@@ -33,11 +34,11 @@ export class LiveLabelledCheckbox extends Row {
         ]
     };
 
-    constructor(textVariable: Variable<string>, variable?: Variable<boolean>, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
+    constructor(textSource: Observable<string>, variable?: Variable<boolean>, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
         const propertiesNoID = filterIDFromProperties(properties);
 
         super([
-            new LiveLabel(textVariable, propertiesNoID),
+            new LiveLabel(textSource, propertiesNoID),
             new Spacing(propertiesNoID),
             new Checkbox(variable, propertiesNoID),
         ], properties);

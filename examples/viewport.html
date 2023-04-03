@@ -22,9 +22,9 @@
                         new Margin(
                             new Column([
                                 label,
-                                new TextInput(new ValidatedVariable('', null, value => {
+                                new TextInput(new ValidatedVariable('').watch(value => {
                                     label.text = `Text input: ${value}`;
-                                }, false)),
+                                })),
                                 new Row([
                                     new TextButton('Button 1'),
                                     new TextButton('Button 2'),
@@ -48,9 +48,9 @@
             // Create the options UI
             const widthLabel = new Label(`Minimum width: ${initialMinWidth}`);
             const heightLabel = new Label(`Minimum height: ${initialMinHeight}`);
-            const widthCoupling = new Variable(viewport.widthCoupling, coupling => viewport.widthCoupling = coupling);
-            const heightCoupling = new Variable(viewport.heightCoupling, coupling => viewport.heightCoupling = coupling);
-            const scrollbarMode = new Variable(viewport.scrollbarMode, mode => viewport.scrollbarMode = mode);
+            const widthCoupling = new Variable(viewport.widthCoupling).watch(coupling => viewport.widthCoupling = coupling, true);
+            const heightCoupling = new Variable(viewport.heightCoupling).watch(coupling => viewport.heightCoupling = coupling, true);
+            const scrollbarMode = new Variable(viewport.scrollbarMode).watch(mode => viewport.scrollbarMode = mode, true);
 
             function makeCouplingColumn(variable) {
                 return new Margin(
@@ -81,37 +81,35 @@
                             ])
                         ),
                         widthLabel,
-                        new Slider(new Variable(initialMinWidth, min => {
+                        new Slider(new Variable(initialMinWidth).watch(min => {
                             viewport.minWidth = min;
                             widthLabel.text = `Minimum width: ${min}`;
                         }), 0, 500, { snapIncrement: 1 }),
                         heightLabel,
-                        new Slider(new Variable(initialMinHeight, min => {
+                        new Slider(new Variable(initialMinHeight).watch(min => {
                             viewport.minHeight = min;
                             heightLabel.text = `Minimum height: ${min}`;
                         }), 0, 500, { snapIncrement: 1 }),
                         new LabelledCheckbox('Use canvas:', new Variable(
-                            viewport instanceof CanvasViewport,
-                            useCanvas => {
-                                const options = {
-                                    minWidth: viewport.minWidth,
-                                    minHeight: viewport.minHeight,
-                                    widthCoupling: viewport.widthCoupling,
-                                    heightCoupling: viewport.heightCoupling,
-                                    scrollbarMode: viewport.scrollbarMode,
-                                    useCanvas
-                                };
-                                const child = viewport.child;
+                            viewport instanceof CanvasViewport
+                        ).watch(useCanvas => {
+                            const options = {
+                                minWidth: viewport.minWidth,
+                                minHeight: viewport.minHeight,
+                                widthCoupling: viewport.widthCoupling,
+                                heightCoupling: viewport.heightCoupling,
+                                scrollbarMode: viewport.scrollbarMode,
+                                useCanvas
+                            };
+                            const child = viewport.child;
 
-                                mainColumn.remove(themeScope);
+                            mainColumn.remove(themeScope);
 
-                                viewport = new ScrollableViewportWidget(child, options);
-                                themeScope = new ThemeScope(viewport, themeScopeTheme);
+                            viewport = new ScrollableViewportWidget(child, options);
+                            themeScope = new ThemeScope(viewport, themeScopeTheme);
 
-                                mainColumn.add(themeScope);
-                            },
-                            false
-                        ))
+                            mainColumn.add(themeScope);
+                        }))
                     ]),
                     [0, 175, 0, Infinity]
                 )

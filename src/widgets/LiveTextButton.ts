@@ -8,7 +8,7 @@ import type { Alignment2D } from '../theme/Alignment2D';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
 import type { LabelProperties } from './BaseLabel';
-import type { Variable } from '../state/Variable';
+import type { Observable } from '../state/Observable';
 
 /**
  * A {@link FilledButton} with a {@link LiveLabel}. Alignment is forced to be
@@ -23,13 +23,13 @@ export class LiveTextButton extends FilledButton<LiveLabel> {
         inputConfig: [
             {
                 mode: 'value',
-                name: 'textVariable',
-                validator: 'variable'
+                name: 'text-source',
+                validator: 'observable'
             }
         ]
     };
 
-    constructor(textVariable: Variable<string>, properties?: Readonly<LabelProperties & ClickableWidgetProperties>) {
+    constructor(textSource: Observable<string>, properties?: Readonly<LabelProperties & ClickableWidgetProperties>) {
         // default properties
         properties = {
             containerAlignment: <Alignment2D>{
@@ -40,6 +40,6 @@ export class LiveTextButton extends FilledButton<LiveLabel> {
             ...properties
         };
 
-        super(new LiveLabel(textVariable, filterIDFromProperties(properties)), properties);
+        super(new LiveLabel(textSource, filterIDFromProperties(properties)), properties);
     }
 }

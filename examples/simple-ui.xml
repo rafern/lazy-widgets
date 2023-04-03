@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui-tree name="simple" xmlns="lazy-widgets" xmlns:option="lazy-widgets:options" xmlns:on="lazy-widgets:on">
     <script>
-        context.variables.set('textVariable', new ValidatedVariable('', null, value => {
+        context.variables.set('textVariable', new ValidatedVariable('').watch(value => {
             context.ids.get('label').text = `Text input: ${value}`;
-        }, false));
+        }));
         context.variables.set('buttonCallback', (ev) => {
             context.ids.get('label').text = `${ev.origin.child.text} clicked!`;
         });

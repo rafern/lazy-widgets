@@ -29,9 +29,9 @@
                         new Margin(
                             new Column([
                                 label,
-                                new TextInput(new ValidatedVariable('', null, value => {
+                                new TextInput(new ValidatedVariable('').watch(value => {
                                     label.text = `Text input: ${value}`;
-                                }, false)),
+                                })),
                                 new Row([
                                     new TextButton('Button 1'),
                                     new TextButton('Button 2'),
