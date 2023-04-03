@@ -65,6 +65,7 @@ export * from './helpers/ButtonClickHelper';
 export * from './helpers/ClickHelper';
 export * from './helpers/ClickState';
 export * from './helpers/CompoundClickHelper';
+export * from './helpers/filterIDFromProperties';
 export * from './helpers/fromKebabCase';
 export * from './helpers/GenericClickHelper';
 export * from './helpers/getPointerEventNormPos';
