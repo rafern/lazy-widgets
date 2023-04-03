@@ -38,9 +38,13 @@ export class ObservableTransformer<V, I extends Iterable<Observable<U>> | [Obser
      * @param decider - Decides whether the transformer's output value needs to be updated or not. If `undefined` (the default), then the value is always assumed to need to be updated whenever an input watcher is invoked.
      */
     constructor(readonly inputs: I, readonly transformer: (inputs: I) => V, readonly decider?: (inputs: I) => boolean) {
-        this.watcher = () => {
+        this.watcher = (_source: Observable<unknown>, group?: unknown) => {
             if (this.decider === undefined || this.decider(this.inputs)) {
                 this.dirty = true;
+
+                for (const callback of this.callbacks) {
+                    callback(this, group);
+                }
             }
         };
 

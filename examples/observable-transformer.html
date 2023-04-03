@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Margin, Column, DOMPointerDriver, ArtificialConstraint,
+                Background, LiveLabel, Variable, ObservableTransformer,
+                TextButton
+            } from '../dist/index.esm.js';
+
+            // Create the root
+            const clicks = new Variable(0);
+            const timeAccum = new Variable(0);
+            const clickAccum = new Variable(0);
+
+            const root = new DOMRoot(
+                new Background(
+                    new ArtificialConstraint(
+                        new Margin(
+                            new Column([
+                                new LiveLabel(new ObservableTransformer(
+                                    [clicks], (inputs) => `Clicks: ${inputs[0].value}`,
+                                )),
+                                new LiveLabel(new ObservableTransformer(
+                                    [timeAccum, clickAccum],
+                                    () => {
+                                        let cps = 0;
+                                        if (timeAccum.value !== 0) {
+                                            cps = 1000 * clickAccum.value / timeAccum.value;
+                                            clickAccum.value = 0;
+                                            timeAccum.value = 0;
+                                        }
+
+                                        return `Clicks per second: ${cps.toFixed(2)}`;
+                                    },
+                                    () => timeAccum.value >= 1000,
+                                )),
+                                new TextButton('Click me!').on(
+                                    'click', () => { clicks.value++; clickAccum.value++ },
+                                ),
+                            ]),
+                        ),
+                        [200, Infinity, 0, Infinity],
+                    ),
+                ),
+            );
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            let prevTimestamp;
+            function updateLoop(timestamp) {
+                if (prevTimestamp !== undefined) {
+                    timeAccum.value += timestamp - prevTimestamp;
+                }
+
+                prevTimestamp = timestamp;
+
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>
