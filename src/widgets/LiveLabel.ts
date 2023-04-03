@@ -1,6 +1,6 @@
 import { BaseLabel } from './BaseLabel';
-import { Variable } from '../state/Variable';
 
+import type { Variable } from '../state/Variable';
 import type { LabelProperties } from './BaseLabel';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 import type { VariableCallback } from '../state/Variable';
@@ -44,7 +44,7 @@ export class LiveLabel extends BaseLabel {
     /**
      * @param textVariable - The variable to get the text for the label.
      */
-    constructor(textVariable: Variable<string> = new Variable(''), properties?: Readonly<LabelProperties>) {
+    constructor(textVariable: Variable<string>, properties?: Readonly<LabelProperties>) {
         super(properties);
 
         this._textVariable = textVariable;

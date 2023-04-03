@@ -24,13 +24,12 @@ export class LiveTextButton extends FilledButton<LiveLabel> {
             {
                 mode: 'value',
                 name: 'textVariable',
-                validator: 'variable',
-                optional: true
+                validator: 'variable'
             }
         ]
     };
 
-    constructor(textVariable?: Variable<string>, properties?: Readonly<LabelProperties & ClickableWidgetProperties>) {
+    constructor(textVariable: Variable<string>, properties?: Readonly<LabelProperties & ClickableWidgetProperties>) {
         // default properties
         properties = {
             containerAlignment: <Alignment2D>{
