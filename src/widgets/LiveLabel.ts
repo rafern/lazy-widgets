@@ -20,7 +20,7 @@ import type { Observable } from '../state/Observable';
  */
 export class LiveLabel extends BaseLabel {
     static override autoXML: WidgetAutoXML = {
-        name: 'label',
+        name: 'live-label',
         inputConfig: [
             {
                 mode: 'value',
