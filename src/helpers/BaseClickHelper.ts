@@ -17,9 +17,18 @@ export interface BaseClickHelper {
     /** Did the last click state change result in a click? */
     get wasClick(): boolean;
     /**
-     * Reset the click helper to its default state. Only call this if absolutely
-     * necessary, such as when the owner Widget is re-activated (this way, hover
-     * states don't linger when a Widget is disabled).
+     * Reset the click helper to its default state, except for the
+     * clickStateChanged flag, which is set to true. Only call this if
+     * absolutely necessary, such as when the owner Widget is re-activated (this
+     * way, hover states don't linger when a Widget is disabled).
+     *
+     * You may be looking for {@link BaseClickHelper#doneProcessing} instead.
      */
     reset(): void;
+    /**
+     * Signal to this click helper that you are done processing changes in
+     * state. This simply resets the
+     * {@link BaseClickHelper#clickStateChanged} flag.
+     */
+    doneProcessing(): void;
 }

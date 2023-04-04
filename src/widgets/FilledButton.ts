@@ -1,19 +1,15 @@
 import { watchField } from '../decorators/FlagFields';
 import { ClickState } from '../helpers/ClickState';
 import { FillStyle } from '../theme/FillStyle';
-import { FocusType } from '../core/FocusType';
 import { DynMsg } from '../core/Strings';
 import { Theme } from '../theme/Theme';
 import { Button } from './Button';
 import { ClickableWidgetProperties } from './ClickableWidgetProperties';
-import { FocusEvent } from '../events/FocusEvent';
-import { BlurEvent } from '../events/BlurEvent';
 import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
 
 import type { ThemeProperties } from '../theme/ThemeProperties';
 import type { Widget, WidgetProperties } from './Widget';
 import type { Rect } from '../helpers/Rect';
-import type { WidgetEvent } from '../events/WidgetEvent';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
 
 /**
@@ -153,14 +149,12 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
         }
     }
 
-    protected override handleEvent(event: WidgetEvent): Widget | null {
-        const capturer = super.handleEvent(event);
-
-        if (this.clickHelper.clickStateChanged || (capturer === this && (event.isa(FocusEvent) || event.isa(BlurEvent)) && event.focusType === FocusType.Keyboard)) {
+    protected override handlePreLayoutUpdate() {
+        if (this.clickHelper.clickStateChanged) {
             this.updateBackground();
         }
 
-        return capturer;
+        super.handlePreLayoutUpdate();
     }
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {

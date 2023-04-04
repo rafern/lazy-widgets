@@ -81,4 +81,14 @@ export class CompoundClickHelper implements BaseClickHelper {
             clickHelper.reset();
         }
     }
+
+    /**
+     * Unsets the {@link BaseClickHelper#clickStateChanged} flag in each click
+     * helper instance being mixed.
+     */
+    doneProcessing() {
+        for(const clickHelper of this.clickHelpers) {
+            clickHelper.doneProcessing();
+        }
+    }
 }

@@ -47,10 +47,14 @@ export class GenericClickHelper implements BaseClickHelper {
         }
     }
 
+    doneProcessing() {
+        this.clickStateChanged = false;
+    }
+
     reset(): void {
         this.lastClickState = ClickState.Released;
         this.clickState = ClickState.Released;
-        this.clickStateChanged = false;
+        this.clickStateChanged = true;
         this.wasClick = false;
     }
 }

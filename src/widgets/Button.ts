@@ -76,6 +76,11 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
         return capture ? this : null;
     }
 
+    protected override handlePreLayoutUpdate() {
+        super.handlePreLayoutUpdate();
+        this.clickHelper.doneProcessing();
+    }
+
     /**
      * Is the button clickable? True by default. Used for disabling the button
      * without hiding it.
