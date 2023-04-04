@@ -22,8 +22,8 @@
                         new Margin(
                             new Column([
                                 label,
-                                new TextInput(new ValidatedVariable('').watch(value => {
-                                    label.text = `Text input: ${value}`;
+                                new TextInput(new ValidatedVariable('').watch(variable => {
+                                    label.text = `Text input: ${variable.value}`;
                                 })),
                                 new Row([
                                     new TextButton('Button 1'),
@@ -48,9 +48,9 @@
             // Create the options UI
             const widthLabel = new Label(`Minimum width: ${initialMinWidth}`);
             const heightLabel = new Label(`Minimum height: ${initialMinHeight}`);
-            const widthCoupling = new Variable(viewport.widthCoupling).watch(coupling => viewport.widthCoupling = coupling, true);
-            const heightCoupling = new Variable(viewport.heightCoupling).watch(coupling => viewport.heightCoupling = coupling, true);
-            const scrollbarMode = new Variable(viewport.scrollbarMode).watch(mode => viewport.scrollbarMode = mode, true);
+            const widthCoupling = new Variable(viewport.widthCoupling).watch(variable => viewport.widthCoupling = variable.value, true);
+            const heightCoupling = new Variable(viewport.heightCoupling).watch(variable => viewport.heightCoupling = variable.value, true);
+            const scrollbarMode = new Variable(viewport.scrollbarMode).watch(variable => viewport.scrollbarMode = variable.value, true);
 
             function makeCouplingColumn(variable) {
                 return new Margin(
@@ -81,25 +81,25 @@
                             ])
                         ),
                         widthLabel,
-                        new Slider(new Variable(initialMinWidth).watch(min => {
-                            viewport.minWidth = min;
-                            widthLabel.text = `Minimum width: ${min}`;
+                        new Slider(new Variable(initialMinWidth).watch(variable => {
+                            viewport.minWidth = variable.value;
+                            widthLabel.text = `Minimum width: ${variable.value}`;
                         }), 0, 500, { snapIncrement: 1 }),
                         heightLabel,
-                        new Slider(new Variable(initialMinHeight).watch(min => {
-                            viewport.minHeight = min;
-                            heightLabel.text = `Minimum height: ${min}`;
+                        new Slider(new Variable(initialMinHeight).watch(variable => {
+                            viewport.minHeight = variable.value;
+                            heightLabel.text = `Minimum height: ${variable.value}`;
                         }), 0, 500, { snapIncrement: 1 }),
                         new LabelledCheckbox('Use canvas:', new Variable(
                             viewport instanceof CanvasViewport
-                        ).watch(useCanvas => {
+                        ).watch(variable => {
                             const options = {
                                 minWidth: viewport.minWidth,
                                 minHeight: viewport.minHeight,
                                 widthCoupling: viewport.widthCoupling,
                                 heightCoupling: viewport.heightCoupling,
                                 scrollbarMode: viewport.scrollbarMode,
-                                useCanvas
+                                useCanvas: variable.value
                             };
                             const child = viewport.child;
 

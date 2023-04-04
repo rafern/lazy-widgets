@@ -38,7 +38,7 @@ export class Variable<V> implements Observable<V> {
         this.setValue(value);
     }
 
-    watch(callback: ObservableCallback<V>, callNow = true, group?: unknown): this {
+    watch(callback: ObservableCallback<V>, callNow = false, group?: unknown): this {
         this.callbacks.push(callback);
 
         if(callNow) {

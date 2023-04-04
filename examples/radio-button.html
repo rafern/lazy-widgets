@@ -10,7 +10,7 @@
             // Create the root
             const variable = new Variable(null);
             const label = new Label();
-            variable.watch(newValue => label.text = `Option selected: ${variable.value ?? 'none'}`);
+            variable.watch(() => label.text = `Option selected: ${variable.value ?? 'none'}`, true);
 
             const root = new DOMRoot(
                 new Background(

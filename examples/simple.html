@@ -16,8 +16,8 @@
                     new Margin(
                         new Column([
                             label,
-                            new TextInput(new ValidatedVariable('').watch(value => {
-                                label.text = `Text input: ${value}`;
+                            new TextInput(new ValidatedVariable('').watch(variable => {
+                                label.text = `Text input: ${variable.value}`;
                             })),
                             new Row([
                                 new TextButton('Button 1'),

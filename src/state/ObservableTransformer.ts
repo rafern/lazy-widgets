@@ -65,7 +65,7 @@ export class ObservableTransformer<V, I extends Iterable<Observable<U>> | [Obser
         this.watcher = null;
     }
 
-    watch(callback: ObservableCallback<V>, callNow = true, group?: unknown): this {
+    watch(callback: ObservableCallback<V>, callNow = false, group?: unknown): this {
         this.callbacks.push(callback);
 
         if(callNow) {

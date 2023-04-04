@@ -11,14 +11,14 @@
             const helloText = new Variable('');
             const languageText = new Variable('');
 
-            function changeLanguage(lang) {
-                if (lang === 'en') {
+            function changeLanguage(variable) {
+                if (variable.value === 'en') {
                     helloText.value = 'Hello!';
                     languageText.value = 'Language:';
-                } else if (lang === 'pt') {
+                } else if (variable.value === 'pt') {
                     helloText.value = 'Olá!';
                     languageText.value = 'Idioma:';
-                } else if (lang === 'fr') {
+                } else if (variable.value === 'fr') {
                     helloText.value = 'Bonjour!';
                     languageText.value = 'Langue:';
                 }
