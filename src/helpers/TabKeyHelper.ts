@@ -83,7 +83,6 @@ export class TabKeyHelper {
 
                     this.waitQueue.delete(callback);
 
-                    console.debug(checkTime, this.lastTabEvent);
                     if (checkTime - this.lastTabEvent <= INPUT_WINDOW_MS) {
                         resolve(true);
                     } else {
