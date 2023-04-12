@@ -9,6 +9,7 @@ import { FocusType } from "../core/FocusType";
 import { ClickHelper } from "./ClickHelper";
 import { ClickState } from "./ClickState";
 import { LeaveEvent } from "../events/LeaveEvent";
+import { PointerMove } from "../events/PointerMove";
 
 import type { Widget } from "../widgets/Widget";
 import type { TricklingEvent } from "../events/TricklingEvent";
@@ -33,6 +34,7 @@ export class ButtonClickHelper extends CompoundClickHelper {
     protected keyboardClickHelper: GenericClickHelper;
     /** The widget that will be auto-scrolled when keyboard focused */
     private widget: Widget;
+    private pointerFocused = false;
 
     constructor(widget: Widget) {
         const pointerClickHelper = new ClickHelper(widget);
@@ -53,10 +55,12 @@ export class ButtonClickHelper extends CompoundClickHelper {
      * @returns Returns true if the focus type was the keyboard focus (and therefore the button probably needs to be re-painted)
      */
     onFocusGrabbed(focusType: FocusType): boolean {
-        if(focusType === FocusType.Keyboard) {
+        if (focusType === FocusType.Keyboard) {
             this.keyboardClickHelper.setClickState(ClickState.Hover, true);
             this.widget.autoScroll();
             return true;
+        } else if (focusType === FocusType.Pointer) {
+            this.pointerFocused = true;
         }
 
         return false;
@@ -71,9 +75,11 @@ export class ButtonClickHelper extends CompoundClickHelper {
      * @returns Returns true if the focus type was the keyboard focus (and therefore the button probably needs to be re-painted)
      */
     onFocusDropped(focusType: FocusType): boolean {
-        if(focusType === FocusType.Keyboard) {
+        if (focusType === FocusType.Keyboard) {
             this.keyboardClickHelper.setClickState(ClickState.Released, false);
             return true;
+        } else if (focusType === FocusType.Pointer) {
+            this.pointerFocused = false;
         }
 
         return false;
@@ -98,8 +104,8 @@ export class ButtonClickHelper extends CompoundClickHelper {
             if (event.key !== 'Enter') {
                 return [false, false];
             }
-        } else if (event.isa(PointerWheelEvent)) {
-            shouldCapture = false;
+        } else if (event.isa(PointerWheelEvent) || event.isa(PointerMove)) {
+            shouldCapture = this.pointerFocused;
         } else if (!(event.isa(LeaveEvent) || event instanceof PointerEvent)) {
             // Discard unhandled events
             return [false, false];
