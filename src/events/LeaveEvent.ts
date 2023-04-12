@@ -3,8 +3,14 @@ import { Widget } from '../widgets/Widget';
 import { TargetableTricklingEvent } from './TargetableTricklingEvent';
 
 /**
- * A leave {@link TricklingEvent}. Dispatched when the pointer leaves the root
- * or the focus capturer changes to another widget.
+ * A leave {@link TricklingEvent}. Dispatched when a pointer is no longer over
+ * a specific widget (other libraries may call this an unhover event).
+ *
+ * If a pointer event never visits a widget, even when the event is in the
+ * bounds of the widget, then the widget will never get a leave event dispatched
+ * to it. This is done by tracking the list of widgets that get visited by a
+ * pointer event every time a pointer event is dispatched. This is done
+ * automatically by the {@link Widget} and {@link Root} classes.
  *
  * Has a focus type of {@link FocusType.Pointer} and needs focus.
  *

@@ -370,9 +370,17 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
             // ignore event if the event is targetted but not a descendant of
             // this widget (or not this widget), or if the event is an
             // untargetted pointer event outside the bounds of the widget
+            let isPointerEvent: boolean | null = null;
             if(event.target === null) {
-                if((event instanceof PointerEvent) && (event.x < this.x || event.y < this.y || event.x >= this.x + this.width || event.y >= this.y + this.height)) {
-                    return null;
+                isPointerEvent = event instanceof PointerEvent;
+                // XXX typescript is being derpy again, so we have to typecast
+                //     everything to a pointer event despite having a guard
+                //     right before the usage
+                if(isPointerEvent) {
+                    const pointerEvent = event as PointerEvent;
+                    if (pointerEvent.x < this.x || pointerEvent.y < this.y || pointerEvent.x >= this.x + this.width || pointerEvent.y >= this.y + this.height) {
+                        return null;
+                    }
                 }
             } else if(event.target !== this) {
                 // XXX trace back the event target. if we are an ascendant of
@@ -389,6 +397,15 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
 
                     head = head._parent;
                 }
+            }
+
+            // if this is a pointer event, mark as being hovered
+            if (isPointerEvent === null) {
+                isPointerEvent = event instanceof PointerEvent;
+            }
+
+            if (isPointerEvent) {
+                this.root.markHovered(this);
             }
 
             // dispatch to user event listeners
