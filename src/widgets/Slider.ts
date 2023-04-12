@@ -235,7 +235,7 @@ export class Slider extends Widget {
         }
 
         // Ignore unhandled events
-        if(event.isa(PointerWheelEvent) || !(event.isa(LeaveEvent) || event instanceof PointerEvent || event instanceof KeyEvent)) {
+        if(!(event.isa(LeaveEvent) || event instanceof PointerEvent || event instanceof KeyEvent)) {
             return null;
         }
 
@@ -364,5 +364,10 @@ export class Slider extends Widget {
 
             ctx.fillRect(x + fullWidth, y, emptyWidth, this.actualHeight);
         }
+    }
+
+    protected override handlePreLayoutUpdate() {
+        super.handlePreLayoutUpdate();
+        this.clickHelper.doneProcessing();
     }
 }

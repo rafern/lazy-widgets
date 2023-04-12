@@ -255,4 +255,9 @@ export class RadioButton<V> extends Widget {
         this.clickHelper.reset();
         this.markWholeAsDirty();
     }
+
+    protected override handlePreLayoutUpdate() {
+        super.handlePreLayoutUpdate();
+        this.clickHelper.doneProcessing();
+    }
 }

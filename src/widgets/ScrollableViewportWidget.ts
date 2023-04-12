@@ -571,6 +571,12 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         this.offset = offset;
     }
 
+    protected override handlePreLayoutUpdate() {
+        super.handlePreLayoutUpdate();
+        this.horizontalClickHelper.doneProcessing();
+        this.verticalClickHelper.doneProcessing();
+    }
+
     protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Check which scrollbars need painting
         const [childWidth, childHeight] = this.child.idealDimensions;
