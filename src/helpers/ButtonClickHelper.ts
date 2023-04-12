@@ -90,10 +90,7 @@ export class ButtonClickHelper extends CompoundClickHelper {
      * @returns Returns a 2-tuple containing, respective, whether a click occurred, and whether the event should be captured
      */
     handleEvent(event: TricklingEvent, root: Root, enabled: boolean, bounds: Bounds): [wasClick: boolean, capture: boolean] {
-        if(event.isa(PointerWheelEvent)) {
-            // Ignore wheel events
-            return [false, false];
-        } else if(event instanceof KeyEvent) {
+        if(event instanceof KeyEvent) {
             // Discard non-enter key events
 
             // don't capture non-enter presses so that tab selection works
@@ -107,27 +104,23 @@ export class ButtonClickHelper extends CompoundClickHelper {
 
         // Abort if not enabled, but still absorb events
         if(!enabled) {
-            this.pointerClickHelper.clickStateChanged = false;
-            this.keyboardClickHelper.clickStateChanged = false;
             return [false, true];
         }
 
         // Update button state
+        const clickStateAlreadyChanged = this.clickStateChanged;
         if(event.isa(KeyPressEvent)) {
-            this.pointerClickHelper.clickStateChanged = false;
             this.keyboardClickHelper.setClickState(ClickState.Hold, true);
             this.widget.autoScroll();
         } else if(event.isa(KeyReleaseEvent)) {
-            this.pointerClickHelper.clickStateChanged = false;
             this.keyboardClickHelper.setClickState(ClickState.Hover, true);
         } else {
-            this.keyboardClickHelper.clickStateChanged = false;
             this.pointerClickHelper.handleClickEvent(event, root, bounds);
         }
 
         // Check if button was pressed and call callback if so
         return [
-            this.clickStateChanged && this.wasClick,
+            !clickStateAlreadyChanged && this.clickStateChanged && this.wasClick,
             true
         ];
     }

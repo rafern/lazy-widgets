@@ -132,8 +132,6 @@ export class ClickHelper extends GenericClickHelper {
             } else {
                 return this.setClickState(ClickState.Hold, inside);
             }
-        } else {
-            this.clickStateChanged = false;
         }
     }
 
