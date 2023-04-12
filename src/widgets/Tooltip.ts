@@ -1,6 +1,6 @@
 import { Layer } from '../core/Layer';
 import { LeaveEvent } from '../events/LeaveEvent';
-import { PointerMove } from '../events/PointerMove';
+import { PointerMoveEvent } from '../events/PointerMoveEvent';
 import { LayeredContainer } from './LayeredContainer';
 import { PassthroughWidget } from './PassthroughWidget';
 import { TooltipContainer } from './TooltipContainer';
@@ -114,7 +114,7 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
         }
 
         // check if this event should count as a hover/unhover
-        if (event.isa(PointerMove)) {
+        if (event.isa(PointerMoveEvent)) {
             if (this._hoverStart === 0) {
                 this._hoverStart = Date.now();
                 this._hoverStartX = event.x;

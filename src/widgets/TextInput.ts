@@ -6,7 +6,7 @@ import { PointerEvent } from '../events/PointerEvent';
 import { PointerPressEvent } from '../events/PointerPressEvent';
 import { PointerWheelEvent } from '../events/PointerWheelEvent';
 import { Widget, WidgetProperties } from './Widget';
-import { PointerMove } from '../events/PointerMove';
+import { PointerMoveEvent } from '../events/PointerMoveEvent';
 import { TextHelper } from '../helpers/TextHelper';
 import { AutoScrollEvent } from '../events/AutoScrollEvent';
 import { KeyPressEvent } from '../events/KeyPressEvent';
@@ -690,7 +690,7 @@ export class TextInput extends Widget {
             // Request keyboard focus if this is a pointer press with the
             // primary button
             const isPressEvent = event.isa(PointerPressEvent);
-            if(isPressEvent || event.isa(PointerMove)) {
+            if(isPressEvent || event.isa(PointerMoveEvent)) {
                 const isPress = isPressEvent && event.isPrimary;
                 if(isPress) {
                     this.dragging = true;

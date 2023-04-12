@@ -2,7 +2,7 @@ import { PointerWheelEvent, PointerWheelMode } from '../events/PointerWheelEvent
 import { PointerReleaseEvent } from '../events/PointerReleaseEvent';
 import { PointerEvent } from '../events/PointerEvent';
 import { PointerPressEvent } from '../events/PointerPressEvent';
-import { PointerMove } from '../events/PointerMove';
+import { PointerMoveEvent } from '../events/PointerMoveEvent';
 import { FocusType } from '../core/FocusType';
 import { PointerHint } from './PointerHint';
 import { LeaveEvent } from '../events/LeaveEvent';
@@ -235,7 +235,7 @@ export class PointerDriver implements Driver {
             captured = this.dispatchEvent(
                 root,
                 state,
-                new PointerMove(x, y, shift, ctrl, alt, source),
+                new PointerMoveEvent(x, y, shift, ctrl, alt, source),
                 source
             );
         }

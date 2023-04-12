@@ -45,7 +45,7 @@ export * from './events/LeaveEvent';
 export * from './events/ModifierEvent';
 export * from './events/PointerButtonEvent';
 export * from './events/PointerEvent';
-export * from './events/PointerMove';
+export * from './events/PointerMoveEvent';
 export * from './events/PointerPressEvent';
 export * from './events/PointerReleaseEvent';
 export * from './events/PointerWheelEvent';

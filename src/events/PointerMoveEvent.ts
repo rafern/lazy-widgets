@@ -11,23 +11,23 @@ import type { SourcePointer } from '../drivers/SourcePointer';
  *
  * @category Event
  */
-export class PointerMove extends PointerEvent {
+export class PointerMoveEvent extends PointerEvent {
     static override readonly type = 'pointer-move';
-    override readonly type: typeof PointerMove.type;
+    override readonly type: typeof PointerMoveEvent.type;
     override readonly focusType: FocusType.Pointer;
 
     constructor(x: number, y: number, shift: boolean, ctrl: boolean, alt: boolean, source: SourcePointer | null, target: Widget | null = null) {
         super(x, y, shift, ctrl, alt, source, target);
 
-        this.type = PointerMove.type;
+        this.type = PointerMoveEvent.type;
         this.focusType = FocusType.Pointer;
     }
 
-    correctOffset(xOffset: number, yOffset: number): PointerMove {
-        return new PointerMove(this.x - xOffset, this.y - yOffset, this.shift, this.ctrl, this.alt, this.source, this.target);
+    correctOffset(xOffset: number, yOffset: number): PointerMoveEvent {
+        return new PointerMoveEvent(this.x - xOffset, this.y - yOffset, this.shift, this.ctrl, this.alt, this.source, this.target);
     }
 
-    cloneWithTarget(target: Widget | null): PointerMove {
-        return new PointerMove(this.x, this.y, this.shift, this.ctrl, this.alt, this.source, target);
+    cloneWithTarget(target: Widget | null): PointerMoveEvent {
+        return new PointerMoveEvent(this.x, this.y, this.shift, this.ctrl, this.alt, this.source, target);
     }
 }

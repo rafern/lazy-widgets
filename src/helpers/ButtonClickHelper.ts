@@ -9,7 +9,7 @@ import { FocusType } from "../core/FocusType";
 import { ClickHelper } from "./ClickHelper";
 import { ClickState } from "./ClickState";
 import { LeaveEvent } from "../events/LeaveEvent";
-import { PointerMove } from "../events/PointerMove";
+import { PointerMoveEvent } from "../events/PointerMoveEvent";
 
 import type { Widget } from "../widgets/Widget";
 import type { TricklingEvent } from "../events/TricklingEvent";
@@ -104,7 +104,7 @@ export class ButtonClickHelper extends CompoundClickHelper {
             if (event.key !== 'Enter') {
                 return [false, false];
             }
-        } else if (event.isa(PointerWheelEvent) || event.isa(PointerMove)) {
+        } else if (event.isa(PointerWheelEvent) || event.isa(PointerMoveEvent)) {
             shouldCapture = this.pointerFocused;
         } else if (!(event.isa(LeaveEvent) || event instanceof PointerEvent)) {
             // Discard unhandled events

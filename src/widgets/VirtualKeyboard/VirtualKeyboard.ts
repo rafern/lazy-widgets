@@ -6,7 +6,7 @@ import { Column } from '../Column';
 import { LeaveEvent } from '../../events/LeaveEvent';
 import { PointerPressEvent } from '../../events/PointerPressEvent';
 import { PointerReleaseEvent } from '../../events/PointerReleaseEvent';
-import { PointerMove } from '../../events/PointerMove';
+import { PointerMoveEvent } from '../../events/PointerMoveEvent';
 import { defaultVirtualKeyboardTemplate, VirtualKeyboardTemplate } from '../../core/VirtualKeyboardTemplate';
 import { filterIDFromProperties } from '../../helpers/filterIDFromProperties';
 
@@ -106,7 +106,7 @@ export class VirtualKeyboard extends Column {
 
     protected override handleEvent(event: WidgetEvent): Widget | null {
         // Ignore all non-pointer events
-        if (event.type === PointerPressEvent.type || event.type === PointerReleaseEvent.type || event.type === PointerMove.type || event.type === LeaveEvent.type) {
+        if (event.type === PointerPressEvent.type || event.type === PointerReleaseEvent.type || event.type === PointerMoveEvent.type || event.type === LeaveEvent.type) {
             return super.handleEvent(event);
         } else {
             return null;
