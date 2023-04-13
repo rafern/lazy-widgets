@@ -336,8 +336,12 @@ export function injectDebugCode(): void {
     injectStackTraceFeature(Root, 'preLayoutUpdate');
     // stacktrace.Root.postLayoutUpdate
     injectStackTraceFeature(Root, 'postLayoutUpdate');
-    // stacktrace.Root.updatePointerStyle
-    injectStackTraceFeature(Root, 'updatePointerStyle');
+    // stacktrace.Root.requestPointerStyle
+    injectStackTraceFeature(Root, 'requestPointerStyle');
+    // stacktrace.Root.clearPointerStyle
+    injectStackTraceFeature(Root, 'clearPointerStyle');
+    // stacktrace.Root.clearPointerStylesFromWidget
+    injectStackTraceFeature(Root, 'clearPointerStylesFromWidget');
     // stacktrace.Root.requestFocus
     injectStackTraceFeature(Root, 'requestFocus');
     // stacktrace.Root.dropFocus

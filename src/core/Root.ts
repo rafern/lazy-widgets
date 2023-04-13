@@ -308,9 +308,8 @@ export class Root implements WidgetEventEmitter {
      * Is this root enabled? If not enabled, painting, updating or resolving
      * layout will do nothing. {@link Root#drivers | Drivers} will also be
      * notified by calling {@link Driver#onEnable} or {@link Driver#onDisable},
-     * pointer style will be reset ({@link Root#updatePointerStyle} called with
-     * 'default') and all {@link Root#_foci | foci} will be cleared
-     * ({@link Root#clearFocus}).
+     * pointer style will be reset and all {@link Root#_foci | foci} will be
+     * cleared ({@link Root#clearFocus}).
      *
      * See {@link Root#_enabled}
      */
@@ -604,8 +603,7 @@ export class Root implements WidgetEventEmitter {
 
     /**
      * Do a post-layout update; calls {@link Root#child}'s
-     * {@link Widget#postLayoutUpdate} and {@link Root#updatePointerStyle}. Does
-     * nothing if root is disabled.
+     * {@link Widget#postLayoutUpdate}. Does nothing if root is disabled.
      *
      * Call this before calling {@link Root#paint} and after calling
      * {@link Root#resolveLayout}
