@@ -1,5 +1,4 @@
 import { PointerPressEvent } from '../events/PointerPressEvent';
-import { PointerWheelEvent } from '../events/PointerWheelEvent';
 import { PointerEvent } from '../events/PointerEvent';
 import { damageField } from '../decorators/FlagFields';
 import { ClickHelper } from '../helpers/ClickHelper';
