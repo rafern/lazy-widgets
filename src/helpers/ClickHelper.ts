@@ -82,9 +82,10 @@ export class ClickHelper extends GenericClickHelper {
 
     /**
      * Updates the current {@link GenericClickHelper#clickState} given an event,
-     * as well as {@link Root#_foci | focus}, {@link Root#pointerStyle},
+     * as well as {@link Root#_foci | focus},
      * {@link GenericClickHelper#wasClick} and
-     * {@link GenericClickHelper#clickStateChanged} flags.
+     * {@link GenericClickHelper#clickStateChanged} flags, and requests pointer
+     * styles when necessary.
      *
      * @param bounds - A 4-tuple containing, respectively, left coordinate, right coordinate, top coordinate and bottom coordinate of clickable area, in pixels
      */
