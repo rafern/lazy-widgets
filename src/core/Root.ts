@@ -499,26 +499,30 @@ export class Root implements WidgetEventEmitter {
             }
         }
 
+        // Special case: when the pointer focus changes, dispatch a leave event
+        // to the last capturer
+        let pointerFocusDropped = false;
+        if(this.droppedPointerFoci.size > 0) {
+            for (const droppedFocus of this.droppedPointerFoci) {
+                const leaveEvent = new LeaveEvent(droppedFocus);
+                captureList.push([
+                    leaveEvent,
+                    this.child.dispatchEvent(leaveEvent) !== null
+                ]);
+            }
+
+            this.droppedPointerFoci.clear();
+            pointerFocusDropped = true;
+        }
+
         // Check which widgets are no longer hovered, and dispatch leave events
         let oldCapturer: Widget | null | undefined;
         if (event instanceof PointerEvent) {
-            if(this.droppedPointerFoci.size > 0) {
-                // Special case: when the pointer focus changes, dispatch a
-                // leave event to the last capturer
-                for (const droppedFocus of this.droppedPointerFoci) {
-                    const leaveEvent = new LeaveEvent(droppedFocus);
-                    captureList.push([
-                        leaveEvent,
-                        this.child.dispatchEvent(leaveEvent) !== null
-                    ]);
-                }
-
-                this.droppedPointerFoci.clear();
-
-                // Special case: when the pointer focus is dropped while a
-                // pointer event is processed, dispatch a new move event in case
-                // the pointer is now hovering a different widget but the new
-                // widget doesn't know this
+            // Special case: when the pointer focus is dropped while a pointer
+            // event is processed, dispatch a new move event in case the pointer
+            // is now hovering a different widget but the new widget doesn't
+            // know this
+            if (pointerFocusDropped) {
                 // XXX typescript is bad with type guards so we have to do an
                 //     explicit cast
                 const origEvent = event as PointerEvent;
