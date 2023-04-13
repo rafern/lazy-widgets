@@ -679,13 +679,14 @@ export class TextInput extends Widget {
             // won't receive pointer release events outside the widget
             this.dragging = false;
             this.lastClick = 0;
+            this.clearPointerStyle();
             return this;
         } else if(event.isa(PointerWheelEvent)) {
             // Don't capture wheel events
             return null;
         } else if(event instanceof PointerEvent) {
             // If this is a pointer event, set pointer style and handle clicks
-            root.pointerStyle = 'text';
+            this.requestPointerStyle('text');
 
             // Request keyboard focus if this is a pointer press with the
             // primary button

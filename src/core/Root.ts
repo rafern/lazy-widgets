@@ -1,6 +1,5 @@
 import { DynMsg, groupedStackTrace } from './Strings';
 import { PointerEvent } from '../events/PointerEvent';
-import { PointerWheelEvent } from '../events/PointerWheelEvent';
 import { CanvasViewport } from './CanvasViewport';
 import { TabSelectEvent } from '../events/TabSelectEvent';
 import { KeyPressEvent } from '../events/KeyPressEvent';
@@ -21,6 +20,49 @@ import type { Widget } from '../widgets/Widget';
 import type { Driver } from './Driver';
 import type { CaptureList } from './CaptureList';
 import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
+
+/**
+ * Allowed cursor styles and in order of priority; lower indices have higher
+ * priority
+ */
+export const ALLOWED_CURSOR_STYLES = [
+    'wait',
+    'not-allowed',
+    'no-drop',
+    'copy',
+    'alias',
+    'move',
+    'grabbing',
+    'pointer',
+    'text',
+    'vertical-text',
+    'cell',
+    'crosshair',
+    'col-resize',
+    'row-resize',
+    'grab',
+    'nesw-resize',
+    'nwse-resize',
+    'ne-resize',
+    'nw-resize',
+    'se-resize',
+    'sw-resize',
+    'ew-resize',
+    'ns-resize',
+    'n-resize',
+    'e-resize',
+    's-resize',
+    'w-resize',
+    'progress',
+    'context-menu',
+    'help',
+    'zoom-in',
+    'zoom-out',
+    'all-scroll',
+    'none',
+    'default',
+    'auto'
+];
 
 /**
  * Optional Root constructor properties.
@@ -79,23 +121,9 @@ export class Root implements WidgetEventEmitter {
      */
     protected _enabled = true;
     /**
-     * The pointer style this root wants. Will be set on
-     * {@link Root#postLayoutUpdate} by {@link Root#pointerStyleHandler}
+     * For internal use only. Current value of {@link Root#pointerStyleHandler}.
      */
-    pointerStyle = 'default';
-    /**
-     * The actual current pointer style.
-     *
-     * For internal use only.
-     *
-     * See {@link Root#pointerStyle}
-     */
-    protected _currentPointerStyle = 'default';
-    /**
-     * Pointer style handler, decides how to show the given pointer style.
-     * Normally a function which sets the CSS cursor style of the Root's canvas
-     */
-    pointerStyleHandler: PointerStyleHandler | null;
+    protected _pointerStyleHandler: PointerStyleHandler | null = null;
     /**
      * Current component foci (event targets for each focus type).
      *
@@ -160,6 +188,18 @@ export class Root implements WidgetEventEmitter {
      * only.
      */
     private pointerFocusDropped = false;
+    /**
+     * Currently requested pointer styles. The list is ordered, where higher
+     * priority pointer styles have a lower index than lower priority pointer
+     * styles; the highest priority pointer style is always at index 0. For
+     * internal use only.
+     */
+    private requestedPointerStyles = new Array<string>();
+    /**
+     * Helper list for {@link requestedPointerStyles} which contains the
+     * respective requester {@link Widget}. For internal use only.
+     */
+    private requestedPointerStyleWidgets = new Array<Widget>();
 
     constructor(child: Widget, properties?: Readonly<RootProperties>) {
         this.viewport = Root.makeViewport(child, properties);
@@ -178,6 +218,48 @@ export class Root implements WidgetEventEmitter {
         if (properties?.maxCanvasHeight !== undefined) {
             this.viewport.maxCanvasHeight = properties.maxCanvasHeight;
         }
+    }
+
+    /**
+     * For internal use only. Sets the pointer style to 'default' if there is a
+     * pointer style handler.
+     */
+    private dropPointerStyleHandler() {
+        if (this._pointerStyleHandler) {
+            this._pointerStyleHandler('default');
+        }
+    }
+
+    /**
+     * For internal use only. Sets the pointer style to the highest priority
+     * requested pointer style if there is a pointer style handler, and if there
+     * is a requested pointer style.
+     */
+    private restorePointerStyleHandler() {
+        if (this._pointerStyleHandler !== null) {
+            const pointerStyle = this.requestedPointerStyles[0];
+            if (pointerStyle !== undefined) {
+                this._pointerStyleHandler(pointerStyle);
+            }
+        }
+    }
+
+    /**
+     * Pointer style handler, decides how to show the given pointer style.
+     * Normally a function which sets the CSS cursor style of the Root's canvas
+     */
+    get pointerStyleHandler(): PointerStyleHandler | null {
+        return this._pointerStyleHandler;
+    }
+
+    set pointerStyleHandler(pointerStyleHandler: PointerStyleHandler | null) {
+        if (this._pointerStyleHandler === pointerStyleHandler) {
+            return;
+        }
+
+        this.dropPointerStyleHandler();
+        this._pointerStyleHandler = pointerStyleHandler;
+        this.restorePointerStyleHandler();
     }
 
     /**
@@ -243,12 +325,14 @@ export class Root implements WidgetEventEmitter {
                 for(const driver of this.drivers) {
                     driver.onEnable(this);
                 }
+
+                this.restorePointerStyleHandler();
             } else {
                 for(const driver of this.drivers) {
                     driver.onDisable(this);
                 }
 
-                this.updatePointerStyle('default');
+                this.dropPointerStyleHandler();
 
                 for(const focus of this._foci.keys()) {
                     this.clearFocus(focus);
@@ -377,12 +461,6 @@ export class Root implements WidgetEventEmitter {
             event = event.cloneWithTarget(focus);
         }
 
-        // Clear pointer style. This will be set by children if neccessary
-        const isPointerEvent = event instanceof PointerEvent;
-        if(event.isa(LeaveEvent) || (!event.isa(PointerWheelEvent) && isPointerEvent)) {
-            this.pointerStyle = 'default';
-        }
-
         // Pass event down to internal Container
         let captured = this.child.dispatchEvent(event);
         const captureList: CaptureList = [[originalEvent, captured !== null]];
@@ -425,7 +503,7 @@ export class Root implements WidgetEventEmitter {
 
         // Check which widgets are no longer hovered, and dispatch leave events
         let oldCapturer: Widget | null | undefined;
-        if (isPointerEvent) {
+        if (event instanceof PointerEvent) {
             // Special case: when the pointer focus changes, dispatch a leave
             // event to the last capturer
             if (event.focusType === FocusType.Pointer) {
@@ -534,29 +612,6 @@ export class Root implements WidgetEventEmitter {
 
         // Post-layout update child
         this.child.postLayoutUpdate();
-
-        // Update pointer style
-        this.updatePointerStyle();
-    }
-
-    /**
-     * Calls {@link Root#pointerStyleHandler} if the {@link Root#pointerStyle}
-     * has changed (checked by comparing with
-     * {@link Root#_currentPointerStyle}). Also updates
-     * {@link Root#_currentPointerStyle}. Can also be optionally supplied a new
-     * pointer style.
-     */
-    updatePointerStyle(newStyle: string | null = null): void {
-        if(newStyle !== null) {
-            this.pointerStyle = newStyle;
-        }
-
-        if(this.pointerStyle !== this._currentPointerStyle) {
-            this._currentPointerStyle = this.pointerStyle;
-            if(this.pointerStyleHandler !== null) {
-                this.pointerStyleHandler(this._currentPointerStyle);
-            }
-        }
     }
 
     /**
@@ -966,5 +1021,91 @@ export class Root implements WidgetEventEmitter {
      */
     markHovered(widget: Widget): void {
         this.hoveredWidgets.add(widget);
+    }
+
+    /**
+     * Request a pointer style. If the pointer style has a lower priority than
+     * the current pointer style, it won't be displayed, but will still be
+     * queued up in case the higher-priority style is cleared.
+     */
+    requestPointerStyle(widget: Widget, pointerStyle: string): void {
+        // remove old pointer style requested by widget (unless it's the same or
+        // missing)
+        let needsUpdate = false;
+        const oldStyle = this.requestedPointerStyles[0];
+        const oldIdx = this.requestedPointerStyleWidgets.indexOf(widget);
+        if (oldIdx !== -1) {
+            if (this.requestedPointerStyles[oldIdx] === pointerStyle) {
+                // already requested
+                return;
+            }
+
+            this.requestedPointerStyles.splice(oldIdx, 1);
+            this.requestedPointerStyleWidgets.splice(oldIdx, 1);
+
+            if (oldIdx === 0 && oldStyle !== this.requestedPointerStyles[0]) {
+                needsUpdate = true;
+            }
+        }
+
+        // get priority of wanted pointer style
+        const priority = ALLOWED_CURSOR_STYLES.indexOf(pointerStyle);
+        if (priority === -1) {
+            console.warn(`Ignored disallowed/invalid pointer style: "${pointerStyle}"`);
+        } else {
+            // insert into list before first index with lower priority (lower number
+            // means higher priority)
+            const len = this.requestedPointerStyles.length;
+            let i = 0;
+            while (i < len) {
+                const oStyle = this.requestedPointerStyles[i];
+                const oPriority = ALLOWED_CURSOR_STYLES.indexOf(oStyle);
+
+                if (oPriority > priority) {
+                    // lower priority, insert before this index
+                    break;
+                } else {
+                    // higher priority, skip indices until a different pointer style
+                    // is found
+                    i++;
+                    for (; i < len; i++) {
+                        if (this.requestedPointerStyles[i] !== oStyle) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            this.requestedPointerStyles.splice(i, 0, pointerStyle);
+            this.requestedPointerStyleWidgets.splice(i, 0, widget);
+
+            if (i === 0 && oldStyle !== this.requestedPointerStyles[0]) {
+                needsUpdate = true;
+            }
+        }
+
+        // update pointer style
+        if (needsUpdate && this._enabled && this._pointerStyleHandler) {
+            this._pointerStyleHandler(pointerStyle);
+        }
+    }
+
+    /**
+     * Stop requesting a pointer style.
+     */
+    clearPointerStyle(widget: Widget): void {
+        // remove pointer style requested by widget
+        const idx = this.requestedPointerStyleWidgets.indexOf(widget);
+        if (idx !== -1) {
+            const oldStyle = this.requestedPointerStyles[0];
+
+            this.requestedPointerStyles.splice(idx, 1);
+            this.requestedPointerStyleWidgets.splice(idx, 1);
+
+            const newStyle = this.requestedPointerStyles[0];
+            if (this._enabled && this._pointerStyleHandler && idx === 0 && oldStyle !== newStyle) {
+                this._pointerStyleHandler(newStyle ?? 'default');
+            }
+        }
     }
 }

@@ -92,6 +92,7 @@ export class ClickHelper extends GenericClickHelper {
         if(event.isa(LeaveEvent)) {
             // Drop focus on this widget if this is a leave event
             root.dropFocus(FocusType.Pointer, this.widget);
+            root.clearPointerStyle(this.widget);
             this.pointerPos = null;
             return this.setClickState(ClickState.Released, false);
         } else if(event instanceof PointerEvent) {
@@ -102,10 +103,14 @@ export class ClickHelper extends GenericClickHelper {
             // pointer style, else, if not targeted, drop focus
             const inside = this.isNormalInRect(...this.pointerPos);
             if(inside) {
-                root.pointerStyle = 'pointer';
-            } else if(event.target === null) {
-                root.dropFocus(FocusType.Pointer, this.widget);
-                return this.setClickState(ClickState.Released, false);
+                root.requestPointerStyle(this.widget, 'pointer');
+            } else {
+                root.clearPointerStyle(this.widget);
+
+                if(event.target === null) {
+                    root.dropFocus(FocusType.Pointer, this.widget);
+                    return this.setClickState(ClickState.Released, false);
+                }
             }
 
             // If this is a press event, request focus and set starting
