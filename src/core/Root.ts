@@ -184,10 +184,10 @@ export class Root implements WidgetEventEmitter {
      */
     private hoveredWidgets = new Set<Widget>();
     /**
-     * Was the pointer focus dropped while processing an event? For internal use
-     * only.
+     * The list of widgets that had a pointer focus but dropped it while
+     * processing an event. For internal use only.
      */
-    private pointerFocusDropped = false;
+    private droppedPointerFoci = new Set<Widget>();
     /**
      * Currently requested pointer styles. The list is ordered, where higher
      * priority pointer styles have a lower index than lower priority pointer
@@ -411,8 +411,6 @@ export class Root implements WidgetEventEmitter {
      * @returns Returns a list of dispatched events and whether they were captured.
      */
     dispatchEvent(baseEvent: WidgetEvent): CaptureList {
-        this.pointerFocusDropped = false;
-
         // Ignore event if Root is disabled
         if(!this.enabled) {
             return [[baseEvent, false]];
@@ -504,24 +502,23 @@ export class Root implements WidgetEventEmitter {
         // Check which widgets are no longer hovered, and dispatch leave events
         let oldCapturer: Widget | null | undefined;
         if (event instanceof PointerEvent) {
-            // Special case: when the pointer focus changes, dispatch a leave
-            // event to the last capturer
-            if (event.focusType === FocusType.Pointer) {
-                oldCapturer = this.getFocusCapturer(FocusType.Pointer);
-                if(oldCapturer !== null && captured !== oldCapturer) {
-                    const leaveEvent = new LeaveEvent(oldCapturer);
+            if(this.droppedPointerFoci.size > 0) {
+                // Special case: when the pointer focus changes, dispatch a
+                // leave event to the last capturer
+                for (const droppedFocus of this.droppedPointerFoci) {
+                    const leaveEvent = new LeaveEvent(droppedFocus);
                     captureList.push([
                         leaveEvent,
                         this.child.dispatchEvent(leaveEvent) !== null
                     ]);
                 }
-            }
 
-            // Special case: when the pointer focus is dropped while a pointer
-            // event is processed, dispatch a new move event in case the pointer
-            // is now hovering a different widget but the new widget doesn't
-            // know this
-            if(this.pointerFocusDropped) {
+                this.droppedPointerFoci.clear();
+
+                // Special case: when the pointer focus is dropped while a
+                // pointer event is processed, dispatch a new move event in case
+                // the pointer is now hovering a different widget but the new
+                // widget doesn't know this
                 // XXX typescript is bad with type guards so we have to do an
                 //     explicit cast
                 const origEvent = event as PointerEvent;
@@ -708,7 +705,7 @@ export class Root implements WidgetEventEmitter {
             }
 
             if (focusType === FocusType.Pointer) {
-                this.pointerFocusDropped = true;
+                this.droppedPointerFoci.add(currentFocus);
             }
 
             // XXX no special case for clearing keyboard/tab focus. keyboard
