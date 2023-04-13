@@ -854,7 +854,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         }
 
         root.dropFoci(this);
-        root.clearPointerStyle(this);
+        root.clearPointerStylesFromWidget(this);
         this._root = null;
         this._viewport = null;
         this._parent = null;
@@ -942,7 +942,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
 
         if(this.attached) {
             (this._root as Root).dropFoci(this);
-            (this._root as Root).clearPointerStyle(this);
+            (this._root as Root).clearPointerStylesFromWidget(this);
         }
     }
 
@@ -1135,8 +1135,8 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
      * Convenience method, which just calls {@link Root#requestPointerStyle}
      * with `this` as the Widget.
      */
-    protected requestPointerStyle(pointerStyle: string): void {
-        this.root.requestPointerStyle(this, pointerStyle)
+    protected requestPointerStyle(pointerStyle: string, source?: unknown): void {
+        this.root.requestPointerStyle(this, pointerStyle, source)
     }
 
     /**
@@ -1144,7 +1144,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
      * Convenience method, which just calls {@link Root#clearPointerStyle} with
      * `this` as the Widget.
      */
-    protected clearPointerStyle(): void {
-        this.root.clearPointerStyle(this);
+    protected clearPointerStyle(source?: unknown): void {
+        this.root.clearPointerStyle(this, source);
     }
 }

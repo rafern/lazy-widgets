@@ -200,6 +200,11 @@ export class Root implements WidgetEventEmitter {
      * respective requesters. For internal use only.
      */
     private requestedPointerStyleSources = new Array<unknown>();
+    /**
+     * Helper list for {@link requestedPointerStyles} which contains the
+     * respective requesters' widget. For internal use only.
+     */
+    private requestedPointerStyleWidgets = new Array<unknown>();
 
     constructor(child: Widget, properties?: Readonly<RootProperties>) {
         this.viewport = Root.makeViewport(child, properties);
@@ -1024,17 +1029,32 @@ export class Root implements WidgetEventEmitter {
         this.hoveredWidgets.add(widget);
     }
 
+    private indexOfPointerStyle(widget: Widget, source: unknown): number {
+        let startIdx = 0;
+        let idx: number;
+
+        while ((idx = this.requestedPointerStyleWidgets.indexOf(widget, startIdx)) !== -1) {
+            if (this.requestedPointerStyleSources[idx] === source) {
+                return idx;
+            }
+
+            startIdx = idx + 1;
+        }
+
+        return -1;
+    }
+
     /**
      * Request a pointer style. If the pointer style has a lower priority than
      * the current pointer style, it won't be displayed, but will still be
      * queued up in case the higher-priority style is cleared.
      */
-    requestPointerStyle(source: unknown, pointerStyle: string): void {
+    requestPointerStyle(widget: Widget, pointerStyle: string, source?: unknown): void {
         // remove old pointer style requested by source (unless it's the same or
         // missing)
         let needsUpdate = false;
         const oldStyle = this.requestedPointerStyles[0];
-        const oldIdx = this.requestedPointerStyleSources.indexOf(source);
+        const oldIdx = this.indexOfPointerStyle(widget, source);
         if (oldIdx !== -1) {
             if (this.requestedPointerStyles[oldIdx] === pointerStyle) {
                 // already requested
@@ -1042,6 +1062,7 @@ export class Root implements WidgetEventEmitter {
             }
 
             this.requestedPointerStyles.splice(oldIdx, 1);
+            this.requestedPointerStyleWidgets.splice(oldIdx, 1);
             this.requestedPointerStyleSources.splice(oldIdx, 1);
 
             if (oldIdx === 0 && oldStyle !== this.requestedPointerStyles[0]) {
@@ -1078,6 +1099,7 @@ export class Root implements WidgetEventEmitter {
             }
 
             this.requestedPointerStyles.splice(i, 0, pointerStyle);
+            this.requestedPointerStyleWidgets.splice(i, 0, widget);
             this.requestedPointerStyleSources.splice(i, 0, source);
 
             if (i === 0 && oldStyle !== this.requestedPointerStyles[0]) {
@@ -1094,19 +1116,45 @@ export class Root implements WidgetEventEmitter {
     /**
      * Stop requesting a pointer style.
      */
-    clearPointerStyle(source: unknown): void {
+    clearPointerStyle(widget: Widget, source?: unknown): void {
         // remove pointer style requested by source
-        const idx = this.requestedPointerStyleSources.indexOf(source);
+        const idx = this.indexOfPointerStyle(widget, source);
         if (idx !== -1) {
             const oldStyle = this.requestedPointerStyles[0];
 
             this.requestedPointerStyles.splice(idx, 1);
+            this.requestedPointerStyleWidgets.splice(idx, 1);
             this.requestedPointerStyleSources.splice(idx, 1);
 
             const newStyle = this.requestedPointerStyles[0];
             if (this._enabled && this._pointerStyleHandler && idx === 0 && oldStyle !== newStyle) {
                 this._pointerStyleHandler(newStyle ?? 'default');
             }
+        }
+    }
+
+    /**
+     * Stop requesting all pointer styles from a specific widget.
+     */
+    clearPointerStylesFromWidget(widget: Widget): void {
+        const oldStyle = this.requestedPointerStyles[0];
+
+        // eslint-disable-next-line no-constant-condition
+        let idx: number;
+        let hadZeroIdx = false;
+        while ((idx = this.requestedPointerStyleWidgets.indexOf(widget)) !== -1) {
+            this.requestedPointerStyles.splice(idx, 1);
+            this.requestedPointerStyleWidgets.splice(idx, 1);
+            this.requestedPointerStyleSources.splice(idx, 1);
+
+            if (idx === 0) {
+                hadZeroIdx = true;
+            }
+        }
+
+        const newStyle = this.requestedPointerStyles[0];
+        if (this._enabled && this._pointerStyleHandler && hadZeroIdx && oldStyle !== newStyle) {
+            this._pointerStyleHandler(newStyle ?? 'default');
         }
     }
 }
