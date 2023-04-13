@@ -920,4 +920,15 @@ export abstract class BaseXMLUIParser {
         const str = await response.text();
         return this.parseFromString(str, config);
     }
+
+    async getParseTreeFromURL(resource: RequestInfo | URL, config?: XMLUIParserConfig, requestOptions?: RequestInit): Promise<[Map<string, Widget>, XMLUIParserContext]> {
+        const response = await fetch(resource, requestOptions);
+
+        if (!response.ok) {
+            throw new Error(`Response not OK (status code ${response.status})`);
+        }
+
+        const str = await response.text();
+        return this.getParseTreeFromString(str, config);
+    }
 }
