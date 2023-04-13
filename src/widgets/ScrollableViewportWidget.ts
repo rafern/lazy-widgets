@@ -294,7 +294,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         } else if(stateChanged) {
             // Release this scrollbar
             this.verticalDragged = null;
-            return true;
+            return false;
         }
 
         return false;
