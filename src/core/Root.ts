@@ -197,9 +197,9 @@ export class Root implements WidgetEventEmitter {
     private requestedPointerStyles = new Array<string>();
     /**
      * Helper list for {@link requestedPointerStyles} which contains the
-     * respective requester {@link Widget}. For internal use only.
+     * respective requesters. For internal use only.
      */
-    private requestedPointerStyleWidgets = new Array<Widget>();
+    private requestedPointerStyleSources = new Array<unknown>();
 
     constructor(child: Widget, properties?: Readonly<RootProperties>) {
         this.viewport = Root.makeViewport(child, properties);
@@ -1029,12 +1029,12 @@ export class Root implements WidgetEventEmitter {
      * the current pointer style, it won't be displayed, but will still be
      * queued up in case the higher-priority style is cleared.
      */
-    requestPointerStyle(widget: Widget, pointerStyle: string): void {
-        // remove old pointer style requested by widget (unless it's the same or
+    requestPointerStyle(source: unknown, pointerStyle: string): void {
+        // remove old pointer style requested by source (unless it's the same or
         // missing)
         let needsUpdate = false;
         const oldStyle = this.requestedPointerStyles[0];
-        const oldIdx = this.requestedPointerStyleWidgets.indexOf(widget);
+        const oldIdx = this.requestedPointerStyleSources.indexOf(source);
         if (oldIdx !== -1) {
             if (this.requestedPointerStyles[oldIdx] === pointerStyle) {
                 // already requested
@@ -1042,7 +1042,7 @@ export class Root implements WidgetEventEmitter {
             }
 
             this.requestedPointerStyles.splice(oldIdx, 1);
-            this.requestedPointerStyleWidgets.splice(oldIdx, 1);
+            this.requestedPointerStyleSources.splice(oldIdx, 1);
 
             if (oldIdx === 0 && oldStyle !== this.requestedPointerStyles[0]) {
                 needsUpdate = true;
@@ -1078,7 +1078,7 @@ export class Root implements WidgetEventEmitter {
             }
 
             this.requestedPointerStyles.splice(i, 0, pointerStyle);
-            this.requestedPointerStyleWidgets.splice(i, 0, widget);
+            this.requestedPointerStyleSources.splice(i, 0, source);
 
             if (i === 0 && oldStyle !== this.requestedPointerStyles[0]) {
                 needsUpdate = true;
@@ -1094,14 +1094,14 @@ export class Root implements WidgetEventEmitter {
     /**
      * Stop requesting a pointer style.
      */
-    clearPointerStyle(widget: Widget): void {
-        // remove pointer style requested by widget
-        const idx = this.requestedPointerStyleWidgets.indexOf(widget);
+    clearPointerStyle(source: unknown): void {
+        // remove pointer style requested by source
+        const idx = this.requestedPointerStyleSources.indexOf(source);
         if (idx !== -1) {
             const oldStyle = this.requestedPointerStyles[0];
 
             this.requestedPointerStyles.splice(idx, 1);
-            this.requestedPointerStyleWidgets.splice(idx, 1);
+            this.requestedPointerStyleSources.splice(idx, 1);
 
             const newStyle = this.requestedPointerStyles[0];
             if (this._enabled && this._pointerStyleHandler && idx === 0 && oldStyle !== newStyle) {
