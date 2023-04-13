@@ -3,7 +3,7 @@
     <script>
         context.variables.set('textVariable', new ValidatedVariable('').watch(variable => {
             context.ids.get('label').text = `Text input: ${variable.value}`;
-        });
+        }));
         context.variables.set('buttonCallback', (ev) => {
             context.ids.get('label').text = `${ev.origin.child.text} clicked!`;
         });
