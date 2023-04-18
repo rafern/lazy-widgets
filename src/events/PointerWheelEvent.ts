@@ -1,9 +1,9 @@
-import { FocusType } from '../core/FocusType';
-import { PointerEvent } from './PointerEvent';
-import { Widget } from '../widgets/Widget';
-import { DynMsg } from '../core/Strings';
+import { FocusType } from '../core/FocusType.js';
+import { PointerEvent } from './PointerEvent.js';
+import { Widget } from '../widgets/Widget.js';
+import { DynMsg } from '../core/Strings.js';
 
-import type { SourcePointer } from '../drivers/SourcePointer';
+import type { SourcePointer } from '../drivers/SourcePointer.js';
 
 /**
  * The scrolling mode that determines how the {@link PointerWheelEvent#deltaX},

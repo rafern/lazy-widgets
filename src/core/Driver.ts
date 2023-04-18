@@ -1,6 +1,6 @@
-import type { Widget } from '../widgets/Widget';
-import type { FocusType } from './FocusType';
-import type { Root } from './Root';
+import type { Widget } from '../widgets/Widget.js';
+import type { FocusType } from './FocusType.js';
+import type { Root } from './Root.js';
 
 /**
  * Drivers are modular expansions to {@link Root | Roots}. Drivers can be

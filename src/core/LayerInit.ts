@@ -1,4 +1,4 @@
-import { Widget } from '../widgets/Widget';
+import { Widget } from '../widgets/Widget.js';
 
 /**
  * A layer initialization object to create a new {@link Layer} for a

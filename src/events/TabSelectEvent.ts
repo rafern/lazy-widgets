@@ -1,5 +1,5 @@
-import { Widget } from '../widgets/Widget';
-import { UntargetableTricklingEvent } from './UntargetableTricklingEvent';
+import { Widget } from '../widgets/Widget.js';
+import { UntargetableTricklingEvent } from './UntargetableTricklingEvent.js';
 
 /**
  * A tab selection {@link TricklingEvent}. Dispatched when tab is pressed and

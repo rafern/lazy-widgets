@@ -1,7 +1,7 @@
-import { Widget } from '../widgets/Widget';
-import { UntargetableTricklingEvent } from './UntargetableTricklingEvent';
+import { Widget } from '../widgets/Widget.js';
+import { UntargetableTricklingEvent } from './UntargetableTricklingEvent.js';
 
-import type { Bounds } from '../helpers/Bounds';
+import type { Bounds } from '../helpers/Bounds.js';
 
 /**
  * An auto-scroll {@link UntargetableTricklingEvent}. Dispatched when a widget

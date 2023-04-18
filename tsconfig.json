@@ -19,7 +19,7 @@
     "esModuleInterop": true,
     "noImplicitOverride": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "emitDeclarationOnly": true
   },
   "ts-node": {

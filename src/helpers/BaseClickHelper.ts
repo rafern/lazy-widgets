@@ -1,4 +1,4 @@
-import { ClickState } from "./ClickState";
+import { ClickState } from './ClickState.js';
 
 /**
  * The common interface for {@link CompoundClickHelper} and

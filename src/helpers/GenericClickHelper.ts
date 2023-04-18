@@ -1,6 +1,6 @@
-import { BaseClickHelper } from './BaseClickHelper';
-import { Widget } from '../widgets/Widget';
-import { ClickState } from './ClickState';
+import { BaseClickHelper } from './BaseClickHelper.js';
+import { Widget } from '../widgets/Widget.js';
+import { ClickState } from './ClickState.js';
 
 /**
  * An aggregate helper class for widgets that can be clicked, in the general

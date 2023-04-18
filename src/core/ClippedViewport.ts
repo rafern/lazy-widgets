@@ -1,8 +1,8 @@
-import { BaseViewport } from "./BaseViewport";
-import { Msg } from './Strings';
+import { BaseViewport } from './BaseViewport.js';
+import { Msg } from './Strings.js';
 
-import type { Rect } from '../helpers/Rect';
-import type { Widget } from "../widgets/Widget";
+import type { Rect } from '../helpers/Rect.js';
+import type { Widget } from '../widgets/Widget.js';
 
 /**
  * A {@link Viewport} which inherits a rendering context from the closest parent

@@ -1,8 +1,8 @@
-import { PassthroughWidget } from './PassthroughWidget';
+import { PassthroughWidget } from './PassthroughWidget.js';
 
-import type { Theme } from '../theme/Theme';
-import type { Widget } from './Widget';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { Theme } from '../theme/Theme.js';
+import type { Widget } from './Widget.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 
 /**
  * A {@link PassthroughWidget} which changes the theme of its child and

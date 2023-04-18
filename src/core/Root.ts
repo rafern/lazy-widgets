@@ -1,25 +1,25 @@
-import { DynMsg, groupedStackTrace } from './Strings';
-import { PointerEvent } from '../events/PointerEvent';
-import { CanvasViewport } from './CanvasViewport';
-import { TabSelectEvent } from '../events/TabSelectEvent';
-import { KeyPressEvent } from '../events/KeyPressEvent';
-import { FocusType } from './FocusType';
-import { LeaveEvent } from '../events/LeaveEvent';
-import { Theme } from '../theme/Theme';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { TricklingEvent } from '../events/TricklingEvent';
-import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions';
-import { FocusEvent } from '../events/FocusEvent';
-import { BlurEvent } from '../events/BlurEvent';
-import { PointerMoveEvent } from '../events/PointerMoveEvent';
+import { DynMsg, groupedStackTrace } from './Strings.js';
+import { PointerEvent } from '../events/PointerEvent.js';
+import { CanvasViewport } from './CanvasViewport.js';
+import { TabSelectEvent } from '../events/TabSelectEvent.js';
+import { KeyPressEvent } from '../events/KeyPressEvent.js';
+import { FocusType } from './FocusType.js';
+import { LeaveEvent } from '../events/LeaveEvent.js';
+import { Theme } from '../theme/Theme.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import { TricklingEvent } from '../events/TricklingEvent.js';
+import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions.js';
+import { FocusEvent } from '../events/FocusEvent.js';
+import { BlurEvent } from '../events/BlurEvent.js';
+import { PointerMoveEvent } from '../events/PointerMoveEvent.js';
 
-import type { PointerStyleHandler } from './PointerStyleHandler';
-import type { LayoutConstraints } from './LayoutConstraints';
-import type { TextInputHandler } from './TextInputHandler';
-import type { Widget } from '../widgets/Widget';
-import type { Driver } from './Driver';
-import type { CaptureList } from './CaptureList';
-import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
+import type { PointerStyleHandler } from './PointerStyleHandler.js';
+import type { LayoutConstraints } from './LayoutConstraints.js';
+import type { TextInputHandler } from './TextInputHandler.js';
+import type { Widget } from '../widgets/Widget.js';
+import type { Driver } from './Driver.js';
+import type { CaptureList } from './CaptureList.js';
+import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter.js';
 
 /**
  * Allowed cursor styles and in order of priority; lower indices have higher

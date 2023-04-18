@@ -1,7 +1,7 @@
-import { BareWidgetXMLInputConfig } from '../xml/BareWidgetXMLInputConfig';
-import { Widget, WidgetProperties } from './Widget';
+import { BareWidgetXMLInputConfig } from '../xml/BareWidgetXMLInputConfig.js';
+import { Widget, WidgetProperties } from './Widget.js';
 
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 
 /**
  * Optional TextInput constructor properties.

@@ -1,9 +1,9 @@
-import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
-import { BaseContainer } from './BaseContainer';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
+import { BaseContainer } from './BaseContainer.js';
 
-import type { Rect } from '../helpers/Rect';
-import type { Widget, WidgetProperties } from './Widget';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { Rect } from '../helpers/Rect.js';
+import type { Widget, WidgetProperties } from './Widget.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 
 /**
  * A container widget that adds a background color.

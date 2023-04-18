@@ -1,9 +1,9 @@
-import { Spacing } from './Spacing';
-import { BareWidgetXMLInputConfig } from '../xml/BareWidgetXMLInputConfig';
+import { Spacing } from './Spacing.js';
+import { BareWidgetXMLInputConfig } from '../xml/BareWidgetXMLInputConfig.js';
 
-import type { SpacingProperties } from './Spacing';
-import type { Rect } from '../helpers/Rect';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { SpacingProperties } from './Spacing.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 
 /**
  * A {@link Spacing} with a colored background, where the color is the same as

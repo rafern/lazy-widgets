@@ -1,4 +1,4 @@
-import type { PointerDriver } from './PointerDriver';
+import type { PointerDriver } from './PointerDriver.js';
 
 /**
  * The source of a pointer event. A pair containing the originating

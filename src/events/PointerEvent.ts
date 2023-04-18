@@ -1,7 +1,7 @@
-import { ModifierEvent } from './ModifierEvent';
+import { ModifierEvent } from './ModifierEvent.js';
 
-import type { Widget } from '../widgets/Widget';
-import type { SourcePointer } from '../drivers/SourcePointer';
+import type { Widget } from '../widgets/Widget.js';
+import type { SourcePointer } from '../drivers/SourcePointer.js';
 
 /**
  * A pointer {@link TricklingEvent}.

@@ -1,4 +1,4 @@
-import type { Alignment } from './Alignment';
+import type { Alignment } from './Alignment.js';
 
 /**
  * Like {@link Alignment}, but for both the horizontal and vertical axes. Each

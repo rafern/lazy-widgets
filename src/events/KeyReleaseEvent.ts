@@ -1,5 +1,5 @@
-import { Widget } from '../widgets/Widget';
-import { KeyEvent } from './KeyEvent';
+import { Widget } from '../widgets/Widget.js';
+import { KeyEvent } from './KeyEvent.js';
 
 /**
  * A key release {@link KeyEvent} (key up).

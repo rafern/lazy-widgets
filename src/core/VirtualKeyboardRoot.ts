@@ -1,10 +1,10 @@
-import { VirtualKeyboard } from '../widgets/VirtualKeyboard/VirtualKeyboard';
-import { VirtualKeyboardTemplate, defaultVirtualKeyboardTemplate } from './VirtualKeyboardTemplate';
-import { Root, RootProperties } from './Root';
-import { Margin } from '../widgets/Margin';
-import { Background } from '../widgets/Background';
+import { VirtualKeyboard } from '../widgets/VirtualKeyboard/VirtualKeyboard.js';
+import { VirtualKeyboardTemplate, defaultVirtualKeyboardTemplate } from './VirtualKeyboardTemplate.js';
+import { Root, RootProperties } from './Root.js';
+import { Margin } from '../widgets/Margin.js';
+import { Background } from '../widgets/Background.js';
 
-import type { KeyboardDriver } from '../drivers/KeyboardDriver';
+import type { KeyboardDriver } from '../drivers/KeyboardDriver.js';
 
 /**
  * Optional VirtualKeyboardRoot constructor properties.

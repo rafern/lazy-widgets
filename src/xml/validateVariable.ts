@@ -1,4 +1,4 @@
-import { Variable } from '../state/Variable';
+import { Variable } from '../state/Variable.js';
 
 /**
  * A validator function which checks whether an input value is a

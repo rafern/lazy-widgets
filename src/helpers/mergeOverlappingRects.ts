@@ -1,7 +1,7 @@
-import { mergeRects } from './mergeRects';
-import { rectsOverlap } from './rectsOverlap';
+import { mergeRects } from './mergeRects.js';
+import { rectsOverlap } from './rectsOverlap.js';
 
-import type { Rect } from './Rect';
+import type { Rect } from './Rect.js';
 
 /**
  * Similar to {@link mergeRects}, except only overlapping rectangles are merged.

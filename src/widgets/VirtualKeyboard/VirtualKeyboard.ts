@@ -1,20 +1,20 @@
-import { KeyboardDriver } from '../../drivers/KeyboardDriver';
-import { FlexAlignment } from '../../theme/FlexAlignment';
-import { Alignment } from '../../theme/Alignment';
-import { VirtualKeyRow } from './VirtualKeyRow';
-import { Column } from '../Column';
-import { LeaveEvent } from '../../events/LeaveEvent';
-import { PointerPressEvent } from '../../events/PointerPressEvent';
-import { PointerReleaseEvent } from '../../events/PointerReleaseEvent';
-import { PointerMoveEvent } from '../../events/PointerMoveEvent';
-import { defaultVirtualKeyboardTemplate, VirtualKeyboardTemplate } from '../../core/VirtualKeyboardTemplate';
-import { filterIDFromProperties } from '../../helpers/filterIDFromProperties';
+import { KeyboardDriver } from '../../drivers/KeyboardDriver.js';
+import { FlexAlignment } from '../../theme/FlexAlignment.js';
+import { Alignment } from '../../theme/Alignment.js';
+import { VirtualKeyRow } from './VirtualKeyRow.js';
+import { Column } from '../Column.js';
+import { LeaveEvent } from '../../events/LeaveEvent.js';
+import { PointerPressEvent } from '../../events/PointerPressEvent.js';
+import { PointerReleaseEvent } from '../../events/PointerReleaseEvent.js';
+import { PointerMoveEvent } from '../../events/PointerMoveEvent.js';
+import { defaultVirtualKeyboardTemplate, VirtualKeyboardTemplate } from '../../core/VirtualKeyboardTemplate.js';
+import { filterIDFromProperties } from '../../helpers/filterIDFromProperties.js';
 
-import type { FlexAlignment2D } from '../../theme/FlexAlignment2D';
-import type { Widget, WidgetProperties } from '../Widget';
-import type { KeyContext } from '../../core/KeyContext';
-import type { WidgetEvent } from '../../events/WidgetEvent';
-import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
+import type { FlexAlignment2D } from '../../theme/FlexAlignment2D.js';
+import type { Widget, WidgetProperties } from '../Widget.js';
+import type { KeyContext } from '../../core/KeyContext.js';
+import type { WidgetEvent } from '../../events/WidgetEvent.js';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML.js';
 
 /**
  * A virtual keyboard widget.

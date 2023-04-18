@@ -1,6 +1,6 @@
-import { Widget } from '../widgets/Widget';
+import { Widget } from '../widgets/Widget.js';
 
-import type { LayerInit } from '../core/LayerInit';
+import type { LayerInit } from '../core/LayerInit.js';
 
 /**
  * A validator function which checks whether an input value is a

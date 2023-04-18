@@ -1,4 +1,4 @@
-import type { LayoutConstraints } from '../core/LayoutConstraints';
+import type { LayoutConstraints } from '../core/LayoutConstraints.js';
 
 /**
  * A validator function which checks whether an input value is a

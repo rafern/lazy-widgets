@@ -1,4 +1,4 @@
-import { DynMsg } from "../core/Strings";
+import { DynMsg } from '../core/Strings.js';
 
 /**
  * A decorator for a public field which sets calls a callback if the property's

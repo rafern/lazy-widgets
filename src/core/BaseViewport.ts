@@ -1,11 +1,11 @@
-import { watchArrayField } from '../decorators/FlagFields';
-import { PointerEvent } from '../events/PointerEvent';
+import { watchArrayField } from '../decorators/FlagFields.js';
+import { PointerEvent } from '../events/PointerEvent.js';
 
-import type { LayoutConstraints } from './LayoutConstraints';
-import type { Widget } from '../widgets/Widget';
-import type { TricklingEvent } from '../events/TricklingEvent';
-import type { Rect } from '../helpers/Rect';
-import type { Viewport } from './Viewport';
+import type { LayoutConstraints } from './LayoutConstraints.js';
+import type { Widget } from '../widgets/Widget.js';
+import type { TricklingEvent } from '../events/TricklingEvent.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { Viewport } from './Viewport.js';
 
 /**
  * The base implementation of the {@link Viewport} interface. See

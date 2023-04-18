@@ -1,17 +1,17 @@
-import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
-import { Widget } from './Widget';
-import { ClickState } from '../helpers/ClickState';
-import { Variable } from '../state/Variable';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { FocusEvent } from '../events/FocusEvent';
-import { BlurEvent } from '../events/BlurEvent';
+import { ButtonClickHelper } from '../helpers/ButtonClickHelper.js';
+import { Widget } from './Widget.js';
+import { ClickState } from '../helpers/ClickState.js';
+import { Variable } from '../state/Variable.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import { FocusEvent } from '../events/FocusEvent.js';
+import { BlurEvent } from '../events/BlurEvent.js';
 
-import type { Viewport } from '../core/Viewport';
-import type { TricklingEvent } from '../events/TricklingEvent';
-import type { Root } from '../core/Root';
-import type { Rect } from '../helpers/Rect';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
+import type { Viewport } from '../core/Viewport.js';
+import type { TricklingEvent } from '../events/TricklingEvent.js';
+import type { Root } from '../core/Root.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
 
 /**
  * A checkbox widget; can be ticked or unticked.

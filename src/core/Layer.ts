@@ -1,4 +1,4 @@
-import { Widget } from '../widgets/Widget';
+import { Widget } from '../widgets/Widget.js';
 
 /**
  * A layer in a {@link LayeredContainer}.

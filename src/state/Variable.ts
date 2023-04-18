@@ -1,5 +1,5 @@
-import type { Observable } from './Observable';
-import type { ObservableCallback } from './ObservableCallback';
+import type { Observable } from './Observable.js';
+import type { ObservableCallback } from './ObservableCallback.js';
 
 /**
  * An aggregate helper class for widgets that contain a variable with a
