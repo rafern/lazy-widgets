@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!--
+            An import map is not needed if you are using a bundler. You may also
+            not include an import map and switch to full paths instead.
+        -->
+        <script type="importmap">
+            {
+                "imports": {
+                    "lazy-widgets": "../dist/index.js"
+                }
+            }
+        </script>
         <script type='module'>
             import {
                 DOMRoot, Margin, Icon, Column, Row, TextButton,
                 DOMPointerDriver, Background
-            } from '../dist/index.esm.js';
+            } from 'lazy-widgets';
 
             // Create the root
             // full video: https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.480p.vp9.webm
@@ -49,10 +60,10 @@
             // Add root to body
             document.body.appendChild(root.domElem);
         </script>
+    </head>
+    <body>
         <noscript>
             Please enable Javascript. This example may not work if running via file:// URIs
         </noscript>
-    </head>
-    <body>
     </body>
 </html>

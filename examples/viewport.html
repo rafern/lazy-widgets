@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!--
+            An import map is not needed if you are using a bundler. You may also
+            not include an import map and switch to full paths instead.
+        -->
+        <script type="importmap">
+            {
+                "imports": {
+                    "lazy-widgets": "../dist/index.js"
+                }
+            }
+        </script>
         <script type='module'>
             import {
                 DOMRoot, Label, Margin, Column, Row, TextButton, TextInput,
@@ -9,7 +20,7 @@
                 ArtificialConstraint, Container, Alignment, ThemeScope, Theme,
                 ValidatedVariable, Variable, AxisCoupling, LabelledRadioButton,
                 CanvasViewport, Background
-            } from '../dist/index.esm.js';
+            } from 'lazy-widgets';
 
             // Create viewport with its child
             const initialMinWidth = 75;
@@ -155,10 +166,10 @@
             // Add root to body
             document.body.appendChild(root.domElem);
         </script>
+    </head>
+    <body>
         <noscript>
             Please enable Javascript. This example may not work if running via file:// URIs
         </noscript>
-    </head>
-    <body>
     </body>
 </html>
