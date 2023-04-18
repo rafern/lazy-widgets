@@ -5,7 +5,7 @@
  *
  * @category Theme
  */
-export const enum FlexAlignment {
+export enum FlexAlignment {
     /** Distribute unused space between each child. */
     SpaceBetween = 'between',
     /** Distribute unused space between each child and at start and end. */
