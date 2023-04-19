@@ -108,6 +108,16 @@ export class CanvasViewport extends BaseViewport {
         }
 
         this.context = context;
+
+        // Re-paint everything in viewport if context is lost
+        this.canvas.addEventListener('contextlost', () => {
+            console.warn('CanvasViewport context was lost. Paint attempts will not be valid');
+        });
+
+        this.canvas.addEventListener('contextrestored', () => {
+            console.warn('CanvasViewport context was restored. Paint attempts are valid again. Viewport bounds will be marked as dirty');
+            this.markWholeAsDirty();
+        }, false);
     }
 
     /**
