@@ -1,4 +1,5 @@
 import type { Widget } from '../widgets/Widget.js';
+import type { BaseXMLUIParser } from './BaseXMLUIParser.js';
 
 /**
  * A context object that will be used when parsing an XML UI tree. Used to keep
@@ -8,6 +9,7 @@ import type { Widget } from '../widgets/Widget.js';
  * @category XML
  */
 export interface XMLUIParserContext {
+    parser: BaseXMLUIParser;
     scriptImports: Map<string, unknown> | null;
     variableMap: Map<string, unknown>;
     idMap: Map<string, Widget>;

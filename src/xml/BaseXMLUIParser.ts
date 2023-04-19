@@ -13,10 +13,10 @@ import type { XMLElementDeserializer } from './XMLElementDeserializer.js';
 import type { XMLParameterModeValidator } from './XMLParameterModeValidator.js';
 import type { XMLArgumentModifier } from './XMLArgumentModifier.js';
 import type { XMLPostInitHook } from './XMLPostInitHook.js';
+import { RootNode } from './RootNode.js';
 
 const RESERVED_PARAMETER_MODES = ['value', 'text', 'widget'];
 const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
-const RESERVED_IMPORTS = ['context', 'window', 'globalThis'];
 
 /**
  * The base lazy-widgets XML namespace. All lazy-widgets namespaces will be
@@ -25,26 +25,6 @@ const RESERVED_IMPORTS = ['context', 'window', 'globalThis'];
  * @category XML
  */
 export const XML_NAMESPACE_BASE = 'lazy-widgets';
-
-/**
- * Makes sure a map-like value, such as a Record, is transformed to a Map.
- *
- * @param record - The map-like value to transform. If nothing is supplied, then an empty Map is created automatically
- * @returns Returns a new Map that is equivalent to the input, or the input if the input is already a Map
- * @internal
- */
-function normalizeToMap(record: Record<string, unknown> | Map<string, unknown> = new Map()) {
-    if (!(record instanceof Map)) {
-        const orig = record;
-        record = new Map();
-
-        for (const key of Object.getOwnPropertyNames(orig)) {
-            record.set(key, orig[key]);
-        }
-    }
-
-    return record;
-}
 
 /**
  * A bare-bones XML UI parser. This must not be used directly as this is an
@@ -731,7 +711,7 @@ export abstract class BaseXMLUIParser {
      * @param elem - The element to parse
      * @returns Returns the new widget instance
      */
-    parseWidgetElem(context: XMLUIParserContext, elem: Element): Widget {
+    private parseWidgetElem(context: XMLUIParserContext, elem: Element): Widget {
         // get factory for this element name
         const name = elem.nodeName.toLowerCase();
         const factory = this.factories.get(name);
@@ -753,7 +733,7 @@ export abstract class BaseXMLUIParser {
      * @param context - The current parser context, shared with all other initializations
      * @returns Returns the new widget instance. All scripts are finished executing when the widget is returned.
      */
-    parseUITreeElem(uiTreeElem: Element, context: XMLUIParserContext): Widget {
+    private parseUITreeElem(uiTreeElem: Element, context: XMLUIParserContext): Widget {
         // iterate children. there should only be one child element with the
         // wanted namespace that represents a widget. there can be many script
         // elements
@@ -843,30 +823,7 @@ export abstract class BaseXMLUIParser {
             throw new Error('No UI trees found in document');
         }
 
-        // setup context
-        let scriptImports = null, variableMap;
-        if (config) {
-            if (config.allowScripts) {
-                scriptImports = normalizeToMap(config.scriptImports);
-
-                for (const name of scriptImports.keys()) {
-                    if (RESERVED_IMPORTS.indexOf(name) >= 0) {
-                        throw new Error(`The script import name "${name}" is reserved`);
-                    }
-                }
-            }
-
-            variableMap = normalizeToMap(config.variables);
-        } else {
-            scriptImports = new Map();
-            variableMap = new Map();
-        }
-
-        const context: XMLUIParserContext = {
-            scriptImports,
-            variableMap,
-            idMap: new Map()
-        };
+        // TODO
 
         // parse UI trees
         const trees = new Map<string, Widget>();
@@ -927,14 +884,51 @@ export abstract class BaseXMLUIParser {
         return this.parseFromString(str, config);
     }
 
-    async getParseTreeFromURL(resource: RequestInfo | URL, config?: XMLUIParserConfig, requestOptions?: RequestInit): Promise<[Map<string, Widget>, XMLUIParserContext]> {
+    getParseTreeFromXMLDocument(xmlDoc: XMLDocument): RootNode {
+        // find all UI tree nodes
+        const uiTrees = xmlDoc.getElementsByTagNameNS(XML_NAMESPACE_BASE, 'ui-tree');
+        if (uiTrees.length === 0) {
+            throw new Error('No UI trees found in document');
+        }
+
+        // parse UI trees
+        const trees = new Map<string, Widget>();
+        for (const uiTree of uiTrees) {
+            const nameAttr = uiTree.attributes.getNamedItemNS(null, 'name');
+            if (nameAttr === null) {
+                throw new Error('UI trees must be named with a "name" attribute');
+            }
+
+            const name = nameAttr.value;
+            if (trees.has(name)) {
+                throw new Error(`A UI tree with the name "${name}" already exists`);
+            }
+
+            const widget = this.parseUITreeElem(uiTree, context);
+            trees.set(name, widget);
+        }
+
+        return [trees, context];
+    }
+
+    getParseTreeFromString(str: string): RootNode {
+        const xmlDoc = this.domParser.parseFromString(str, 'text/xml');
+
+        const errorNode = xmlDoc.querySelector('parsererror');
+        if (errorNode) {
+            throw new Error('Invalid XML');
+        }
+
+        return this.getParseTreeFromXMLDocument(xmlDoc);
+    }
+
+    async getParseTreeFromURL(resource: RequestInfo | URL, requestOptions?: RequestInit): Promise<RootNode> {
         const response = await fetch(resource, requestOptions);
 
         if (!response.ok) {
             throw new Error(`Response not OK (status code ${response.status})`);
         }
 
-        const str = await response.text();
-        return this.getParseTreeFromString(str, config);
+        return this.getParseTreeFromString(await response.text());
     }
 }
