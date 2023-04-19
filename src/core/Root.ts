@@ -64,6 +64,9 @@ export const ALLOWED_CURSOR_STYLES = [
     'auto'
 ];
 
+/** Has the warning for poorly captured TabSelectEvent events been issued? */
+let badTabCaptureWarned = false;
+
 /**
  * Optional Root constructor properties.
  *
@@ -167,10 +170,6 @@ export class Root implements WidgetEventEmitter {
      * and {@link Root#getTextInput}
      */
     protected _mobileTextInUse = false;
-    /**
-     * Has the warning for poorly captured TabSelectEvent events been issued?
-     */
-    private static badTabCaptureWarned = false;
     /**
      * The list of widgets that were hovered in the last check. Will be swapped
      * with {@link Root#hoveredWidgets} every time a pointer event is
@@ -492,8 +491,8 @@ export class Root implements WidgetEventEmitter {
 
         if(event.isa(TabSelectEvent)) {
             if(captured) {
-                if(!event.reachedRelative && !Root.badTabCaptureWarned) {
-                    Root.badTabCaptureWarned = true;
+                if(!event.reachedRelative && !badTabCaptureWarned) {
+                    badTabCaptureWarned = true;
                     console.warn(DynMsg.OVERCAPTURING_WIDGET(captured));
                     groupedStackTrace();
                 }

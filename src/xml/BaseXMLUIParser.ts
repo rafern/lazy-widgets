@@ -59,7 +59,7 @@ function normalizeToMap(record: Record<string, unknown> | Map<string, unknown> =
  */
 export abstract class BaseXMLUIParser {
     /** The DOMParser to actually parse the XML into nodes */
-    private domParser = new DOMParser();
+    private domParser: DOMParser;
     /** A map which assigns a factory function to an element name. */
     private factories = new Map<string, (context: XMLUIParserContext, elem: Element) => Widget>();
     /**
@@ -86,6 +86,12 @@ export abstract class BaseXMLUIParser {
      * the instance can be modified post-initialization.
      */
     private postInitHooks = new Array<XMLPostInitHook>;
+
+    constructor() {
+        // XXX this is done here instead of in the field declaration because it
+        //     confuses the tree shaking eslint plugin
+        this.domParser = new DOMParser();
+    }
 
     /**
      * Parse a value in an attribute. The value will be deserialized according

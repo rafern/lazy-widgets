@@ -42,6 +42,7 @@
     "chai": "^4.3.7",
     "concurrently": "^8.0.1",
     "eslint": "^8.37.0",
+    "eslint-plugin-tree-shaking": "^1.10.0",
     "eslint-plugin-tsdoc": "^0.2.17",
     "jsdom": "^21.1.1",
     "mocha": "^10.2.0",
