@@ -1,12 +1,12 @@
-import { BaseLabel } from './BaseLabel';
+import { BaseLabel } from './BaseLabel.js';
 
-import type { LabelProperties } from './BaseLabel';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { Root } from '../core/Root';
-import type { Viewport } from '../core/Viewport';
-import type { Widget } from './Widget';
-import type { ObservableCallback } from '../state/ObservableCallback';
-import type { Observable } from '../state/Observable';
+import type { LabelProperties } from './BaseLabel.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import type { Root } from '../core/Root.js';
+import type { Viewport } from '../core/Viewport.js';
+import type { Widget } from './Widget.js';
+import type { ObservableCallback } from '../state/ObservableCallback.js';
+import type { Observable } from '../state/Observable.js';
 
 /**
  * A widget which displays a line of text.

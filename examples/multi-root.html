@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!--
+            An import map is not needed if you are using a bundler. You may also
+            not include an import map and switch to full paths instead.
+        -->
+        <script type="importmap">
+            {
+                "imports": {
+                    "lazy-widgets": "../dist/index.js"
+                }
+            }
+        </script>
     </head>
     <body>
         <p>Try changing the focused element by pressing tab or shift+tab</p>
@@ -13,7 +24,7 @@
                 DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
                 DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
                 ValidatedVariable, Background
-            } from '../dist/index.esm.js';
+            } from 'lazy-widgets';
 
             // Create drivers
             const keyboardDriver = new DOMKeyboardDriver();

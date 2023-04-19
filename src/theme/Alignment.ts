@@ -4,7 +4,7 @@
  *
  * @category Theme
  */
-export const enum Alignment {
+export enum Alignment {
     /** Give the extra space to the child, potentially stretching it. */
     Stretch = 'stretch',
     /**

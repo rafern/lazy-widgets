@@ -1,4 +1,4 @@
-import { Variable } from "./Variable";
+import { Variable } from './Variable.js';
 
 /**
  * An input validator. A function which checks whether an input is valid and

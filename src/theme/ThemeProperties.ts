@@ -1,9 +1,9 @@
-import type { TextAlignMode } from '../helpers/TextHelper';
-import type { FlexAlignment2D } from './FlexAlignment2D';
-import type { Alignment2D } from './Alignment2D';
-import type { FillStyle } from './FillStyle';
-import type { Padding } from './Padding';
-import type { CornerRadii } from '../widgets/CornerRadii';
+import type { TextAlignMode } from '../helpers/TextHelper.js';
+import type { FlexAlignment2D } from './FlexAlignment2D.js';
+import type { Alignment2D } from './Alignment2D.js';
+import type { FillStyle } from './FillStyle.js';
+import type { Padding } from './Padding.js';
+import type { CornerRadii } from '../widgets/CornerRadii.js';
 
 /**
  * Something which contains all properties of a theme. Use this interface for

@@ -1,4 +1,4 @@
-import type { KeyContext } from '../core/KeyContext';
+import type { KeyContext } from '../core/KeyContext.js';
 
 /**
  * A validator function which checks whether an input value is a

@@ -1,4 +1,4 @@
-import { Theme } from '../theme/Theme';
+import { Theme } from '../theme/Theme.js';
 
 /**
  * A validator function which checks whether an input value is a {@link Theme}.

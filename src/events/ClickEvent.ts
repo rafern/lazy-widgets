@@ -1,6 +1,6 @@
-import { BubblingEvent } from './BubblingEvent';
+import { BubblingEvent } from './BubblingEvent.js';
 
-import type { Widget } from '../widgets/Widget';
+import type { Widget } from '../widgets/Widget.js';
 
 /**
  * An event that is fired when specific widgets are clicked, such as the

@@ -1,4 +1,4 @@
-import type { Rect } from "./Rect";
+import type { Rect } from './Rect.js';
 
 /**
  * Merge a list of rectangles into a single rectangle. If there are no

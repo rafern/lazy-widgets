@@ -3,7 +3,8 @@
   "parser": "@typescript-eslint/parser",
   "plugins": [
     "@typescript-eslint/eslint-plugin",
-    "eslint-plugin-tsdoc"
+    "eslint-plugin-tsdoc",
+    "tree-shaking"
   ],
   "extends": [
     "eslint:recommended",
@@ -17,7 +18,8 @@
     "brace-style": "error",
     "curly": "error",
     "indent": "off",
-    "@typescript-eslint/indent": ["error", 4, { "ignoredNodes": ["PropertyDefinition"] }]
+    "@typescript-eslint/indent": ["error", 4, { "ignoredNodes": ["PropertyDefinition"] }],
+    "tree-shaking/no-side-effects-in-initialization": 2
   }
 }
 

@@ -1,4 +1,4 @@
-import type { Widget } from '../widgets/Widget';
+import type { Widget } from '../widgets/Widget.js';
 
 /**
  * A context object that will be used when parsing an XML UI tree. Used to keep

@@ -1,4 +1,4 @@
-import { Msg } from "../core/Strings";
+import { Msg } from '../core/Strings.js';
 
 /** The rendering context used for measuring text. */
 let measureContext: CanvasRenderingContext2D | null = null;

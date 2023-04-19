@@ -1,8 +1,8 @@
-import { FocusType } from '../core/FocusType';
-import { PointerEvent } from './PointerEvent';
-import { Widget } from '../widgets/Widget';
+import { FocusType } from '../core/FocusType.js';
+import { PointerEvent } from './PointerEvent.js';
+import { Widget } from '../widgets/Widget.js';
 
-import type { SourcePointer } from '../drivers/SourcePointer';
+import type { SourcePointer } from '../drivers/SourcePointer.js';
 
 /**
  * A pointer move {@link PointerEvent}.

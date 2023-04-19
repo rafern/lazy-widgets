@@ -1,6 +1,6 @@
-import { RayPointerDriver } from './RayPointerDriver';
+import { RayPointerDriver } from './RayPointerDriver.js';
 
-import type { PointerHint } from './PointerHint';
+import type { PointerHint } from './PointerHint.js';
 
 /**
  * A source of rays for a {@link RayPointerDriver}. Used so that different kinds

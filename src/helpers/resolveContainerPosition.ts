@@ -1,8 +1,8 @@
-import { Alignment } from '../theme/Alignment';
+import { Alignment } from '../theme/Alignment.js';
 
-import type { Alignment2D } from '../theme/Alignment2D';
-import type { Padding } from '../theme/Padding';
-import type { Widget } from '../widgets/Widget';
+import type { Alignment2D } from '../theme/Alignment2D.js';
+import type { Padding } from '../theme/Padding.js';
+import type { Widget } from '../widgets/Widget.js';
 
 /**
  * Reusable function for resolving container positions.

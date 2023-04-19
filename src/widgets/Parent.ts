@@ -1,8 +1,8 @@
-import { Widget } from '../widgets/Widget';
+import { Widget } from '../widgets/Widget.js';
 
-import type { Viewport } from '../core/Viewport';
-import type { Theme } from '../theme/Theme';
-import type { Root } from '../core/Root';
+import type { Viewport } from '../core/Viewport.js';
+import type { Theme } from '../theme/Theme.js';
+import type { Root } from '../core/Root.js';
 
 /**
  * A class for widgets which may have children.

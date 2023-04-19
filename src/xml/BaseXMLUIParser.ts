@@ -1,18 +1,18 @@
-import { Widget } from '../widgets/Widget';
-import { toKebabCase } from '../helpers/toKebabCase';
-import { WHITESPACE_REGEX } from '../helpers/whitespace-regex';
+import { Widget } from '../widgets/Widget.js';
+import { toKebabCase } from '../helpers/toKebabCase.js';
+import { WHITESPACE_REGEX } from '../helpers/whitespace-regex.js';
 
-import type { WidgetAutoXML, WidgetXMLInputConfig, WidgetXMLInputConfigParameter, WidgetXMLInputConfigTextParameter, WidgetAutoXMLConfigValidator, WidgetXMLInputConfigValueParameter, WidgetXMLInputConfigWidgetParameter } from './WidgetAutoXML';
-import type { XMLUIParserConfig } from './XMLUIParserConfig';
-import type { XMLUIParserContext } from './XMLUIParserContext';
-import type { XMLUIParserScriptContext } from './XMLUIParserScriptContext';
-import type { XMLWidgetFactory } from './XMLWidgetFactory';
-import type { XMLAttributeValueDeserializer } from './XMLAttributeValueDeserializer';
-import type { XMLAttributeNamespaceHandler } from './XMLAttributeNamespaceHandler';
-import type { XMLElementDeserializer } from './XMLElementDeserializer';
-import type { XMLParameterModeValidator } from './XMLParameterModeValidator';
-import type { XMLArgumentModifier } from './XMLArgumentModifier';
-import type { XMLPostInitHook } from './XMLPostInitHook';
+import type { WidgetAutoXML, WidgetXMLInputConfig, WidgetXMLInputConfigParameter, WidgetXMLInputConfigTextParameter, WidgetAutoXMLConfigValidator, WidgetXMLInputConfigValueParameter, WidgetXMLInputConfigWidgetParameter } from './WidgetAutoXML.js';
+import type { XMLUIParserConfig } from './XMLUIParserConfig.js';
+import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { XMLUIParserScriptContext } from './XMLUIParserScriptContext.js';
+import type { XMLWidgetFactory } from './XMLWidgetFactory.js';
+import type { XMLAttributeValueDeserializer } from './XMLAttributeValueDeserializer.js';
+import type { XMLAttributeNamespaceHandler } from './XMLAttributeNamespaceHandler.js';
+import type { XMLElementDeserializer } from './XMLElementDeserializer.js';
+import type { XMLParameterModeValidator } from './XMLParameterModeValidator.js';
+import type { XMLArgumentModifier } from './XMLArgumentModifier.js';
+import type { XMLPostInitHook } from './XMLPostInitHook.js';
 
 const RESERVED_PARAMETER_MODES = ['value', 'text', 'widget'];
 const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
@@ -59,7 +59,7 @@ function normalizeToMap(record: Record<string, unknown> | Map<string, unknown> =
  */
 export abstract class BaseXMLUIParser {
     /** The DOMParser to actually parse the XML into nodes */
-    private domParser = new DOMParser();
+    private domParser: DOMParser;
     /** A map which assigns a factory function to an element name. */
     private factories = new Map<string, (context: XMLUIParserContext, elem: Element) => Widget>();
     /**
@@ -86,6 +86,12 @@ export abstract class BaseXMLUIParser {
      * the instance can be modified post-initialization.
      */
     private postInitHooks = new Array<XMLPostInitHook>;
+
+    constructor() {
+        // XXX this is done here instead of in the field declaration because it
+        //     confuses the tree shaking eslint plugin
+        this.domParser = new DOMParser();
+    }
 
     /**
      * Parse a value in an attribute. The value will be deserialized according

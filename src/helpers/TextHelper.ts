@@ -1,7 +1,7 @@
-import { measureTextDims } from '../helpers/measureTextDims';
-import { multiFlagField } from '../decorators/FlagFields';
-import { FillStyle } from '../theme/FillStyle';
-import { DynMsg, Msg } from '../core/Strings';
+import { measureTextDims } from '../helpers/measureTextDims.js';
+import { multiFlagField } from '../decorators/FlagFields.js';
+import { FillStyle } from '../theme/FillStyle.js';
+import { DynMsg, Msg } from '../core/Strings.js';
 
 const WIDTH_OVERRIDING_CHARS = new Set(['\n', '\t']);
 

@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!--
+            An import map is not needed if you are using a bundler. You may also
+            not include an import map and switch to full paths instead.
+        -->
+        <script type="importmap">
+            {
+                "imports": {
+                    "lazy-widgets": "../dist/index.js"
+                }
+            }
+        </script>
         <script type='module'>
             import {
                 DOMRoot, Label, Margin, Column, Row, TextButton, ScrollbarMode,
                 DOMKeyboardDriver, DOMPointerDriver, FlexAlignment, TextInput,
                 ScrollableViewportWidget, Alignment, ValidatedVariable,
                 AxisCoupling, Background
-            } from '../dist/index.esm.js';
+            } from 'lazy-widgets';
 
             // Create the root
             const label = new Label('Hello world!');
@@ -79,5 +90,8 @@
         </script>
     </head>
     <body>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
     </body>
 </html>

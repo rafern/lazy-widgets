@@ -1,12 +1,12 @@
-import { flagField } from '../decorators/FlagFields';
-import { roundToPower2 } from '../helpers/roundToPower2';
-import { isPower2 } from '../helpers/isPower2';
-import { BaseViewport } from './BaseViewport';
-import { Msg } from './Strings';
-import { mergeOverlappingRects } from '../helpers/mergeOverlappingRects';
+import { flagField } from '../decorators/FlagFields.js';
+import { roundToPower2 } from '../helpers/roundToPower2.js';
+import { isPower2 } from '../helpers/isPower2.js';
+import { BaseViewport } from './BaseViewport.js';
+import { Msg } from './Strings.js';
+import { mergeOverlappingRects } from '../helpers/mergeOverlappingRects.js';
 
-import type { Widget } from '../widgets/Widget';
-import type { Rect } from '../helpers/Rect';
+import type { Widget } from '../widgets/Widget.js';
+import type { Rect } from '../helpers/Rect.js';
 
 /**
  * A {@link Viewport} with an internal canvas, where the rendering context used
@@ -108,6 +108,16 @@ export class CanvasViewport extends BaseViewport {
         }
 
         this.context = context;
+
+        // Re-paint everything in viewport if context is lost
+        this.canvas.addEventListener('contextlost', () => {
+            console.warn('CanvasViewport context was lost. Paint attempts will not be valid');
+        });
+
+        this.canvas.addEventListener('contextrestored', () => {
+            console.warn('CanvasViewport context was restored. Paint attempts are valid again. Viewport bounds will be marked as dirty');
+            this.markWholeAsDirty();
+        }, false);
     }
 
     /**

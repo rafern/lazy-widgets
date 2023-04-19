@@ -2,17 +2,17 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { TextHelper } from '../helpers/TextHelper';
-import { BaseTheme } from '../theme/BaseTheme';
-import { Widget } from '../widgets/Widget';
-import { Msg } from './Strings';
-import { Root } from './Root';
-import { DebuggableCanvasViewport } from './DebuggableCanvasViewport';
+import { TextHelper } from '../helpers/TextHelper.js';
+import { BaseTheme } from '../theme/BaseTheme.js';
+import { Widget } from '../widgets/Widget.js';
+import { Msg } from './Strings.js';
+import { Root } from './Root.js';
+import { DebuggableCanvasViewport } from './DebuggableCanvasViewport.js';
 
-import type { TextRenderGroup } from '../helpers/TextHelper';
-import type { FillStyle } from '../theme/FillStyle';
-import type { RootProperties } from './Root';
-import type { CanvasViewport } from './CanvasViewport';
+import type { TextRenderGroup } from '../helpers/TextHelper.js';
+import type { FillStyle } from '../theme/FillStyle.js';
+import type { RootProperties } from './Root.js';
+import type { CanvasViewport } from './CanvasViewport.js';
 
 type ToggleCallback = (enabled: boolean) => void;
 
@@ -336,8 +336,12 @@ export function injectDebugCode(): void {
     injectStackTraceFeature(Root, 'preLayoutUpdate');
     // stacktrace.Root.postLayoutUpdate
     injectStackTraceFeature(Root, 'postLayoutUpdate');
-    // stacktrace.Root.updatePointerStyle
-    injectStackTraceFeature(Root, 'updatePointerStyle');
+    // stacktrace.Root.requestPointerStyle
+    injectStackTraceFeature(Root, 'requestPointerStyle');
+    // stacktrace.Root.clearPointerStyle
+    injectStackTraceFeature(Root, 'clearPointerStyle');
+    // stacktrace.Root.clearPointerStylesFromWidget
+    injectStackTraceFeature(Root, 'clearPointerStylesFromWidget');
     // stacktrace.Root.requestFocus
     injectStackTraceFeature(Root, 'requestFocus');
     // stacktrace.Root.dropFocus

@@ -1,8 +1,8 @@
-import { PointerButtonEvent } from './PointerButtonEvent';
-import { FocusType } from '../core/FocusType';
-import { Widget } from '../widgets/Widget';
+import { PointerButtonEvent } from './PointerButtonEvent.js';
+import { FocusType } from '../core/FocusType.js';
+import { Widget } from '../widgets/Widget.js';
 
-import type { SourcePointer } from '../drivers/SourcePointer';
+import type { SourcePointer } from '../drivers/SourcePointer.js';
 
 /**
  * A pointer release {@link PointerButtonEvent} (pointer button up).

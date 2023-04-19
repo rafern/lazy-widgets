@@ -1,5 +1,5 @@
-import type { FlexAlignment } from './FlexAlignment';
-import type { Alignment } from './Alignment';
+import type { FlexAlignment } from './FlexAlignment.js';
+import type { Alignment } from './Alignment.js';
 
 /**
  * Like {@link Alignment2D}, but for multi-containers. Each axis can also be a

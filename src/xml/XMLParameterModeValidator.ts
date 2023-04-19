@@ -1,6 +1,6 @@
-import type { BaseXMLUIParser } from './BaseXMLUIParser';
-import type { WidgetXMLInputConfigParameter } from './WidgetAutoXML';
-import type { XMLUIParserContext } from './XMLUIParserContext';
+import type { BaseXMLUIParser } from './BaseXMLUIParser.js';
+import type { WidgetXMLInputConfigParameter } from './WidgetAutoXML.js';
+import type { XMLUIParserContext } from './XMLUIParserContext.js';
 
 /**
  * A function that validates and transforms a value passed to a custom parameter

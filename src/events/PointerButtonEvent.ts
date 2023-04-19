@@ -1,7 +1,7 @@
-import { PointerEvent } from './PointerEvent';
+import { PointerEvent } from './PointerEvent.js';
 
-import type { Widget } from '../widgets/Widget';
-import type { SourcePointer } from '../drivers/SourcePointer';
+import type { Widget } from '../widgets/Widget.js';
+import type { SourcePointer } from '../drivers/SourcePointer.js';
 
 /**
  * A {@link PointerEvent} for button presses/releases, containing helpers for

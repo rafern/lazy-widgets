@@ -1,5 +1,5 @@
-import type { Observable } from './Observable';
-import type { ObservableCallback } from './ObservableCallback';
+import type { Observable } from './Observable.js';
+import type { ObservableCallback } from './ObservableCallback.js';
 
 // HACK: I extends Iterable<Observable<U>> | [Observable<U>] instead of just
 //       extending Iterable<Observable<U>> because this forces typescript to

@@ -1,7 +1,7 @@
-import { BaseLabel } from './BaseLabel';
+import { BaseLabel } from './BaseLabel.js';
 
-import type { LabelProperties } from './BaseLabel';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { LabelProperties } from './BaseLabel.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 
 /**
  * A widget which displays a line of text.

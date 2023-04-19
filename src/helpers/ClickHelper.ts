@@ -1,14 +1,14 @@
-import { PointerReleaseEvent } from '../events/PointerReleaseEvent';
-import { GenericClickHelper } from './GenericClickHelper';
-import { PointerPressEvent } from '../events/PointerPressEvent';
-import { PointerEvent } from '../events/PointerEvent';
-import { FocusType } from '../core/FocusType';
-import { ClickState } from './ClickState';
-import { LeaveEvent } from '../events/LeaveEvent';
+import { PointerReleaseEvent } from '../events/PointerReleaseEvent.js';
+import { GenericClickHelper } from './GenericClickHelper.js';
+import { PointerPressEvent } from '../events/PointerPressEvent.js';
+import { PointerEvent } from '../events/PointerEvent.js';
+import { FocusType } from '../core/FocusType.js';
+import { ClickState } from './ClickState.js';
+import { LeaveEvent } from '../events/LeaveEvent.js';
 
-import type { TricklingEvent } from '../events/TricklingEvent';
-import type { Root } from '../core/Root';
-import type { Bounds } from './Bounds';
+import type { TricklingEvent } from '../events/TricklingEvent.js';
+import type { Root } from '../core/Root.js';
+import type { Bounds } from './Bounds.js';
 
 /**
  * An aggregate helper class for widgets that can be clicked.
@@ -82,9 +82,10 @@ export class ClickHelper extends GenericClickHelper {
 
     /**
      * Updates the current {@link GenericClickHelper#clickState} given an event,
-     * as well as {@link Root#_foci | focus}, {@link Root#pointerStyle},
+     * as well as {@link Root#_foci | focus},
      * {@link GenericClickHelper#wasClick} and
-     * {@link GenericClickHelper#clickStateChanged} flags.
+     * {@link GenericClickHelper#clickStateChanged} flags, and requests pointer
+     * styles when necessary.
      *
      * @param bounds - A 4-tuple containing, respectively, left coordinate, right coordinate, top coordinate and bottom coordinate of clickable area, in pixels
      */

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { TextAlignMode, TextHelper, WrapMode } from '../../src';
+import { TextAlignMode, TextHelper, WrapMode } from '../../src/index.js';
 
 const MULTILINE_TEXT = `\
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.

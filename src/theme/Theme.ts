@@ -1,6 +1,6 @@
-import { BaseTheme } from './BaseTheme';
+import { BaseTheme } from './BaseTheme.js';
 
-import type { ThemeProperties } from './ThemeProperties';
+import type { ThemeProperties } from './ThemeProperties.js';
 
 /**
  * Provides styling for {@link Widget | Widgets}.

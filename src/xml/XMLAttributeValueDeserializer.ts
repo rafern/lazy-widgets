@@ -1,5 +1,5 @@
-import type { BaseXMLUIParser } from './BaseXMLUIParser';
-import type { XMLUIParserContext } from './XMLUIParserContext';
+import type { BaseXMLUIParser } from './BaseXMLUIParser.js';
+import type { XMLUIParserContext } from './XMLUIParserContext.js';
 
 /**
  * A function that deserializes an attribute's value. The correct deserializer

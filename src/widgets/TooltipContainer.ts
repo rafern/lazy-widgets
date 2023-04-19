@@ -1,15 +1,15 @@
-import { Widget, WidgetProperties } from './Widget';
-import { Alignment } from '../theme/Alignment';
-import { SingleParent } from './SingleParent';
-import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions';
-import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
-import { Alignment2D } from '../theme/Alignment2D';
-import { safeRoundRect } from '../helpers/safeRoundRect';
-import { layoutArrayField, layoutField } from '../decorators/FlagFields';
-import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
+import { Widget, WidgetProperties } from './Widget.js';
+import { Alignment } from '../theme/Alignment.js';
+import { SingleParent } from './SingleParent.js';
+import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions.js';
+import { resolveContainerPosition } from '../helpers/resolveContainerPosition.js';
+import { Alignment2D } from '../theme/Alignment2D.js';
+import { safeRoundRect } from '../helpers/safeRoundRect.js';
+import { layoutArrayField, layoutField } from '../decorators/FlagFields.js';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
 
-import type { Rect } from '../helpers/Rect';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { Rect } from '../helpers/Rect.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 
 const startAlignment = <Alignment2D>{
     horizontal: Alignment.Start, vertical: Alignment.Start

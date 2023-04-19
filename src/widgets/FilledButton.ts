@@ -1,16 +1,16 @@
-import { watchField } from '../decorators/FlagFields';
-import { ClickState } from '../helpers/ClickState';
-import { FillStyle } from '../theme/FillStyle';
-import { DynMsg } from '../core/Strings';
-import { Theme } from '../theme/Theme';
-import { Button } from './Button';
-import { ClickableWidgetProperties } from './ClickableWidgetProperties';
-import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
+import { watchField } from '../decorators/FlagFields.js';
+import { ClickState } from '../helpers/ClickState.js';
+import { FillStyle } from '../theme/FillStyle.js';
+import { DynMsg } from '../core/Strings.js';
+import { Theme } from '../theme/Theme.js';
+import { Button } from './Button.js';
+import { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
 
-import type { ThemeProperties } from '../theme/ThemeProperties';
-import type { Widget, WidgetProperties } from './Widget';
-import type { Rect } from '../helpers/Rect';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
+import type { ThemeProperties } from '../theme/ThemeProperties.js';
+import type { Widget, WidgetProperties } from './Widget.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 
 /**
  * Optional FilledButton constructor properties.

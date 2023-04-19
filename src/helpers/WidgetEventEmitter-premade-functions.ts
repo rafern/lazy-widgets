@@ -1,5 +1,5 @@
-import type { WidgetEvent } from '../events/WidgetEvent';
-import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
+import type { WidgetEvent } from '../events/WidgetEvent.js';
+import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter.js';
 
 /**
  * Helper function for implementing the {@link WidgetEventEmitter#on} method.

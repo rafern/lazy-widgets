@@ -1,13 +1,13 @@
-import { GlyphVirtualKey } from './GlyphVirtualKey';
-import { DynMsg } from '../../core/Strings';
-import { Row } from '../Row';
-import { filterIDFromProperties } from '../../helpers/filterIDFromProperties';
+import { GlyphVirtualKey } from './GlyphVirtualKey.js';
+import { DynMsg } from '../../core/Strings.js';
+import { Row } from '../Row.js';
+import { filterIDFromProperties } from '../../helpers/filterIDFromProperties.js';
 
-import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from '../../core/KeyContext';
-import type { VirtualKey } from './VirtualKey';
-import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
-import type { VirtualKeyRowTemplate } from '../../core/VirtualKeyboardTemplate';
+import type { WidgetProperties } from '../Widget.js';
+import type { KeyContext } from '../../core/KeyContext.js';
+import type { VirtualKey } from './VirtualKey.js';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML.js';
+import type { VirtualKeyRowTemplate } from '../../core/VirtualKeyboardTemplate.js';
 
 /**
  * A {@link Row} of {@link VirtualKey | virtual keys}. Generates given a
