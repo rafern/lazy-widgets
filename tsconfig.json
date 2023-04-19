@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "outDir": "dist",
-    "target": "es6",
-    "module": "es6",
+    "target": "ESNext",
+    "module": "ESNext",
     "lib": ["ESNext", "dom"],
     "sourceMap": true,
     "sourceRoot": "https://raw.githubusercontent.com/rafern/lazy-widgets/main/",
