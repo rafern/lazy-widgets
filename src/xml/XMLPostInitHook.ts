@@ -1,6 +1,6 @@
 import { Widget } from '../widgets/Widget.js';
 import { BaseXMLUIParser } from './BaseXMLUIParser.js';
-import { XMLUIParserContext } from './XMLUIParserContext.js';
+import { ASTInstantiationContext } from './ASTInstantiationContext.js';
 
 /**
  * A function that is called after a widget instance is created. Can be used to
@@ -9,4 +9,4 @@ import { XMLUIParserContext } from './XMLUIParserContext.js';
  *
  * @category XML
  */
-export type XMLPostInitHook = (parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, instance: Widget) => void;
+export type XMLPostInitHook = (parser: BaseXMLUIParser, context: ASTInstantiationContext, instantiationContext: Record<string, unknown>, instance: Widget) => void;

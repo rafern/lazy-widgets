@@ -1,11 +1,11 @@
 import { WidgetNode } from './WidgetNode.js';
-import { XMLUIParserNode } from './XMLUIParserNode.js';
+import { ASTNode } from './ASTNode.js';
 import { ScriptNode } from './ScriptNode.js';
 
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
 import type { Widget } from '../index.js';
 
-export class UITreeNode extends XMLUIParserNode {
+export class UITreeNode extends ASTNode {
     static override readonly type = 'ui-tree';
     override readonly type = UITreeNode.type;
     static override readonly typeGroup = null;
@@ -15,7 +15,7 @@ export class UITreeNode extends XMLUIParserNode {
         super();
     }
 
-    instantiate(context: XMLUIParserContext): Widget {
+    instantiate(context: ASTInstantiationContext): Widget {
         let widget = null;
         for (const child of this.children) {
             if (child.isa(WidgetNode)) {

@@ -1,9 +1,9 @@
-import { XMLUIParserNode } from './XMLUIParserNode.js';
+import { ASTNode } from './ASTNode.js';
 
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
-import type { XMLUIParserScriptContext } from './XMLUIParserScriptContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
+import type { ASTInstantiationScriptContext } from './ASTInstantiationScriptContext.js';
 
-export class ScriptNode extends XMLUIParserNode {
+export class ScriptNode extends ASTNode {
     static override readonly type = 'script';
     override readonly type = ScriptNode.type;
     static override readonly typeGroup = null;
@@ -13,14 +13,14 @@ export class ScriptNode extends XMLUIParserNode {
         super();
     }
 
-    execute(context: XMLUIParserContext) {
+    execute(context: ASTInstantiationContext) {
         // script, check if we have permission to run it
         if (context.scriptImports === null) {
             throw new Error('Scripts are disabled'); // TODO
         }
 
         // create script context
-        const scriptContext: XMLUIParserScriptContext = {
+        const scriptContext: ASTInstantiationScriptContext = {
             variables: context.variableMap,
             ids: context.idMap
         };

@@ -1,7 +1,7 @@
 import { WidgetEventListener } from '../events/WidgetEventEmitter.js';
 import { Widget } from '../widgets/Widget.js';
 import { WidgetModifierNode } from './WidgetModifierNode.js';
-import { XMLUIParserContext } from './XMLUIParserContext.js';
+import { ASTInstantiationContext } from './ASTInstantiationContext.js';
 
 export class EventListenerNode extends WidgetModifierNode {
     static override readonly type = 'event-listener';
@@ -11,7 +11,7 @@ export class EventListenerNode extends WidgetModifierNode {
         super();
     }
 
-    evaluate(context: XMLUIParserContext): WidgetEventListener {
+    evaluate(context: ASTInstantiationContext): WidgetEventListener {
         const listener = context.parser.parseAttributeValue(this.rawListener, context);
 
         if (typeof listener !== 'function') {
@@ -21,7 +21,7 @@ export class EventListenerNode extends WidgetModifierNode {
         return listener as WidgetEventListener;
     }
 
-    override apply(context: XMLUIParserContext, widget: Widget): void {
+    override apply(context: ASTInstantiationContext, widget: Widget): void {
         widget.on(this.eventType, this.evaluate(context), this.once);
     }
 }

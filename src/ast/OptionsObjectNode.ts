@@ -1,6 +1,6 @@
 import { OptionNode } from './OptionNode.js';
 
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
 
 export class OptionsObjectNode extends OptionNode {
     static override readonly type = 'options-object';
@@ -10,7 +10,7 @@ export class OptionsObjectNode extends OptionNode {
         super();
     }
 
-    evaluate(context: XMLUIParserContext): Record<string, unknown> {
+    evaluate(context: ASTInstantiationContext): Record<string, unknown> {
         const options = context.parser.parseAttributeValue(this.rawValue, context);
 
         if (typeof options === 'object') {

@@ -1,6 +1,6 @@
-import { XMLUIParserNode } from './XMLUIParserNode.js';
+import { ASTNode } from './ASTNode.js';
 
-export class MetadataAttributeNode extends XMLUIParserNode {
+export class MetadataAttributeNode extends ASTNode {
     static override readonly type = 'metadata-attribute';
     override readonly type = MetadataAttributeNode.type;
     static override readonly typeGroup = 'metadata';

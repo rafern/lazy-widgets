@@ -3,7 +3,7 @@
  *
  * @category XML
  */
-export interface XMLUIParserConfig {
+export interface ASTInstantiationConfig {
     scriptImports?: Record<string, unknown> | Map<string, unknown>;
     variables?: Record<string, unknown> | Map<string, unknown>;
     allowScripts?: boolean;

@@ -1,17 +1,17 @@
-export abstract class XMLUIParserNode {
+export abstract class ASTNode {
     static readonly type: string;
     abstract readonly type: string;
     static readonly typeGroup: string | null;
     abstract readonly typeGroup: string | null;
 
-    parent: XMLUIParserNode | null = null;
-    children = new Array<XMLUIParserNode>();
+    parent: ASTNode | null = null;
+    children = new Array<ASTNode>();
 
     // abstract validate(errors: Array<Error>): boolean; // TODO dont use error objects
 
     // TODO serialize method
 
-    removeChild(node: XMLUIParserNode): boolean {
+    removeChild(node: ASTNode): boolean {
         const idx = this.children.indexOf(node);
         if (idx !== -1) {
             this.children.splice(idx, 1);
@@ -22,7 +22,7 @@ export abstract class XMLUIParserNode {
         }
     }
 
-    addChild(node: XMLUIParserNode): void {
+    addChild(node: ASTNode): void {
         if (node.parent === this) {
             return;
         }
@@ -38,11 +38,11 @@ export abstract class XMLUIParserNode {
         }
     }
 
-    attach(parent: XMLUIParserNode) {
+    attach(parent: ASTNode) {
         parent.addChild(this);
     }
 
-    isa<N extends XMLUIParserNode>(clazz: ({ new (..._args: never[]): N, type: string }) ): this is N {
+    isa<N extends ASTNode>(clazz: ({ new (..._args: never[]): N, type: string }) ): this is N {
         return clazz.type === this.type;
     }
 }

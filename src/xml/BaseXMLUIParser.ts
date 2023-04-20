@@ -3,9 +3,8 @@ import { toKebabCase } from '../helpers/toKebabCase.js';
 import { WHITESPACE_REGEX } from '../helpers/whitespace-regex.js';
 
 import type { WidgetAutoXML, WidgetXMLInputConfig, WidgetXMLInputConfigParameter, WidgetXMLInputConfigTextParameter, WidgetAutoXMLConfigValidator, WidgetXMLInputConfigValueParameter, WidgetXMLInputConfigWidgetParameter } from './WidgetAutoXML.js';
-import type { XMLUIParserConfig } from './XMLUIParserConfig.js';
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
-import type { XMLUIParserScriptContext } from './XMLUIParserScriptContext.js';
+import type { ASTInstantiationConfig } from '../ast/ASTInstantiationConfig.js';
+import type { ASTInstantiationContext } from '../ast/ASTInstantiationContext.js';
 import type { XMLWidgetFactory } from './XMLWidgetFactory.js';
 import type { XMLAttributeValueDeserializer } from './XMLAttributeValueDeserializer.js';
 import type { XMLAttributeNamespaceHandler } from './XMLAttributeNamespaceHandler.js';
@@ -13,14 +12,14 @@ import type { XMLElementDeserializer } from './XMLElementDeserializer.js';
 import type { XMLParameterModeValidator } from './XMLParameterModeValidator.js';
 import type { XMLArgumentModifier } from './XMLArgumentModifier.js';
 import type { XMLPostInitHook } from './XMLPostInitHook.js';
-import { RootNode } from './RootNode.js';
-import { XMLUIParserNode } from './XMLUIParserNode.js';
-import { MetadataElementNode } from './MetadataElementNode.js';
-import { MetadataAttributeNode } from './MetadataAttributeNode.js';
-import { MetadataTextNode } from './MetadataTextNode.js';
-import { MetadataCommentNode } from './MetadataCommentNode.js';
-import { UITreeNode } from './UITreeNode.js';
-import { ScriptNode } from './ScriptNode.js';
+import { RootNode } from '../ast/RootNode.js';
+import { ASTNode } from '../ast/ASTNode.js';
+import { MetadataElementNode } from '../ast/MetadataElementNode.js';
+import { MetadataAttributeNode } from '../ast/MetadataAttributeNode.js';
+import { MetadataTextNode } from '../ast/MetadataTextNode.js';
+import { MetadataCommentNode } from '../ast/MetadataCommentNode.js';
+import { UITreeNode } from '../ast/UITreeNode.js';
+import { ScriptNode } from '../ast/ScriptNode.js';
 
 const RESERVED_PARAMETER_MODES = ['value', 'text', 'widget'];
 const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
@@ -89,7 +88,7 @@ export abstract class BaseXMLUIParser {
      * @param rawValue - The value in the attribute, with the prefix included
      * @param context - The current parser context, which will be passed to a deserializer if the value is prefixed with a registered deserializer prefix
      */
-    parseAttributeValue(rawValue: string, context: XMLUIParserContext): unknown {
+    parseAttributeValue(rawValue: string, context: ASTInstantiationContext): unknown {
         if (rawValue.length === 0) {
             return rawValue;
         }
@@ -139,7 +138,7 @@ export abstract class BaseXMLUIParser {
     }
 
     /** Create a new widget instance given a config and context */
-    private instantiateWidget(inputConfig: WidgetXMLInputConfig, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown>, factory: XMLWidgetFactory, factoryName: string, context: XMLUIParserContext, elem: Element) {
+    private instantiateWidget(inputConfig: WidgetXMLInputConfig, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown>, factory: XMLWidgetFactory, factoryName: string, context: ASTInstantiationContext, elem: Element) {
         // parse parameters and options
         const paramCount = inputConfig.length;
         const instantiationContext: Record<string, unknown> = {};
@@ -728,7 +727,7 @@ export abstract class BaseXMLUIParser {
      * @param config - The configuration object to use for the parser
      * @returns Returns a pair containing, respectively, a Map which maps a UI tree name to a widget, and the parser context after all UI trees are parsed
      */
-    parseFromXMLDocument(xmlDoc: XMLDocument, config?: XMLUIParserConfig): [Map<string, Widget>, XMLUIParserContext] {
+    parseFromXMLDocument(xmlDoc: XMLDocument, config?: ASTInstantiationConfig): [Map<string, Widget>, ASTInstantiationContext] {
         const rootNode = this.getParseTreeFromXMLDocument(xmlDoc);
         return rootNode.instantiateUITrees(this, config);
     }
@@ -741,7 +740,7 @@ export abstract class BaseXMLUIParser {
      * @param config - The configuration object to use for the parser
      * @returns Returns a pair containing, respectively, a Map which maps a UI tree name to a widget, and the parser context after all UI trees are parsed
      */
-    parseFromString(str: string, config?: XMLUIParserConfig): [Map<string, Widget>, XMLUIParserContext] {
+    parseFromString(str: string, config?: ASTInstantiationConfig): [Map<string, Widget>, ASTInstantiationContext] {
         const rootNode = this.getParseTreeFromString(str);
         return rootNode.instantiateUITrees(this, config);
     }
@@ -755,7 +754,7 @@ export abstract class BaseXMLUIParser {
      * @param requestOptions - Options to use for the HTTP request
      * @returns Returns a pair containing, respectively, a Map which maps a UI tree name to a widget, and the parser context after all UI trees are parsed. Returned asynchronously as a promise
      */
-    async parseFromURL(resource: RequestInfo | URL, config?: XMLUIParserConfig, requestOptions?: RequestInit): Promise<[Map<string, Widget>, XMLUIParserContext]> {
+    async parseFromURL(resource: RequestInfo | URL, config?: ASTInstantiationConfig, requestOptions?: RequestInit): Promise<[Map<string, Widget>, ASTInstantiationContext]> {
         const rootNode = await this.getParseTreeFromURL(resource, requestOptions);
         return rootNode.instantiateUITrees(this, config);
     }
@@ -768,9 +767,9 @@ export abstract class BaseXMLUIParser {
         }
     }
 
-    protected deserializeMetadata(node: Node, parent: XMLUIParserNode): void {
+    protected deserializeMetadata(node: Node, parent: ASTNode): void {
         const nodeType = node.nodeType;
-        let meta: XMLUIParserNode | null = null;
+        let meta: ASTNode | null = null;
         if (nodeType === Node.ELEMENT_NODE) {
             const elem = node as Element;
             meta = new MetadataElementNode(elem.localName, elem.namespaceURI);
@@ -800,7 +799,7 @@ export abstract class BaseXMLUIParser {
         }
     }
 
-    protected deserializeWidget(elem: Element, parent: XMLUIParserNode): void {
+    protected deserializeWidget(elem: Element, parent: ASTNode): void {
         // TODO
     }
 

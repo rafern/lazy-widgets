@@ -1,5 +1,5 @@
 import type { BaseXMLUIParser } from './BaseXMLUIParser.js';
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
 
 /**
  * A function that deserializes an XML element into a value usable by a Widget
@@ -8,4 +8,4 @@ import type { XMLUIParserContext } from './XMLUIParserContext.js';
  *
  * @category XML
  */
-export type XMLElementDeserializer = (parser: BaseXMLUIParser, context: XMLUIParserContext, xmlElem: Element) => unknown;
+export type XMLElementDeserializer = (parser: BaseXMLUIParser, context: ASTInstantiationContext, xmlElem: Element) => unknown;

@@ -1,11 +1,11 @@
 import { LoneOptionNode } from './LoneOptionNode.js';
-import { XMLUIParserNode } from './XMLUIParserNode.js';
+import { ASTNode } from './ASTNode.js';
 import { OptionNode } from './OptionNode.js';
 import { OptionsObjectNode } from './OptionsObjectNode.js';
 
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
 
-export class OptionsNode extends XMLUIParserNode {
+export class OptionsNode extends ASTNode {
     static override readonly type = 'options';
     override readonly type = OptionsNode.type;
     static override readonly typeGroup = null;
@@ -15,7 +15,7 @@ export class OptionsNode extends XMLUIParserNode {
         console.warn('Options object expansion needed because there is both an options node and at least one lone-option node');
     }
 
-    evaluate(context: XMLUIParserContext): Record<string, unknown> | undefined {
+    evaluate(context: ASTInstantiationContext): Record<string, unknown> | undefined {
         let options: Record<string, unknown> | undefined;
         let needsExpansion = false;
         let warned = false;

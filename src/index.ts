@@ -196,9 +196,6 @@ export * from './xml/XMLElementDeserializer.js';
 export * from './xml/XMLParameterModeValidator.js';
 export * from './xml/XMLPostInitHook.js';
 export * from './xml/XMLUIParser.js';
-export * from './xml/XMLUIParserConfig.js';
-export * from './xml/XMLUIParserContext.js';
-export * from './xml/XMLUIParserScriptContext.js';
 export * from './xml/XMLWidgetFactory.js';
 
 // re-export concrete widgets in separate namespace, so they can be iterated

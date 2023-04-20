@@ -2,7 +2,7 @@ import { WidgetNode } from './WidgetNode.js';
 import { UnnamedArgumentNode } from './UnnamedArgumentNode.js';
 
 import type { LayerInit } from '../core/LayerInit.js';
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
 import type { Widget } from '../index.js';
 
 export class LayerNode extends UnnamedArgumentNode {
@@ -13,7 +13,7 @@ export class LayerNode extends UnnamedArgumentNode {
         super('layer');
     }
 
-    evaluate(context: XMLUIParserContext): LayerInit<Widget> {
+    evaluate(context: ASTInstantiationContext): LayerInit<Widget> {
         let widget = null;
         for (const child of this.children) {
             if (child.isa(WidgetNode)) {
