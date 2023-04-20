@@ -30,6 +30,7 @@ const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
  * @category XML
  */
 export const XML_NAMESPACE_BASE = 'lazy-widgets';
+const XML_NAMESPACE_PREFIX = `${XML_NAMESPACE_BASE}:`;
 
 export type FactoryDefinition = [ inputMapping: WidgetXMLInputConfig, factory: XMLWidgetFactory, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown> ];
 
@@ -752,11 +753,17 @@ export abstract class BaseXMLUIParser {
         return rootNode.instantiateUITrees(this, config);
     }
 
-    protected namespaceMatches(namespace: string | null): boolean {
+    protected namespaceMatches(namespace: string | null, subNamespace?: string | null): boolean {
         if (namespace === null) {
             return false;
+        } if (subNamespace === undefined) {
+            return namespace === XML_NAMESPACE_BASE || namespace.startsWith(XML_NAMESPACE_PREFIX);
+        } else if (subNamespace === null) {
+            return namespace === XML_NAMESPACE_BASE;
+        } else if (!namespace.startsWith(XML_NAMESPACE_PREFIX)) {
+            return false;
         } else {
-            return namespace === XML_NAMESPACE_BASE || namespace.startsWith(`${XML_NAMESPACE_BASE}:`);
+            return namespace.substring(XML_NAMESPACE_PREFIX.length) === subNamespace;
         }
     }
 
