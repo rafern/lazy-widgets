@@ -11,7 +11,18 @@ export class OptionsObjectNode extends OptionNode {
     }
 
     evaluate(context: XMLUIParserContext): Record<string, unknown> {
-        // TODO
-        return context.parser.parseAttributeValue(this.rawValue, context);
+        const options = context.parser.parseAttributeValue(this.rawValue, context);
+
+        if (typeof options === 'object') {
+            if (options === null) {
+                throw new Error(`Options objects must evaluate to either an object or undefined, but was null`);
+            } else {
+                return options as Record<string, unknown>;
+            }
+        } else if (options === undefined) {
+            return {};
+        } else {
+            throw new Error(`Options objects must evaluate to either an object or undefined, but had type "${typeof options}"`);
+        }
     }
 }

@@ -23,7 +23,7 @@ export class UITreeNode extends XMLUIParserNode {
                     // TODO error
                 }
 
-                widget = child.instantiate(context);
+                widget = child.evaluate(context);
             } else if (child.isa(ScriptNode)) {
                 child.execute(context);
             } else {
