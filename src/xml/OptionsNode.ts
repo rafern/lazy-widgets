@@ -11,8 +11,14 @@ export class OptionsNode extends XMLUIParserNode {
     static override readonly typeGroup = null;
     override readonly typeGroup = OptionsNode.typeGroup;
 
-    evaluate(context: XMLUIParserContext): Record<string, unknown> {
-        const options: Record<string, unknown> = {};
+    private warnExpansion(): void {
+        console.warn('Options object expansion needed because there is both an options node and at least one lone-option node');
+    }
+
+    evaluate(context: XMLUIParserContext): Record<string, unknown> | undefined {
+        let options: Record<string, unknown> | undefined;
+        let needsExpansion = false;
+        let warned = false;
 
         const filteredChildren = new Array<OptionNode>();
         for (const child of this.children) {
@@ -28,12 +34,33 @@ export class OptionsNode extends XMLUIParserNode {
         } else {
             for (const child of filteredChildren) {
                 if (child.isa(LoneOptionNode)) {
+                    if (options === undefined) {
+                        options = {};
+                    } else if (needsExpansion) {
+                        if (!warned) {
+                            this.warnExpansion();
+                            warned = true;
+                        }
+
+                        needsExpansion = false;
+                        options = { ...options };
+                    }
+
                     options[child.name] = child.evaluate(context);
                 } else if (child.isa(OptionsObjectNode)) {
-                    const subObj = child.evaluate(context);
+                    if (options === undefined) {
+                        options = child.evaluate(context);
+                        needsExpansion = true;
+                    } else {
+                        if (!warned) {
+                            this.warnExpansion();
+                            warned = true;
+                        }
 
-                    for (const name of Object.getOwnPropertyNames(subObj)) {
-                        options[name] = subObj[name];
+                        const subObj = child.evaluate(context);
+                        for (const name of Object.getOwnPropertyNames(subObj)) {
+                            options[name] = subObj[name];
+                        }
                     }
                 } else {
                     throw 'ded'; // TODO

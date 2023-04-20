@@ -35,7 +35,7 @@ export class RootNode extends XMLUIParserNode {
     static override readonly typeGroup = null;
     override readonly typeGroup = RootNode.typeGroup;
 
-    instantiateUITrees(parser: BaseXMLUIParser, config?: XMLUIParserConfig): Map<string, Widget> {
+    instantiateUITrees(parser: BaseXMLUIParser, config?: XMLUIParserConfig): [trees: Map<string, Widget>, context: XMLUIParserContext] {
         // setup context
         let scriptImports = null, variableMap;
         if (config) {
@@ -78,15 +78,16 @@ export class RootNode extends XMLUIParserNode {
             }
         }
 
-        return trees;
+        return [trees, context];
     }
 
-    instantiateUITree(name: string, parser: BaseXMLUIParser, config?: XMLUIParserConfig): Widget {
-        const widget = this.instantiateUITrees(parser, config).get(name);
+    instantiateUITree(name: string, parser: BaseXMLUIParser, config?: XMLUIParserConfig): [tree: Widget, context: XMLUIParserContext] {
+        const [trees, context] = this.instantiateUITrees(parser, config);
+        const widget = trees.get(name);
         if (widget === undefined) {
             throw new Error(`Could not find UI tree with name "${name}"`);
         }
 
-        return widget;
+        return [widget, context];
     }
 }

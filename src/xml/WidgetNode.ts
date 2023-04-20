@@ -4,6 +4,7 @@ import { Widget } from '../widgets/Widget.js';
 import { UnnamedArgumentNode } from './UnnamedArgumentNode.js';
 
 import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import { WidgetModifierNode } from './WidgetModifierNode.js';
 
 export class WidgetNode extends UnnamedArgumentNode {
     static override readonly type = 'widget';
@@ -27,6 +28,7 @@ export class WidgetNode extends UnnamedArgumentNode {
         const parameters = new Array<unknown>(paramCount);
         const setParameters = new Array<boolean>(paramCount).fill(false);
         const setViaName = new Array<boolean>(paramCount).fill(false);
+        const modifierNodes = new Array<WidgetModifierNode>();
         let options: Record<string, unknown> | undefined;
         let hadOptions = false;
 
@@ -41,6 +43,8 @@ export class WidgetNode extends UnnamedArgumentNode {
                 continue;
             } else if (ArgumentNode.derives(child)) {
                 child.fillParameter(context, factoryDefinition, parameters, setParameters, setViaName);
+            } else if (WidgetModifierNode.derives(child)) {
+                modifierNodes.push(child);
             } else {
                 // TODO how to handle unneeded nodes?
                 continue;
@@ -71,6 +75,14 @@ export class WidgetNode extends UnnamedArgumentNode {
 
         // call factory
         parameters.push(options);
-        return factoryDefinition[1](...parameters);
+        const widget = factoryDefinition[1](...parameters);
+
+        // apply modifiers
+        for (const modifierNode of modifierNodes) {
+            modifierNode.apply(context, widget);
+        }
+
+        // done
+        return widget;
     }
 }
