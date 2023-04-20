@@ -5,7 +5,7 @@ import type { Widget } from '../widgets/Widget.js';
  *
  * @category XML
  */
-export interface XMLUIParserScriptContext {
+export interface ASTInstantiationScriptContext {
     variables: Map<string, unknown>;
     ids: Map<string, Widget>;
 }

@@ -22,7 +22,7 @@ import { fromKebabCase } from '../helpers/fromKebabCase.js';
 import { WidgetEventListener } from '../events/WidgetEventEmitter.js';
 import { WHITESPACE_REGEX } from '../helpers/whitespace-regex.js';
 import type { Widget } from '../widgets/Widget.js';
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
 import type { LayerInit } from '../core/LayerInit.js';
 /**
  * A layer parameter for a {@link WidgetXMLInputConfig}.
@@ -47,7 +47,7 @@ export interface WidgetXMLInputConfigLayerParameter {
  *
  * @category XML
  */
-export function deserializeLayerElement(parser: BaseXMLUIParser, context: XMLUIParserContext, elem: Element): LayerInit<Widget> {
+export function deserializeLayerElement(parser: BaseXMLUIParser, context: ASTInstantiationContext, elem: Element): LayerInit<Widget> {
     // parse attributes
     let child: Widget | undefined, name: string | undefined, canExpand: boolean | undefined;
     for (const attr of elem.attributes) {
@@ -126,7 +126,7 @@ export function deserializeLayerElement(parser: BaseXMLUIParser, context: XMLUIP
  *
  * @category XML
  */
-export function deserializeOptionsAttribute(parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, attribute: Attr) {
+export function deserializeOptionsAttribute(parser: BaseXMLUIParser, context: ASTInstantiationContext, instantiationContext: Record<string, unknown>, attribute: Attr) {
     // this attribute sets an options object's field. record it in the
     // instantiation context so it can be added to the parameters list later
     if (attribute.localName === '_') {
@@ -176,7 +176,7 @@ export function deserializeOptionsAttribute(parser: BaseXMLUIParser, context: XM
  *
  * @category XML
  */
-export function deserializeEventAttribute(once: boolean, parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, attribute: Attr) {
+export function deserializeEventAttribute(once: boolean, parser: BaseXMLUIParser, context: ASTInstantiationContext, instantiationContext: Record<string, unknown>, attribute: Attr) {
     // get listener callback
     const callback = validateFunction(parser.parseAttributeValue(attribute.value, context))[0];
 
@@ -200,7 +200,7 @@ export function deserializeEventAttribute(once: boolean, parser: BaseXMLUIParser
  *
  * @category XML
  */
-export function addOptionsObjectToArguments(_parser: BaseXMLUIParser, _context: XMLUIParserContext, instantiationContext: Record<string, unknown>, args: Array<unknown>) {
+export function addOptionsObjectToArguments(_parser: BaseXMLUIParser, _context: ASTInstantiationContext, instantiationContext: Record<string, unknown>, args: Array<unknown>) {
     // add options object to end of argument list
     if ('options' in instantiationContext) {
         args.push(instantiationContext.options);
@@ -220,7 +220,7 @@ export function addOptionsObjectToArguments(_parser: BaseXMLUIParser, _context: 
  *
  * @category XML
  */
-export function addEventListenersToWidget(_parser: BaseXMLUIParser, _context: XMLUIParserContext, instantiationContext: Record<string, unknown>, instance: Widget) {
+export function addEventListenersToWidget(_parser: BaseXMLUIParser, _context: ASTInstantiationContext, instantiationContext: Record<string, unknown>, instance: Widget) {
     // add listeners to instance
     if ('listeners' in instantiationContext) {
         const listeners = instantiationContext.listeners as Array<[string, WidgetEventListener, boolean]>;

@@ -1,5 +1,6 @@
 import type { BaseXMLUIParser } from './BaseXMLUIParser.js';
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
+
 /**
  * A function that does something with an attribute that belongs to a specific
  * namespace. Could be used to add extra functionality to the parser, such as
@@ -8,4 +9,4 @@ import type { XMLUIParserContext } from './XMLUIParserContext.js';
  *
  * @category XML
  */
-export type XMLAttributeNamespaceHandler = (parser: BaseXMLUIParser, context: XMLUIParserContext, instantiationContext: Record<string, unknown>, attribute: Attr) => void;
+export type XMLAttributeNamespaceHandler = (parser: BaseXMLUIParser, context: ASTInstantiationContext, instantiationContext: Record<string, unknown>, attribute: Attr) => void;

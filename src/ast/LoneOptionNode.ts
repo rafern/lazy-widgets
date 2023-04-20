@@ -1,7 +1,7 @@
 import { fromKebabCase } from '../index.js';
 import { OptionNode } from './OptionNode.js';
 
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
 
 export class LoneOptionNode extends OptionNode {
     static override readonly type = 'lone-option';
@@ -15,7 +15,7 @@ export class LoneOptionNode extends OptionNode {
         return new LoneOptionNode(fromKebabCase(kebabName), rawValue);
     }
 
-    evaluate(context: XMLUIParserContext): unknown {
+    evaluate(context: ASTInstantiationContext): unknown {
         return context.parser.parseAttributeValue(this.rawValue, context);
     }
 }

@@ -1,9 +1,9 @@
 import { Widget } from '../widgets/Widget.js';
 import { ArgumentNode } from './ArgumentNode.js';
-import { FactoryDefinition } from './BaseXMLUIParser.js';
-import { WidgetXMLInputConfigWidgetParameter } from './WidgetAutoXML.js';
+import { FactoryDefinition } from '../xml/BaseXMLUIParser.js';
+import { WidgetXMLInputConfigWidgetParameter } from '../xml/WidgetAutoXML.js';
 
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
 
 export class ValueNode extends ArgumentNode {
     static override readonly type = 'value';
@@ -13,11 +13,11 @@ export class ValueNode extends ArgumentNode {
         super();
     }
 
-    override evaluate(context: XMLUIParserContext): unknown {
+    override evaluate(context: ASTInstantiationContext): unknown {
         return context.parser.parseAttributeValue(this.rawValue, context);
     }
 
-    override fillParameter(context: XMLUIParserContext, factoryDefinition: FactoryDefinition, parameters: Array<unknown>, setParameters: Array<boolean>, setViaName: Array<boolean>): void {
+    override fillParameter(context: ASTInstantiationContext, factoryDefinition: FactoryDefinition, parameters: Array<unknown>, setParameters: Array<boolean>, setViaName: Array<boolean>): void {
         const [inputMapping, _factory, paramNames, paramValidators] = factoryDefinition;
         const idx = paramNames.get(this.name);
         if (idx === undefined) {

@@ -3,7 +3,7 @@ import { OptionsNode } from './OptionsNode.js';
 import { Widget } from '../widgets/Widget.js';
 import { UnnamedArgumentNode } from './UnnamedArgumentNode.js';
 
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
 import { WidgetModifierNode } from './WidgetModifierNode.js';
 
 export class WidgetNode extends UnnamedArgumentNode {
@@ -14,7 +14,7 @@ export class WidgetNode extends UnnamedArgumentNode {
         super('widget');
     }
 
-    override evaluate(context: XMLUIParserContext): Widget {
+    override evaluate(context: ASTInstantiationContext): Widget {
         // get factory
         const parser = context.parser;
         const factoryDefinition = parser.getFactory(this.widgetName);

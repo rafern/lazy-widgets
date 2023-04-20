@@ -1,7 +1,7 @@
 import { ArgumentNode } from './ArgumentNode.js';
-import { XMLUIParserContext } from './XMLUIParserContext.js';
-import { WidgetXMLInputConfig } from './WidgetAutoXML.js';
-import { FactoryDefinition } from './BaseXMLUIParser.js';
+import { ASTInstantiationContext } from './ASTInstantiationContext.js';
+import { WidgetXMLInputConfig } from '../xml/WidgetAutoXML.js';
+import { FactoryDefinition } from '../xml/BaseXMLUIParser.js';
 
 const RESERVED_PARAMETER_MODES = ['value', 'text', 'widget', 'layer'];
 
@@ -19,7 +19,7 @@ export abstract class UnnamedArgumentNode extends ArgumentNode {
      * @param mode - The parameter mode to find
      * @returns Returns the index of the next unset parameter of the wanted mode. If none are found, -1 is returned.
      */
-    private findNextParamOfType(context: XMLUIParserContext, inputMapping: WidgetXMLInputConfig, parametersSet: Array<boolean>) {
+    private findNextParamOfType(context: ASTInstantiationContext, inputMapping: WidgetXMLInputConfig, parametersSet: Array<boolean>) {
         const paramCount = inputMapping.length;
         let canBeList = false;
 
@@ -46,7 +46,7 @@ export abstract class UnnamedArgumentNode extends ArgumentNode {
         return -1;
     }
 
-    override fillParameter(context: XMLUIParserContext, factoryDefinition: FactoryDefinition, parameters: Array<unknown>, setParameters: Array<boolean>, _setViaName: Array<boolean>): void {
+    override fillParameter(context: ASTInstantiationContext, factoryDefinition: FactoryDefinition, parameters: Array<unknown>, setParameters: Array<boolean>, _setViaName: Array<boolean>): void {
         const parser = context.parser;
         const inputMapping = factoryDefinition[0];
         const parameterModeTuple = parser.getParameterMode(this.parameterMode);

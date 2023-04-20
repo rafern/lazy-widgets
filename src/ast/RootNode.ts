@@ -1,11 +1,11 @@
-import { XMLUIParserNode } from './XMLUIParserNode.js';
+import { ASTNode } from './ASTNode.js';
 import { ScriptNode } from './ScriptNode.js';
 import { UITreeNode } from './UITreeNode.js';
 
 import type { Widget } from '../widgets/Widget.js';
-import type { XMLUIParserConfig } from './XMLUIParserConfig.js';
-import type { XMLUIParserContext } from './XMLUIParserContext.js';
-import type { BaseXMLUIParser } from './BaseXMLUIParser.js';
+import type { ASTInstantiationConfig } from './ASTInstantiationConfig.js';
+import type { ASTInstantiationContext } from './ASTInstantiationContext.js';
+import type { BaseXMLUIParser } from '../xml/BaseXMLUIParser.js';
 
 const RESERVED_IMPORTS = ['context', 'window', 'globalThis'];
 
@@ -29,13 +29,13 @@ function normalizeToMap(record: Record<string, unknown> | Map<string, unknown> =
     return record;
 }
 
-export class RootNode extends XMLUIParserNode {
+export class RootNode extends ASTNode {
     static override readonly type = 'root';
     override readonly type = RootNode.type;
     static override readonly typeGroup = null;
     override readonly typeGroup = RootNode.typeGroup;
 
-    instantiateUITrees(parser: BaseXMLUIParser, config?: XMLUIParserConfig): [trees: Map<string, Widget>, context: XMLUIParserContext] {
+    instantiateUITrees(parser: BaseXMLUIParser, config?: ASTInstantiationConfig): [trees: Map<string, Widget>, context: ASTInstantiationContext] {
         // setup context
         let scriptImports = null, variableMap;
         if (config) {
@@ -55,7 +55,7 @@ export class RootNode extends XMLUIParserNode {
             variableMap = new Map();
         }
 
-        const context: XMLUIParserContext = {
+        const context: ASTInstantiationContext = {
             parser, scriptImports, variableMap, idMap: new Map()
         };
 
@@ -81,7 +81,7 @@ export class RootNode extends XMLUIParserNode {
         return [trees, context];
     }
 
-    instantiateUITree(name: string, parser: BaseXMLUIParser, config?: XMLUIParserConfig): [tree: Widget, context: XMLUIParserContext] {
+    instantiateUITree(name: string, parser: BaseXMLUIParser, config?: ASTInstantiationConfig): [tree: Widget, context: ASTInstantiationContext] {
         const [trees, context] = this.instantiateUITrees(parser, config);
         const widget = trees.get(name);
         if (widget === undefined) {

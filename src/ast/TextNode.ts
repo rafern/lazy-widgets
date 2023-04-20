@@ -1,5 +1,5 @@
 import { UnnamedArgumentNode } from './UnnamedArgumentNode.js';
-import { XMLUIParserContext } from './XMLUIParserContext.js';
+import { ASTInstantiationContext } from './ASTInstantiationContext.js';
 
 export class TextNode extends UnnamedArgumentNode {
     static override readonly type = 'text';
@@ -9,7 +9,7 @@ export class TextNode extends UnnamedArgumentNode {
         super('text');
     }
 
-    override evaluate(_context: XMLUIParserContext): string {
+    override evaluate(_context: ASTInstantiationContext): string {
         return this.text;
     }
 }
