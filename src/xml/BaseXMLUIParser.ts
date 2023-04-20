@@ -13,6 +13,13 @@ import type { XMLParameterModeValidator } from './XMLParameterModeValidator.js';
 import type { XMLArgumentModifier } from './XMLArgumentModifier.js';
 import type { XMLPostInitHook } from './XMLPostInitHook.js';
 import { RootNode } from './RootNode.js';
+import { XMLUIParserNode } from './XMLUIParserNode.js';
+import { MetadataElementNode } from './MetadataElementNode.js';
+import { MetadataAttributeNode } from './MetadataAttributeNode.js';
+import { MetadataTextNode } from './MetadataTextNode.js';
+import { MetadataCommentNode } from './MetadataCommentNode.js';
+import { UITreeNode } from './UITreeNode.js';
+import { ScriptNode } from './ScriptNode.js';
 
 const RESERVED_PARAMETER_MODES = ['value', 'text', 'widget'];
 const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
@@ -708,113 +715,6 @@ export abstract class BaseXMLUIParser {
     }
 
     /**
-     * Parse an XML element which is expected to represent a widget. If the XML
-     * element doesn't represent a widget, then an error is thrown; this will
-     * happen if no factory is registered to the element name.
-     *
-     * @param context - The current parser context, shared with all other initializations
-     * @param elem - The element to parse
-     * @returns Returns the new widget instance
-     */
-    private parseWidgetElem(context: XMLUIParserContext, elem: Element): Widget {
-        // get factory for this element name
-        const name = elem.nodeName.toLowerCase();
-        const factory = this.factories.get(name);
-
-        if (factory === undefined) {
-            throw new Error(`No factory registered to name (${name})`);
-        }
-
-        // generate widget
-        return factory(context, elem);
-    }
-
-    /**
-     * Parse a <ui-tree> element. Expected to contain at least one widget
-     * element, and can contain <script> elements. Scripts must finish execution
-     * or this will never return.
-     *
-     * @param uiTreeElem - The <ui-tree> element to parse
-     * @param context - The current parser context, shared with all other initializations
-     * @returns Returns the new widget instance. All scripts are finished executing when the widget is returned.
-     */
-    private parseUITreeElem(uiTreeElem: Element, context: XMLUIParserContext): Widget {
-        // iterate children. there should only be one child element with the
-        // wanted namespace that represents a widget. there can be many script
-        // elements
-        let topWidget = null;
-        for (const child of uiTreeElem.childNodes) {
-            const nodeType = child.nodeType;
-            if (nodeType === Node.ELEMENT_NODE) {
-                const childElem = child as Element;
-                if (childElem.namespaceURI !== XML_NAMESPACE_BASE) {
-                    continue;
-                }
-
-                // is this a widget or a script?
-                if (childElem.localName === 'script') {
-                    // script, check if we have permission to run it
-                    if (context.scriptImports === null) {
-                        throw new Error('Scripts are disabled');
-                    }
-
-                    // create script context
-                    const scriptContext: XMLUIParserScriptContext = {
-                        variables: context.variableMap,
-                        ids: context.idMap
-                    };
-
-                    // concatenate all text
-                    let text = '';
-                    for (const grandChild of childElem.childNodes) {
-                        const gcNodeType = grandChild.nodeType;
-                        if (gcNodeType === Node.TEXT_NODE || gcNodeType === Node.CDATA_SECTION_NODE) {
-                            text += (grandChild as CharacterData).data;
-                        } else {
-                            throw new Error('Unexpected XML non-text node inside script node');
-                        }
-                    }
-
-                    // exec in the global scope, passing the script context and
-                    // defining all imports
-                    const params = ['context'];
-                    const args: Array<unknown> = [scriptContext];
-
-                    for (const [key, value] of context.scriptImports) {
-                        params.push(key);
-                        args.push(value);
-                    }
-
-                    (new Function(...params, `"use strict"; ${String(text)}`))(...args);
-                } else {
-                    // widget, parse it
-                    if (topWidget !== null) {
-                        throw new Error('XML UI tree can only have one top-most widget');
-                    }
-
-                    topWidget = this.parseWidgetElem(context, childElem);
-                }
-            } else if (nodeType === Node.TEXT_NODE) {
-                if (!WHITESPACE_REGEX.test((child as CharacterData).data)) {
-                    throw new Error('Unexpected text node as UI tree child');
-                }
-            } else if (nodeType === Node.CDATA_SECTION_NODE) {
-                throw new Error('Unexpected CDATA node as UI tree child');
-            } else if (nodeType === Node.DOCUMENT_NODE) {
-                throw new Error('Unexpected document node as UI tree child');
-            } else if (nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-                throw new Error('Unexpected document fragment node as UI tree child');
-            }
-        }
-
-        if (topWidget === null) {
-            throw new Error('Expected a XML widget definition in the UI tree, none found');
-        }
-
-        return topWidget;
-    }
-
-    /**
      * Parse an XML document which can contain multiple <ui-tree> descendants.
      *
      * @param xmlDoc - The XML document to parse
@@ -822,32 +722,8 @@ export abstract class BaseXMLUIParser {
      * @returns Returns a pair containing, respectively, a Map which maps a UI tree name to a widget, and the parser context after all UI trees are parsed
      */
     parseFromXMLDocument(xmlDoc: XMLDocument, config?: XMLUIParserConfig): [Map<string, Widget>, XMLUIParserContext] {
-        // find all UI tree nodes
-        const uiTrees = xmlDoc.getElementsByTagNameNS(XML_NAMESPACE_BASE, 'ui-tree');
-        if (uiTrees.length === 0) {
-            throw new Error('No UI trees found in document');
-        }
-
-        // TODO setup context?
-
-        // parse UI trees
-        const trees = new Map<string, Widget>();
-        for (const uiTree of uiTrees) {
-            const nameAttr = uiTree.attributes.getNamedItemNS(null, 'name');
-            if (nameAttr === null) {
-                throw new Error('UI trees must be named with a "name" attribute');
-            }
-
-            const name = nameAttr.value;
-            if (trees.has(name)) {
-                throw new Error(`A UI tree with the name "${name}" already exists`);
-            }
-
-            const widget = this.parseUITreeElem(uiTree, context);
-            trees.set(name, widget);
-        }
-
-        return [trees, context];
+        const rootNode = this.getParseTreeFromXMLDocument(xmlDoc);
+        return rootNode.instantiateUITrees(this, config);
     }
 
     /**
@@ -859,14 +735,8 @@ export abstract class BaseXMLUIParser {
      * @returns Returns a pair containing, respectively, a Map which maps a UI tree name to a widget, and the parser context after all UI trees are parsed
      */
     parseFromString(str: string, config?: XMLUIParserConfig): [Map<string, Widget>, XMLUIParserContext] {
-        const xmlDoc = this.domParser.parseFromString(str, 'text/xml');
-
-        const errorNode = xmlDoc.querySelector('parsererror');
-        if (errorNode) {
-            throw new Error('Invalid XML');
-        }
-
-        return this.parseFromXMLDocument(xmlDoc, config);
+        const rootNode = this.getParseTreeFromString(str);
+        return rootNode.instantiateUITrees(this, config);
     }
 
     /**
@@ -879,41 +749,201 @@ export abstract class BaseXMLUIParser {
      * @returns Returns a pair containing, respectively, a Map which maps a UI tree name to a widget, and the parser context after all UI trees are parsed. Returned asynchronously as a promise
      */
     async parseFromURL(resource: RequestInfo | URL, config?: XMLUIParserConfig, requestOptions?: RequestInit): Promise<[Map<string, Widget>, XMLUIParserContext]> {
-        const response = await fetch(resource, requestOptions);
+        const rootNode = await this.getParseTreeFromURL(resource, requestOptions);
+        return rootNode.instantiateUITrees(this, config);
+    }
 
-        if (!response.ok) {
-            throw new Error(`Response not OK (status code ${response.status})`);
+    protected namespaceMatches(namespace: string | null): boolean {
+        if (namespace === null) {
+            return false;
+        } else {
+            return namespace === XML_NAMESPACE_BASE || namespace.startsWith(`${XML_NAMESPACE_BASE}:`);
+        }
+    }
+
+    protected deserializeMetadata(node: Node, parent: XMLUIParserNode): void {
+        const nodeType = node.nodeType;
+        let meta: XMLUIParserNode | null = null;
+        if (nodeType === Node.ELEMENT_NODE) {
+            const elem = node as Element;
+            meta = new MetadataElementNode(elem.localName, elem.namespaceURI);
+        } else if (nodeType === Node.ATTRIBUTE_NODE) {
+            const attr = node as Attr;
+            meta = new MetadataAttributeNode(attr.localName, attr.value, attr.namespaceURI);
+        } else if (nodeType === Node.TEXT_NODE || nodeType === Node.CDATA_SECTION_NODE) {
+            const text = node as Text;
+            meta = new MetadataTextNode(text.data);
+        } else if (nodeType === Node.COMMENT_NODE) {
+            const text = node as Text;
+            meta = new MetadataCommentNode(text.data);
+        } else if (nodeType === Node.PROCESSING_INSTRUCTION_NODE) {
+            // TODO safe to ignore, or should it be kept as a new kind of
+            //      metadata to be used by custom parsers?
+        } else {
+            throw new Error(`Unexpected XML node type: ${nodeType}`);
         }
 
-        const str = await response.text();
-        return this.parseFromString(str, config);
+        if (meta !== null) {
+            parent.addChild(meta);
+            parent = meta;
+        }
+
+        for (const child of node.childNodes) {
+            this.deserializeMetadata(child, parent);
+        }
+    }
+
+    protected deserializeWidget(elem: Element, parent: XMLUIParserNode): void {
+        // TODO
+    }
+
+    protected deserializeUITree(uiTreeElem: Element, rootNode: RootNode): void {
+        // get ui tree name
+        const uiTreeName = uiTreeElem.getAttributeNS(XML_NAMESPACE_BASE, 'name');
+        if (uiTreeName === null) {
+            throw new Error('Unexpected unnamed UI tree');
+        }
+
+        // make ui tree node
+        const uiTree = new UITreeNode(uiTreeName);
+        rootNode.addChild(uiTree);
+
+        // look for script elements and a single non-script element (treated as
+        // a widget). deserialize comments and elements/attributes that don't
+        // use standard namespaces as metadata nodes
+        for (const child of uiTreeElem.childNodes) {
+            const nodeType = child.nodeType;
+            if (nodeType === Node.ELEMENT_NODE) {
+                const elem = child as Element;
+                const namespace = elem.namespaceURI;
+
+                if (namespace === XML_NAMESPACE_BASE) {
+                    const name = elem.localName;
+                    if (name === 'script') {
+                        this.deserializeScript(elem, uiTree);
+                    } else {
+                        this.deserializeWidget(elem, uiTree);
+                    }
+                } else if (this.namespaceMatches(namespace)) {
+                    throw new Error(`Unexpected element using non-base library namespace`);
+                } else {
+                    this.deserializeMetadata(elem, uiTree);
+                }
+            } else if (nodeType === Node.ATTRIBUTE_NODE) {
+                // XXX for some reason directly casting ChildNode to Attr
+                //     doesn't work
+                const attr = child as Node as Attr;
+                const namespace = attr.namespaceURI;
+
+                if (namespace === XML_NAMESPACE_BASE) {
+                    if (attr.localName !== 'name') {
+                        throw new Error(`Unexpected attribute with name "${attr.localName}" using base library namespace`);
+                    }
+                } else if (this.namespaceMatches(namespace)) {
+                    throw new Error(`Unexpected attribute using non-base library namespace`);
+                } else {
+                    this.deserializeMetadata(attr, uiTree);
+                }
+            } else if (nodeType === Node.TEXT_NODE) {
+                if (!WHITESPACE_REGEX.test((child as CharacterData).data)) {
+                    throw new Error('Unexpected text node as child of root node');
+                }
+            } else if (nodeType === Node.CDATA_SECTION_NODE) {
+                throw new Error(`Unexpected CDATA node as child of root node`);
+            } else if (nodeType === Node.COMMENT_NODE) {
+                this.deserializeMetadata(child, uiTree);
+            } else if (nodeType === Node.PROCESSING_INSTRUCTION_NODE) {
+                // TODO safe to ignore, or should it be kept as a new kind of
+                //      metadata to be used by custom parsers?
+            } else {
+                throw new Error(`Unexpected XML node type: ${nodeType}`);
+            }
+        }
+    }
+
+    protected deserializeScript(elem: Element, parent: RootNode | UITreeNode): void {
+        // collect text parts
+        const textParts = new Array<string>();
+
+        for (const child of elem.childNodes) {
+            const nodeType = child.nodeType;
+            // TODO should external scripts be allowed? src="yadayada.js"
+            if (nodeType === Node.TEXT_NODE || nodeType === Node.CDATA_SECTION_NODE) {
+                textParts.push((child as Text).data);
+            } else {
+                throw new Error(`Unexpected node type ${nodeType} as child of script element`);
+            }
+        }
+
+        // join text parts into script node
+        parent.addChild(new ScriptNode(textParts.join('')));
+    }
+
+    protected deserializeRootDescendants(node: Node, rootNode: RootNode, foundRoot = false): void {
+        // look for ui-tree and script elements (or a root element if it hasn't
+        // been found yet). deserialize comments and elements/attributes that
+        // don't use standard namespaces as metadata nodes
+        for (const child of node.childNodes) {
+            const nodeType = child.nodeType;
+            if (nodeType === Node.ELEMENT_NODE) {
+                const elem = child as Element;
+                const namespace = elem.namespaceURI;
+
+                if (this.namespaceMatches(namespace)) {
+                    if (namespace !== XML_NAMESPACE_BASE) {
+                        throw new Error(`Unexpected element using non-base library namespace`);
+                    }
+
+                    const name = elem.localName;
+                    if (name === 'root') {
+                        if (foundRoot) {
+                            throw new Error(`Unexpected root element inside root element`);
+                        } else {
+                            this.deserializeRootDescendants(elem, rootNode, true);
+                        }
+                    } else if (name === 'ui-tree') {
+                        this.deserializeUITree(elem, rootNode);
+                    } else if (name === 'script') {
+                        this.deserializeScript(elem, rootNode);
+                    } else {
+                        throw new Error(`Unexpected element with name "${name}" using base library namespace`);
+                    }
+                } else {
+                    this.deserializeMetadata(elem, rootNode);
+                }
+            } else if (nodeType === Node.ATTRIBUTE_NODE) {
+                // XXX for some reason directly casting ChildNode to Attr
+                //     doesn't work
+                const attr = child as Node as Attr;
+                const namespace = attr.namespaceURI;
+
+                if (this.namespaceMatches(namespace)) {
+                    throw new Error(`Unexpected attribute with name "${attr.localName}" using library namespace`);
+                } else {
+                    this.deserializeMetadata(attr, rootNode);
+                }
+            } else if (nodeType === Node.TEXT_NODE) {
+                if (!WHITESPACE_REGEX.test((child as CharacterData).data)) {
+                    throw new Error('Unexpected text node');
+                }
+            } else if (nodeType === Node.CDATA_SECTION_NODE) {
+                throw new Error(`Unexpected CDATA node`);
+            } else if (nodeType === Node.COMMENT_NODE) {
+                this.deserializeMetadata(child, rootNode);
+            } else if (nodeType === Node.PROCESSING_INSTRUCTION_NODE) {
+                // TODO safe to ignore, or should it be kept as a new kind of
+                //      metadata to be used by custom parsers?
+            } else {
+                throw new Error(`Unexpected XML node type: ${nodeType}`);
+            }
+        }
     }
 
     getParseTreeFromXMLDocument(xmlDoc: XMLDocument): RootNode {
-        // find all UI tree nodes
-        const uiTrees = xmlDoc.getElementsByTagNameNS(XML_NAMESPACE_BASE, 'ui-tree');
-        if (uiTrees.length === 0) {
-            throw new Error('No UI trees found in document');
-        }
-
-        // parse UI trees
-        const trees = new Map<string, Widget>();
-        for (const uiTree of uiTrees) {
-            const nameAttr = uiTree.attributes.getNamedItemNS(null, 'name');
-            if (nameAttr === null) {
-                throw new Error('UI trees must be named with a "name" attribute');
-            }
-
-            const name = nameAttr.value;
-            if (trees.has(name)) {
-                throw new Error(`A UI tree with the name "${name}" already exists`);
-            }
-
-            const widget = this.parseUITreeElem(uiTree, context);
-            trees.set(name, widget);
-        }
-
-        return [trees, context];
+        // deserialize all UI trees
+        const rootNode = new RootNode();
+        this.deserializeRootDescendants(xmlDoc, rootNode);
+        return rootNode;
     }
 
     getParseTreeFromString(str: string): RootNode {
