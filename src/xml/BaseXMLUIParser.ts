@@ -19,6 +19,16 @@ import { MetadataTextNode } from '../ast/MetadataTextNode.js';
 import { MetadataCommentNode } from '../ast/MetadataCommentNode.js';
 import { UITreeNode } from '../ast/UITreeNode.js';
 import { ScriptNode } from '../ast/ScriptNode.js';
+import { WidgetNode } from '../ast/WidgetNode.js';
+import { TextNode } from '../ast/TextNode.js';
+import { ValueNode } from '../ast/ValueNode.js';
+import { OptionNode } from '../ast/OptionNode.js';
+import { OptionsObjectNode } from '../ast/OptionsObjectNode.js';
+import { LoneOptionNode } from '../ast/LoneOptionNode.js';
+import { OptionsNode } from '../ast/OptionsNode.js';
+import { AnyEventListenerNode } from '../ast/AnyEventListenerNode.js';
+import { EventListenerNode } from '../ast/EventListenerNode.js';
+import { LayerNode } from '../ast/LayerNode.js';
 
 const RESERVED_PARAMETER_MODES = ['value', 'text', 'widget'];
 const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
@@ -30,9 +40,30 @@ const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
  * @category XML
  */
 export const XML_NAMESPACE_BASE = 'lazy-widgets';
-const XML_NAMESPACE_PREFIX = `${XML_NAMESPACE_BASE}:`;
+export const XML_NAMESPACE_PREFIX = `${XML_NAMESPACE_BASE}:`;
+export const XML_SUB_NAMESPACE_OPTIONS = 'options';
+export const XML_SUB_NAMESPACE_ON = 'on';
+export const XML_SUB_NAMESPACE_ONCE = 'once';
 
 export type FactoryDefinition = [ inputMapping: WidgetXMLInputConfig, factory: XMLWidgetFactory, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown> ];
+
+function getSubNamespace(namespace: string): string {
+    return namespace.substring(XML_NAMESPACE_PREFIX.length);
+}
+
+function namespaceMatches(namespace: string | null, subNamespace?: string | null): boolean {
+    if (namespace === null) {
+        return false;
+    } if (subNamespace === undefined) {
+        return namespace === XML_NAMESPACE_BASE || namespace.startsWith(XML_NAMESPACE_PREFIX);
+    } else if (subNamespace === null) {
+        return namespace === XML_NAMESPACE_BASE;
+    } else if (!namespace.startsWith(XML_NAMESPACE_PREFIX)) {
+        return false;
+    } else {
+        return getSubNamespace(namespace) === subNamespace;
+    }
+}
 
 /**
  * A bare-bones XML UI parser. This must not be used directly as this is an
@@ -753,20 +784,6 @@ export abstract class BaseXMLUIParser {
         return rootNode.instantiateUITrees(this, config);
     }
 
-    protected namespaceMatches(namespace: string | null, subNamespace?: string | null): boolean {
-        if (namespace === null) {
-            return false;
-        } if (subNamespace === undefined) {
-            return namespace === XML_NAMESPACE_BASE || namespace.startsWith(XML_NAMESPACE_PREFIX);
-        } else if (subNamespace === null) {
-            return namespace === XML_NAMESPACE_BASE;
-        } else if (!namespace.startsWith(XML_NAMESPACE_PREFIX)) {
-            return false;
-        } else {
-            return namespace.substring(XML_NAMESPACE_PREFIX.length) === subNamespace;
-        }
-    }
-
     protected deserializeMetadata(node: Node, parent: ASTNode): void {
         const nodeType = node.nodeType;
         let meta: ASTNode | null = null;
@@ -799,8 +816,169 @@ export abstract class BaseXMLUIParser {
         }
     }
 
-    protected deserializeWidget(elem: Element, parent: ASTNode): void {
-        // TODO
+    protected deserializeLayer(layerElem: Element, widgetNode: WidgetNode): void {
+        // make layer node
+        const layerNode = new LayerNode();
+        widgetNode.addChild(layerNode);
+
+        // look for can-expand/name attributes and a single widget element
+        for (const child of layerElem.childNodes) {
+            const nodeType = child.nodeType;
+            if (nodeType === Node.ELEMENT_NODE) {
+                const elem = child as Element;
+                const namespace = elem.namespaceURI;
+
+                if (namespaceMatches(namespace, null)) {
+                    if (layerNode.hasChildOfType(WidgetNode.type)) {
+                        throw new Error('Layers can only have one widget');
+                    }
+
+                    this.deserializeWidget(elem, layerNode);
+                } else if (namespaceMatches(namespace)) {
+                    throw new Error('Unexpected element with non-base library namespace as child of layer');
+                } else {
+                    this.deserializeMetadata(elem, layerNode);
+                }
+            } else if (nodeType === Node.ATTRIBUTE_NODE) {
+                const attr = child as Node as Attr;
+                const namespace = attr.namespaceURI;
+
+                if (namespaceMatches(namespace, null)) {
+                    const name = attr.localName;
+                    if (name === 'name') {
+                        layerNode.nameRaw = name;
+                    } else if (name === 'can-expand') {
+                        layerNode.canExpandRaw = attr.value;
+                    } else {
+                        throw new Error(`Unknown layer attribute "${name}"`);
+                    }
+                } else if (namespaceMatches(namespace)) {
+                    throw new Error('Unexpected attribute with non-base library namespace in layer');
+                } else {
+                    this.deserializeMetadata(attr, layerNode);
+                }
+            } else if (nodeType === Node.TEXT_NODE || nodeType === Node.CDATA_SECTION_NODE) {
+                throw new Error('Unexpected text node as child of layer');
+            } else if (nodeType === Node.COMMENT_NODE) {
+                this.deserializeMetadata(child, widgetNode);
+            } else if (nodeType === Node.PROCESSING_INSTRUCTION_NODE) {
+                // TODO safe to ignore, or should it be kept as a new kind of
+                //      metadata to be used by custom parsers?
+            } else {
+                throw new Error(`Unexpected XML node type: ${nodeType}`);
+            }
+        }
+
+        // verify layer has widget
+        if (!layerNode.hasChildOfType(WidgetNode.type)) {
+            throw new Error('Layer has no child widget');
+        }
+    }
+
+    protected deserializeWidgetChildElement(elem: Element, widgetNode: WidgetNode): void {
+        const namespace = elem.namespaceURI;
+
+        if (namespaceMatches(namespace, null)) {
+            const name = elem.localName;
+            if (name === 'layer') {
+                this.deserializeLayer(elem, widgetNode);
+            } else {
+                this.deserializeWidget(elem, widgetNode);
+            }
+        } else if (namespaceMatches(namespace)) {
+            throw new Error(`Unexpected element using non-base library namespace`);
+        } else {
+            this.deserializeMetadata(elem, widgetNode);
+        }
+    }
+
+    protected deserializeWidgetAttribute(attr: Attr, widgetNode: WidgetNode): void {
+        const namespace = attr.namespaceURI;
+
+        if (namespaceMatches(namespace, null)) {
+            // value
+            widgetNode.addChild(new ValueNode(attr.localName, attr.value));
+        } else if (namespaceMatches(namespace, XML_SUB_NAMESPACE_OPTIONS)) {
+            // options
+            // get current or make options node
+            let optionsNode = widgetNode.getFirstChildOfType(OptionsNode.type);
+            if (optionsNode === null) {
+                optionsNode = new OptionsNode();
+                widgetNode.addChild(optionsNode);
+            }
+
+            // add to options node
+            const name = attr.localName;
+            if (name === '_') {
+                // options object
+                optionsNode.addChild(new OptionsObjectNode(attr.value));
+            } else {
+                // lone option
+                optionsNode.addChild(new LoneOptionNode(name, attr.value));
+            }
+        } else {
+            const isOnce = namespaceMatches(namespace, XML_SUB_NAMESPACE_ONCE);
+            if (isOnce || namespaceMatches(namespace, XML_SUB_NAMESPACE_ON)) {
+                // on/once
+                const name = attr.localName;
+                if (name === '_') {
+                    // any event type
+                    if (isOnce) {
+                        throw new Error("Event listeners that listen to any event type can't be triggered only once");
+                    }
+
+                    widgetNode.addChild(new AnyEventListenerNode(attr.value));
+                } else {
+                    // specific event type
+                    widgetNode.addChild(new EventListenerNode(attr.localName, attr.value, isOnce));
+                }
+            } else {
+                this.deserializeMetadata(attr, widgetNode);
+            }
+        }
+    }
+
+    protected deserializeWidget(widgetElem: Element, parent: ASTNode): void {
+        // get factory
+        const factoryName = widgetElem.localName;
+        const factoryDefinition = this.factories.get(factoryName);
+        if (factoryDefinition === undefined) {
+            throw new Error(`No factory registered to name "${factoryName}"`);
+        }
+
+        // make widget node
+        const widgetNode = new WidgetNode(factoryName);
+        parent.addChild(widgetNode);
+
+        // look for widget/layer elements, argument/option/listener attributes
+        // and text nodes. deserialize comments and elements/attributes that
+        // don't use library namespaces as metadata nodes
+        const textParts = new Array<string>();
+
+        for (const child of widgetElem.childNodes) {
+            const nodeType = child.nodeType;
+            if (nodeType === Node.ELEMENT_NODE) {
+                this.deserializeWidgetChildElement(child as Element, widgetNode);
+            } else if (nodeType === Node.ATTRIBUTE_NODE) {
+                // XXX for some reason directly casting ChildNode to Attr
+                //     doesn't work
+                this.deserializeWidgetAttribute(child as Node as Attr, widgetNode);
+            } else if (nodeType === Node.TEXT_NODE || nodeType === Node.CDATA_SECTION_NODE) {
+                textParts.push((child as Text).data);
+            } else if (nodeType === Node.COMMENT_NODE) {
+                this.deserializeMetadata(child, widgetNode);
+            } else if (nodeType === Node.PROCESSING_INSTRUCTION_NODE) {
+                // TODO safe to ignore, or should it be kept as a new kind of
+                //      metadata to be used by custom parsers?
+            } else {
+                throw new Error(`Unexpected XML node type: ${nodeType}`);
+            }
+        }
+
+        // make text node if text is present
+        if (textParts.length > 0) {
+            widgetNode.addChild(new TextNode(textParts.join('')));
+        }
     }
 
     protected deserializeUITree(uiTreeElem: Element, rootNode: RootNode): void {
@@ -816,7 +994,7 @@ export abstract class BaseXMLUIParser {
 
         // look for script elements and a single non-script element (treated as
         // a widget). deserialize comments and elements/attributes that don't
-        // use standard namespaces as metadata nodes
+        // use library namespaces as metadata nodes
         for (const child of uiTreeElem.childNodes) {
             const nodeType = child.nodeType;
             if (nodeType === Node.ELEMENT_NODE) {
@@ -830,7 +1008,7 @@ export abstract class BaseXMLUIParser {
                     } else {
                         this.deserializeWidget(elem, uiTree);
                     }
-                } else if (this.namespaceMatches(namespace)) {
+                } else if (namespaceMatches(namespace)) {
                     throw new Error(`Unexpected element using non-base library namespace`);
                 } else {
                     this.deserializeMetadata(elem, uiTree);
@@ -845,7 +1023,7 @@ export abstract class BaseXMLUIParser {
                     if (attr.localName !== 'name') {
                         throw new Error(`Unexpected attribute with name "${attr.localName}" using base library namespace`);
                     }
-                } else if (this.namespaceMatches(namespace)) {
+                } else if (namespaceMatches(namespace)) {
                     throw new Error(`Unexpected attribute using non-base library namespace`);
                 } else {
                     this.deserializeMetadata(attr, uiTree);
@@ -888,14 +1066,14 @@ export abstract class BaseXMLUIParser {
     protected deserializeRootDescendants(node: Node, rootNode: RootNode, foundRoot = false): void {
         // look for ui-tree and script elements (or a root element if it hasn't
         // been found yet). deserialize comments and elements/attributes that
-        // don't use standard namespaces as metadata nodes
+        // don't use library namespaces as metadata nodes
         for (const child of node.childNodes) {
             const nodeType = child.nodeType;
             if (nodeType === Node.ELEMENT_NODE) {
                 const elem = child as Element;
                 const namespace = elem.namespaceURI;
 
-                if (this.namespaceMatches(namespace)) {
+                if (namespaceMatches(namespace)) {
                     if (namespace !== XML_NAMESPACE_BASE) {
                         throw new Error(`Unexpected element using non-base library namespace`);
                     }
@@ -923,7 +1101,7 @@ export abstract class BaseXMLUIParser {
                 const attr = child as Node as Attr;
                 const namespace = attr.namespaceURI;
 
-                if (this.namespaceMatches(namespace)) {
+                if (namespaceMatches(namespace)) {
                     throw new Error(`Unexpected attribute with name "${attr.localName}" using library namespace`);
                 } else {
                     this.deserializeMetadata(attr, rootNode);

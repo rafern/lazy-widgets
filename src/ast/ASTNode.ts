@@ -38,8 +38,22 @@ export abstract class ASTNode {
         }
     }
 
-    attach(parent: ASTNode) {
+    attach(parent: ASTNode): void {
         parent.addChild(this);
+    }
+
+    getFirstChildOfType(type: string): ASTNode | null {
+        for (const child of this.children) {
+            if (child.type === type) {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    hasChildOfType(type: string): boolean {
+        return this.getFirstChildOfType(type) !== null;
     }
 
     isa<N extends ASTNode>(clazz: ({ new (..._args: never[]): N, type: string }) ): this is N {

@@ -6,7 +6,7 @@ export class OptionsObjectNode extends OptionNode {
     static override readonly type = 'options-object';
     override readonly type = OptionsObjectNode.type;
 
-    constructor(public name: string, public rawValue: string) {
+    constructor(public rawValue: string) {
         super();
     }
 
