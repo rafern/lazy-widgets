@@ -24,6 +24,9 @@ const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
  * @category XML
  */
 export const XML_NAMESPACE_BASE = 'lazy-widgets';
+
+export type FactoryDefinition = [ inputMapping: WidgetXMLInputConfig, factory: XMLWidgetFactory, paramNames: Map<string, number>, paramValidators: Map<number, (inputValue: unknown) => unknown> ];
+
 /**
  * A bare-bones XML UI parser. This must not be used directly as this is an
  * extensible parser; you are supported to create a subclass of this and add all
@@ -39,7 +42,7 @@ export abstract class BaseXMLUIParser {
     /** The DOMParser to actually parse the XML into nodes */
     private domParser = new DOMParser();
     /** A map which assigns a factory function to an element name. */
-    private factories = new Map<string, (context: XMLUIParserContext, elem: Element) => Widget>();
+    private factories = new Map<string, FactoryDefinition>();
     /**
      * A map which assigns a validator function to a unique name, allowing a
      * validator to be referred to by string. Referred to as built-in
@@ -374,6 +377,16 @@ export abstract class BaseXMLUIParser {
         }
 
         return instance;
+    }
+
+    getFactory(kebabName: string): FactoryDefinition | undefined {
+        return this.factories.get(kebabName);
+    }
+
+    getParameterMode(mode: string) {
+        // TODO remove this. parameter mode configs should be dictated by the
+        // implementation of an ArgumentNode
+        return this.parameterModes.get(mode);
     }
 
     /**

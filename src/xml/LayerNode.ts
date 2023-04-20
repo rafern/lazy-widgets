@@ -1,16 +1,16 @@
-import { ArgumentNode } from './ArgumentNode.js';
 import { WidgetNode } from './WidgetNode.js';
+import { UnnamedArgumentNode } from './UnnamedArgumentNode.js';
 
 import type { LayerInit } from '../core/LayerInit.js';
 import type { XMLUIParserContext } from './XMLUIParserContext.js';
 import type { Widget } from '../index.js';
 
-export class LayerNode extends ArgumentNode {
+export class LayerNode extends UnnamedArgumentNode {
     static override readonly type = 'layer';
     override readonly type = LayerNode.type;
 
     constructor(public name?: string, public canExpand: boolean = true) {
-        super();
+        super('layer');
     }
 
     evaluate(context: XMLUIParserContext): LayerInit<Widget> {
@@ -21,7 +21,7 @@ export class LayerNode extends ArgumentNode {
                     // TODO error
                 }
 
-                widget = child.instantiate(context);
+                widget = child.evaluate(context);
             } else {
                 // TODO error
             }

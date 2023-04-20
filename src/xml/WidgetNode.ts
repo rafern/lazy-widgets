@@ -1,22 +1,76 @@
-import { fromKebabCase } from '../helpers/fromKebabCase.js';
 import { ArgumentNode } from './ArgumentNode.js';
+import { OptionsNode } from './OptionsNode.js';
+import { Widget } from '../widgets/Widget.js';
+import { UnnamedArgumentNode } from './UnnamedArgumentNode.js';
 
 import type { XMLUIParserContext } from './XMLUIParserContext.js';
-import type { Widget } from '../widgets/Widget.js';
 
-export class WidgetNode extends ArgumentNode {
+export class WidgetNode extends UnnamedArgumentNode {
     static override readonly type = 'widget';
     override readonly type = WidgetNode.type;
 
-    constructor(public widgetType: string) {
-        super();
+    constructor(public widgetName: string) {
+        super('widget');
     }
 
-    static fromKebabCaseWidgetType(kebabWidgetType: string): WidgetNode {
-        return new WidgetNode(fromKebabCase(kebabWidgetType));
-    }
+    override evaluate(context: XMLUIParserContext): Widget {
+        // get factory
+        const parser = context.parser;
+        const factoryDefinition = parser.getFactory(this.widgetName);
+        if (factoryDefinition === undefined) {
+            throw 'ded'; // TODO
+        }
 
-    instantiate(context: XMLUIParserContext): Widget {
-        // TODO
+        // parse parameters and options
+        const inputMapping = factoryDefinition[0];
+        const paramCount = inputMapping.length;
+        const parameters = new Array<unknown>(paramCount);
+        const setParameters = new Array<boolean>(paramCount).fill(false);
+        const setViaName = new Array<boolean>(paramCount).fill(false);
+        let options: Record<string, unknown> | undefined;
+        let hadOptions = false;
+
+        for (const child of this.children) {
+            if (child.isa(OptionsNode)) {
+                if (hadOptions) {
+                    throw 'ded'; // TODO
+                }
+
+                options = child.evaluate(context);
+                hadOptions = true;
+                continue;
+            } else if (ArgumentNode.derives(child)) {
+                child.fillParameter(context, factoryDefinition, parameters, setParameters, setViaName);
+            } else {
+                // TODO how to handle unneeded nodes?
+                continue;
+            }
+        }
+
+        // check if all required parameters are set
+        for (let i = 0; i < paramCount; i++) {
+            if (!setParameters[i]) {
+                const param = inputMapping[i];
+                const mode = param.mode;
+                if (mode === 'value' || mode === 'text') {
+                    if (!param.optional) {
+                        throw new Error(`Parameter "${param.name}" with mode "${mode}" is not set`);
+                    }
+                } else {
+                    const modeConfig = parser.getParameterMode(mode);
+                    if (modeConfig === undefined) {
+                        throw new Error(`Unknown parameter mode "${mode}"; this is a bug, since there is an earlier check for this, please report it`);
+                    }
+
+                    if (!modeConfig[2] || !(param as { optional: boolean }).optional) {
+                        throw new Error(`Required parameter "${param.name}" not set`);
+                    }
+                }
+            }
+        }
+
+        // call factory
+        parameters.push(options);
+        return factoryDefinition[1](...parameters);
     }
 }
