@@ -9,7 +9,7 @@ export class LayerNode extends UnnamedArgumentNode {
     static override readonly type = 'layer';
     override readonly type = LayerNode.type;
 
-    constructor(public name?: string, public canExpand: boolean = true) {
+    constructor(public nameRaw?: string, public canExpandRaw?: string) {
         super('layer');
     }
 
@@ -32,6 +32,28 @@ export class LayerNode extends UnnamedArgumentNode {
             // TODO error
         }
 
-        return { name: this.name, canExpand: this.canExpand, child: widget };
+        let name: string | undefined;
+        if (this.nameRaw !== undefined) {
+            const parsedName = context.parser.parseAttributeValue(this.nameRaw, context);
+
+            if (typeof parsedName !== 'string') {
+                throw new Error('Unexpected non-string layer name');
+            }
+
+            name = parsedName;
+        }
+
+        let canExpand: boolean | undefined;
+        if (this.canExpandRaw !== undefined) {
+            const parsedCanExpand = context.parser.parseAttributeValue(this.canExpandRaw, context);
+
+            if (typeof parsedCanExpand !== 'boolean') {
+                throw new Error('Unexpected non-boolean layer can-expand');
+            }
+
+            canExpand = parsedCanExpand;
+        }
+
+        return { name, canExpand, child: widget };
     }
 }
