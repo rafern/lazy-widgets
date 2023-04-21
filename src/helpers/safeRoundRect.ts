@@ -105,15 +105,13 @@ export function safeRoundRect(ctx: CanvasRenderingContext2D, x: number, y: numbe
     const xw = x + w;
     const yh = y + h;
 
-    /**
-     *   .A------B.
-     *  /          \
-     * H            C
-     * |            |
-     * G            D
-     *  \          /
-     *   `F------E'
-     */
+    //   .A------B.
+    //  /          \
+    // H            C
+    // |            |
+    // G            D
+    //  \          /
+    //   `F------E'
 
     // A (begin)
     ctx.moveTo(x + upperLeft.x, y);
