@@ -356,7 +356,7 @@ export abstract class BaseXMLUIParser {
             if (!setParameters[i]) {
                 const param = inputConfig[i];
                 const mode = param.mode;
-                if (mode === 'value' || mode === 'text') {
+                if (RESERVED_PARAMETER_MODES.indexOf(mode) >= 0) {
                     if (!param.optional) {
                         throw new Error(`Parameter "${param.name}" with mode "${mode}" is not set in "${factoryName}" widget`);
                     }
