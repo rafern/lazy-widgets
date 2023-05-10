@@ -241,10 +241,15 @@ export class PointerDriver implements Driver {
         }
 
         // Update pointer's hint
-        if(state.pressing > 0) {
-            this.setPointerHint(pointer, PointerHint.Pressing);
-        } else {
-            this.setPointerHint(pointer, PointerHint.Hovering);
+        // XXX an event listener might have removed the driver or disabled the
+        //     root, so we have to check again to prevent the pointer hint from
+        //     being set while the driver is not being attached to the root
+        if (this.states.has(root)) {
+            if(state.pressing > 0) {
+                this.setPointerHint(pointer, PointerHint.Pressing);
+            } else {
+                this.setPointerHint(pointer, PointerHint.Hovering);
+            }
         }
 
         return captured;
