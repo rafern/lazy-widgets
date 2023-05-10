@@ -45,13 +45,18 @@ This project is licensed under the MIT license (see the LICENSE file)
 This project uses the following open-source projects:
 - [@typescript-eslint/eslint-plugin](https://github.com/typescript-eslint/typescript-eslint) licensed under the MIT license
 - [@typescript-eslint/parser](https://github.com/typescript-eslint/typescript-eslint) licensed under the BSD 2-Clause license
-- [canvas-roundrect-polyfill](https://github.com/Kaiido/roundRect) licensed under the MIT license
+- [chai](http://chaijs.com/) licensed under the MIT license
 - [concurrently](https://github.com/open-cli-tools/concurrently) licensed under the MIT license
+- [DefinitelyTyped](http://definitelytyped.github.io/) licensed under the MIT license
 - [esbuild](https://github.com/evanw/esbuild) licensed under the MIT license
 - [eslint](https://github.com/eslint/eslint) licensed under the MIT license
 - [eslint-plugin-tsdoc](https://github.com/microsoft/tsdoc) licensed under the MIT license
-- [rimraf](https://github.com/isaacs/rimraf) licensed under the ISC license
+- [http-server](https://github.com/http-party/http-server) licensed under the MIT license
+- [jsdom](https://github.com/jsdom/jsdom#readme) licensed under the MIT license
+- [mocha](https://mochajs.org/) licensed under the MIT license
+- [node-canvas](https://github.com/Automattic/node-canvas) licensed under the MIT license
+- [shx](https://github.com/shelljs/shx#readme) licensed under the MIT license
+- [tslib](https://github.com/Microsoft/tslib) licensed under the BSD Zero Clause license
+- [ts-node](https://typestrong.org/ts-node) licensed under the MIT license
 - [typedoc](https://github.com/TypeStrong/TypeDoc) licensed under the Apache 2.0 license
 - [typescript](https://github.com/Microsoft/TypeScript) licensed under the Apache 2.0 license
-- [tslib](https://github.com/Microsoft/tslib) licensed under the BSD Zero Clause License
-- [http-server](https://github.com/http-party/http-server) licensed under the MIT license
