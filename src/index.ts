@@ -42,6 +42,7 @@ export * from './events/KeyEvent';
 export * from './events/KeyPressEvent';
 export * from './events/KeyReleaseEvent';
 export * from './events/LeaveEvent';
+export * from './events/LeaveRootEvent';
 export * from './events/ModifierEvent';
 export * from './events/PointerButtonEvent';
 export * from './events/PointerEvent';
