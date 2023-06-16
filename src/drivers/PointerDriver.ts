@@ -5,13 +5,14 @@ import { PointerPressEvent } from '../events/PointerPressEvent';
 import { PointerMoveEvent } from '../events/PointerMoveEvent';
 import { FocusType } from '../core/FocusType';
 import { PointerHint } from './PointerHint';
-import { LeaveEvent } from '../events/LeaveEvent';
 
 import type { Widget } from '../widgets/Widget';
 import type { Driver } from '../core/Driver';
 import type { TricklingEvent } from '../events/TricklingEvent';
 import type { Root } from '../core/Root';
 import type { SourcePointer } from './SourcePointer';
+import { LeaveRootEvent } from '../events/LeaveRootEvent';
+import { StickyEvent } from '../events/StickyEvent';
 
 /**
  * A container which has the state associated with a specific {@link Root} for
@@ -69,10 +70,10 @@ export class PointerDriver implements Driver {
         // Clear state
         state.pointer = null;
         if(state.hovering) {
-            // Dispatch LeaveEvent event if hovering
+            // Dispatch LeaveRootEvent event if hovering
             this.dispatchEvent(
                 root, state,
-                new LeaveEvent(root.getFocusCapturer(FocusType.Pointer)),
+                new LeaveRootEvent(),
                 pointerID === null ? null : [this, pointerID]
             );
         }
@@ -98,8 +99,8 @@ export class PointerDriver implements Driver {
      * Unregister a pointer.
      *
      * If a root has this pointer bound to it, the pointer is unbound from the
-     * root, a LeaveEvent event is dispatched to the root and the hovering and
-     * pressing state of the root is set to false.
+     * root, a LeaveRootEvent event is dispatched to the root and the hovering
+     * and pressing state of the root is set to false.
      */
     unregisterPointer(pointer: number): void {
         for(const [root, state] of this.states) {
@@ -256,8 +257,8 @@ export class PointerDriver implements Driver {
     }
 
     /**
-     * Dispatch a {@link LeaveEvent} event to a given root. Event will only be
-     * dispatched if the root was being hovered.
+     * Dispatch a {@link LeaveRootEvent} event to a given root. Event will only
+     * be dispatched if the root was being hovered.
      *
      * @param pointer - The registered pointer ID
      * @returns Returns true if the event was captured
@@ -277,7 +278,7 @@ export class PointerDriver implements Driver {
             const captured = this.dispatchEvent(
                 root,
                 state,
-                new LeaveEvent(root.getFocusCapturer(FocusType.Pointer)),
+                new LeaveRootEvent(),
                 [this, pointer]
             );
             this.setPointerHint(pointer, PointerHint.None);
@@ -288,9 +289,9 @@ export class PointerDriver implements Driver {
     }
 
     /**
-     * Dispatch a {@link LeaveEvent} event to any root with the given pointer
-     * assigned. Event will only be dispatched if the root was being hovered.
-     * Pointer will also be unassigned from root.
+     * Dispatch a {@link LeaveRootEvent} event to any root with the given
+     * pointer assigned. Event will only be dispatched if the root was being
+     * hovered. Pointer will also be unassigned from root.
      *
      * @param pointer - The registered pointer ID
      */
@@ -392,8 +393,8 @@ export class PointerDriver implements Driver {
     }
 
     /**
-     * Dispatches a leave event for the disabled root and deletes the state of
-     * the disabled root from {@link PointerDriver#states}.
+     * Dispatches a leave-root event for the disabled root and deletes the state
+     * of the disabled root from {@link PointerDriver#states}.
      */
     onDisable(root: Root): void {
         if (!this.states.has(root)) {
@@ -401,8 +402,8 @@ export class PointerDriver implements Driver {
             return;
         }
 
-        // Dispatch leave event
-        root.dispatchEvent(new LeaveEvent());
+        // Dispatch leave-root event
+        root.dispatchEvent(new LeaveRootEvent());
 
         // Reset hint for assigned pointer and stop dragging
         const state = this.states.get(root);
@@ -423,7 +424,7 @@ export class PointerDriver implements Driver {
      *
      * @returns Returns true if the event was captured
      */
-    private dispatchEvent(root: Root, state: PointerDriverState, event: TricklingEvent, source: SourcePointer | null): boolean {
+    private dispatchEvent(root: Root, state: PointerDriverState, event: TricklingEvent | StickyEvent, source: SourcePointer | null): boolean {
         // Check if drag to scroll is enabled for this root
         const dragToScroll = state.pointer === null
             ? false

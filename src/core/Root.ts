@@ -20,6 +20,7 @@ import type { Widget } from '../widgets/Widget';
 import type { Driver } from './Driver';
 import type { CaptureList } from './CaptureList';
 import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
+import { LeaveRootEvent } from '../events/LeaveRootEvent';
 
 /**
  * Allowed cursor styles and in order of priority; lower indices have higher
@@ -428,8 +429,25 @@ export class Root implements WidgetEventEmitter {
         // Don't do anything else if event is not a trickling event; can't
         // bubble up because we're at the root already, and can't do anything
         // with a sticky event since that's meant to be handled by users
+        // XXX with the exception of leave-root events, see below...
         if (baseEvent.propagation !== PropagationModel.Trickling) {
-            return [[baseEvent, false]];
+            const captureList: CaptureList = [[baseEvent, false]];
+
+            // Special case for leave-root event; try to dispatch leave events to
+            // all hovered widgets
+            if (baseEvent.isa(LeaveRootEvent)) {
+                for (const widget of this.lastHoveredWidgets) {
+                    const leaveEvent = new LeaveEvent(widget);
+                    captureList.push([
+                        leaveEvent,
+                        this.child.dispatchEvent(leaveEvent) !== null
+                    ]);
+                }
+
+                this.lastHoveredWidgets.clear();
+            }
+
+            return captureList;
         }
 
         // Event is a trickling event
