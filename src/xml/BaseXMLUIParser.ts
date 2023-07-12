@@ -22,7 +22,7 @@ const RESERVED_IMPORTS = ['context', 'window', 'globalThis'];
  *
  * @category XML
  */
-export const XML_NAMESPACE_BASE = 'lazy-widgets.js';
+export const XML_NAMESPACE_BASE = 'lazy-widgets';
 /**
  * Makes sure a map-like value, such as a Record, is transformed to a Map.
  *

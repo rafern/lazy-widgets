@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs.js';
+import { readFileSync, writeFileSync } from 'fs';
 function showError(error) {
     console.error(error);
     process.exit(1);
