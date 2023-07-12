@@ -62,8 +62,8 @@ jobs:
           name: build
       - run: tar -xf build.tar.gz dist/
       - run: mkdir docs/dist
-      - run: mv dist/index.esm.js docs/dist/index.esm.js
-      - run: mv dist/index.esm.js.map docs/dist/index.esm.js.map
+      - run: mv dist/index.js docs/dist/index.js
+      - run: mv dist/index.js.map docs/dist/index.js.map
       - run: mv examples docs/examples
       - uses: actions/upload-pages-artifact@v1
         with:
