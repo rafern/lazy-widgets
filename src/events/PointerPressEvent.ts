@@ -1,8 +1,6 @@
-import { PointerButtonEvent } from './PointerButtonEvent';
-import { Widget } from '../widgets/Widget';
-
-import type { SourcePointer } from '../drivers/SourcePointer';
-
+import { PointerButtonEvent } from './PointerButtonEvent.js';
+import { Widget } from '../widgets/Widget.js';
+import type { SourcePointer } from '../drivers/SourcePointer.js';
 /**
  * A pointer press {@link PointerButtonEvent} (pointer button down).
  *

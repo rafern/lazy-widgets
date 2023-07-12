@@ -1,5 +1,4 @@
-import { Widget } from '../widgets/Widget';
-
+import { Widget } from '../widgets/Widget.js';
 /**
  * A validator function which checks whether an input value is a {@link Widget}.
  * Doesn't stop the validator chain.

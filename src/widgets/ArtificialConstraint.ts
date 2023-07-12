@@ -1,10 +1,8 @@
-import { layoutArrayField } from '../decorators/FlagFields';
-import { PassthroughWidget } from './PassthroughWidget';
-
-import type { LayoutConstraints } from '../core/LayoutConstraints';
-import type { Widget, WidgetProperties } from './Widget';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { layoutArrayField } from '../decorators/FlagFields.js';
+import { PassthroughWidget } from './PassthroughWidget.js';
+import type { LayoutConstraints } from '../core/LayoutConstraints.js';
+import type { Widget, WidgetProperties } from './Widget.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * A {@link PassthroughWidget} which imposes further layout constraints onto a
  * child.

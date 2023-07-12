@@ -1,10 +1,8 @@
-import { ArtificialConstraint } from '../ArtificialConstraint';
-import { TextButton } from '../TextButton';
-import { filterIDFromProperties } from '../../helpers/filterIDFromProperties';
-
-import type { WidgetProperties } from '../Widget';
-import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
-
+import { ArtificialConstraint } from '../ArtificialConstraint.js';
+import { TextButton } from '../TextButton.js';
+import { filterIDFromProperties } from '../../helpers/filterIDFromProperties.js';
+import type { WidgetProperties } from '../Widget.js';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML.js';
 /**
  * An {@link ArtificialConstraint} with a {@link TextButton} which calls a given
  * callback and displays a given text source.

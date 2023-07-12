@@ -1,7 +1,5 @@
-import { StickyEvent } from './StickyEvent';
-
-import type { FocusType } from '../core/FocusType';
-
+import { StickyEvent } from './StickyEvent.js';
+import type { FocusType } from '../core/FocusType.js';
 /**
  * A sticky event that is fired right before a {@link Widget} gains a specific
  * {@link FocusType | focus}. Not capturable by user listeners. If not captured

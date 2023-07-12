@@ -1,15 +1,13 @@
-import { TextAlignMode } from '../helpers/TextHelper';
-import { LiveLabel } from './LiveLabel';
-import { Alignment } from '../theme/Alignment';
-import { FilledButton } from './FilledButton';
-import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
-
-import type { Alignment2D } from '../theme/Alignment2D';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
-import type { LabelProperties } from './BaseLabel';
-import type { Observable } from '../state/Observable';
-
+import { TextAlignMode } from '../helpers/TextHelper.js';
+import { LiveLabel } from './LiveLabel.js';
+import { Alignment } from '../theme/Alignment.js';
+import { FilledButton } from './FilledButton.js';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties.js';
+import type { Alignment2D } from '../theme/Alignment2D.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
+import type { LabelProperties } from './BaseLabel.js';
+import type { Observable } from '../state/Observable.js';
 /**
  * A {@link FilledButton} with a {@link LiveLabel}. Alignment is forced to be
  * horizontally centered and vertically stretching like in {@link TextMargin}.

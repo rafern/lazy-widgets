@@ -1,31 +1,29 @@
-import { BaseXMLUIParser, XML_NAMESPACE_BASE } from './BaseXMLUIParser';
-import * as widgets from '../widgets/concrete-widgets';
-import { WidgetAutoXML } from './WidgetAutoXML';
-import { validateArray } from './validateArray';
-import { validateBoolean } from './validateBoolean';
-import { validateFunction } from './validateFunction';
-import { validateImageSource } from './validateImageSource';
-import { validateKeyboardDriver } from './validateKeyboardDriver';
-import { validateKeyContext } from './validateKeyContext';
-import { validateLayerInit } from './validateLayerInit';
-import { validateLayoutConstraints } from './validateLayoutConstraints';
-import { validateNullable } from './validateNullable';
-import { validateNumber } from './validateNumber';
-import { validateObject } from './validateObject';
-import { validateObservable } from './validateObservable';
-import { validateString } from './validateString';
-import { validateTheme } from './validateTheme';
-import { validateValidatedVariable } from './validateValidatedVariable';
-import { validateVariable } from './validateVariable';
-import { validateWidget } from './validateWidget';
-import { fromKebabCase } from '../helpers/fromKebabCase';
-import { WidgetEventListener } from '../events/WidgetEventEmitter';
-import { WHITESPACE_REGEX } from '../helpers/whitespace-regex';
-
-import type { Widget } from '../widgets/Widget';
-import type { XMLUIParserContext } from './XMLUIParserContext';
-import type { LayerInit } from '../core/LayerInit';
-
+import { BaseXMLUIParser, XML_NAMESPACE_BASE } from './BaseXMLUIParser.js';
+import * as widgets from '../widgets/concrete-widgets.js';
+import { WidgetAutoXML } from './WidgetAutoXML.js';
+import { validateArray } from './validateArray.js';
+import { validateBoolean } from './validateBoolean.js';
+import { validateFunction } from './validateFunction.js';
+import { validateImageSource } from './validateImageSource.js';
+import { validateKeyboardDriver } from './validateKeyboardDriver.js';
+import { validateKeyContext } from './validateKeyContext.js';
+import { validateLayerInit } from './validateLayerInit.js';
+import { validateLayoutConstraints } from './validateLayoutConstraints.js';
+import { validateNullable } from './validateNullable.js';
+import { validateNumber } from './validateNumber.js';
+import { validateObject } from './validateObject.js';
+import { validateObservable } from './validateObservable.js';
+import { validateString } from './validateString.js';
+import { validateTheme } from './validateTheme.js';
+import { validateValidatedVariable } from './validateValidatedVariable.js';
+import { validateVariable } from './validateVariable.js';
+import { validateWidget } from './validateWidget.js';
+import { fromKebabCase } from '../helpers/fromKebabCase.js';
+import { WidgetEventListener } from '../events/WidgetEventEmitter.js';
+import { WHITESPACE_REGEX } from '../helpers/whitespace-regex.js';
+import type { Widget } from '../widgets/Widget.js';
+import type { XMLUIParserContext } from './XMLUIParserContext.js';
+import type { LayerInit } from '../core/LayerInit.js';
 /**
  * A layer parameter for a {@link WidgetXMLInputConfig}.
  *

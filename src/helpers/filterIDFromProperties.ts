@@ -1,5 +1,4 @@
-import { WidgetProperties } from '../widgets/Widget';
-
+import { WidgetProperties } from '../widgets/Widget.js';
 export function filterIDFromProperties(properties?: WidgetProperties): WidgetProperties | undefined {
     if (properties === undefined || !('id' in properties)) {
         return properties;

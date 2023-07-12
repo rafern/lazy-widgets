@@ -1,24 +1,22 @@
-import { ViewportWidget, ViewportWidgetProperties } from './ViewportWidget';
-import { AxisCoupling } from '../core/AxisCoupling';
-import { PointerEvent } from '../events/PointerEvent';
-import { PointerWheelEvent } from '../events/PointerWheelEvent';
-import { ClickHelper } from '../helpers/ClickHelper';
-import { ClickState } from '../helpers/ClickState';
-import { TextHelper } from '../helpers/TextHelper';
-import { AutoScrollEvent } from '../events/AutoScrollEvent';
-import { LeaveEvent } from '../events/LeaveEvent';
-import { Root } from '../core/Root';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { FocusEvent } from '../events/FocusEvent';
-import { BlurEvent } from '../events/BlurEvent';
-import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
-
-import type { Bounds } from '../helpers/Bounds';
-import type { TricklingEvent } from '../events/TricklingEvent';
-import type { Widget } from './Widget';
-import type { Rect } from '../helpers/Rect';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { ViewportWidget, ViewportWidgetProperties } from './ViewportWidget.js';
+import { AxisCoupling } from '../core/AxisCoupling.js';
+import { PointerEvent } from '../events/PointerEvent.js';
+import { PointerWheelEvent } from '../events/PointerWheelEvent.js';
+import { ClickHelper } from '../helpers/ClickHelper.js';
+import { ClickState } from '../helpers/ClickState.js';
+import { TextHelper } from '../helpers/TextHelper.js';
+import { AutoScrollEvent } from '../events/AutoScrollEvent.js';
+import { LeaveEvent } from '../events/LeaveEvent.js';
+import { Root } from '../core/Root.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import { FocusEvent } from '../events/FocusEvent.js';
+import { BlurEvent } from '../events/BlurEvent.js';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
+import type { Bounds } from '../helpers/Bounds.js';
+import type { TricklingEvent } from '../events/TricklingEvent.js';
+import type { Widget } from './Widget.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * The mode for how a scrollbar is shown in a {@link ScrollableViewportWidget}.
  *

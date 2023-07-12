@@ -1,7 +1,5 @@
-import { Parent } from './Parent';
-
-import type { Widget, WidgetProperties } from '../widgets/Widget';
-
+import { Parent } from './Parent.js';
+import type { Widget, WidgetProperties } from '../widgets/Widget.js';
 /**
  * A specialised version of the {@link Parent} class for parents with a single
  * mandatory child.

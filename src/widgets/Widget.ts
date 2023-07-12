@@ -1,21 +1,19 @@
-import { ThemeProperties } from "../theme/ThemeProperties";
-import { PointerEvent } from '../events/PointerEvent';
-import { AutoScrollEvent } from '../events/AutoScrollEvent';
-import { TabSelectEvent } from '../events/TabSelectEvent';
-import { BaseTheme } from '../theme/BaseTheme';
-import { DynMsg } from '../core/Strings';
-import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions';
-import { PropagationModel, WidgetEvent } from "../events/WidgetEvent";
-
-import type { Viewport } from '../core/Viewport';
-import type { Bounds } from '../helpers/Bounds';
-import type { TricklingEvent } from '../events/TricklingEvent';
-import type { Theme } from '../theme/Theme';
-import type { Rect } from '../helpers/Rect';
-import type { Root } from '../core/Root';
-import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter';
-import type { WidgetAutoXML } from "../xml/WidgetAutoXML";
-
+import { ThemeProperties } from "../theme/ThemeProperties.js";
+import { PointerEvent } from '../events/PointerEvent.js';
+import { AutoScrollEvent } from '../events/AutoScrollEvent.js';
+import { TabSelectEvent } from '../events/TabSelectEvent.js';
+import { BaseTheme } from '../theme/BaseTheme.js';
+import { DynMsg } from '../core/Strings.js';
+import { eventEmitterHandleEvent, eventEmitterOff, eventEmitterOffAny, eventEmitterOn, eventEmitterOnAny } from '../helpers/WidgetEventEmitter-premade-functions.js';
+import { PropagationModel, WidgetEvent } from "../events/WidgetEvent.js";
+import type { Viewport } from '../core/Viewport.js';
+import type { Bounds } from '../helpers/Bounds.js';
+import type { TricklingEvent } from '../events/TricklingEvent.js';
+import type { Theme } from '../theme/Theme.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { Root } from '../core/Root.js';
+import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter.js';
+import type { WidgetAutoXML } from "../xml/WidgetAutoXML.js";
 /**
  * Optional Widget constructor properties.
  *

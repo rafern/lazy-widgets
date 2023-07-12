@@ -1,9 +1,7 @@
-import { MultiContainer } from './MultiContainer';
-import { MultiParentXMLInputConfig } from '../xml/MultiParentXMLInputConfig';
-
-import type { Widget, WidgetProperties } from './Widget';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { MultiContainer } from './MultiContainer.js';
+import { MultiParentXMLInputConfig } from '../xml/MultiParentXMLInputConfig.js';
+import type { Widget, WidgetProperties } from './Widget.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * A vertical {@link MultiContainer}.
  *

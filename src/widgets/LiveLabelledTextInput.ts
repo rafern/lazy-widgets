@@ -1,12 +1,10 @@
-import { LiveLabel } from './LiveLabel';
-import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
-import { BaseLabelledTextInput } from './BaseLabelledTextInput';
-
-import type { ValidatedVariable } from '../state/ValidatedVariable';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { LabelledTextInputProperties } from './BaseLabelledTextInput';
-import type { Observable } from '../state/Observable';
-
+import { LiveLabel } from './LiveLabel.js';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties.js';
+import { BaseLabelledTextInput } from './BaseLabelledTextInput.js';
+import type { ValidatedVariable } from '../state/ValidatedVariable.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import type { LabelledTextInputProperties } from './BaseLabelledTextInput.js';
+import type { Observable } from '../state/Observable.js';
 /**
  * Similar to {@link LabelledTextInput}, but a {@link LiveLabel} is used.
  *

@@ -1,22 +1,20 @@
-import { ClippedViewport } from '../core/ClippedViewport';
-import { CanvasViewport } from '../core/CanvasViewport';
-import { layoutField } from '../decorators/FlagFields';
-import { AxisCoupling } from '../core/AxisCoupling';
-import { Widget, WidgetProperties } from './Widget';
-import { SingleParent } from './SingleParent';
-import { DynMsg } from '../core/Strings';
-import { Rect } from '../helpers/Rect';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { TricklingEvent } from '../events/TricklingEvent';
-import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
-import { ScrollEvent } from '../events/ScrollEvent';
-
-import type { LayoutConstraints } from '../core/LayoutConstraints';
-import type { Viewport } from '../core/Viewport';
-import type { Bounds } from '../helpers/Bounds';
-import type { Root } from '../core/Root';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { ClippedViewport } from '../core/ClippedViewport.js';
+import { CanvasViewport } from '../core/CanvasViewport.js';
+import { layoutField } from '../decorators/FlagFields.js';
+import { AxisCoupling } from '../core/AxisCoupling.js';
+import { Widget, WidgetProperties } from './Widget.js';
+import { SingleParent } from './SingleParent.js';
+import { DynMsg } from '../core/Strings.js';
+import { Rect } from '../helpers/Rect.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import { TricklingEvent } from '../events/TricklingEvent.js';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
+import { ScrollEvent } from '../events/ScrollEvent.js';
+import type { LayoutConstraints } from '../core/LayoutConstraints.js';
+import type { Viewport } from '../core/Viewport.js';
+import type { Bounds } from '../helpers/Bounds.js';
+import type { Root } from '../core/Root.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * Optional ViewportWidget constructor properties.
  *

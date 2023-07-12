@@ -1,11 +1,9 @@
-import { safeRoundRect } from '../helpers/safeRoundRect';
-import { PassthroughWidget } from './PassthroughWidget';
-import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
-
-import type { Rect } from '../helpers/Rect';
-import type { Widget, WidgetProperties } from './Widget';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { safeRoundRect } from '../helpers/safeRoundRect.js';
+import { PassthroughWidget } from './PassthroughWidget.js';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { Widget, WidgetProperties } from './Widget.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * A container widget that rounds the corners of a child widget.
  *

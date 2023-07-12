@@ -1,6 +1,5 @@
-import type { Widget } from '../widgets/Widget';
-import type { XMLWidgetFactory } from './XMLWidgetFactory';
-
+import type { Widget } from '../widgets/Widget.js';
+import type { XMLWidgetFactory } from './XMLWidgetFactory.js';
 /**
  * A generic validator function which can transform a value and be chained with
  * other validators. If an input value is invalid, an error must be thrown.

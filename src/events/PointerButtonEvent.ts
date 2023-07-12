@@ -1,8 +1,6 @@
-import { PointerEvent } from './PointerEvent';
-
-import type { Widget } from '../widgets/Widget';
-import type { SourcePointer } from '../drivers/SourcePointer';
-
+import { PointerEvent } from './PointerEvent.js';
+import type { Widget } from '../widgets/Widget.js';
+import type { SourcePointer } from '../drivers/SourcePointer.js';
 /**
  * A {@link PointerEvent} for button presses/releases, containing helpers for
  * checking whether it was the left/primary button, right/secondary button or

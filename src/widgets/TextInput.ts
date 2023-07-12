@@ -1,28 +1,26 @@
-import { layoutField, damageArrayField, watchField } from '../decorators/FlagFields';
-import { ValidatedVariable } from '../state/ValidatedVariable';
-import { PointerReleaseEvent } from '../events/PointerReleaseEvent';
-import { TextPasteEvent } from '../events/TextPasteEvent';
-import { PointerEvent } from '../events/PointerEvent';
-import { PointerPressEvent } from '../events/PointerPressEvent';
-import { PointerWheelEvent } from '../events/PointerWheelEvent';
-import { Widget, WidgetProperties } from './Widget';
-import { PointerMoveEvent } from '../events/PointerMoveEvent';
-import { TextHelper } from '../helpers/TextHelper';
-import { AutoScrollEvent } from '../events/AutoScrollEvent';
-import { KeyPressEvent } from '../events/KeyPressEvent';
-import { FocusType } from '../core/FocusType';
-import { LeaveEvent } from '../events/LeaveEvent';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { TricklingEvent } from '../events/TricklingEvent';
-import { FocusEvent } from '../events/FocusEvent';
-import { BlurEvent } from '../events/BlurEvent';
-
-import type { Viewport } from '../core/Viewport';
-import type { Bounds } from '../helpers/Bounds';
-import type { Rect } from '../helpers/Rect';
-import type { Root } from '../core/Root';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { layoutField, damageArrayField, watchField } from '../decorators/FlagFields.js';
+import { ValidatedVariable } from '../state/ValidatedVariable.js';
+import { PointerReleaseEvent } from '../events/PointerReleaseEvent.js';
+import { TextPasteEvent } from '../events/TextPasteEvent.js';
+import { PointerEvent } from '../events/PointerEvent.js';
+import { PointerPressEvent } from '../events/PointerPressEvent.js';
+import { PointerWheelEvent } from '../events/PointerWheelEvent.js';
+import { Widget, WidgetProperties } from './Widget.js';
+import { PointerMoveEvent } from '../events/PointerMoveEvent.js';
+import { TextHelper } from '../helpers/TextHelper.js';
+import { AutoScrollEvent } from '../events/AutoScrollEvent.js';
+import { KeyPressEvent } from '../events/KeyPressEvent.js';
+import { FocusType } from '../core/FocusType.js';
+import { LeaveEvent } from '../events/LeaveEvent.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import { TricklingEvent } from '../events/TricklingEvent.js';
+import { FocusEvent } from '../events/FocusEvent.js';
+import { BlurEvent } from '../events/BlurEvent.js';
+import type { Viewport } from '../core/Viewport.js';
+import type { Bounds } from '../helpers/Bounds.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { Root } from '../core/Root.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * Optional TextInput constructor properties.
  *

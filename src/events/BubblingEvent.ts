@@ -1,6 +1,5 @@
-import { Widget } from '../widgets/Widget';
-import { WidgetEvent, PropagationModel } from './WidgetEvent';
-
+import { Widget } from '../widgets/Widget.js';
+import { WidgetEvent, PropagationModel } from './WidgetEvent.js';
 /**
  * A generic event that bubbles up a UI tree. This is an abstract class and must
  * be implemented in child classes.

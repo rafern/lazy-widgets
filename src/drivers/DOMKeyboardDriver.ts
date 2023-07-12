@@ -1,11 +1,9 @@
-import { KeyboardDriver } from './KeyboardDriver';
-import { getTabKeyHelper } from '../helpers/TabKeyHelper';
-import { TabSelectEvent } from '../events/TabSelectEvent';
-
-import type { KeyboardDriverGroup, KeyboardDriverGroupOptions } from './KeyboardDriver';
-import type { CaptureList } from '../core/CaptureList';
-import type { TabKeyHelper } from '../helpers/TabKeyHelper';
-
+import { KeyboardDriver } from './KeyboardDriver.js';
+import { getTabKeyHelper } from '../helpers/TabKeyHelper.js';
+import { TabSelectEvent } from '../events/TabSelectEvent.js';
+import type { KeyboardDriverGroup, KeyboardDriverGroupOptions } from './KeyboardDriver.js';
+import type { CaptureList } from '../core/CaptureList.js';
+import type { TabKeyHelper } from '../helpers/TabKeyHelper.js';
 /**
  * Unpack a KeyboardEvent into a 4-tuple containing the event's key and modifier
  * key state. The 4-tuple contains, respectively, the key

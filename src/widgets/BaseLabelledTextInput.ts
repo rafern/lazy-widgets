@@ -1,14 +1,12 @@
-import { Spacing, SpacingProperties } from './Spacing';
-import { TextInput } from './TextInput';
-import { Row } from './Row';
-import { ArtificialConstraint } from './ArtificialConstraint';
-
-import type { ValidatedVariable } from '../state/ValidatedVariable';
-import type { TextInputProperties } from './TextInput';
-import type { LabelProperties } from './BaseLabel';
-import type { LayoutConstraints } from '../core/LayoutConstraints';
-import type { Widget } from './Widget';
-
+import { Spacing, SpacingProperties } from './Spacing.js';
+import { TextInput } from './TextInput.js';
+import { Row } from './Row.js';
+import { ArtificialConstraint } from './ArtificialConstraint.js';
+import type { ValidatedVariable } from '../state/ValidatedVariable.js';
+import type { TextInputProperties } from './TextInput.js';
+import type { LabelProperties } from './BaseLabel.js';
+import type { LayoutConstraints } from '../core/LayoutConstraints.js';
+import type { Widget } from './Widget.js';
 export interface LabelledTextInputProperties extends LabelProperties, SpacingProperties, TextInputProperties {
     textInputConstraints?: LayoutConstraints;
 }

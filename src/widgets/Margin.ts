@@ -1,12 +1,10 @@
-import { Alignment } from '../theme/Alignment';
-import { Container } from './Container';
-import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
-
-import type { ThemeProperties } from '../theme/ThemeProperties';
-import type { Alignment2D } from '../theme/Alignment2D';
-import type { Widget } from './Widget';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { Alignment } from '../theme/Alignment.js';
+import { Container } from './Container.js';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
+import type { ThemeProperties } from '../theme/ThemeProperties.js';
+import type { Alignment2D } from '../theme/Alignment2D.js';
+import type { Widget } from './Widget.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * A {@link Container} with center alignment on both axes and default padding,
  * similar to {@link Center}.

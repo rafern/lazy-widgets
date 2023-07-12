@@ -1,14 +1,12 @@
-import { KeyReleaseEvent } from '../events/KeyReleaseEvent';
-import { KeyPressEvent } from '../events/KeyPressEvent';
-import { FocusType } from '../core/FocusType';
-import { KeyEvent } from '../events/KeyEvent';
-import { TabSelectEvent } from '../events/TabSelectEvent';
-
-import type { Widget } from '../widgets/Widget';
-import type { Driver } from '../core/Driver';
-import type { Root } from '../core/Root';
-import type { CaptureList } from '../core/CaptureList';
-
+import { KeyReleaseEvent } from '../events/KeyReleaseEvent.js';
+import { KeyPressEvent } from '../events/KeyPressEvent.js';
+import { FocusType } from '../core/FocusType.js';
+import { KeyEvent } from '../events/KeyEvent.js';
+import { TabSelectEvent } from '../events/TabSelectEvent.js';
+import type { Widget } from '../widgets/Widget.js';
+import type { Driver } from '../core/Driver.js';
+import type { Root } from '../core/Root.js';
+import type { CaptureList } from '../core/CaptureList.js';
 /**
  * A group of Roots. When a {@link TabSelectEvent} is not captured by a
  * {@link Root} in a group, the TabSelectEvent is carried over to the next (or

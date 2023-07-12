@@ -1,15 +1,13 @@
-import { TextAlignMode } from '../helpers/TextHelper';
-import { FlexAlignment } from './FlexAlignment';
-import { Alignment } from './Alignment';
-
-import type { FlexAlignment2D } from './FlexAlignment2D';
-import type { ThemeProperties } from './ThemeProperties';
-import type { Alignment2D } from './Alignment2D';
-import type { FillStyle } from './FillStyle';
-import type { Padding } from './Padding';
-import type { Theme } from './Theme';
-import type { CornerRadii } from '../widgets/CornerRadii';
-
+import { TextAlignMode } from '../helpers/TextHelper.js';
+import { FlexAlignment } from './FlexAlignment.js';
+import { Alignment } from './Alignment.js';
+import type { FlexAlignment2D } from './FlexAlignment2D.js';
+import type { ThemeProperties } from './ThemeProperties.js';
+import type { Alignment2D } from './Alignment2D.js';
+import type { FillStyle } from './FillStyle.js';
+import type { Padding } from './Padding.js';
+import type { Theme } from './Theme.js';
+import type { CornerRadii } from '../widgets/CornerRadii.js';
 /**
  * The base class for {@link Widget} and {@link Theme}. The backbone of the
  * theming system.

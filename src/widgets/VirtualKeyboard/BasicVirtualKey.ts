@@ -1,9 +1,7 @@
-import { VirtualKey } from './VirtualKey';
-
-import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from '../../core/KeyContext';
-import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
-
+import { VirtualKey } from './VirtualKey.js';
+import type { WidgetProperties } from '../Widget.js';
+import type { KeyContext } from '../../core/KeyContext.js';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML.js';
 /**
  * A {@link VirtualKey} which emits key presses of a given key code.
  *

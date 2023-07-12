@@ -1,11 +1,9 @@
-import { Widget, WidgetProperties } from './Widget';
-import { SingleParent } from './SingleParent';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
-
-import type { Rect } from '../helpers/Rect';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { Widget, WidgetProperties } from './Widget.js';
+import { SingleParent } from './SingleParent.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * A {@link SingleParent} which contains a single child and does nothing,
  * passing all events through to its child. Useful for widgets that are only

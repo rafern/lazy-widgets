@@ -1,8 +1,6 @@
-import { FocusType } from '../core/FocusType';
-import { TargetableTricklingEvent } from './TargetableTricklingEvent';
-
-import type { Widget } from '../widgets/Widget';
-
+import { FocusType } from '../core/FocusType.js';
+import { TargetableTricklingEvent } from './TargetableTricklingEvent.js';
+import type { Widget } from '../widgets/Widget.js';
 /**
  * An event which contains text pasted by the clipboard.
  *

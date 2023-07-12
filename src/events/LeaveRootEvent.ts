@@ -1,5 +1,4 @@
-import { StickyEvent } from './StickyEvent';
-
+import { StickyEvent } from './StickyEvent.js';
 /**
  * Signals to a {@link Root} that the pointer is no longer hovering it. This
  * will result in new {@link LeaveEvent | LeaveEvents} being dispatched to

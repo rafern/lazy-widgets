@@ -1,16 +1,14 @@
-import { Layer } from '../core/Layer';
-import { LeaveEvent } from '../events/LeaveEvent';
-import { PointerMoveEvent } from '../events/PointerMoveEvent';
-import { LayeredContainer } from './LayeredContainer';
-import { PassthroughWidget } from './PassthroughWidget';
-import { TooltipContainer } from './TooltipContainer';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-
-import type { Root } from '../core/Root';
-import type { Viewport } from '../core/Viewport';
-import type { Widget, WidgetProperties } from './Widget';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { Layer } from '../core/Layer.js';
+import { LeaveEvent } from '../events/LeaveEvent.js';
+import { PointerMoveEvent } from '../events/PointerMoveEvent.js';
+import { LayeredContainer } from './LayeredContainer.js';
+import { PassthroughWidget } from './PassthroughWidget.js';
+import { TooltipContainer } from './TooltipContainer.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import type { Root } from '../core/Root.js';
+import type { Viewport } from '../core/Viewport.js';
+import type { Widget, WidgetProperties } from './Widget.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 const SENSITIVITY_RADIUS = 8;
 const HOVER_TIME = 1000;
 

@@ -1,9 +1,7 @@
-import { TextPasteEvent } from '../events/TextPasteEvent';
-import { Root, RootProperties } from './Root';
-import { Msg } from './Strings';
-
-import type { Widget } from '../widgets/Widget';
-
+import { TextPasteEvent } from '../events/TextPasteEvent.js';
+import { Root, RootProperties } from './Root.js';
+import { Msg } from './Strings.js';
+import type { Widget } from '../widgets/Widget.js';
 /**
  * Like Root, but for easy use in an HTML page.
  *

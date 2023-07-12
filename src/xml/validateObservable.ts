@@ -1,5 +1,4 @@
-import { Observable } from '../state/Observable';
-
+import { Observable } from '../state/Observable.js';
 /**
  * A validator function which checks whether an input value is an observable.
  * Doesn't stop the validator chain.

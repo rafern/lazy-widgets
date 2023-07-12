@@ -1,5 +1,4 @@
-import { WidgetProperties } from './Widget';
-
+import { WidgetProperties } from './Widget.js';
 /**
  * Optional constructor properties for widgets that have a `clickable` field,
  * such as the {@link Button} widget.

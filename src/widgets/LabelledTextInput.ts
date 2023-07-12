@@ -1,11 +1,9 @@
-import { Label } from './Label';
-import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
-import { BaseLabelledTextInput } from './BaseLabelledTextInput';
-
-import type { ValidatedVariable } from '../state/ValidatedVariable';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { LabelledTextInputProperties } from './BaseLabelledTextInput';
-
+import { Label } from './Label.js';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties.js';
+import { BaseLabelledTextInput } from './BaseLabelledTextInput.js';
+import type { ValidatedVariable } from '../state/ValidatedVariable.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import type { LabelledTextInputProperties } from './BaseLabelledTextInput.js';
 /**
  * A {@link Row} with a {@link Label}, {@link Spacing} and a {@link TextInput}.
  *

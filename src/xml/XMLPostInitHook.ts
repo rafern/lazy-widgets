@@ -1,7 +1,6 @@
-import { Widget } from '../widgets/Widget';
-import { BaseXMLUIParser } from './BaseXMLUIParser';
-import { XMLUIParserContext } from './XMLUIParserContext';
-
+import { Widget } from '../widgets/Widget.js';
+import { BaseXMLUIParser } from './BaseXMLUIParser.js';
+import { XMLUIParserContext } from './XMLUIParserContext.js';
 /**
  * A function that is called after a widget instance is created. Can be used to
  * modify a part of a widget that is only available after the widget is created,

@@ -1,5 +1,4 @@
-import { CornerRadii, NonUniformCornerRadius } from '../widgets/CornerRadii';
-
+import { CornerRadii, NonUniformCornerRadius } from '../widgets/CornerRadii.js';
 /**
  * CanvasRenderingContext2D.roundRect, but safe to use in browsers without
  * support, like Firefox.

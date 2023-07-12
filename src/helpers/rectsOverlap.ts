@@ -1,5 +1,4 @@
-import type { Rect } from './Rect';
-
+import type { Rect } from './Rect.js';
 /**
  * Check if 2 rectangles overlap.
  *

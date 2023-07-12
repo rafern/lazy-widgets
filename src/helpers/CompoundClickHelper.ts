@@ -1,7 +1,6 @@
-import { GenericClickHelper } from "./GenericClickHelper";
-import { BaseClickHelper } from "./BaseClickHelper";
-import { ClickState } from "./ClickState";
-
+import { GenericClickHelper } from "./GenericClickHelper.js";
+import { BaseClickHelper } from "./BaseClickHelper.js";
+import { ClickState } from "./ClickState.js";
 /**
  * A class that mixes multiple {@link GenericClickHelper} instances into one.
  * Useful if you want a widget to be both clickable by a pointer and by the

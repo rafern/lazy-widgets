@@ -1,8 +1,6 @@
-import { ModifierEvent } from './ModifierEvent';
-import { FocusType } from '../core/FocusType';
-
-import type { Widget } from '../widgets/Widget';
-
+import { ModifierEvent } from './ModifierEvent.js';
+import { FocusType } from '../core/FocusType.js';
+import type { Widget } from '../widgets/Widget.js';
 /**
  * A keyboard {@link ModifierEvent}. This is an abstract class and is
  * implemented in the child classes {@link KeyPressEvent} and

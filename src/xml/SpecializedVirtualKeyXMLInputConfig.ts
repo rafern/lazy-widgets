@@ -1,5 +1,4 @@
-import { WidgetXMLInputConfig } from './WidgetAutoXML';
-
+import { WidgetXMLInputConfig } from './WidgetAutoXML.js';
 /**
  * {@link WidgetXMLInputConfig} for {@link VirtualKey} widgets with keyContext,
  * minWidth (optional) and minHeight (optional) parameters.

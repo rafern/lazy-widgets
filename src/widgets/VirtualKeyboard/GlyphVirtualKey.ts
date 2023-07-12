@@ -1,9 +1,7 @@
-import { VirtualKey } from './VirtualKey';
-
-import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
-import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from '../../core/KeyContext';
-
+import { VirtualKey } from './VirtualKey.js';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML.js';
+import type { WidgetProperties } from '../Widget.js';
+import type { KeyContext } from '../../core/KeyContext.js';
 /**
  * A {@link VirtualKey} which emits key presses for a given glyph (character),
  * handling alternative versions of the glyph when shift is held down, such as

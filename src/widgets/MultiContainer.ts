@@ -1,13 +1,11 @@
-import { FlexAlignment } from '../theme/FlexAlignment';
-import { Widget, WidgetProperties } from './Widget';
-import { Alignment } from '../theme/Alignment';
-import { MultiParent } from './MultiParent';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-
-import type { TricklingEvent } from '../events/TricklingEvent';
-import type { Rect } from '../helpers/Rect';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { FlexAlignment } from '../theme/FlexAlignment.js';
+import { Widget, WidgetProperties } from './Widget.js';
+import { Alignment } from '../theme/Alignment.js';
+import { MultiParent } from './MultiParent.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import type { TricklingEvent } from '../events/TricklingEvent.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * A {@link MultiParent} which automatically paints children, adds spacing,
  * propagates events and handles layout.

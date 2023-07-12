@@ -1,10 +1,8 @@
-import { SpecializedVirtualKeyXMLInputConfig } from '../../xml/SpecializedVirtualKeyXMLInputConfig';
-import { VirtualKey } from './VirtualKey';
-
-import type { WidgetProperties } from '../Widget';
-import type { KeyContext } from '../../core/KeyContext';
-import type { WidgetAutoXML } from '../../xml/WidgetAutoXML';
-
+import { SpecializedVirtualKeyXMLInputConfig } from '../../xml/SpecializedVirtualKeyXMLInputConfig.js';
+import { VirtualKey } from './VirtualKey.js';
+import type { WidgetProperties } from '../Widget.js';
+import type { KeyContext } from '../../core/KeyContext.js';
+import type { WidgetAutoXML } from '../../xml/WidgetAutoXML.js';
 /**
  * A {@link VirtualKey} which acts as a shift key; toggles
  * {@link KeyContext#shift} on click.

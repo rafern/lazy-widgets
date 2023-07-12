@@ -1,11 +1,9 @@
-import { Widget, WidgetProperties } from './Widget';
-import { SingleParent } from './SingleParent';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions';
-import { resolveContainerPosition } from '../helpers/resolveContainerPosition';
-
-import type { Rect } from '../helpers/Rect';
-
+import { Widget, WidgetProperties } from './Widget.js';
+import { SingleParent } from './SingleParent.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions.js';
+import { resolveContainerPosition } from '../helpers/resolveContainerPosition.js';
+import type { Rect } from '../helpers/Rect.js';
 /**
  * A {@link SingleParent} which contains a single child and automatically paints
  * the child, adds padding, propagates events (if enabled) and handles layout.

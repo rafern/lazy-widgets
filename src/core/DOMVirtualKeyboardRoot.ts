@@ -1,12 +1,10 @@
-import { VirtualKeyboard } from '../widgets/concrete-widgets';
-import { Margin } from '../widgets/Margin';
-import { DOMRoot } from './DOMRoot';
-import { Background } from '../widgets/Background';
-import { defaultVirtualKeyboardTemplate } from './VirtualKeyboardTemplate';
-
-import type { VirtualKeyboardRootProperties } from './VirtualKeyboardRoot';
-import type { KeyboardDriver } from '../drivers/KeyboardDriver';
-
+import { VirtualKeyboard } from '../widgets/concrete-widgets.js';
+import { Margin } from '../widgets/Margin.js';
+import { DOMRoot } from './DOMRoot.js';
+import { Background } from '../widgets/Background.js';
+import { defaultVirtualKeyboardTemplate } from './VirtualKeyboardTemplate.js';
+import type { VirtualKeyboardRootProperties } from './VirtualKeyboardRoot.js';
+import type { KeyboardDriver } from '../drivers/KeyboardDriver.js';
 /**
  * A {@link DOMRoot} with similar functionality to {@link VirtualKeyboardRoot}.
  * In this version {@link VirtualKeyboardRoot#updateVisibility} doesn't exist.

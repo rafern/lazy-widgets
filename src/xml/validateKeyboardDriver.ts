@@ -1,5 +1,4 @@
-import { KeyboardDriver } from '../drivers/KeyboardDriver';
-
+import { KeyboardDriver } from '../drivers/KeyboardDriver.js';
 /**
  * A validator function which checks whether an input value is a
  * {@link KeyboardDriver}. Doesn't stop the validator chain.

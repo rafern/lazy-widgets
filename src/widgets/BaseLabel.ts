@@ -1,9 +1,7 @@
-import { TextHelper, WrapMode } from '../helpers/TextHelper';
-import { layoutField } from '../decorators/FlagFields';
-import { Widget, WidgetProperties } from './Widget';
-
-import type { Rect } from '../helpers/Rect';
-
+import { TextHelper, WrapMode } from '../helpers/TextHelper.js';
+import { layoutField } from '../decorators/FlagFields.js';
+import { Widget, WidgetProperties } from './Widget.js';
+import type { Rect } from '../helpers/Rect.js';
 /**
  * Optional TextInput constructor properties.
  *

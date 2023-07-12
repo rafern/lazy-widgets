@@ -1,16 +1,14 @@
-import { ButtonClickHelper } from '../helpers/ButtonClickHelper';
-import { BaseContainer } from './BaseContainer';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
-import { ClickEvent } from '../events/ClickEvent';
-import { FocusEvent } from '../events/FocusEvent';
-import { BlurEvent } from '../events/BlurEvent';
-
-import type { Widget } from './Widget';
-import type { TricklingEvent } from '../events/TricklingEvent';
-import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { ButtonClickHelper } from '../helpers/ButtonClickHelper.js';
+import { BaseContainer } from './BaseContainer.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
+import { ClickEvent } from '../events/ClickEvent.js';
+import { FocusEvent } from '../events/FocusEvent.js';
+import { BlurEvent } from '../events/BlurEvent.js';
+import type { Widget } from './Widget.js';
+import type { TricklingEvent } from '../events/TricklingEvent.js';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * A {@link BaseContainer} which can be {@link ClickHelper | clicked} as a
  * button. Since the button grabs all events, no events are propagated to the

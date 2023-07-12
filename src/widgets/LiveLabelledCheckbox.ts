@@ -1,15 +1,13 @@
-import { Spacing, SpacingProperties } from './Spacing';
-import { LiveLabel } from './LiveLabel';
-import { Checkbox } from './Checkbox';
-import { Row } from './Row';
-import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
-
-import type { Variable } from '../state/Variable';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
-import type { LabelProperties } from './BaseLabel';
-import type { Observable } from '../state/Observable';
-
+import { Spacing, SpacingProperties } from './Spacing.js';
+import { LiveLabel } from './LiveLabel.js';
+import { Checkbox } from './Checkbox.js';
+import { Row } from './Row.js';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties.js';
+import type { Variable } from '../state/Variable.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
+import type { LabelProperties } from './BaseLabel.js';
+import type { Observable } from '../state/Observable.js';
 /**
  * A {@link Row} with a {@link LiveLabel}, {@link Spacing} and a
  * {@link Checkbox}.

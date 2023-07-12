@@ -1,10 +1,8 @@
-import { damageField, layoutField, damageLayoutArrayField } from '../decorators/FlagFields';
-import { Widget, WidgetProperties } from './Widget';
-import { DynMsg, Msg } from '../core/Strings';
-
-import type { Rect } from '../helpers/Rect';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { damageField, layoutField, damageLayoutArrayField } from '../decorators/FlagFields.js';
+import { Widget, WidgetProperties } from './Widget.js';
+import { DynMsg, Msg } from '../core/Strings.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 const videoRegex = /^.*\.(webm|og[gv]|m(p4|4v|ov)|avi|qt)$/i;
 
 /**

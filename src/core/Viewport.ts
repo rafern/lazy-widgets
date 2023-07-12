@@ -1,8 +1,7 @@
-import type { LayoutConstraints } from './LayoutConstraints';
-import type { Widget } from '../widgets/Widget';
-import type { TricklingEvent } from '../events/TricklingEvent';
-import type { Rect } from '../helpers/Rect';
-
+import type { LayoutConstraints } from './LayoutConstraints.js';
+import type { Widget } from '../widgets/Widget.js';
+import type { TricklingEvent } from '../events/TricklingEvent.js';
+import type { Rect } from '../helpers/Rect.js';
 /**
  * Viewports are constrained rectangles that can be painted to. Viewports have a
  * rendering context associated with them, either by inheriting them from a

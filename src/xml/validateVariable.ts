@@ -1,5 +1,4 @@
-import { Variable } from '../state/Variable';
-
+import { Variable } from '../state/Variable.js';
 /**
  * A validator function which checks whether an input value is a
  * {@link Variable}. Doesn't stop the validator chain.

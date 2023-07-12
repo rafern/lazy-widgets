@@ -1,19 +1,17 @@
-import { PointerWheelEvent, PointerWheelMode } from '../events/PointerWheelEvent';
-import { PointerReleaseEvent } from '../events/PointerReleaseEvent';
-import { PointerEvent } from '../events/PointerEvent';
-import { PointerPressEvent } from '../events/PointerPressEvent';
-import { PointerMoveEvent } from '../events/PointerMoveEvent';
-import { FocusType } from '../core/FocusType';
-import { PointerHint } from './PointerHint';
-
-import type { Widget } from '../widgets/Widget';
-import type { Driver } from '../core/Driver';
-import type { TricklingEvent } from '../events/TricklingEvent';
-import type { Root } from '../core/Root';
-import type { SourcePointer } from './SourcePointer';
-import { LeaveRootEvent } from '../events/LeaveRootEvent';
-import { StickyEvent } from '../events/StickyEvent';
-
+import { PointerWheelEvent, PointerWheelMode } from '../events/PointerWheelEvent.js';
+import { PointerReleaseEvent } from '../events/PointerReleaseEvent.js';
+import { PointerEvent } from '../events/PointerEvent.js';
+import { PointerPressEvent } from '../events/PointerPressEvent.js';
+import { PointerMoveEvent } from '../events/PointerMoveEvent.js';
+import { FocusType } from '../core/FocusType.js';
+import { PointerHint } from './PointerHint.js';
+import type { Widget } from '../widgets/Widget.js';
+import type { Driver } from '../core/Driver.js';
+import type { TricklingEvent } from '../events/TricklingEvent.js';
+import type { Root } from '../core/Root.js';
+import type { SourcePointer } from './SourcePointer.js';
+import { LeaveRootEvent } from '../events/LeaveRootEvent.js';
+import { StickyEvent } from '../events/StickyEvent.js';
 /**
  * A container which has the state associated with a specific {@link Root} for
  * use in a {@link PointerDriver}.

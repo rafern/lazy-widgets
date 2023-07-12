@@ -1,10 +1,8 @@
-import { Icon, IconProperties } from './Icon';
-import { Button } from './Button';
-import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
-
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
-
+import { Icon, IconProperties } from './Icon.js';
+import { Button } from './Button.js';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
 /**
  * A {@link Button} with an {@link Icon}.
  *

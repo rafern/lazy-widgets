@@ -1,9 +1,7 @@
-import { PointerDriver } from './PointerDriver';
-import { Root } from '../core/Root';
-
-import type { RayPointerSource } from './RayPointerSource';
-import type { PointerHint } from './PointerHint';
-
+import { PointerDriver } from './PointerDriver.js';
+import { Root } from '../core/Root.js';
+import type { RayPointerSource } from './RayPointerSource.js';
+import type { PointerHint } from './PointerHint.js';
 /**
  * A {@link PointerDriver} which gets pointer events from raycasts in a 3D
  * engine's world. This is an abstract class and must be implemented.

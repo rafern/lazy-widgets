@@ -1,14 +1,12 @@
-import { BackspaceKey } from '../widgets/VirtualKeyboard/BackspaceKey';
-import { EnterKey } from '../widgets/VirtualKeyboard/EnterKey';
-import { EscapeKey } from '../widgets/VirtualKeyboard/EscapeKey';
-import { ShiftKey } from '../widgets/VirtualKeyboard/ShiftKey';
-import { SpaceKey } from '../widgets/VirtualKeyboard/SpaceKey';
-import { TabKey } from '../widgets/VirtualKeyboard/TabKey';
-import { VirtualKey } from '../widgets/VirtualKeyboard/VirtualKey';
-
-import type { WidgetProperties } from '../widgets/Widget';
-import type { KeyContext } from './KeyContext';
-
+import { BackspaceKey } from '../widgets/VirtualKeyboard/BackspaceKey.js';
+import { EnterKey } from '../widgets/VirtualKeyboard/EnterKey.js';
+import { EscapeKey } from '../widgets/VirtualKeyboard/EscapeKey.js';
+import { ShiftKey } from '../widgets/VirtualKeyboard/ShiftKey.js';
+import { SpaceKey } from '../widgets/VirtualKeyboard/SpaceKey.js';
+import { TabKey } from '../widgets/VirtualKeyboard/TabKey.js';
+import { VirtualKey } from '../widgets/VirtualKeyboard/VirtualKey.js';
+import type { WidgetProperties } from '../widgets/Widget.js';
+import type { KeyContext } from './KeyContext.js';
 /**
  * A template for a single virtual keyboard key. A function that, when called
  * given a {@link KeyContext} and theme override, returns a {@link VirtualKey}

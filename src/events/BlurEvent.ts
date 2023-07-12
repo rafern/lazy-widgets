@@ -1,7 +1,5 @@
-import { StickyEvent } from './StickyEvent';
-
-import type { FocusType } from '../core/FocusType';
-
+import { StickyEvent } from './StickyEvent.js';
+import type { FocusType } from '../core/FocusType.js';
 /**
  * A sticky event that is fired when a {@link Widget} loses a specific
  * {@link FocusType | focus}. Not capturable by user listeners or the widget

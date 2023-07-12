@@ -1,11 +1,9 @@
-import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
-import { Label } from './Label';
-import { Tooltip } from './Tooltip';
-import { TooltipContainer } from './TooltipContainer';
-
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { Widget, WidgetProperties } from './Widget';
-
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties.js';
+import { Label } from './Label.js';
+import { Tooltip } from './Tooltip.js';
+import { TooltipContainer } from './TooltipContainer.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import type { Widget, WidgetProperties } from './Widget.js';
 /**
  * A convenience widget for a {@link Tooltip} that has a {@link Label}.
  *

@@ -1,5 +1,4 @@
-import type { WidgetEvent } from '../events/WidgetEvent';
-
+import type { WidgetEvent } from '../events/WidgetEvent.js';
 /**
  * A list of pairs. Each pair contains, in this order, the event that was
  * dispatched, and whether it was captured.

@@ -1,5 +1,4 @@
-import { WidgetEvent, PropagationModel } from './WidgetEvent';
-
+import { WidgetEvent, PropagationModel } from './WidgetEvent.js';
 /**
  * A generic event that does not propagate in a UI tree; it must be handled at
  * the dispatch origin of the event. This is an abstract class and must be

@@ -1,9 +1,7 @@
-import { BaseContainer } from './BaseContainer';
-import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig';
-
-import type { Widget, WidgetProperties } from './Widget';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { BaseContainer } from './BaseContainer.js';
+import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
+import type { Widget, WidgetProperties } from './Widget.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * A {@link BaseContainer} which always propagates events. Use this widget if
  * you are not sure what that means.

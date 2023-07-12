@@ -1,5 +1,4 @@
-import type { WidgetEvent } from './WidgetEvent';
-
+import type { WidgetEvent } from './WidgetEvent.js';
 // TODO once typescript decides that functions should return undefined instead
 // of void by default (https://github.com/microsoft/TypeScript/issues/36239),
 // the return type of the listener should be `boolean | undefined` instead of

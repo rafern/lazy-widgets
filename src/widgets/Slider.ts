@@ -1,25 +1,23 @@
-import { PointerPressEvent } from '../events/PointerPressEvent';
-import { PointerEvent } from '../events/PointerEvent';
-import { damageField } from '../decorators/FlagFields';
-import { ClickHelper } from '../helpers/ClickHelper';
-import { Widget, WidgetProperties } from './Widget';
-import { ClickState } from '../helpers/ClickState';
-import { KeyPressEvent } from '../events/KeyPressEvent';
-import { FocusType } from '../core/FocusType';
-import { KeyEvent } from '../events/KeyEvent';
-import { Variable } from '../state/Variable';
-import { DynMsg } from '../core/Strings';
-import { LeaveEvent } from '../events/LeaveEvent';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { FocusEvent } from '../events/FocusEvent';
-import { BlurEvent } from '../events/BlurEvent';
-
-import type { Viewport } from '../core/Viewport';
-import type { Bounds } from '../helpers/Bounds';
-import type { Root } from '../core/Root';
-import type { Rect } from '../helpers/Rect';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-
+import { PointerPressEvent } from '../events/PointerPressEvent.js';
+import { PointerEvent } from '../events/PointerEvent.js';
+import { damageField } from '../decorators/FlagFields.js';
+import { ClickHelper } from '../helpers/ClickHelper.js';
+import { Widget, WidgetProperties } from './Widget.js';
+import { ClickState } from '../helpers/ClickState.js';
+import { KeyPressEvent } from '../events/KeyPressEvent.js';
+import { FocusType } from '../core/FocusType.js';
+import { KeyEvent } from '../events/KeyEvent.js';
+import { Variable } from '../state/Variable.js';
+import { DynMsg } from '../core/Strings.js';
+import { LeaveEvent } from '../events/LeaveEvent.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import { FocusEvent } from '../events/FocusEvent.js';
+import { BlurEvent } from '../events/BlurEvent.js';
+import type { Viewport } from '../core/Viewport.js';
+import type { Bounds } from '../helpers/Bounds.js';
+import type { Root } from '../core/Root.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * Optional Slider constructor properties.
  *

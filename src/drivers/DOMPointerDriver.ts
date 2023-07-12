@@ -1,10 +1,8 @@
-import { getPointerEventNormPos } from '../helpers/getPointerEventNormPos';
-import { parseDOMDeltaMode } from '../events/PointerWheelEvent';
-import { PointerDriver } from './PointerDriver';
-import { Msg } from '../core/Strings';
-
-import type { Root } from '../core/Root';
-
+import { getPointerEventNormPos } from '../helpers/getPointerEventNormPos.js';
+import { parseDOMDeltaMode } from '../events/PointerWheelEvent.js';
+import { PointerDriver } from './PointerDriver.js';
+import { Msg } from '../core/Strings.js';
+import type { Root } from '../core/Root.js';
 /**
  * A container which has all the event listeners for a {@link Root} DOM bind to
  * a {@link DOMPointerDriver}; a link between a DOM element and an existing

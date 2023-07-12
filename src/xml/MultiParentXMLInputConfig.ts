@@ -1,5 +1,4 @@
-import { WidgetXMLInputConfig } from './WidgetAutoXML';
-
+import { WidgetXMLInputConfig } from './WidgetAutoXML.js';
 /**
  * {@link WidgetXMLInputConfig} for {@link MultiParent} widgets with a single
  * optional child widget list parameter.

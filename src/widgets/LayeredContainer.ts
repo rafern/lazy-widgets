@@ -1,14 +1,12 @@
-import { Layer } from '../core/Layer';
-import { PropagationModel, WidgetEvent } from '../events/WidgetEvent';
-import { Parent } from './Parent';
-
-import type { LayerInit } from '../core/LayerInit';
-import type { Root } from '../core/Root';
-import type { Viewport } from '../core/Viewport';
-import type { Rect } from '../helpers/Rect';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { Widget, WidgetProperties } from './Widget';
-
+import { Layer } from '../core/Layer.js';
+import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
+import { Parent } from './Parent.js';
+import type { LayerInit } from '../core/LayerInit.js';
+import type { Root } from '../core/Root.js';
+import type { Viewport } from '../core/Viewport.js';
+import type { Rect } from '../helpers/Rect.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import type { Widget, WidgetProperties } from './Widget.js';
 /**
  * A tuple with a layer and the name of that layer (or null if it is an unnamed
  * layer). For internal use only.

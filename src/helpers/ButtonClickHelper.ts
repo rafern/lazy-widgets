@@ -1,21 +1,19 @@
-import { CompoundClickHelper } from "./CompoundClickHelper";
-import { GenericClickHelper } from "./GenericClickHelper";
-import { PointerEvent } from "../events/PointerEvent";
-import { PointerWheelEvent } from "../events/PointerWheelEvent";
-import { KeyReleaseEvent } from "../events/KeyReleaseEvent";
-import { KeyEvent } from "../events/KeyEvent";
-import { KeyPressEvent } from "../events/KeyPressEvent";
-import { FocusType } from "../core/FocusType";
-import { ClickHelper } from "./ClickHelper";
-import { ClickState } from "./ClickState";
-import { LeaveEvent } from "../events/LeaveEvent";
-import { PointerMoveEvent } from "../events/PointerMoveEvent";
-
-import type { Widget } from "../widgets/Widget";
-import type { TricklingEvent } from "../events/TricklingEvent";
-import type { Root } from "../core/Root";
-import type { Bounds } from "./Bounds";
-
+import { CompoundClickHelper } from "./CompoundClickHelper.js";
+import { GenericClickHelper } from "./GenericClickHelper.js";
+import { PointerEvent } from "../events/PointerEvent.js";
+import { PointerWheelEvent } from "../events/PointerWheelEvent.js";
+import { KeyReleaseEvent } from "../events/KeyReleaseEvent.js";
+import { KeyEvent } from "../events/KeyEvent.js";
+import { KeyPressEvent } from "../events/KeyPressEvent.js";
+import { FocusType } from "../core/FocusType.js";
+import { ClickHelper } from "./ClickHelper.js";
+import { ClickState } from "./ClickState.js";
+import { LeaveEvent } from "../events/LeaveEvent.js";
+import { PointerMoveEvent } from "../events/PointerMoveEvent.js";
+import type { Widget } from "../widgets/Widget.js";
+import type { TricklingEvent } from "../events/TricklingEvent.js";
+import type { Root } from "../core/Root.js";
+import type { Bounds } from "./Bounds.js";
 /**
  * A {@link CompoundClickHelper} specialised for {@link Button}-like widgets.
  * Handles pointer clicks and enter key-presses if the widget has a keyboard

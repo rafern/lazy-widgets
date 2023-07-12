@@ -1,7 +1,6 @@
-import { FocusType} from '../core/FocusType';
-import { Widget } from '../widgets/Widget';
-import { TargetableTricklingEvent } from './TargetableTricklingEvent';
-
+import { FocusType} from '../core/FocusType.js';
+import { Widget } from '../widgets/Widget.js';
+import { TargetableTricklingEvent } from './TargetableTricklingEvent.js';
 /**
  * A leave {@link TricklingEvent}. Dispatched when a pointer is no longer over
  * a specific widget (other libraries may call this an unhover event).

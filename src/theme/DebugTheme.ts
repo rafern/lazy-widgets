@@ -1,6 +1,5 @@
-import { FillStyle } from './FillStyle';
-import { Theme } from './Theme';
-
+import { FillStyle } from './FillStyle.js';
+import { Theme } from './Theme.js';
 /**
  * A theme which always gives out a random canvas fill colour. Used for
  * debugging when painting occurs. Has no properties but always has a fallback

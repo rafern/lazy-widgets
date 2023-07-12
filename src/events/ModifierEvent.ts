@@ -1,7 +1,5 @@
-import { TargetableTricklingEvent } from './TargetableTricklingEvent';
-
-import type { Widget } from '../widgets/Widget';
-
+import { TargetableTricklingEvent } from './TargetableTricklingEvent.js';
+import type { Widget } from '../widgets/Widget.js';
 /**
  * An event which contains the state of modifier keys. This is an abstract class
  * and must be implemented in child classes.

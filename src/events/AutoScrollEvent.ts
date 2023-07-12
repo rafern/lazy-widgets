@@ -1,8 +1,6 @@
-import { Widget } from '../widgets/Widget';
-import { UntargetableTricklingEvent } from './UntargetableTricklingEvent';
-
-import type { Bounds } from '../helpers/Bounds';
-
+import { Widget } from '../widgets/Widget.js';
+import { UntargetableTricklingEvent } from './UntargetableTricklingEvent.js';
+import type { Bounds } from '../helpers/Bounds.js';
 /**
  * An auto-scroll {@link UntargetableTricklingEvent}. Dispatched when a widget
  * (or part of a widget) wants to be visible to the user, such as the current

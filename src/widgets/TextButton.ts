@@ -1,14 +1,12 @@
-import { TextAlignMode } from '../helpers/TextHelper';
-import { Label } from './Label';
-import { Alignment } from '../theme/Alignment';
-import { FilledButton } from './FilledButton';
-import { filterIDFromProperties } from '../helpers/filterIDFromProperties';
-
-import type { Alignment2D } from '../theme/Alignment2D';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML';
-import type { ClickableWidgetProperties } from './ClickableWidgetProperties';
-import type { LabelProperties } from './BaseLabel';
-
+import { TextAlignMode } from '../helpers/TextHelper.js';
+import { Label } from './Label.js';
+import { Alignment } from '../theme/Alignment.js';
+import { FilledButton } from './FilledButton.js';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties.js';
+import type { Alignment2D } from '../theme/Alignment2D.js';
+import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
+import type { LabelProperties } from './BaseLabel.js';
 /**
  * A {@link FilledButton} with a {@link Label}. Alignment is forced to be
  * horizontally centered and vertically stretching like in {@link TextMargin}.

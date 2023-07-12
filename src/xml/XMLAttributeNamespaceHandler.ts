@@ -1,6 +1,5 @@
-import type { BaseXMLUIParser } from './BaseXMLUIParser';
-import type { XMLUIParserContext } from './XMLUIParserContext';
-
+import type { BaseXMLUIParser } from './BaseXMLUIParser.js';
+import type { XMLUIParserContext } from './XMLUIParserContext.js';
 /**
  * A function that does something with an attribute that belongs to a specific
  * namespace. Could be used to add extra functionality to the parser, such as

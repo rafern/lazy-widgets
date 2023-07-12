@@ -2,7 +2,6 @@
 // https://github.com/TypeStrong/ts-node/issues/55#issuecomment-186679305
 
 import { JSDOM } from 'jsdom';
-
 const jsdom = new JSDOM('');
 
 // setup global context without localStorage/sessionStorage support

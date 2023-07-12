@@ -1,11 +1,9 @@
-import { ScrollableViewportWidget, ScrollableViewportWidgetProperties, ScrollbarMode } from "./ScrollableViewportWidget";
-import { TextInput, TextInputProperties } from "./TextInput";
-import { AxisCoupling } from "../core/AxisCoupling";
-import { filterIDFromProperties } from "../helpers/filterIDFromProperties";
-
-import type { ValidatedVariable } from "../state/ValidatedVariable";
-import type { WidgetAutoXML } from "../xml/WidgetAutoXML";
-
+import { ScrollableViewportWidget, ScrollableViewportWidgetProperties, ScrollbarMode } from "./ScrollableViewportWidget.js";
+import { TextInput, TextInputProperties } from "./TextInput.js";
+import { AxisCoupling } from "../core/AxisCoupling.js";
+import { filterIDFromProperties } from "../helpers/filterIDFromProperties.js";
+import type { ValidatedVariable } from "../state/ValidatedVariable.js";
+import type { WidgetAutoXML } from "../xml/WidgetAutoXML.js";
 /**
  * A {@link ScrollableViewportWidget} with a {@link TextInput}. Meant to be used
  * as an analogue to the HTML textarea. Allows tab typing by default.

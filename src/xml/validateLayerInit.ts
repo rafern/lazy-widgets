@@ -1,7 +1,5 @@
-import { Widget } from '../widgets/Widget';
-
-import type { LayerInit } from '../core/LayerInit';
-
+import { Widget } from '../widgets/Widget.js';
+import type { LayerInit } from '../core/LayerInit.js';
 /**
  * A validator function which checks whether an input value is a
  * {@link LayerInit}. Doesn't stop the validator chain.
