@@ -70,17 +70,6 @@ export class DebuggableCanvasViewport extends CanvasViewport {
         this.updateOutputCanvas();
     }
 
-    protected override mergedDirtyRects(): Array<Rect> {
-        // intercept merged dirty rectangles
-        const merged = super.mergedDirtyRects();
-
-        for (const rect of merged) {
-            this.addDebugEvent(rect, true);
-        }
-
-        return merged;
-    }
-
     updateOutputCanvas() {
         const width = this.canvas.width;
         const height = this.canvas.height;
@@ -103,7 +92,7 @@ export class DebuggableCanvasViewport extends CanvasViewport {
 
                 this.overlayContext.fillStyle = `rgba(${event[2] ? 0 : 255}, 0, ${event[2] ? 255 : 0}, ${1 - animDelta})`;
 
-                if (this.preventAtlasBleeding) {
+                if (this.preventAtlasBleeding && !event[2]) {
                     const rect = event[0];
                     this.overlayContext.fillRect(
                         rect[0] + 1, rect[1] + 1, rect[2], rect[3]
@@ -205,6 +194,10 @@ export class DebuggableCanvasViewport extends CanvasViewport {
 
         if (paintDirtyRects) {
             this._paintCounter++;
+
+            for (const rect of paintDirtyRects) {
+                this.addDebugEvent(rect, true);
+            }
         }
 
         if (this._overlayEnabled) {
