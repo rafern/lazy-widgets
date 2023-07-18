@@ -200,10 +200,10 @@ export class DebuggableCanvasViewport extends CanvasViewport {
         return wasResized;
     }
 
-    override paintToInternal(): boolean {
-        const wasDirty = super.paintToInternal();
+    override paintToInternal(): null | Array<Rect> {
+        const paintDirtyRects = super.paintToInternal();
 
-        if (wasDirty) {
+        if (paintDirtyRects) {
             this._paintCounter++;
         }
 
@@ -220,18 +220,18 @@ export class DebuggableCanvasViewport extends CanvasViewport {
             }
 
             // paint overlay
-            if (wasDirty || this._overlayDirty) {
+            if (paintDirtyRects || this._overlayDirty) {
                 this.updateOutputCanvas();
-                return true;
+                return [[0, 0, this.canvas.width, this.canvas.height]];
             } else {
-                return false;
+                return null;
             }
         } else {
-            if (wasDirty) {
+            if (paintDirtyRects) {
                 this.updateOutputCanvas();
             }
 
-            return wasDirty;
+            return paintDirtyRects;
         }
     }
 }

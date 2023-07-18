@@ -20,6 +20,7 @@ import type { Driver } from './Driver.js';
 import type { CaptureList } from './CaptureList.js';
 import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter.js';
 import { LeaveRootEvent } from '../events/LeaveRootEvent.js';
+import { type Rect } from '../helpers/Rect.js';
 /**
  * Allowed cursor styles and in order of priority; lower indices have higher
  * priority
@@ -385,12 +386,12 @@ export class Root implements WidgetEventEmitter {
      *
      * Call this after calling {@link Root#postLayoutUpdate}.
      *
-     * @returns Returns whether the child was re-painted or not. Use this to tell an external 3D library whether to update a mesh's texture or not.
+     * @returns Returns a list of dirty rectangles in the texture's coordinates, or null if the child widget was not repainted. Use this to tell an external 3D library whether to update a mesh's texture or not, and where to update the mesh's texture.
      */
-    paint(): boolean {
+    paint(): null | Array<Rect> {
         // Don't do anything if Root is disabled
         if(!this.enabled) {
-            return false;
+            return null;
         }
 
         return this.viewport.paintToInternal();

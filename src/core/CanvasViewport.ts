@@ -388,6 +388,39 @@ export class CanvasViewport extends BaseViewport {
     protected mergedDirtyRects(): Array<Rect> {
         const dirtyRects = mergeOverlappingRects(this.dirtyRects);
         this.dirtyRects.length = 0;
+
+        const [maxRight, maxBottom] = this.usableCanvasDimensions;
+
+        // fix out-of-bounds rects and filter 0-sized dirty rects
+        for (let i = dirtyRects.length - 1; i >= 0; i--) {
+            const dirtyRect = dirtyRects[i];
+
+            // disallow negative offsets
+            if (dirtyRect[0] < 0) {
+                dirtyRect[2] += dirtyRect[0];
+                dirtyRect[0] = 0;
+            }
+
+            if (dirtyRect[1] < 0) {
+                dirtyRect[3] += dirtyRect[1];
+                dirtyRect[1] = 0;
+            }
+
+            // clamp right and bottom
+            if (dirtyRect[0] + dirtyRect[2] > maxRight) {
+                dirtyRect[2] = maxRight - dirtyRect[0];
+            }
+
+            if (dirtyRect[1] + dirtyRect[3] > maxBottom) {
+                dirtyRect[3] = maxBottom - dirtyRect[1];
+            }
+
+            // cull 0-sized rects
+            if (dirtyRect[2] <= 0 || dirtyRect[3] <= 0) {
+                dirtyRects.splice(i, 1);
+            }
+        }
+
         return dirtyRects;
     }
 
@@ -397,12 +430,12 @@ export class CanvasViewport extends BaseViewport {
      * {@link Viewport#paint} if you are using this Viewport's canvas as the
      * output canvas (such as in the {@link Root}).
      */
-    paintToInternal(): boolean {
+    paintToInternal(): null | Array<Rect> {
         // check if there are any parts that need to be repainted
         const dirtyRects = this.mergedDirtyRects();
-        const wasDirty = dirtyRects.length > 0;
+        let canvasSpaceDirtyRects: null | Array<Rect> = null;
 
-        if (wasDirty) {
+        if (dirtyRects.length > 0) {
             // clip to dirty rectangles (and translate if using atlas bleeding
             // prevention)
             this.context.save();
@@ -441,6 +474,15 @@ export class CanvasViewport extends BaseViewport {
 
             // stop clipping/scaling
             this.context.restore();
+
+            // generate list of dirty rects in canvas-space coordinates
+            canvasSpaceDirtyRects = dirtyRects;
+            if (this.preventAtlasBleeding) {
+                for (const dirtyRect of canvasSpaceDirtyRects) {
+                    dirtyRect[0] += 1;
+                    dirtyRect[1] += 1;
+                }
+            }
         }
 
         // prevent bleeding by clearing out-of-bounds parts of canvas
@@ -449,6 +491,11 @@ export class CanvasViewport extends BaseViewport {
             const canvasWidth = this.canvas.width;
             const canvasHeight = this.canvas.height;
             const [realWidth, realHeight] = this.realDimensions;
+
+            // XXX set returned dirty rects to a single rect covering the whole
+            //     canvas, otherwise, there will be too many rects to be useful
+            //     for texture sub-region updates
+            canvasSpaceDirtyRects = [[0, 0, canvasWidth, canvasHeight]];
 
             if (this.preventAtlasBleeding) {
                 // clear top and left borders
@@ -489,7 +536,7 @@ export class CanvasViewport extends BaseViewport {
             }
         }
 
-        return wasDirty;
+        return canvasSpaceDirtyRects;
     }
 
     paint(extraDirtyRects: Array<Rect>): boolean {
@@ -508,7 +555,7 @@ export class CanvasViewport extends BaseViewport {
         }
 
         // paint to internal canvas
-        const wasDirty = this.paintToInternal();
+        const dirtyRects = this.paintToInternal();
 
         // Paint to parent viewport, if any, and if inside bounds
         if(this.parent !== null && wClipped !== 0 && hClipped !== 0) {
@@ -543,7 +590,7 @@ export class CanvasViewport extends BaseViewport {
             ctx.restore();
         }
 
-        return wasDirty;
+        return dirtyRects !== null;
     }
 
     protected pushDirtyRects(rects: Array<Rect>) {
