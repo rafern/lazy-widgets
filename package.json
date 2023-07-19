@@ -14,7 +14,7 @@
     "lint": "eslint src/ --ext .ts",
     "lint-fix": "eslint src/ --ext .ts --fix",
     "build": "tsc",
-    "dev": "concurrently --kill-others 'http-server -c-1 .' 'tsc --watch'",
+    "dev": "concurrently --kill-others 'http-server -c-1 .' 'tsc --watch --preserveWatchOutput'",
     "docs": "typedoc --options typedoc.json",
     "generate_theme": "node generate_theme.mjs",
     "test": "mocha",
