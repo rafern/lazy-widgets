@@ -144,5 +144,11 @@ export class ClickHelper extends GenericClickHelper {
         this.pointerPos = null;
         this.startingPointerPos = null;
         this.pointerButton = 0;
+
+        if (this.widget.attached) {
+            const root = this.widget.root;
+            root.dropFocus(FocusType.Pointer, this.widget);
+            root.clearPointerStyle(this.widget, this);
+        }
     }
 }
