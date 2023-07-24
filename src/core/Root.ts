@@ -205,8 +205,14 @@ export class Root implements WidgetEventEmitter {
      * respective requesters' widget. For internal use only.
      */
     private requestedPointerStyleWidgets = new Array<unknown>();
+    /**
+     * For internal use only. Returns true if the child widget has been detached
+     * from the root.
+     */
+    private hasDetached: () => boolean;
 
     constructor(child: Widget, properties?: Readonly<RootProperties>) {
+        this.hasDetached = () => !this.child.attached;
         this.viewport = Root.makeViewport(child, properties);
         this.pointerStyleHandler = properties?.pointerStyleHandler ?? null;
         this.child.inheritedTheme = properties?.theme ?? new Theme();
@@ -421,8 +427,13 @@ export class Root implements WidgetEventEmitter {
         }
 
         // Dispatch to user event listeners
-        if (eventEmitterHandleEvent(this, this.typedListeners, this.untypedListeners, baseEvent)) {
+        if (eventEmitterHandleEvent(this, this.typedListeners, this.untypedListeners, baseEvent, this.hasDetached)) {
             return [[baseEvent, true]];
+        }
+
+        // Cancel if a user event listener destroyed this root
+        if (!this.child.attached) {
+            return [[baseEvent, false]];
         }
 
         // Don't do anything else if event is not a trickling event; can't
@@ -432,8 +443,8 @@ export class Root implements WidgetEventEmitter {
         if (baseEvent.propagation !== PropagationModel.Trickling) {
             const captureList: CaptureList = [[baseEvent, false]];
 
-            // Special case for leave-root event; try to dispatch leave events to
-            // all hovered widgets
+            // Special case for leave-root event; try to dispatch leave events
+            // to all hovered widgets
             if (baseEvent.isa(LeaveRootEvent)) {
                 for (const widget of this.lastHoveredWidgets) {
                     const leaveEvent = new LeaveEvent(widget);
@@ -441,6 +452,11 @@ export class Root implements WidgetEventEmitter {
                         leaveEvent,
                         this.child.dispatchEvent(leaveEvent) !== null
                     ]);
+
+                    // Cancel if an event listener destroyed this root
+                    if (!this.child.attached) {
+                        return captureList;
+                    }
                 }
 
                 this.lastHoveredWidgets.clear();
@@ -484,6 +500,11 @@ export class Root implements WidgetEventEmitter {
         let captured = this.child.dispatchEvent(event);
         const captureList: CaptureList = [[originalEvent, captured !== null]];
 
+        // Cancel if an event listener destroyed this root
+        if (!this.child.attached) {
+            return captureList;
+        }
+
         if(captured === null) {
             if(event.isa(KeyPressEvent)) {
                 if(event.key === 'Tab' && !event.virtual) {
@@ -492,6 +513,11 @@ export class Root implements WidgetEventEmitter {
                     captureList.push(
                         ...this.dispatchEvent(new TabSelectEvent(this.getFocus(FocusType.Tab), event.shift))
                     );
+
+                    // Cancel if an event listener destroyed this root
+                    if (!this.child.attached) {
+                        return captureList;
+                    }
                 } else if(event.key === 'Escape') {
                     // special case for escape key; clear keyboard focus
                     this.clearFocus(FocusType.Keyboard);
@@ -504,6 +530,11 @@ export class Root implements WidgetEventEmitter {
             if(event.isa(TabSelectEvent) && event.relativeTo !== null) {
                 event = new TabSelectEvent(null, event.reversed);
                 captured = this.child.dispatchEvent(event);
+
+                // Cancel if an event listener destroyed this root
+                if (!this.child.attached) {
+                    return captureList;
+                }
             }
         }
 
@@ -530,6 +561,11 @@ export class Root implements WidgetEventEmitter {
                     leaveEvent,
                     this.child.dispatchEvent(leaveEvent) !== null
                 ]);
+
+                // Cancel if an event listener destroyed this root
+                if (!this.child.attached) {
+                    return captureList;
+                }
             }
 
             this.droppedPointerFoci.clear();
@@ -552,6 +588,11 @@ export class Root implements WidgetEventEmitter {
                     moveEvent,
                     this.child.dispatchEvent(moveEvent) !== null
                 ]);
+
+                // Cancel if an event listener destroyed this root
+                if (!this.child.attached) {
+                    return captureList;
+                }
             }
 
             for (const widget of this.lastHoveredWidgets) {
@@ -561,6 +602,11 @@ export class Root implements WidgetEventEmitter {
                         leaveEvent,
                         this.child.dispatchEvent(leaveEvent) !== null
                     ]);
+
+                    // Cancel if an event listener destroyed this root
+                    if (!this.child.attached) {
+                        return captureList;
+                    }
                 }
             }
 

@@ -101,7 +101,7 @@ function assertCapturable(captured: boolean | void, event: WidgetEvent): boolean
  * @returns Returns true if the user captured the event.
  * @category Helper
  */
-export function eventEmitterHandleEvent(handler: WidgetEventEmitter, typedListenersMap: WidgetEventTypedListenerMap, untypedListeners: WidgetEventUntypedListenerList, event: WidgetEvent): boolean {
+export function eventEmitterHandleEvent(handler: WidgetEventEmitter, typedListenersMap: WidgetEventTypedListenerMap, untypedListeners: WidgetEventUntypedListenerList, event: WidgetEvent, cancelGetter?: () => boolean): boolean {
     // invoke typed handlers first, they have priority
     const typedListeners = typedListenersMap.get(event.type);
     if (typedListeners !== undefined) {
@@ -161,6 +161,11 @@ export function eventEmitterHandleEvent(handler: WidgetEventEmitter, typedListen
             if (captured) {
                 return true;
             }
+
+            // check if we need to cancel
+            if (cancelGetter !== undefined && cancelGetter()) {
+                return false;
+            }
         }
     }
 
@@ -177,6 +182,11 @@ export function eventEmitterHandleEvent(handler: WidgetEventEmitter, typedListen
         // captured, stop
         if (captured) {
             return true;
+        }
+
+        // check if we need to cancel
+        if (cancelGetter !== undefined && cancelGetter()) {
+            return false;
         }
 
         // handles changes in index
