@@ -61,9 +61,7 @@ jobs:
         with:
           name: build
       - run: tar -xf build.tar.gz dist/
-      - run: mkdir docs/dist
-      - run: mv dist/index.js docs/dist/index.js
-      - run: mv dist/index.js.map docs/dist/index.js.map
+      - run: mv dist docs/dist
       - run: mv examples docs/examples
       - uses: actions/upload-pages-artifact@v1
         with:
