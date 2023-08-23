@@ -5,6 +5,7 @@ import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 const videoRegex = /^.*\.(webm|og[gv]|m(p4|4v|ov)|avi|qt)$/i;
 
+// TODO rename this to MediaFit
 /**
  * The image fitting mode for {@link Icon} widgets; describes how an image is
  * transformed if its dimensions don't match the output dimensions.
@@ -31,6 +32,7 @@ export enum IconFit {
     Fill
 }
 
+// TODO rename this to MediaProperties
 /**
  * Optional Icon constructor properties.
  *
@@ -49,6 +51,7 @@ export interface IconProperties extends WidgetProperties {
     fit?: IconFit
 }
 
+// TODO rename this to Media
 /**
  * A widget which displays a given image.
  *
@@ -67,13 +70,16 @@ export class Icon extends Widget {
     };
 
     /** The current image/video used by the icon. */
-    private _image: HTMLImageElement | HTMLVideoElement;
+    private _media: HTMLImageElement | HTMLVideoElement;
+    /** Is the current media an image? */
+    private _isImage: boolean;
     /**
      * The last source that the current image was using. Used for tracking if
      * the image source changed and if the image is fully loaded. Only used if
      * image is not a video.
      */
     private lastSrc: string | null = null;
+
     /**
      * The current image rotation in radians.
      *
@@ -147,14 +153,18 @@ export class Icon extends Widget {
                 // element then this won't be automatically set
                 videoElem.preload = 'auto';
                 image = videoElem;
+                this._isImage = false;
             } else {
                 const imgElem = document.createElement('img');
                 imgElem.src = image;
                 image = imgElem;
+                this._isImage = true;
             }
+        } else {
+            this._isImage = !(image instanceof HTMLVideoElement);
         }
 
-        this._image = image;
+        this._media = image;
         this.rotation = properties?.rotation ?? 0;
         this.viewBox = properties?.viewBox ?? null;
         this.imageWidth = properties?.width ?? null;
@@ -168,31 +178,31 @@ export class Icon extends Widget {
      * not a video
      */
     private setupVideoEvents() {
-        if(this.image instanceof HTMLVideoElement) {
+        if(!this._isImage) {
+            const video = this._media as HTMLVideoElement;
             // Add event listeners
             // loadedmetadata is so that we resize the widget when we know the
             // video dimensions
             this.loadedmetadataListener = _event => this._layoutDirty = true;
-            this.image.addEventListener('loadedmetadata', this.loadedmetadataListener);
+            video.addEventListener('loadedmetadata', this.loadedmetadataListener);
             // canplay is so that the first video frame is always displayed
             this.canplayListener = _event => this.markWholeAsDirty();
-            this.image.addEventListener('canplay', this.canplayListener);
+            video.addEventListener('canplay', this.canplayListener);
 
-            if('requestVideoFrameCallback' in this.image) {
+            if('requestVideoFrameCallback' in video) {
                 console.warn(Msg.VIDEO_API_AVAILABLE);
 
-                const originalVideo = this.image;
+                const originalVideo = video;
                 this.frameCallback = (_now, _metadata) => {
                     // Mark widget as dirty when there is a new frame so that it
                     // is painted
-                    this.markWholeAsDirty();
-
-                    if(this.image === originalVideo && this.frameCallback !== null) {
-                        this.image.requestVideoFrameCallback(this.frameCallback);
+                    if(this._media === originalVideo && this.frameCallback !== null) {
+                        this.markWholeAsDirty();
+                        video.requestVideoFrameCallback(this.frameCallback);
                     }
                 }
 
-                this.image.requestVideoFrameCallback(this.frameCallback);
+                video.requestVideoFrameCallback(this.frameCallback);
             }
         }
     }
@@ -200,26 +210,27 @@ export class Icon extends Widget {
     /**
      * The image or video used by this Icon.
      *
-     * Sets {@link Icon#_image} if changed and sets {@link Icon#lastSrc} to null
+     * Sets {@link Icon#_media} if changed and sets {@link Icon#lastSrc} to null
      * to mark the image as loading so that flickers are minimised.
      *
-     * If getting, returns {@link Icon#_image}.
+     * If getting, returns {@link Icon#_media}.
      */
     set image(image: HTMLImageElement | HTMLVideoElement) {
-        if(image !== this._image) {
-            if(this._image instanceof HTMLVideoElement) {
+        if(image !== this._media) {
+            if(this._media instanceof HTMLVideoElement) {
                 // Remove old event listeners in video. null checks aren't
                 // needed, but adding them anyways so that typescript doesn't
                 // complain
                 if(this.loadedmetadataListener !== null) {
-                    this._image.removeEventListener('loadedmetadata', this.loadedmetadataListener);
+                    this._media.removeEventListener('loadedmetadata', this.loadedmetadataListener);
                 }
                 if(this.canplayListener !== null) {
-                    this._image.removeEventListener('canplay', this.canplayListener);
+                    this._media.removeEventListener('canplay', this.canplayListener);
                 }
             }
 
-            this._image = image;
+            this._media = image;
+            this._isImage = !(image instanceof HTMLVideoElement);
             this.lastSrc = null;
             this.loadedmetadataListener = null;
             this.canplayListener = null;
@@ -229,7 +240,7 @@ export class Icon extends Widget {
     }
 
     get image(): HTMLImageElement | HTMLVideoElement {
-        return this._image;
+        return this._media;
     }
 
     protected override handlePreLayoutUpdate(): void {
@@ -237,13 +248,17 @@ export class Icon extends Widget {
         // the image setter, or if the source changed, but not if the icon isn't
         // loaded yet. If this is a playing video, icon only needs to be
         // re-drawn if video is playing
-        if(this._image instanceof HTMLVideoElement) {
-            if(!this._image.paused && this.frameCallback === null) {
+        if(!this._isImage) {
+            if(!(this._media as HTMLVideoElement).paused && this.frameCallback === null) {
                 this.markWholeAsDirty();
             }
-        } else if(this._image?.src !== this.lastSrc && this._image?.complete) {
-            this._layoutDirty = true;
-            this.markWholeAsDirty();
+        } else {
+            const curSrc = this._media.src;
+            if(curSrc !== this.lastSrc && (this._media as HTMLImageElement).complete) {
+                this._layoutDirty = true;
+                this.lastSrc = curSrc;
+                this.markWholeAsDirty();
+            }
         }
     }
 
@@ -252,10 +267,10 @@ export class Icon extends Widget {
         let wantedWidth = this.imageWidth;
         if(wantedWidth === null) {
             if(this.viewBox === null) {
-                if(this._image instanceof HTMLVideoElement) {
-                    wantedWidth = this._image.videoWidth;
+                if(this._isImage) {
+                    wantedWidth = (this._media as HTMLImageElement).naturalWidth;
                 } else {
-                    wantedWidth = this._image.naturalWidth;
+                    wantedWidth = (this._media as HTMLVideoElement).videoWidth;
                 }
             } else {
                 wantedWidth = this.viewBox[2];
@@ -267,10 +282,10 @@ export class Icon extends Widget {
         let wantedHeight = this.imageHeight;
         if(wantedHeight === null) {
             if(this.viewBox === null) {
-                if(this._image instanceof HTMLVideoElement) {
-                    wantedHeight = this._image.videoHeight;
+                if(this._isImage) {
+                    wantedHeight = (this._media as HTMLImageElement).naturalHeight;
                 } else {
-                    wantedHeight = this._image.naturalHeight;
+                    wantedHeight = (this._media as HTMLVideoElement).videoHeight;
                 }
             } else {
                 wantedHeight = this.viewBox[3];
@@ -313,13 +328,9 @@ export class Icon extends Widget {
 
     protected override handlePainting(_dirtyRects: Array<Rect>): void {
         // Abort if icon isn't ready yet
-        if(this._image instanceof HTMLImageElement && !this._image?.complete) {
-            this.lastSrc = null;
+        if(this._isImage && !(this._media as HTMLImageElement).complete) {
             return;
         }
-
-        // Mark as not needing to be drawn by setting the source
-        this.lastSrc = this._image.src;
 
         // Translate, rotate and clip if rotation is not 0
         let tdx = this.x + this.offsetX, tdy = this.y + this.offsetY;
@@ -346,12 +357,12 @@ export class Icon extends Widget {
         // Draw image, with viewBox if it is not null
         if(this.viewBox === null) {
             ctx.drawImage(
-                this._image,
+                this._media,
                 tdx, tdy, this.actualWidth, this.actualHeight,
             );
         } else {
             ctx.drawImage(
-                this._image, ...this.viewBox,
+                this._media, ...this.viewBox,
                 tdx, tdy, this.actualWidth, this.actualHeight,
             );
         }

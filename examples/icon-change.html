@@ -39,7 +39,9 @@
                         vid.src = newSrc;
                         vid.loop = true;
                         vid.muted = true;
-                        vid.autoplay = true;
+                        // XXX can't use autoplay, since autoplay only works on
+                        //     chromium if the video is attached to the dom
+                        vid.play();
                         icon.image = vid;
                     }
                     else {
@@ -50,7 +52,12 @@
                 }
                 else {
                     // Change Icon.image.src
-                    icon.image.src = newSrc;
+                    const media = icon.image;
+                    media.src = newSrc;
+
+                    if (isVideo) {
+                        media.play();
+                    }
                 }
             }
 

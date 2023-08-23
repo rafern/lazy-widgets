@@ -370,21 +370,52 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     override propagateDirtyRect(rect: Rect): void {
         // convert damage region from relative coordinates to absolute
         // coordinates if necessary
+        let left: number, top: number, right: number, bottom: number
         if (this.internalViewport.relativeCoordinates) {
             const vpX = this.internalViewport.rect[0] + this.internalViewport.offset[0];
             const vpY = this.internalViewport.rect[1] + this.internalViewport.offset[1];
 
-            const left = Math.floor(rect[0] + vpX);
-            const top = Math.floor(rect[1] + vpY);
-            const right = Math.ceil(rect[0] + rect[2] + vpX);
-            const bottom = Math.ceil(rect[1] + rect[3] + vpY);
-            const width = right - left;
-            const height = bottom - top;
-
-            rect = [ left, top, width, height ];
+            left = Math.floor(rect[0] + vpX);
+            top = Math.floor(rect[1] + vpY);
+            right = Math.ceil(rect[0] + rect[2] + vpX);
+            bottom = Math.ceil(rect[1] + rect[3] + vpY);
+        } else {
+            left = rect[0];
+            top = rect[1];
+            right = left + rect[2];
+            bottom = right + rect[3];
         }
 
-        super.propagateDirtyRect(rect);
+        // clip dirty rects to avoid dirty rects being spammed from widgets that
+        // are offscreen and therefore won't be painted, causing a loop of
+        // constant dirty rects
+        const vpLeft = this.x;
+        const vpRight = vpLeft + this.width;
+        if (left < vpLeft) {
+            left = vpLeft;
+        }
+        if (right > vpRight) {
+            right = vpRight;
+        }
+
+        if (left >= right) {
+            return;
+        }
+
+        const vpTop = this.y;
+        const vpBottom = vpTop + this.height;
+        if (top < vpTop) {
+            top = vpTop;
+        }
+        if (bottom > vpBottom) {
+            bottom = vpBottom;
+        }
+
+        if (top >= bottom) {
+            return;
+        }
+
+        super.propagateDirtyRect([ left, top, right - left, bottom - top ]);
     }
 
     override queryRect(rect: Rect, relativeTo: Widget | null = null): Rect {
