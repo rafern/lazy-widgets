@@ -638,13 +638,8 @@ export class TextHelper {
 
     /** Paint all line ranges. */
     paint(ctx: CanvasRenderingContext2D, fillStyle: FillStyle, x: number, y: number): void {
-        // Clip
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(x, y, this.width, this.height);
-        ctx.clip();
-
         // Apply fill style and font
+        ctx.save();
         ctx.font = this.font;
         ctx.fillStyle = fillStyle;
         ctx.textBaseline = 'alphabetic';
@@ -666,7 +661,7 @@ export class TextHelper {
             yOffset += fullLineHeight;
         }
 
-        // Stop clipping
+        // Restore text style
         ctx.restore();
     }
 
