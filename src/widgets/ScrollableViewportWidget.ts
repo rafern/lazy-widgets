@@ -550,8 +550,29 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         this.reservedX = reserve && this.heightCoupling !== AxisCoupling.Bi ? thickness : 0;
         this.reservedY = reserve && this.widthCoupling !== AxisCoupling.Bi ? thickness : 0;
 
+        // Get dimensions of child viewport before resolving them
+        let scrollbarsDirty = false;
+        const [oldChildWidth, oldChildHeight] = this.child.idealDimensions;
+        const oldPaintX = this.scrollbarNeedsPaint(false, oldChildWidth > this.effectiveWidth);
+        const oldPaintY = this.scrollbarNeedsPaint(true, oldChildHeight > this.effectiveHeight);
+
         // Resolve dimensions
         super.handleResolveDimensions(minWidth, maxWidth, minHeight, maxHeight);
+
+        // Mark as dirty if scrollbars changed (check this by comparing old dims
+        // with new dims of child viewport)
+        const [newChildWidth, newChildHeight] = this.child.idealDimensions;
+        const newPaintX = this.scrollbarNeedsPaint(false, newChildWidth > this.effectiveWidth);
+        if ((oldPaintX !== newPaintX) || (newPaintX && newChildWidth !== oldChildWidth)) {
+            scrollbarsDirty = true;
+        } else {
+            const newPaintY = this.scrollbarNeedsPaint(true, newChildHeight > this.effectiveHeight);
+            scrollbarsDirty = (oldPaintY !== newPaintY) || (newPaintY && newChildHeight !== oldChildHeight);
+        }
+
+        if (scrollbarsDirty) {
+            this.markWholeAsDirty();
+        }
 
         // Save dimensions to effective dimensions
         this.effectiveWidth = this.idealWidth;
