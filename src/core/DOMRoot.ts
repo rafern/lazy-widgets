@@ -2,6 +2,21 @@ import { TextPasteEvent } from '../events/TextPasteEvent.js';
 import { Root, RootProperties } from './Root.js';
 import { Msg } from './Strings.js';
 import type { Widget } from '../widgets/Widget.js';
+
+/**
+ * Optional DOMRoot constructor properties.
+ *
+ * @category Core
+ */
+export interface DOMRootProperties extends RootProperties {
+    /**
+     * Should contentEditable be set to true? Needed for paste events, but
+     * creates issues on mobile; virtual keyboard is opened whenever the canvas
+     * is clicked. Disabled by default
+     */
+    enablePasteEvents?: boolean;
+}
+
 /**
  * Like Root, but for easy use in an HTML page.
  *
@@ -17,7 +32,7 @@ export class DOMRoot extends Root {
     /** This root's canvas element's context. Used for painting */
     private domCanvasContext: CanvasRenderingContext2D;
 
-    constructor(child: Widget, properties?: Readonly<RootProperties>) {
+    constructor(child: Widget, properties?: Readonly<DOMRootProperties>) {
         super(child, properties);
 
         // Make DOM element, which is a canvas, and get a 2D context for it
@@ -38,19 +53,21 @@ export class DOMRoot extends Root {
             };
         }
 
-        // Listen to paste events
-        this.domElem.addEventListener('paste', event => {
-            event.preventDefault();
-            if(event.clipboardData !== null) {
-                this.dispatchEvent(new TextPasteEvent(event.clipboardData.getData('text')));
-            }
-        });
-        this.domElem.contentEditable = 'true';
+        if (properties?.enablePasteEvents) {
+            // Listen to paste events
+            this.domElem.addEventListener('paste', event => {
+                event.preventDefault();
+                if(event.clipboardData !== null) {
+                    this.dispatchEvent(new TextPasteEvent(event.clipboardData.getData('text')));
+                }
+            });
+            this.domElem.contentEditable = 'true';
 
-        // Remove styling added by contenteditable
-        this.domElem.style.outline = '0px solid transparent';
-        this.domElem.style.caretColor = 'transparent';
-        this.domElem.style.cursor = 'default';
+            // Remove styling added by contenteditable
+            this.domElem.style.outline = '0px solid transparent';
+            this.domElem.style.caretColor = 'transparent';
+            this.domElem.style.cursor = 'default';
+        }
     }
 
     /**
