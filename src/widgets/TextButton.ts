@@ -1,4 +1,4 @@
-import { TextAlignMode } from '../helpers/TextHelper.js';
+import { TextAlignMode, WrapMode } from '../helpers/TextHelper.js';
 import { Label } from './Label.js';
 import { Alignment } from '../theme/Alignment.js';
 import { FilledButton } from './FilledButton.js';
@@ -32,7 +32,7 @@ export class TextButton extends FilledButton<Label> {
                 horizontal: Alignment.Center, vertical: Alignment.Stretch,
             },
             bodyTextAlign: TextAlignMode.Center,
-            wrapText: false,
+            wrapMode: WrapMode.Ellipsis,
             ...properties
         };
 

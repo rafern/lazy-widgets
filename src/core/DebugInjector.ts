@@ -419,15 +419,15 @@ export function injectDebugCode(): void {
             const origFillStyle = ctx.fillStyle;
             const height = this.actualLineHeight;
             const fullHeight = this.fullLineHeight;
-            if(!group[3] && group[2] > left) {
+            if(!group.overridesWidth && group.right > left) {
                 const alternate = textHelperAlternate.get(this);
                 ctx.fillStyle = alternate ? 'rgba(255, 0, 0, 0.5)'
                     : 'rgba(0, 255, 0, 0.5)';
-                ctx.fillRect(x, y - height, group[2] - left, fullHeight);
+                ctx.fillRect(x, y - height, group.right - left, fullHeight);
                 textHelperAlternate.set(this, !alternate);
                 ctx.fillStyle = origFillStyle;
             } else {
-                let debugWidth = group[2] - left;
+                let debugWidth = group.right - left;
                 ctx.fillStyle = debugWidth > 0 ? 'rgba(0, 0, 255, 0.5)'
                     : 'rgba(0, 0, 0, 0.5)';
                 if(debugWidth == 0) {

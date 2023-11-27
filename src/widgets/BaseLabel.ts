@@ -8,8 +8,8 @@ import type { Rect } from '../helpers/Rect.js';
  * @category Widget
  */
 export interface LabelProperties extends WidgetProperties {
-    /** Sets {@link Label#wrapText}. */
-    wrapText?: boolean,
+    /** Sets {@link Label#wrapMode}. */
+    wrapMode?: WrapMode,
 }
 
 /**
@@ -21,19 +21,20 @@ export abstract class BaseLabel extends Widget {
     /** The helper for measuring/painting text */
     protected textHelper: TextHelper;
     /**
-     * Is text wrapping enabled? If not, text will clipped on overflow
+     * Text wrapping mode. Used to control what happens when the text is too big
+     * to fit in the label. Uses shrink-wrapping by default.
      *
      * @decorator `@layoutField`
      */
     @layoutField
-    wrapText: boolean;
+    wrapMode: WrapMode;
 
     constructor(properties?: Readonly<LabelProperties>) {
         super(properties);
 
-        this.wrapText = properties?.wrapText ?? true;
+        this.wrapMode = properties?.wrapMode ?? WrapMode.Shrink;
         this.textHelper = new TextHelper();
-        this.textHelper.wrapMode = this.wrapText ? WrapMode.Shrink : WrapMode.None;
+        this.textHelper.wrapMode = this.wrapMode;
     }
 
     protected override onThemeUpdated(property: string | null = null): void {
@@ -56,7 +57,7 @@ export abstract class BaseLabel extends Widget {
         this.textHelper.font = this.bodyTextFont;
         this.textHelper.lineHeight = this.bodyTextHeight;
         this.textHelper.lineSpacing = this.bodyTextSpacing;
-        this.textHelper.wrapMode = this.wrapText ? WrapMode.Shrink : WrapMode.None;
+        this.textHelper.wrapMode = this.wrapMode;
         this.textHelper.alignMode = this.bodyTextAlign;
 
         // Mark as dirty if text helper is dirty
@@ -82,7 +83,7 @@ export abstract class BaseLabel extends Widget {
         // Start clipping if text wrapping is disabled or the text vertically
         // overflows
         const spacedHeight = this.textHelper.height + this.textHelper.actualLineSpacing;
-        const needsClip = !this.wrapText || spacedHeight > this.idealHeight;
+        const needsClip = this.wrapMode === WrapMode.None || this.wrapMode === WrapMode.Ellipsis || spacedHeight > this.idealHeight;
         const ctx = this.viewport.context;
 
         if(needsClip) {

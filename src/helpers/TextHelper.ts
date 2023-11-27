@@ -2,17 +2,33 @@ import { measureTextDims } from '../helpers/measureTextDims.js';
 import { multiFlagField } from '../decorators/FlagFields.js';
 import { FillStyle } from '../theme/FillStyle.js';
 import { DynMsg, Msg } from '../core/Strings.js';
+
 const WIDTH_OVERRIDING_CHARS = new Set(['\n', '\t']);
+const ELLIPSIS = '...';
 
 /**
- * A text render group. Contains all neccessary information to position a piece
- * of text.
+ * The type of a {@link TextRenderGroup}.
  *
- * A 4-tuple containing, respectively, the inclusive index where the piece of
- * text starts, the exclusive index where the piece of text ends (including
- * characters that aren't rendered, such as newlines), the right horizontal
- * offset of the piece of text and whether the piece of text overrides width or
- * not.
+ * @category Helper
+ */
+export enum TextRenderGroupType {
+    Range,
+    Inline,
+}
+
+/** Base interface for {@link TextRenderGroup}. */
+export interface BaseTextRenderGroup {
+    type: TextRenderGroupType,
+    rangeStart: number,
+    rangeEnd: number,
+    right: number,
+    overridesWidth: boolean,
+    visible: boolean,
+}
+
+/**
+ * A text render group that represents a range of existing text. Contains all
+ * neccessary information to position that piece of text.
  *
  * For characters that override width, the text range should have a length of 1
  * and will not be merged with other text render groups, else, it is a hint
@@ -30,7 +46,36 @@ const WIDTH_OVERRIDING_CHARS = new Set(['\n', '\t']);
  *
  * @category Helper
  */
-export type TextRenderGroup = [rangeStart: number, rangeEnd: number, right: number, overridesWidth: boolean];
+export interface RangeTextRenderGroup extends BaseTextRenderGroup {
+    type: TextRenderGroupType.Range,
+}
+
+/**
+ * In-place text. Instead of representing an existing range of text (the text
+ * range is 0-sized, and the start of the range is the offset where the in-place
+ * text should be inserted), this render group represents a piece of text that
+ * is not present in the original text. This is useful for inserting ellipsis on
+ * overflow.
+ *
+ * @category Helper
+ */
+export interface InlineTextRenderGroup extends BaseTextRenderGroup {
+    type: TextRenderGroupType.Inline,
+    text: string,
+}
+
+/**
+ * A text render group. Contains all neccessary information to position a piece
+ * of text.
+ *
+ * Contains the inclusive index where the piece of text starts, the exclusive
+ * index where the piece of text ends (including characters that aren't
+ * rendered, such as newlines), the right horizontal offset of the piece of text
+ * and whether the piece of text overrides width or not.
+ *
+ * @category Helper
+ */
+export type TextRenderGroup = RangeTextRenderGroup | InlineTextRenderGroup;
 
 /**
  * A line range. Contains all neccessary information to render a line of text.
@@ -47,12 +92,18 @@ export type LineRange = Array<TextRenderGroup>;
  */
 export enum WrapMode {
     /** No text wrapping. Text will overflow if it exceeds the maximum width. */
-    None,
+    None = 'none',
+    /**
+     * No text wrapping, but instead of clipping the text, the end is replaced
+     * with ellipsis. If the text won't even fit ellipsis, then the text is
+     * clipped.
+     */
+    Ellipsis = 'ellipsis',
     /**
      * Whitespaces always have width. The default wrapping mode for input
      * widgets
      */
-    Normal,
+    Normal = 'normal',
     /**
      * Whitespaces at the end of a line which result in an overflow have no
      * width. The default wrapping mode for widgets that display text, since
@@ -60,7 +111,7 @@ export enum WrapMode {
      * {@link Label | labels}. Whitespaces at the beginning of a new line are
      * still kept, as they are deliberate.
      */
-    Shrink,
+    Shrink = 'shrink',
 }
 
 /**
@@ -104,8 +155,9 @@ export class TextHelper {
     font = '';
     /**
      * The current maximum text width. If not Infinite and
-     * {@link TextHelper#wrapMode} is not `WrapMode.None`, then text will be
-     * wrapped and width will be set to maxWidth.
+     * {@link TextHelper#wrapMode} is not `WrapMode.None` and not
+     * `WrapMode.Ellipsis`, then text will be wrapped and width will be set to
+     * maxWidth.
      *
      * @decorator `@multiFlagField(['_dirty', 'maxWidthDirty'])`
      */
@@ -214,7 +266,7 @@ export class TextHelper {
      */
     private getLineRangeWidthUntil(range: LineRange, index: number): number {
         // If before or at first group's start index, 0 width
-        if(index <= range[0][0]) {
+        if(index <= range[0].rangeStart) {
             return 0;
         }
 
@@ -225,32 +277,32 @@ export class TextHelper {
             // Most width-overriding groups have a length of 1 and therefore
             // just stop here
             const group = range[groupIndex];
-            const groupEnd = group[1];
+            const groupEnd = group.rangeEnd;
             if(index == groupEnd) {
-                return group[2];
-            } else if(index >= group[0] && index < groupEnd) {
+                return group.right;
+            } else if(index >= group.rangeStart && index < groupEnd) {
                 break;
             }
         }
 
         // If index was after line end, pick end of last group
         if(groupIndex === range.length) {
-            return range[groupIndex - 1][2];
+            return range[groupIndex - 1].right;
         }
 
         // Find left value
         let left = 0;
         if(groupIndex > 0) {
-            left = range[groupIndex - 1][2];
+            left = range[groupIndex - 1].right;
         }
 
         // Measure the slice of text. Interpolate if it's a width-overidding
         // group
         const group = range[groupIndex];
-        if(group[3]) {
-            return left + group[2] * (index - group[0]) / (group[1] - group[0]);
+        if(group.overridesWidth) {
+            return left + group.right * (index - group.rangeStart) / (group.rangeEnd - group.rangeStart);
         } else {
-            return this.measureTextSlice(left, group[0], index);
+            return this.measureTextSlice(left, group.rangeStart, index);
         }
     }
 
@@ -273,8 +325,8 @@ export class TextHelper {
         let wantedGroups = 0;
         for(; wantedGroups < lineRange.length; wantedGroups++) {
             const group: TextRenderGroup = lineRange[wantedGroups];
-            if(start >= group[0] && start < group[1]) {
-                start = group[0];
+            if(start >= group.rangeStart && start < group.rangeEnd) {
+                start = group.rangeStart;
                 break;
             }
         }
@@ -284,8 +336,8 @@ export class TextHelper {
         // measured yet
         if(wantedGroups > 0) {
             let lastGroup: TextRenderGroup | null = lineRange[wantedGroups - 1];
-            if(lastGroup[1] !== start) {
-                start = lastGroup[1];
+            if(lastGroup.rangeEnd !== start) {
+                start = lastGroup.rangeEnd;
 
                 if(--wantedGroups > 0) {
                     lastGroup = lineRange[wantedGroups];
@@ -294,8 +346,8 @@ export class TextHelper {
                 }
             }
 
-            if(lastGroup !== null && !lastGroup[3] && !WIDTH_OVERRIDING_CHARS.has(this.text[start])) {
-                start = lastGroup[0];
+            if(lastGroup !== null && !lastGroup.overridesWidth && !WIDTH_OVERRIDING_CHARS.has(this.text[start])) {
+                start = lastGroup.rangeStart;
                 wantedGroups--;
             }
         }
@@ -303,7 +355,7 @@ export class TextHelper {
         // Find left horizontal offset
         let left = 0;
         if(wantedGroups > 0) {
-            left = lineRange[wantedGroups - 1][2];
+            left = lineRange[wantedGroups - 1].right;
         }
 
         // Measure range of text, potentially splitting it into render groups
@@ -314,10 +366,24 @@ export class TextHelper {
                 // Align to tab width
                 const tabWidth = this.actualTabWidth;
                 left = (Math.floor(left / tabWidth) + 1) * tabWidth;
-                addedGroups.push([groupStart, ++groupStart, left, true]);
+                addedGroups.push({
+                    type: TextRenderGroupType.Range,
+                    rangeStart: groupStart,
+                    rangeEnd: ++groupStart,
+                    right: left,
+                    overridesWidth: true,
+                    visible: false,
+                });
             } else if(this.text[groupStart] === '\n') {
                 // Make it 0-width and ignore all other text
-                addedGroups.push([groupStart, ++groupStart, left, true]);
+                addedGroups.push({
+                    type: TextRenderGroupType.Range,
+                    rangeStart: groupStart,
+                    rangeEnd: ++groupStart,
+                    right: left,
+                    overridesWidth: true,
+                    visible: false,
+                });
 
                 if(groupStart < end) {
                     console.warn(Msg.ROGUE_NEWLINE);
@@ -341,7 +407,14 @@ export class TextHelper {
 
                 // Measure group
                 left = this.measureTextSlice(left, groupStart, groupEnd);
-                addedGroups.push([groupStart, groupEnd, left, false]);
+                addedGroups.push({
+                    type: TextRenderGroupType.Range,
+                    rangeStart: groupStart,
+                    rangeEnd: groupEnd,
+                    right: left,
+                    overridesWidth: false,
+                    visible: true,
+                });
 
                 groupStart = groupEnd;
             }
@@ -356,10 +429,17 @@ export class TextHelper {
         if(lastGroup === null) {
             // Lines ranges must have at least one group
             lineRange.length = 0;
-            lineRange.push([start, start, 0, false]);
+            lineRange.push({
+                type: TextRenderGroupType.Range,
+                rangeStart: start,
+                rangeEnd: start,
+                right: 0,
+                overridesWidth: false,
+                visible: false,
+            });
             return true;
-        } else if((groupCount === 1 && (lastGroup[1] - lastGroup[0]) <= 1) ||
-                lastGroup[2] <= maxWidth) {
+        } else if((groupCount === 1 && (lastGroup.rangeEnd - lastGroup.rangeStart) <= 1) ||
+                lastGroup.right <= maxWidth) {
             lineRange.length = wantedGroups;
             lineRange.push(...addedGroups);
             return true;
@@ -419,7 +499,7 @@ export class TextHelper {
                     // maxWidth if maxWidth is not infinity
                     this._width = 0;
                     for(const range of this._lineRanges) {
-                        const width = range[range.length - 1][2];
+                        const width = range[range.length - 1].right;
                         if(width > this._width) {
                             this._width = width;
                         }
@@ -449,7 +529,7 @@ export class TextHelper {
         this.hasWrappedLines = false;
 
         const fullLineHeight = this._lineHeight + this._lineSpacing;
-        const notWrapping = this.maxWidth === Infinity || this.wrapMode === WrapMode.None;
+        const notWrapping = this.maxWidth === Infinity || this.wrapMode === WrapMode.None || this.wrapMode === WrapMode.Ellipsis;
 
         if(this.text.length === 0) {
             // Special case for empty string; set height to height of single
@@ -458,7 +538,14 @@ export class TextHelper {
             this._height = fullLineHeight;
             this._width = notWrapping ? 0 : this.maxWidth;
             this._lineRanges.length = 1;
-            this._lineRanges[0] = [[0, 0, 0, false]];
+            this._lineRanges[0] = [{
+                type: TextRenderGroupType.Range,
+                rangeStart: 0,
+                rangeEnd: 0,
+                right: 0,
+                overridesWidth: false,
+                visible: false,
+            }];
         } else if(notWrapping) {
             // Don't wrap text, but split lines when there's a newline character
             this._lineRanges.length = 0;
@@ -480,7 +567,7 @@ export class TextHelper {
                 this._lineRanges.push(range);
 
                 this._height += fullLineHeight;
-                const width = range[range.length - 1][2];
+                const width = range[range.length - 1].right;
                 if(width > this._width) {
                     this._width = width;
                 }
@@ -554,13 +641,34 @@ export class TextHelper {
                         if(range.length === 0) {
                             const lastLineRange = this._lineRanges[this._lineRanges.length - 1];
                             if(lastLineRange === undefined) {
-                                range.push([0, 0, 0, false]);
+                                range.push({
+                                    type: TextRenderGroupType.Range,
+                                    rangeStart: 0,
+                                    rangeEnd: 0,
+                                    right: 0,
+                                    overridesWidth: false,
+                                    visible: false,
+                                });
                             } else {
                                 const lastGroup = lastLineRange[lastLineRange.length - 1];
                                 if(lastGroup === undefined) {
-                                    range.push([0, 0, 0, false]);
+                                    range.push({
+                                        type: TextRenderGroupType.Range,
+                                        rangeStart: 0,
+                                        rangeEnd: 0,
+                                        right: 0,
+                                        overridesWidth: false,
+                                        visible: false,
+                                    });
                                 } else {
-                                    range.push([lastGroup[1], lastGroup[1], 0, false]);
+                                    range.push({
+                                        type: TextRenderGroupType.Range,
+                                        rangeStart: lastGroup.rangeEnd,
+                                        rangeEnd: lastGroup.rangeEnd,
+                                        right: 0,
+                                        overridesWidth: false,
+                                        visible: false,
+                                    });
                                 }
                             }
                         }
@@ -589,12 +697,14 @@ export class TextHelper {
                             } while(text[i] !== '\n' && spaceRegex.test(text[i]));
 
                             const lastGroup = range[range.length - 1];
-                            range.push([
-                                spaceGroupStart,
-                                i,
-                                lastGroup !== undefined ? lastGroup[2] : 0,
-                                true,
-                            ]);
+                            range.push({
+                                type: TextRenderGroupType.Range,
+                                rangeStart: spaceGroupStart,
+                                rangeEnd: i,
+                                right: lastGroup !== undefined ? lastGroup.right : 0,
+                                overridesWidth: true,
+                                visible: false,
+                            });
                             this._lineRanges.push(range);
                             range = [];
                             continue;
@@ -620,6 +730,56 @@ export class TextHelper {
             this._width = this.maxWidth;
             this._height = fullLineHeight * this._lineRanges.length;
         }
+
+        // handle horizontal overflow
+        let actualMaxWidth = this.maxWidth;
+        let hasEllipsis = false;
+        if (this.wrapMode === WrapMode.Ellipsis) {
+            const ellipsisWidth = measureTextDims(ELLIPSIS, this.font).width;
+            // only add ellipsis if they fit, otherwise just clip
+            if (ellipsisWidth <= this.maxWidth) {
+                hasEllipsis = true;
+                actualMaxWidth -= ellipsisWidth;
+            }
+        }
+
+        for (const line of this._lineRanges) {
+            const lastGroup = line[line.length - 1];
+            if (lastGroup.right <= this.maxWidth) {
+                continue;
+            }
+
+            // line overflows, clip it
+            let left = 0;
+            for (const group of line) {
+                const origRight = group.right;
+                const completelyHidden = group.right <= left;
+                if (completelyHidden || group.right > actualMaxWidth) {
+                    // already past max width or group intersects with
+                    // point of max width, clip it
+                    group.right = actualMaxWidth;
+                    group.overridesWidth = true;
+
+                    if (completelyHidden) {
+                        group.visible = false;
+                    }
+                }
+
+                left = origRight;
+            }
+
+            if (hasEllipsis) {
+                line.push({
+                    type: TextRenderGroupType.Inline,
+                    rangeStart: lastGroup.rangeEnd,
+                    rangeEnd: lastGroup.rangeEnd,
+                    right: this.maxWidth,
+                    overridesWidth: false,
+                    visible: true,
+                    text: ELLIPSIS,
+                });
+            }
+        }
     }
 
     /**
@@ -630,9 +790,28 @@ export class TextHelper {
      * method unless you have a very specific need.
      */
     paintGroup(ctx: CanvasRenderingContext2D, group: TextRenderGroup, left: number, x: number, y: number): void {
-        // Skip width-overidding or zero-width render groups
-        if(!group[3] && group[2] > left) {
-            ctx.fillText(this.text.slice(group[0], group[1]), x, y);
+        if (!group.visible || group.right <= left) {
+            // invisible or zero-width text group, don't bother rendering it
+            return;
+        }
+
+        if (group.overridesWidth) {
+            // width-overriding groups have an unsafe width for rendering, so we
+            // have to clip them
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(x, y - this._lineHeight, group.right - left, this.fullLineHeight);
+            ctx.clip();
+        }
+
+        if (group.type === TextRenderGroupType.Inline) {
+            ctx.fillText(group.text, x, y);
+        } else {
+            ctx.fillText(this.text.slice(group.rangeStart, group.rangeEnd), x, y);
+        }
+
+        if (group.overridesWidth) {
+            ctx.restore();
         }
     }
 
@@ -655,7 +834,7 @@ export class TextHelper {
             const shift = this.getLineShift(line);
             for(const group of this._lineRanges[line]) {
                 this.paintGroup(ctx, group, left, x + left + shift, yOffset);
-                left = group[2];
+                left = group.right;
             }
 
             yOffset += fullLineHeight;
@@ -687,7 +866,7 @@ export class TextHelper {
         // Check which line the index is in
         let line = 0;
         for(const range of this._lineRanges) {
-            if(index < range[range.length - 1][1]) {
+            if(index < range[range.length - 1].rangeEnd) {
                 break;
             }
 
@@ -702,12 +881,12 @@ export class TextHelper {
 
         // Handle wrapping preferences
         let lineRange = this._lineRanges[line];
-        if (preferLineEnd && line > 0 && index === lineRange[0][0]) {
+        if (preferLineEnd && line > 0 && index === lineRange[0].rangeStart) {
             // check if there is a newline at the end of the last render group
             // of the previous line
             const prevLineRange = this._lineRanges[line - 1];
             const prevTextGroup = prevLineRange[prevLineRange.length - 1];
-            const prevEndIndex = prevTextGroup[1] - 1;
+            const prevEndIndex = prevTextGroup.rangeEnd - 1;
             if (prevEndIndex >= 0 && this.text[prevEndIndex] !== '\n') {
                 // line was created due to wrap. prefer previous line
                 line--;
@@ -755,9 +934,9 @@ export class TextHelper {
         const yOffset = line * fullLineHeight;
         const range = this._lineRanges[line];
         const shift = this.getLineShift(line);
-        const lineStart = range[0][0];
-        if(range.length === 1 && lineStart === range[0][1]) {
-            return [lineStart, [range[0][2] + shift, yOffset]];
+        const lineStart = range[0].rangeStart;
+        if(range.length === 1 && lineStart === range[0].rangeEnd) {
+            return [lineStart, [range[0].right + shift, yOffset]];
         }
 
         // Special case; if this is at or before the start of the line, select
@@ -768,7 +947,7 @@ export class TextHelper {
 
         // Special case; if line range ends with a newline, ignore last
         // character
-        let lineEnd = range[range.length - 1][1];
+        let lineEnd = range[range.length - 1].rangeEnd;
         if(this.text[lineEnd - 1] === '\n') {
             lineEnd--;
         }
@@ -830,7 +1009,7 @@ export class TextHelper {
         for(let line = 0; line < this._lineRanges.length; line++) {
             const lineRange = this._lineRanges[line];
             const lastGroup = lineRange[lineRange.length - 1];
-            if(index < lastGroup[1]) {
+            if(index < lastGroup.rangeEnd) {
                 return line;
             }
         }
@@ -852,10 +1031,10 @@ export class TextHelper {
 
         if(line >= this._lineRanges.length) {
             const lastLine = this._lineRanges[this._lineRanges.length - 1];
-            return lastLine[lastLine.length - 1][1];
+            return lastLine[lastLine.length - 1].rangeEnd;
         }
 
-        return this._lineRanges[line][0][0];
+        return this._lineRanges[line][0].rangeStart;
     }
 
     /**
@@ -873,14 +1052,14 @@ export class TextHelper {
 
         if(line >= this._lineRanges.length) {
             const lastLine = this._lineRanges[this._lineRanges.length - 1];
-            return lastLine[lastLine.length - 1][1];
+            return lastLine[lastLine.length - 1].rangeEnd;
         }
 
         const lineRange = this._lineRanges[line];
         const lastGroup = lineRange[lineRange.length - 1];
-        const lastIndex = lastGroup[1];
+        const lastIndex = lastGroup.rangeEnd;
         if(!includeNewlines && lastIndex > 0 &&
-           this.text[lastIndex - 1] === '\n' && lastGroup[0] !== lastGroup[1]) {
+           this.text[lastIndex - 1] === '\n' && lastGroup.rangeStart !== lastGroup.rangeEnd) {
             return lastIndex - 1;
         } else {
             return lastIndex;
@@ -909,7 +1088,7 @@ export class TextHelper {
         }
 
         const lineRange = this._lineRanges[line];
-        return (this.width - lineRange[lineRange.length - 1][2]) * ratio;
+        return (this.width - lineRange[lineRange.length - 1].right) * ratio;
     }
 
     /** The current text width. Re-measures text if neccessary. */
@@ -927,9 +1106,9 @@ export class TextHelper {
     /**
      * Which range of text indices are used for each line.
      *
-     * If there is no text wrapping (`maxWidth` is `Infinity` or `wrapMode` is
-     * `WrapMode.None`), then this will contain a single tuple containing
-     * `[0, (text length)]`.
+     * If there is no text wrapping (`maxWidth` is `Infinity`, or `wrapMode` is
+     * `WrapMode.None` or `wrapMode` is `WrapMode.Ellipsis`), then this will
+     * contain a single tuple containing `[0, (text length)]`.
      *
      * If there is text wrapping, then this will be an array where each member
      * is a tuple containing the starting index of a line of text and the ending

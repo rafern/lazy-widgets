@@ -4,6 +4,7 @@ import { Tooltip } from './Tooltip.js';
 import { TooltipContainer } from './TooltipContainer.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import type { Widget, WidgetProperties } from './Widget.js';
+import { WrapMode } from '../index.js';
 /**
  * A convenience widget for a {@link Tooltip} that has a {@link Label}.
  *
@@ -34,7 +35,7 @@ export class TextTooltip<W extends Widget = Widget> extends Tooltip<W, TooltipCo
                     tooltipText,
                     {
                         ...propertiesNoID,
-                        wrapText: false
+                        wrapMode: WrapMode.Ellipsis,
                     }
                 ),
                 propertiesNoID
