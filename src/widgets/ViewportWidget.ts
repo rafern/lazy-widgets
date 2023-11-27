@@ -370,7 +370,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     override propagateDirtyRect(rect: Rect): void {
         // convert damage region from relative coordinates to absolute
         // coordinates if necessary
-        let left: number, top: number, right: number, bottom: number
+        let left: number, top: number, right: number, bottom: number;
         if (this.internalViewport.relativeCoordinates) {
             const vpX = this.internalViewport.rect[0] + this.internalViewport.offset[0];
             const vpY = this.internalViewport.rect[1] + this.internalViewport.offset[1];
