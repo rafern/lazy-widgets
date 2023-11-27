@@ -9,7 +9,7 @@ import { Theme } from './Theme.js';
  */
 export class DebugTheme extends Theme {
     /**
-     * @param fallback - The actual theme to use. Canvas fill color will be ignored as it is randomly generated. If none supplied, then the default theme found in {@link (Theme:constructor)} is used
+     * @param fallback - The actual theme to use. Canvas fill color will be ignored as it is randomly generated. If none supplied, then the default theme found in {@link Theme."constructor"} is used
      */
     constructor(fallback: Theme = new Theme()) {
         super(undefined, fallback);
