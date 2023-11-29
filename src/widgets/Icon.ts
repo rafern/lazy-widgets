@@ -79,6 +79,8 @@ export class Icon extends Widget {
      * image is not a video.
      */
     private lastSrc: string | null = null;
+    /** Has the user already been warned about the broken image? */
+    private warnedBroken = false;
 
     /**
      * The current image rotation in radians.
@@ -355,16 +357,27 @@ export class Icon extends Widget {
         }
 
         // Draw image, with viewBox if it is not null
-        if(this.viewBox === null) {
-            ctx.drawImage(
-                this._media,
-                tdx, tdy, this.actualWidth, this.actualHeight,
-            );
-        } else {
-            ctx.drawImage(
-                this._media, ...this.viewBox,
-                tdx, tdy, this.actualWidth, this.actualHeight,
-            );
+        try {
+            if(this.viewBox === null) {
+                ctx.drawImage(
+                    this._media,
+                    tdx, tdy, this.actualWidth, this.actualHeight,
+                );
+            } else {
+                ctx.drawImage(
+                    this._media, ...this.viewBox,
+                    tdx, tdy, this.actualWidth, this.actualHeight,
+                );
+            }
+        } catch(err) {
+            // HACK even though complete is true, the image might be in a broken
+            // state, which is not easy to detect. to prevent a crash, catch the
+            // exception and log as a warning
+            if (!this.warnedBroken) {
+                this.warnedBroken = true;
+                console.error(err);
+                console.warn("Failed to paint image to Icon widget. Are you using an invalid image URL? This warning won't be shown again");
+            }
         }
 
         // Revert transformation
