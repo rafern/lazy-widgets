@@ -5,6 +5,7 @@
     "module": "NodeNext",
     "lib": ["ESNext", "dom"],
     "sourceMap": true,
+    "inlineSources": true,
     "strict": true,
     "strictFunctionTypes": true,
     "noImplicitReturns": true,

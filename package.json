@@ -1,10 +1,10 @@
 {
   "name": "lazy-widgets",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Typescript retained mode GUI for the HTML canvas API",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
   "exports": {
     ".": "./dist/index.js"
