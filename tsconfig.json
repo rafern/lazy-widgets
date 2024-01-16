@@ -20,7 +20,8 @@
     "esModuleInterop": true,
     "noImplicitOverride": true,
     "experimentalDecorators": true,
-    "moduleResolution": "nodenext"
+    "moduleResolution": "nodenext",
+    "importHelpers": true
   },
   "ts-node": {
     "esm": true,
