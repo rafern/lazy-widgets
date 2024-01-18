@@ -18,8 +18,8 @@
     "docs": "typedoc --options typedoc.json",
     "generate_theme": "node generate_theme.mjs",
     "test": "mocha",
-    "clean": "shx rm -rf dist/*",
-    "pack": "pnpm run clean && pnpm run lint && pnpm run test && pnpm run docs && pnpm run build && pnpm pack"
+    "clean-build": "shx rm -rf dist/*",
+    "pack": "pnpm run clean-build && pnpm run lint && pnpm run test && pnpm run docs && pnpm run build && pnpm pack"
   },
   "files": [
     "dist/**/*.d.ts",
