@@ -125,6 +125,16 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     private nextListener = 0;
     /** Internal field for {@link Widget#id}. */
     private _id: string | null = null;
+    /**
+     * Last {@link idealWidth}. Internal field used for marking widgets as
+     * dirty.
+     */
+    private lastIdealWidth = 0;
+    /**
+     * Last {@link idealHeight}. Internal field used for marking widgets as
+     * dirty.
+     */
+    private lastIdealHeight = 0;
 
     /**
      * How much this widget will expand relative to other widgets in a flexbox
@@ -518,21 +528,17 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
             minHeight = 0;
         }
 
-        // Keep track of old dimensions to compare later
-        const oldWidth = this.idealWidth;
-        const oldHeight = this.idealHeight;
-
         // Resolve dimensions
         this.handleResolveDimensions(minWidth, maxWidth, minHeight, maxHeight);
 
         // Validate resolved dimensions, handling overflows, underflows and
         // invalid dimensions
         if(this.idealWidth < minWidth) {
+            console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealWidth, minWidth, true, false));
             this.idealWidth = minWidth;
-            console.error(DynMsg.BROKEN_CONSTRAINTS(this.idealWidth, minWidth, true, false));
         } else if(this.idealWidth > maxWidth) {
+            console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealWidth, maxWidth, true, true));
             this.idealWidth = maxWidth;
-            console.error(DynMsg.BROKEN_CONSTRAINTS(this.idealWidth, maxWidth, true, true));
         }
 
         if(this.idealWidth < 0 || !isFinite(this.idealWidth) || isNaN(this.idealWidth)) {
@@ -540,11 +546,11 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         }
 
         if(this.idealHeight < minHeight) {
+            console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealHeight, minHeight, false, false));
             this.idealHeight = minHeight;
-            console.error(DynMsg.BROKEN_CONSTRAINTS(this.idealHeight, minHeight, false, false));
         } else if(this.idealHeight > maxHeight) {
+            console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealHeight, maxHeight, false, true));
             this.idealHeight = maxHeight;
-            console.error(DynMsg.BROKEN_CONSTRAINTS(this.idealHeight, maxHeight, false, true));
         }
 
         if(this.idealHeight < 0 || !isFinite(this.idealHeight) || isNaN(this.idealHeight)) {
@@ -553,15 +559,6 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
 
         // Clear layout dirty flag
         this._layoutDirty = false;
-
-        // If dimensions changed (compare with tracked old dimensions), then
-        // mark as dirty
-        if(oldWidth !== this.idealWidth || oldHeight !== this.idealHeight) {
-            // FIXME this is being called too much, investigate why. my guess is
-            // that this gets called too much because layout resolution is done
-            // in 2 stages to measure the minimum space requirements
-            this.markWholeAsDirty();
-        }
     }
 
     /**
@@ -662,6 +659,22 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     postLayoutUpdate(): void {
         if(this._enabled) {
             this.handlePostLayoutUpdate();
+
+            // if the rendering of this widget depends on the ideal dimensions
+            // of the widget (e.g. if the widget uses the widget's ideal
+            // dimensions to render the thickness of a line), then we need to
+            // mark the widget as dirty in case the ideal dimensions changed
+            // without changing the actual finalized dimensions.
+            // this is checked here instead of in resolveDimensions so that
+            // unnecesary paint damage isn't propagated in the probing phase
+            // (when widgets are resolved with infinite bounds, since that will
+            // likely change the ideal width, but will soon be invalidated by a
+            // second resolveDimensions call with finite bounds)
+            if (this.idealWidth !== this.lastIdealWidth || this.idealHeight !== this.lastIdealHeight) {
+                this.lastIdealWidth = this.idealWidth;
+                this.lastIdealHeight = this.idealHeight;
+                this.markWholeAsDirty();
+            }
         }
     }
 

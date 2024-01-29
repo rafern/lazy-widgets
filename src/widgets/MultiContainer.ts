@@ -119,7 +119,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         // Resolve children's layout with loose constraints along the main axis
         // to get their wanted dimensions and calculate total flex ratio
         let totalFlex = 0, crossLength = 0, minCrossAxis = 0;
-        const maxLength = this.vertical ? maxHeight : maxWidth;
+        let maxLength = this.vertical ? maxHeight : maxWidth;
 
         const alignment = this.multiContainerAlignment;
         if(alignment.cross === Alignment.Stretch) {
@@ -158,7 +158,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             crossLength = minCrossLength;
         }
 
-        // Get free space
+        // Get used space
         const spacing = this.multiContainerSpacing;
         let usedSpace = Math.max(this.enabledChildCount - 1, 0) * spacing;
         for(const child of this._children) {
@@ -170,14 +170,21 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             usedSpace += this.vertical ? child.idealDimensions[1] : child.idealDimensions[0];
         }
 
-        const freeSpace = maxLength - usedSpace;
+        // If we haven't reached the minimum length, treat it as the maximum
+        // length so that the empty space needed to fit the required minimum
+        // length is distributed properly
+        const minLength = this.vertical ? minHeight : minWidth;
+        if (usedSpace < minLength) {
+            maxLength = minLength;
+        }
 
         // Don't do flexbox calculations if free space is infinite
         // (unconstrained main axis) or if there isn't any free space.
-        if(freeSpace == Infinity || freeSpace <= 0) {
+        const freeSpace = maxLength - usedSpace;
+        if(freeSpace === Infinity || freeSpace <= 0) {
             if(this.vertical) {
                 this.idealWidth = crossLength;
-                this.idealHeight = Math.min(usedSpace, maxHeight);
+                this.idealHeight = Math.max(Math.min(usedSpace, maxHeight), minHeight);
             } else {
                 this.idealWidth = Math.min(usedSpace, maxWidth);
                 this.idealHeight = crossLength;
@@ -254,20 +261,17 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         }
 
         // Resolve width and height
-        let length;
         if(this.vertical) {
-            length = maxHeight;
             this.idealWidth = crossLength;
-            this.idealHeight = length;
+            this.idealHeight = maxLength;
         } else {
-            length = maxWidth;
-            this.idealWidth = length;
+            this.idealWidth = maxLength;
             this.idealHeight = crossLength;
         }
 
         // Calculate final unused space; used for alignment. Clamp to zero just
         // in case XXX is that neccessary?
-        this.unusedSpace = Math.max(length - usedSpaceAfter, 0);
+        this.unusedSpace = Math.max(maxLength - usedSpaceAfter, 0);
     }
 
     override resolvePosition(x: number, y: number): void {

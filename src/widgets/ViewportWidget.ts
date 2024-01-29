@@ -264,12 +264,16 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     }
 
     protected override handlePostLayoutUpdate(): void {
-        // Update viewport rect
-        this.internalViewport.rect = [this.x, this.y, this.width, this.height];
-
         // Post-layout update child
         const child = this.child;
         child.postLayoutUpdate();
+    }
+
+    override finalizeBounds(): void {
+        super.finalizeBounds();
+
+        // Update viewport rect
+        this.internalViewport.rect = [this.x, this.y, this.width, this.height];
     }
 
     /**
@@ -285,8 +289,8 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         // reserve space
         const rMaxWidth = Math.max(maxWidth - this.reservedX, 0);
         const rMaxHeight = Math.max(maxHeight - this.reservedY, 0);
-        let effectiveMinWidth = Math.min(Math.max(minWidth, this.minWidth) - this.reservedX, rMaxWidth);
-        let effectiveMinHeight = Math.min(Math.max(minHeight, this.minHeight) - this.reservedY, rMaxHeight);
+        let effectiveMinWidth = Math.min(Math.max(minWidth - this.reservedX, this.minWidth - this.reservedX, 0), rMaxWidth);
+        let effectiveMinHeight = Math.min(Math.max(minHeight - this.reservedY, this.minHeight - this.reservedY, 0), rMaxHeight);
 
         // Expand to the needed dimensions
         if(this._widthCoupling !== AxisCoupling.Bi) {
@@ -383,7 +387,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
             left = rect[0];
             top = rect[1];
             right = left + rect[2];
-            bottom = right + rect[3];
+            bottom = top + rect[3];
         }
 
         // clip dirty rects to avoid dirty rects being spammed from widgets that

@@ -237,8 +237,15 @@ export class TextHelper {
      */
     get dirty(): boolean {
         const wasDirty = this._dirty;
-        this._dirty = false;
+        this.cleanDirtyFlag();
         return wasDirty;
+    }
+
+    /**
+     * Resets {@link TextHelper#_dirty} to false
+     */
+    cleanDirtyFlag() {
+        this._dirty = false;
     }
 
     /**

@@ -68,10 +68,14 @@ export abstract class BaseLabel extends Widget {
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
-        this.textHelper.maxWidth = maxWidth;
         if(this.textHelper.dirty) {
             this.markWholeAsDirty();
         }
+
+        this.textHelper.maxWidth = maxWidth;
+        // XXX we don't want maxWidth to propagate damage; only if it actually
+        //     changes the text dimensions
+        this.textHelper.cleanDirtyFlag();
 
         // extra spacing is added so that there is enough height to center the
         // text
