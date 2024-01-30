@@ -16,6 +16,6 @@ export interface Observable<V> {
      * @param group - The group to use when calling immediately. Only used if callNow is true, and is `undefined` by default
      */
     watch(callback: ObservableCallback<V>, callNow?: boolean, group?: unknown): this;
-    /** Unregister a previously registered callback from this variable. */
+    /** Unregister a previously registered callback from this observable. */
     unwatch(callback: ObservableCallback<V>): this;
 }
