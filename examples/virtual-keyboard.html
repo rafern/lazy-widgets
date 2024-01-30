@@ -17,7 +17,7 @@
             import {
                 DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
                 DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
-                ValidatedVariable, DOMVirtualKeyboardRoot, Background
+                Variable, DOMVirtualKeyboardRoot, Background
             } from '../dist/index.js';
 
             // Create the root
@@ -28,7 +28,7 @@
                     new Margin(
                         new Column([
                             label,
-                            new TextInput(new ValidatedVariable('').watch(variable => {
+                            new TextInput(new Variable('').watch(variable => {
                                 label.text = `Text input: ${variable.value}`;
                             })),
                             new Row([

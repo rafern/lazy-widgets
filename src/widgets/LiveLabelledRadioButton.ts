@@ -3,11 +3,12 @@ import { LiveLabel } from './LiveLabel.js';
 import { RadioButton } from './RadioButton.js';
 import { Row } from './Row.js';
 import { filterIDFromProperties } from '../helpers/filterIDFromProperties.js';
-import type { Variable } from '../state/Variable.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
 import type { LabelProperties } from './BaseLabel.js';
 import type { Observable } from '../state/Observable.js';
+import { type Box } from '../state/Box.js';
+
 /**
  * A {@link Row} with a {@link LiveLabel}, {@link Spacing} and a
  * {@link RadioButton}.
@@ -26,7 +27,7 @@ export class LiveLabelledRadioButton<V> extends Row {
             {
                 mode: 'value',
                 name: 'variable',
-                validator: 'variable'
+                validator: 'box'
             },
             {
                 mode: 'value',
@@ -35,7 +36,7 @@ export class LiveLabelledRadioButton<V> extends Row {
         ]
     };
 
-    constructor(textSource: Observable<string>, variable: Variable<V>, value: V, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
+    constructor(textSource: Observable<string>, variable: Box<V>, value: V, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
         const propertiesNoID = filterIDFromProperties(properties);
 
         super([

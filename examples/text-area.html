@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Margin, Column, TextArea, Label, ValidatedVariable,
+                DOMRoot, Margin, Column, TextArea, Label, Variable,
                 DOMKeyboardDriver, DOMPointerDriver, Background
             } from '../dist/index.js';
 
@@ -14,7 +14,7 @@
                         new Column([
                             new Label('Text area (200x200 minimum length):'),
                             new TextArea(
-                                new ValidatedVariable('Type some text here...'),
+                                new Variable('Type some text here...'),
                                 { minWidth: 200, minHeight: 200 }
                             )
                         ])

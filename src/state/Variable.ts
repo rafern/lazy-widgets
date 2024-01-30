@@ -1,5 +1,5 @@
-import type { Observable } from './Observable.js';
-import type { ObservableCallback } from './ObservableCallback.js';
+import { type Box } from './Box.js';
+import { type ObservableCallback } from './ObservableCallback.js';
 /**
  * An aggregate helper class for widgets that contain a variable with a
  * specified type which is intended to be controlled by the user.
@@ -11,7 +11,7 @@ import type { ObservableCallback } from './ObservableCallback.js';
  *
  * @category State Management
  */
-export class Variable<V> implements Observable<V> {
+export class Variable<V> implements Box<V> {
     /** The current value, for internal use. */
     private _value: V;
     /** The function callbacks called when the value is changed */
@@ -59,13 +59,6 @@ export class Variable<V> implements Observable<V> {
         return this;
     }
 
-    /**
-     * Sets {@link Variable#_value}. Does nothing if the value is already the
-     * one specified.
-     *
-     * @param group - The observable group that this change belongs to. `undefined` by default.
-     * @returns Returns true if the value was changed, false if not
-     */
     setValue(value: V, group?: unknown): boolean {
         if(this._value === value) {
             return false;

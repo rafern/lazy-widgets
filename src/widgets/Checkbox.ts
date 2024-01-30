@@ -11,6 +11,8 @@ import type { Root } from '../core/Root.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
+import { type Box } from '../state/Box.js';
+
 /**
  * A checkbox widget; can be ticked or unticked.
  *
@@ -23,7 +25,7 @@ export class Checkbox extends Widget {
             {
                 mode: 'value',
                 name: 'variable',
-                validator: 'variable',
+                validator: 'box',
                 optional: true
             }
         ]
@@ -38,16 +40,16 @@ export class Checkbox extends Widget {
     /** The helper used for handling pointer clicks and enter presses */
     protected clickHelper: ButtonClickHelper;
     /** The helper for keeping track of the checkbox value */
-    readonly variable: Variable<boolean>;
+    readonly variable: Box<boolean>;
     /** The callback used for the {@link Checkbox#"variable"} */
     private readonly callback: () => void;
     /** See {@link Checkbox#clickable} */
     private _clickable: boolean;
 
     /**
-     * @param variable - The {@link Variable} where the value will be stored.
+     * @param variable - The {@link Box} where the value will be stored.
      */
-    constructor(variable: Variable<boolean> = new Variable(false), properties?: Readonly<ClickableWidgetProperties>) {
+    constructor(variable: Box<boolean> = new Variable(false), properties?: Readonly<ClickableWidgetProperties>) {
         // Checkboxes need a clear background, have no children and don't
         // propagate events
         super(properties);

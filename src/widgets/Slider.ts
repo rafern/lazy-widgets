@@ -18,6 +18,8 @@ import type { Bounds } from '../helpers/Bounds.js';
 import type { Root } from '../core/Root.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { type Box } from '../state/Box.js';
+
 /**
  * Optional Slider constructor properties.
  *
@@ -46,7 +48,7 @@ export class Slider extends Widget {
             {
                 mode: 'value',
                 name: 'variable',
-                validator: 'variable',
+                validator: 'box',
                 optional: true
             },
             {
@@ -89,7 +91,7 @@ export class Slider extends Widget {
     @damageField
     private keyboardFocused = false;
     /** The helper for keeping track of the slider value */
-    readonly variable: Variable<number>;
+    readonly variable: Box<number>;
     /** The callback used for the {@link Slider#"variable"} */
     private readonly callback: () => void;
     /**
@@ -99,7 +101,7 @@ export class Slider extends Widget {
      */
     private dragBounds: Bounds = [0, 0, 0, 0];
 
-    constructor(variable: Variable<number> = new Variable(0), minValue = 0, maxValue = 1, properties?: Readonly<SliderProperties>) {
+    constructor(variable: Box<number> = new Variable(0), minValue = 0, maxValue = 1, properties?: Readonly<SliderProperties>) {
         // Sliders need a clear background, have no children and don't propagate
         // events
         super(properties);

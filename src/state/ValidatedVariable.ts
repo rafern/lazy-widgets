@@ -1,15 +1,7 @@
-import { Variable } from "./Variable.js";
-/**
- * An input validator. A function which checks whether an input is valid and
- * transforms that input.
- *
- * @returns Returns a tuple containing whether the input is valid and the transformed input. Note that if the input is not valid, then the transformed input will be a bogus value.
- * @typeParam U - The type of the input.
- * @typeParam V - The type of the output (the transformed input).
- *
- * @category State Management
- */
-export type Validator<U, V> = (value: U) => [true, V] | [false, unknown];
+import { type ValidatedBox } from './ValidatedBox.js';
+import { type ValidationResult } from './ValidationResult.js';
+import { type Validator } from './Validator.js';
+import { Variable } from './Variable.js';
 
 /**
  * Similar to {@link Variable}, except the variable's value can optionally be
@@ -20,7 +12,7 @@ export type Validator<U, V> = (value: U) => [true, V] | [false, unknown];
  *
  * @category State Management
  */
-export class ValidatedVariable<V, T = V> extends Variable<V> {
+export class ValidatedVariable<V, T = V> extends Variable<V> implements ValidatedBox<V, T> {
     /** See {@link ValidatedVariable#valid}. For internal use only */
     private _valid = true;
     /** See {@link ValidatedVariable#validValue}. For internal use only */
@@ -36,18 +28,13 @@ export class ValidatedVariable<V, T = V> extends Variable<V> {
         super(initialValue);
 
         this.validator = validator;
-        this.validate(initialValue);
+        this.validateAndSet(initialValue);
     }
 
-    /** If true, then the current value is valid. */
     get valid() {
         return this._valid;
     }
 
-    /**
-     * The last valid value. If there was never a valid value, `undefined` is
-     * returned.
-     */
     get validValue(): T {
         return this._validValue as T;
     }
@@ -57,21 +44,28 @@ export class ValidatedVariable<V, T = V> extends Variable<V> {
             return false;
         }
 
-        this.validate(value);
+        this.validateAndSet(value);
 
         return super.setValue(value, group);
     }
 
-    private validate(value: V): void {
-        if(this.validator) {
-            const [valid, validValueCandidate] = this.validator(value);
-            // XXX _valid is set in two stages so the type system knows whether
-            // valid is true or false
-            this._valid = valid;
+    validate(value: V): ValidationResult<T> {
+        if (this.validator) {
+            return this.validator(value);
+        } else {
+            // XXX we have to assume that the user provided the right type
+            return [true, value as unknown as T];
+        }
+    }
 
-            if(valid) {
-                this._validValue = validValueCandidate;
-            }
+    private validateAndSet(value: V): void {
+        const [valid, validValueCandidate] = this.validate(value);
+        // XXX _valid is set in two stages so the type system knows whether
+        // valid is true or false
+        this._valid = valid;
+
+        if(valid) {
+            this._validValue = validValueCandidate;
         }
     }
 }

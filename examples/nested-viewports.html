@@ -5,7 +5,7 @@
             import {
                 DOMRoot, Label, Margin, Column, Row, TextButton, ScrollbarMode,
                 DOMKeyboardDriver, DOMPointerDriver, FlexAlignment, TextInput,
-                ScrollableViewportWidget, Alignment, ValidatedVariable,
+                ScrollableViewportWidget, Alignment, Variable,
                 AxisCoupling, Background
             } from '../dist/index.js';
 
@@ -22,7 +22,7 @@
                                     new Margin(
                                         new Column([
                                             label,
-                                            new TextInput(new ValidatedVariable('').watch(variable => {
+                                            new TextInput(new Variable('').watch(variable => {
                                                 label.text = `Text input: ${variable.value}`;
                                             })),
                                             new Row([

@@ -3,11 +3,12 @@ import { LiveLabel } from './LiveLabel.js';
 import { Checkbox } from './Checkbox.js';
 import { Row } from './Row.js';
 import { filterIDFromProperties } from '../helpers/filterIDFromProperties.js';
-import type { Variable } from '../state/Variable.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
 import type { LabelProperties } from './BaseLabel.js';
 import type { Observable } from '../state/Observable.js';
+import { type Box } from '../state/Box.js';
+
 /**
  * A {@link Row} with a {@link LiveLabel}, {@link Spacing} and a
  * {@link Checkbox}.
@@ -26,13 +27,13 @@ export class LiveLabelledCheckbox extends Row {
             {
                 mode: 'value',
                 name: 'variable',
-                validator: 'variable',
+                validator: 'box',
                 optional: true
             }
         ]
     };
 
-    constructor(textSource: Observable<string>, variable?: Variable<boolean>, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
+    constructor(textSource: Observable<string>, variable?: Box<boolean>, properties?: Readonly<LabelProperties & SpacingProperties & ClickableWidgetProperties>) {
         const propertiesNoID = filterIDFromProperties(properties);
 
         super([

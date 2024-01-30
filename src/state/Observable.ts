@@ -1,4 +1,5 @@
 import type { ObservableCallback } from './ObservableCallback.js';
+
 /**
  * An object containing a value which can be efficiently watched for changes.
  *

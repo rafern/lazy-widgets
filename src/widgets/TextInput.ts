@@ -1,5 +1,4 @@
 import { layoutField, damageArrayField, watchField } from '../decorators/FlagFields.js';
-import { ValidatedVariable } from '../state/ValidatedVariable.js';
 import { PointerReleaseEvent } from '../events/PointerReleaseEvent.js';
 import { TextPasteEvent } from '../events/TextPasteEvent.js';
 import { PointerEvent } from '../events/PointerEvent.js';
@@ -16,11 +15,15 @@ import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
 import { TricklingEvent } from '../events/TricklingEvent.js';
 import { FocusEvent } from '../events/FocusEvent.js';
 import { BlurEvent } from '../events/BlurEvent.js';
-import type { Viewport } from '../core/Viewport.js';
-import type { Bounds } from '../helpers/Bounds.js';
-import type { Rect } from '../helpers/Rect.js';
-import type { Root } from '../core/Root.js';
-import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { type Viewport } from '../core/Viewport.js';
+import { type Bounds } from '../helpers/Bounds.js';
+import { type Rect } from '../helpers/Rect.js';
+import { type Root } from '../core/Root.js';
+import { type WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { type Box } from '../state/Box.js';
+import { type ValidatedBox } from '../state/ValidatedBox.js';
+import { Variable } from '../state/Variable.js';
+
 /**
  * Optional TextInput constructor properties.
  *
@@ -58,7 +61,7 @@ export class TextInput extends Widget {
             {
                 mode: 'value',
                 name: 'variable',
-                validator: 'validated-variable',
+                validator: 'box',
                 optional: true
             }
         ]
@@ -148,8 +151,11 @@ export class TextInput extends Widget {
      * after the layout is finalized?
      */
     private needsAutoScroll = false;
-    /** The helper for keeping track of the checkbox value */
-    readonly variable: ValidatedVariable<string, unknown>;
+    /**
+     * The helper for keeping track of the text value. If it's not a validated
+     * box, then it will be assumed to always be valid.
+     */
+    readonly variable: ValidatedBox<string, unknown> | Box<string>;
     /** The callback used for the {@link TextInput#"variable"} */
     private readonly callback: () => void;
     /**
@@ -166,7 +172,7 @@ export class TextInput extends Widget {
     @watchField(TextInput.prototype.markDirtyCaret)
     tabModeEnabled = false;
 
-    constructor(variable: ValidatedVariable<string, unknown> = new ValidatedVariable(''), properties?: Readonly<TextInputProperties>) {
+    constructor(variable: ValidatedBox<string, unknown> | Box<string> = new Variable(''), properties?: Readonly<TextInputProperties>) {
         // TextInputs clear their own background, have no children and don't
         // propagate events
         super(properties);
@@ -1147,7 +1153,8 @@ export class TextInput extends Widget {
         // Paint current text value
         let fillStyle;
         if(this._editingEnabled) {
-            if(this.variable.valid) {
+            const valid = (this.variable as ValidatedBox<string, unknown> | (Box<string> & { valid: undefined })).valid;
+            if(valid || valid === undefined) {
                 fillStyle = this.inputTextFill;
             } else {
                 fillStyle = this.inputTextFillInvalid;

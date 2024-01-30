@@ -7,7 +7,7 @@
                 DOMKeyboardDriver, DOMPointerDriver, Slider, FlexAlignment,
                 ScrollableViewportWidget, ScrollbarMode, LabelledCheckbox,
                 ArtificialConstraint, Container, Alignment, ThemeScope, Theme,
-                ValidatedVariable, Variable, AxisCoupling, LabelledRadioButton,
+                Variable, Variable, AxisCoupling, LabelledRadioButton,
                 CanvasViewport, Background
             } from '../dist/index.js';
 
@@ -22,7 +22,7 @@
                         new Margin(
                             new Column([
                                 label,
-                                new TextInput(new ValidatedVariable('').watch(variable => {
+                                new TextInput(new Variable('').watch(variable => {
                                     label.text = `Text input: ${variable.value}`;
                                 })),
                                 new Row([

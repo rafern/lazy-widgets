@@ -1,4 +1,5 @@
 import type { Observable } from './Observable.js';
+
 /**
  * A callback used for watching changes in a value of an {@link Observable}.
  *

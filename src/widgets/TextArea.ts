@@ -1,9 +1,11 @@
-import { ScrollableViewportWidget, ScrollableViewportWidgetProperties, ScrollbarMode } from "./ScrollableViewportWidget.js";
-import { TextInput, TextInputProperties } from "./TextInput.js";
-import { AxisCoupling } from "../core/AxisCoupling.js";
-import { filterIDFromProperties } from "../helpers/filterIDFromProperties.js";
-import type { ValidatedVariable } from "../state/ValidatedVariable.js";
-import type { WidgetAutoXML } from "../xml/WidgetAutoXML.js";
+import { ScrollableViewportWidget, ScrollableViewportWidgetProperties, ScrollbarMode } from './ScrollableViewportWidget.js';
+import { TextInput, TextInputProperties } from './TextInput.js';
+import { AxisCoupling } from '../core/AxisCoupling.js';
+import { filterIDFromProperties } from '../helpers/filterIDFromProperties.js';
+import { type WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { type Box } from '../state/Box.js';
+import { type ValidatedBox } from '../state/ValidatedBox.js';
+
 /**
  * A {@link ScrollableViewportWidget} with a {@link TextInput}. Meant to be used
  * as an analogue to the HTML textarea. Allows tab typing by default.
@@ -24,12 +26,13 @@ export class TextArea extends ScrollableViewportWidget<TextInput> {
             {
                 mode: 'value',
                 name: 'variable',
-                validator: 'variable'
+                validator: 'box',
+                optional: true,
             }
         ]
     };
 
-    constructor(variable: ValidatedVariable<string, unknown>, properties?: Readonly<ScrollableViewportWidgetProperties & TextInputProperties>) {
+    constructor(variable?: ValidatedBox<string, unknown> | Box<string>, properties?: Readonly<ScrollableViewportWidgetProperties & TextInputProperties>) {
         // default properties
         properties = {
             widthCoupling: AxisCoupling.Uni,

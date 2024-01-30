@@ -5,16 +5,17 @@ import { paintCircle } from '../helpers/paintCircle.js';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
 import { FocusEvent } from '../events/FocusEvent.js';
 import { BlurEvent } from '../events/BlurEvent.js';
-import type { Variable } from '../state/Variable.js';
+import type { Box } from '../state/Box.js';
 import type { Viewport } from '../core/Viewport.js';
 import type { TricklingEvent } from '../events/TricklingEvent.js';
 import type { Root } from '../core/Root.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
+
 /**
  * A radio button widget; used for selecting one of many options. Uses a shared
- * {@link Variable} instance and expects the creation of multiple RadioButton
+ * {@link Box} instance and expects the creation of multiple RadioButton
  * instances.
  *
  * @typeParam V - The type stored in the {@link RadioButton#"variable"}; when a radio button is clicked, the value inside the variable has this type.
@@ -28,7 +29,7 @@ export class RadioButton<V> extends Widget {
             {
                 mode: 'value',
                 name: 'variable',
-                validator: 'variable'
+                validator: 'box'
             },
             {
                 mode: 'value',
@@ -45,8 +46,8 @@ export class RadioButton<V> extends Widget {
     private actualLength = 0;
     /** The helper used for handling pointer clicks and enter presses */
     protected clickHelper: ButtonClickHelper;
-    /** The shared {@link Variable} where the value is set */
-    readonly variable: Variable<V>;
+    /** The shared {@link Box} where the value is set */
+    readonly variable: Box<V>;
     /**
      * The value that will be used when the {@link RadioButton#"variable"} is
      * set
@@ -63,7 +64,7 @@ export class RadioButton<V> extends Widget {
      * @param variable - The shared variable that radio buttons will save the value to when selected.
      * @param value - The value that will be used to set the {@link RadioButton#"variable"} when the radio button is clicked
      */
-    constructor(variable: Variable<V>, value: V, properties?: Readonly<ClickableWidgetProperties>) {
+    constructor(variable: Box<V>, value: V, properties?: Readonly<ClickableWidgetProperties>) {
         // Radio buttons need a clear background, have no children and don't
         // propagate events
         super(properties);

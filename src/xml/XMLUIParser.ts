@@ -3,6 +3,7 @@ import * as widgets from '../widgets/concrete-widgets.js';
 import { WidgetAutoXML } from './WidgetAutoXML.js';
 import { validateArray } from './validateArray.js';
 import { validateBoolean } from './validateBoolean.js';
+import { validateBox } from './validateBox.js';
 import { validateFunction } from './validateFunction.js';
 import { validateImageSource } from './validateImageSource.js';
 import { validateKeyboardDriver } from './validateKeyboardDriver.js';
@@ -15,6 +16,7 @@ import { validateObject } from './validateObject.js';
 import { validateObservable } from './validateObservable.js';
 import { validateString } from './validateString.js';
 import { validateTheme } from './validateTheme.js';
+import { validateValidatedBox } from './validateValidatedBox.js';
 import { validateValidatedVariable } from './validateValidatedVariable.js';
 import { validateVariable } from './validateVariable.js';
 import { validateWidget } from './validateWidget.js';
@@ -312,6 +314,8 @@ export class XMLUIParser extends BaseXMLUIParser {
         this.registerValidator('validated-variable', validateValidatedVariable);
         this.registerValidator('variable', validateVariable);
         this.registerValidator('widget', validateWidget);
+        this.registerValidator('box', validateBox);
+        this.registerValidator('validated-box', validateValidatedBox);
 
         // register factories for default widgets
         for (const ctor of Object.values(widgets)) {

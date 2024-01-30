@@ -5,7 +5,7 @@
             import {
                 DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
                 DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
-                ValidatedVariable, Background, LayeredContainer, TextTooltip
+                Variable, Background, LayeredContainer, TextTooltip
             } from '../dist/index.js';
 
             // Create the root
@@ -16,7 +16,7 @@
                             new Column([
                                 new Label('Hover your cursor over the input to show a tooltip:'),
                                 new TextTooltip(
-                                    new TextInput(new ValidatedVariable('Hover over this!')),
+                                    new TextInput(new Variable('Hover over this!')),
                                     'I am a tooltip!'
                                 )
                             ])
