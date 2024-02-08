@@ -13,6 +13,17 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
 import { type Box } from '../state/Box.js';
 
+// HACK this prevents environments like Wonderland Engine from crashing when
+//      bundling
+let tickPath: Path2D | null = null;
+function getTickPath() {
+    if (!tickPath) {
+        tickPath = new Path2D('M 0.1768 0.3339 L 0 0.5106 L 0.3846 0.8952 L 1 0.2798 L 0.8249 0.1048 L 0.3863 0.5434 z');
+    }
+
+    return tickPath;
+}
+
 /**
  * A checkbox widget; can be ticked or unticked.
  *
@@ -174,47 +185,32 @@ export class Checkbox extends Widget {
         const useGlow = this.clickHelper.clickState === ClickState.Hover ||
                         this.clickHelper.clickState === ClickState.Hold;
 
-        // Draw unchecked part of checkbox
+        // Draw background
         const ctx = this.viewport.context;
-        if(useGlow) {
-            ctx.fillStyle = this.backgroundGlowFill;
-        } else {
-            ctx.fillStyle = this.backgroundFill;
-        }
-
         const checkboxX = this.offsetX + this.x;
         const checkboxY = this.offsetY + this.y;
+        ctx.fillStyle = useGlow ? this.backgroundGlowFill : this.backgroundFill;
         ctx.fillRect(
             checkboxX, checkboxY, this.actualLength, this.actualLength,
         );
 
-        // Draw checked part of checkbox
+        // Draw tick with filled square
         if(this.checked) {
-            if(useGlow) {
-                ctx.fillStyle = this.accentFill;
-            } else {
-                ctx.fillStyle = this.primaryFill;
-            }
-
             const innerPadding = this.checkboxInnerPadding;
             const innerLength = this.actualLength - innerPadding * 2;
 
-            // Fall back to filling entire checkbox if there isn't enough space
-            // for padding
-            if(innerLength <= 0) {
-                ctx.fillRect(
-                    checkboxX,
-                    checkboxY,
-                    this.actualLength,
-                    this.actualLength,
-                );
-            } else {
-                ctx.fillRect(
-                    checkboxX + innerPadding,
-                    checkboxY + innerPadding,
-                    innerLength,
-                    innerLength,
-                );
+            if(innerLength > 0) {
+                ctx.fillStyle = useGlow ? this.accentFill : this.primaryFill;
+                const cox = checkboxX + innerPadding;
+                const coy = checkboxY + innerPadding;
+                ctx.fillRect(cox, coy, innerLength, innerLength);
+
+                ctx.save();
+                ctx.fillStyle = useGlow ? this.backgroundGlowFill : this.backgroundFill;
+                ctx.translate(cox, coy);
+                ctx.scale(innerLength, innerLength);
+                ctx.fill(getTickPath());
+                ctx.restore();
             }
         }
     }
