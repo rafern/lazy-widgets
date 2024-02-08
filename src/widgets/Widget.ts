@@ -952,6 +952,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         this._layoutDirty = true;
 
         if(this.attached) {
+            this.unsafeMarkAsDirty([this.x, this.y, this.width, this.height]);
             (this._root as Root).dropFoci(this);
             (this._root as Root).clearPointerStylesFromWidget(this);
         }
@@ -976,19 +977,12 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     }
 
     /**
-     * Mark a part of this widget as dirty. The dirty rectangle will be
-     * propagated via ascendant widgets until it reaches a CanvasViewport.
+     * Similar to {@link Widget#markAsDirty}, but does not check whether the
+     * widget is active. For internal use only.
      *
-     * If the widget is not active, then this method call is ignored.
-     *
-     * Must not be overridden; you probably want to override
-     * {@link Widget#propagateDirtyRect} instead.
+     * markAsDirty actually calls this method; the other method is only a guard.
      */
-    protected markAsDirty(rect: Rect): void {
-        if (!this._active) {
-            return;
-        }
-
+    private unsafeMarkAsDirty(rect: Rect): void {
         if (this._parent) {
             this._parent.propagateDirtyRect(rect);
         } else if (this._viewport) {
@@ -999,7 +993,22 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     }
 
     /**
-     * Mark the entire widget as dirty. Conveniance method that calls
+     * Mark a part of this widget as dirty. The dirty rectangle will be
+     * propagated via ascendant widgets until it reaches a CanvasViewport.
+     *
+     * If the widget is not active, then this method call is ignored.
+     *
+     * Must not be overridden; you probably want to override
+     * {@link Widget#propagateDirtyRect} instead.
+     */
+    protected markAsDirty(rect: Rect): void {
+        if (this._active) {
+            this.unsafeMarkAsDirty(rect);
+        }
+    }
+
+    /**
+     * Mark the entire widget as dirty. Convenience method that calls
      * {@link Widget#markAsDirty}.
      */
     protected markWholeAsDirty(): void {
