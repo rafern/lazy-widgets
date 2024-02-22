@@ -4,6 +4,11 @@ import { Msg } from './Strings.js';
 import type { Widget } from '../widgets/Widget.js';
 
 /**
+ * A function that controls the size of the DOM element of a UI root.
+ */
+export type DOMSizeController = (domRoot: DOMRoot, effectiveScale: [xScale: number, yScale: number], dimensions: [width: number, height: number], preferredSize: [width: number, height: number]) => [width: number, height: number];
+
+/**
  * Optional DOMRoot constructor properties.
  *
  * @category Core
@@ -15,6 +20,8 @@ export interface DOMRootProperties extends RootProperties {
      * is clicked. Disabled by default
      */
     enablePasteEvents?: boolean;
+    /** See {@link DOMRoot#domSizeController}. */
+    domSizeController?: DOMSizeController;
 }
 
 /**
@@ -31,6 +38,11 @@ export class DOMRoot extends Root {
     readonly domElem: HTMLCanvasElement;
     /** This root's canvas element's context. Used for painting */
     private domCanvasContext: CanvasRenderingContext2D;
+    /**
+     * A function that controls the size of the DOM element of this UI root.
+     * Optional.
+     */
+    private domSizeController?: DOMSizeController;
 
     constructor(child: Widget, properties?: Readonly<DOMRootProperties>) {
         super(child, properties);
@@ -68,6 +80,8 @@ export class DOMRoot extends Root {
             this.domElem.style.caretColor = 'transparent';
             this.domElem.style.cursor = 'default';
         }
+
+        this.domSizeController = properties?.domSizeController;
     }
 
     /**
@@ -90,7 +104,7 @@ export class DOMRoot extends Root {
         this.preLayoutUpdate();
         if(this.resolveLayout()) {
             this.updateDOMDims();
-            this.autoScale();
+            this.rescaleDOMElement();
         }
         this.postLayoutUpdate();
         if(this.paint()) {
@@ -122,13 +136,25 @@ export class DOMRoot extends Root {
     }
 
     /**
-     * Counter Root viewport scaling with an opposite CSS scale (via width and
-     * height, not CSS transforms).
+     * Re-scale the DOM element of this UI root. You only need to manually call
+     * this if you use a {@link DOMRoot#domSizeController} and an external
+     * factor would affect the result of your custom size.
+     *
+     * Counters Root viewport scaling with an opposite CSS scale (via width and
+     * height, not CSS transforms), and applies size given by domSizeController,
+     * if any is supplied.
      */
-    private autoScale(): void {
+    rescaleDOMElement(): void {
         const [scaleX, scaleY] = this.effectiveScale;
-        this.domElem.style.width = (this.domElem.width / scaleX).toString() + 'px';
-        this.domElem.style.height = (this.domElem.height / scaleY).toString() + 'px';
+        let wantedWidth = this.domElem.width / scaleX;
+        let wantedHeight = this.domElem.height / scaleY;
+
+        if (this.domSizeController) {
+            [wantedWidth, wantedHeight] = this.domSizeController(this, [scaleX, scaleY], this.dimensions, [wantedWidth, wantedHeight]);
+        }
+
+        this.domElem.style.width = (wantedWidth).toString() + 'px';
+        this.domElem.style.height = (wantedHeight).toString() + 'px';
     }
 
     override destroy(): void {
