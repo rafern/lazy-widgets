@@ -14,7 +14,7 @@ import type { Viewport } from './Viewport.js';
 export abstract class BaseViewport implements Viewport {
     readonly relativeCoordinates: boolean;
     readonly child: Widget;
-    abstract readonly context: CanvasRenderingContext2D;
+    abstract readonly context: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
     @watchArrayField(BaseViewport.prototype.relayoutAndReposition)
     constraints: LayoutConstraints;
     @watchArrayField(BaseViewport.prototype.relayoutAndReposition)

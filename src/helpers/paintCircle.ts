@@ -7,7 +7,7 @@ const TAU = Math.PI * 2;
  *
  * @category Helper
  */
-export function paintCircle(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number): void {
+export function paintCircle(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, x: number, y: number, radius: number): void {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, TAU);
     ctx.fill();

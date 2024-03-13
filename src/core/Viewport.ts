@@ -29,7 +29,7 @@ export interface Viewport {
      * {@link CanvasViewport}) will always use the same context, while others
      * (such as {@link ClippedViewport}) will occasionally change the context.
      */
-    readonly context: CanvasRenderingContext2D;
+    readonly context: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D;
     // TODO ^^^ remove readonly once typescript ~~stops being bad~~ introduces
     // getters in interfaces
     /**

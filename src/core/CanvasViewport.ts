@@ -20,10 +20,10 @@ import type { Rect } from '../helpers/Rect.js';
  * @category Core
  */
 export class CanvasViewport extends BaseViewport {
-    readonly context: CanvasRenderingContext2D;
+    readonly context: OffscreenCanvasRenderingContext2D;
 
     /** The internal canvas. Widgets are painted to this */
-    readonly canvas: HTMLCanvasElement;
+    readonly canvas: OffscreenCanvas;
     /** Current maximum canvas width. For internal use only. */
     private _maxCanvasWidth: number;
     /** Current maximum canvas height. For internal use only. */
@@ -92,10 +92,7 @@ export class CanvasViewport extends BaseViewport {
         this.preventAtlasBleeding = preventAtlasBleeding;
 
         // Create internal canvas
-        this.canvas = document.createElement('canvas');
-        this.canvas.width = startingWidth;
-        this.canvas.height = startingHeight;
-
+        this.canvas = new OffscreenCanvas(startingWidth, startingHeight);
         this._maxCanvasWidth = 16384;
         this._maxCanvasHeight = 16384;
 

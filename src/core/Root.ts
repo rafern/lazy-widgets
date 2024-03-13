@@ -360,7 +360,7 @@ export class Root implements WidgetEventEmitter {
      * The {@link Root#viewport}'s {@link CanvasViewport#canvas | canvas}. The
      * canvas must not be modified directly; consider it output-only.
      */
-    get canvas(): HTMLCanvasElement {
+    get canvas(): HTMLCanvasElement | OffscreenCanvas {
         return this.viewport.canvas;
     }
 

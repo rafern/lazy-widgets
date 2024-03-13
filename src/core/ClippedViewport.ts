@@ -10,7 +10,7 @@ import type { Widget } from "../widgets/Widget.js";
  * @category Core
  */
 export class ClippedViewport extends BaseViewport {
-    get context(): CanvasRenderingContext2D {
+    get context(): CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D {
         if(this.parent === null) {
             throw Msg.PARENTLESS_CLIPVP;
         }
