@@ -1118,14 +1118,19 @@ export class TextHelper {
         // Update line ranges if needed
         this.updateTextDims();
 
+        let referenceWidth = this.maxWidth;
+        if (!isFinite(referenceWidth)) {
+            referenceWidth = this.width;
+        }
+
         if(line < 0) {
             line = 0;
         } else if(line >= this._lineRanges.length) {
-            return this.maxWidth * ratio;
+            return referenceWidth * ratio;
         }
 
         const lineRange = this._lineRanges[line];
-        return (this.maxWidth - lineRange[lineRange.length - 1].right) * ratio;
+        return (referenceWidth - lineRange[lineRange.length - 1].right) * ratio;
     }
 
     /** The current text width. Re-measures text if neccessary. */
