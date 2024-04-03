@@ -1121,11 +1121,11 @@ export class TextHelper {
         if(line < 0) {
             line = 0;
         } else if(line >= this._lineRanges.length) {
-            return this.width * ratio;
+            return this.maxWidth * ratio;
         }
 
         const lineRange = this._lineRanges[line];
-        return (this.width - lineRange[lineRange.length - 1].right) * ratio;
+        return (this.maxWidth - lineRange[lineRange.length - 1].right) * ratio;
     }
 
     /** The current text width. Re-measures text if neccessary. */
