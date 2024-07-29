@@ -55,11 +55,21 @@ export class DOMPointerDriver extends PointerDriver {
      * can only be one mouse.
      */
     private mousePointerID: number;
+    // TODO allow multi-touch by tracking all pointerIds currently touching the
+    //      screen, and putting them into buckets
+    /**
+     * The pointer ID of touch input. Registered in constructor. This is needed
+     * due to each touch event having a new pointerId, which prevents the
+     * detection of double-clicks. This unfortunately also prevents the use of
+     * multi-touch input.
+     */
+    private touchPointerID: number;
 
     constructor() {
         super();
 
         this.mousePointerID = this.registerPointer(false);
+        this.touchPointerID = this.registerPointer(true);
     }
 
     /**
@@ -114,9 +124,10 @@ export class DOMPointerDriver extends PointerDriver {
         let pointerID = this.pointers.get(event.pointerId);
 
         if(pointerID === undefined) {
-            const isMouse = event.pointerType === 'mouse';
-            if(isMouse) {
+            if(event.pointerType === 'mouse') {
                 pointerID = this.mousePointerID;
+            } else if(event.pointerType === 'touch') {
+                pointerID = this.touchPointerID;
             } else {
                 pointerID = this.registerPointer(true);
             }
@@ -140,6 +151,11 @@ export class DOMPointerDriver extends PointerDriver {
                     event.buttons,
                     ...unpackModifiers(event),
                 ));
+
+                // HACK prevent virtual keyboard flashes when moving cursor
+                if (root.textInputHandler) {
+                    event.preventDefault();
+                }
             }
 
             domElem.addEventListener('pointermove', rootBind.pointerListen);
@@ -149,6 +165,17 @@ export class DOMPointerDriver extends PointerDriver {
 
         if(rootBind.pointerleaveListen === null) {
             rootBind.pointerleaveListen = (event: PointerEvent) => {
+                const inputHandler = root.currentTextInputHandler;
+                if (inputHandler) {
+                    const curFocus = document.activeElement;
+                    if (curFocus && (inputHandler.domElems as readonly Element[]).indexOf(curFocus) >= 0) {
+                        // HACK prevent VK from stealing focus of root,
+                        //      preventing double-clicks in TextInput widgets
+                        event.preventDefault();
+                        return;
+                    }
+                }
+
                 this.handleCapture(
                     event, this.leavePointer(root, this.getPointerID(event))
                 );
