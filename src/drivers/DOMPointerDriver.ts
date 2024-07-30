@@ -59,7 +59,7 @@ export class DOMPointerDriver extends PointerDriver {
     constructor() {
         super();
 
-        this.mousePointerID = this.registerPointer(true);
+        this.mousePointerID = this.registerPointer(false);
     }
 
     /**
