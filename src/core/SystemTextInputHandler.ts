@@ -4,11 +4,17 @@ const BLUR_DISMISS_TIMEOUT = 500;
 const EV_LISTEN_OPTS = { passive: true, capture: true };
 
 /**
- * The default implementation of {@link TextInputHandler}, for mobile devices.
+ * The default implementation of {@link TextInputHandler}, for devices that have
+ * a virtual keyboard (such as mobile devices).
+ *
+ * Can also be used in a WebXR session if the browser supports it, however, this
+ * is not recommended, as some devices such as the Oculus Quest 2 will ignore
+ * the initial value of the text input and the text selection, which leads to a
+ * bad user experience.
  *
  * @category Core
  */
-export class MobileTextInputHandler extends TextInputHandler {
+export class SystemTextInputHandler extends TextInputHandler {
     private textInputElem: HTMLInputElement;
     private dismissTimeout: number | null = null;
 

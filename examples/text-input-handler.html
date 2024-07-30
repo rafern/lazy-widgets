@@ -5,7 +5,7 @@
             import {
                 DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
                 DOMPointerDriver, Alignment, FlexAlignment, Variable,
-                MobileTextInputHandler, Background
+                SystemTextInputHandler, Background
             } from '../dist/index.js';
 
             // Create the root
@@ -34,7 +34,7 @@
                 )
             );
 
-            root.textInputHandler = MobileTextInputHandler;
+            root.textInputHandler = SystemTextInputHandler;
 
             // Create, bind DOM and register the pointer driver (note that no
             // keyboard driver was registered but you can still type text into
