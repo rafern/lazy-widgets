@@ -430,17 +430,17 @@ export class PointerDriver implements Driver {
 
         // If this is a pointer event and pointer is dragging, continue
         // doing dragging logic
-        if(event instanceof PointerEvent && state.dragLast !== null) {
+        if(state.dragLast !== null && event instanceof PointerEvent) {
             const [startX, startY] = state.dragLast;
             const capturedList = root.dispatchEvent(new PointerWheelEvent(
                 ...state.dragOrigin,
                 startX - event.x, startY - event.y, 0,
-                PointerWheelMode.Pixel, false, false, false, true, source
+                PointerWheelMode.Pixel, true, false, false, true, source
             ));
 
             let captured = false;
-            for (const [_event, eventCaptured] of capturedList) {
-                if (eventCaptured) {
+            for (const [capEvent, eventCaptured] of capturedList) {
+                if (eventCaptured && capEvent.isa(PointerWheelEvent)) {
                     captured = true;
                     break;
                 }
@@ -458,10 +458,15 @@ export class PointerDriver implements Driver {
 
         // Dispatch event. If nobody captures the event, dragToScroll is
         // enabled and this is a pointer press, then start dragging
-        if(root.dispatchEvent(event)) {
-            state.dragLast = null;
-            return true;
-        } else if(dragToScroll && event.isa(PointerPressEvent)) {
+        const capList = root.dispatchEvent(event);
+        for (const [_capturer, captured] of capList) {
+            if (captured) {
+                state.dragLast = null;
+                return true;
+            }
+        }
+
+        if(dragToScroll && event.isa(PointerPressEvent)) {
             state.dragLast = [event.x, event.y];
             state.dragOrigin[0] = event.x;
             state.dragOrigin[1] = event.y;

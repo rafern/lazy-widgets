@@ -756,7 +756,6 @@ export class TextInput extends Widget {
             // Stop dragging if the pointer leaves the text input, since it
             // won't receive pointer release events outside the widget
             this.dragging = false;
-            this.lastClick = 0;
             this.clearPointerStyle();
             return this;
         } else if(event.isa(PointerWheelEvent)) {
