@@ -20,7 +20,7 @@ export class IconButton extends Button<Icon> {
         ]
     };
 
-    constructor(image: HTMLImageElement, properties?: Readonly<IconProperties & ClickableWidgetProperties>) {
+    constructor(image: HTMLImageElement | HTMLVideoElement | string, properties?: Readonly<IconProperties & ClickableWidgetProperties>) {
         super(new Icon(image, filterIDFromProperties(properties)), properties);
     }
 }
