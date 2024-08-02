@@ -94,11 +94,10 @@ export class DOMRoot extends Root {
      * {@link Root#postLayoutUpdate} and {@link Root#paint}.
      */
     update(): void {
-        if(!this.enabled) {
-            this.domElem.style.display = 'none';
-            return;
-        } else {
+        if(this.enabled) {
             this.domElem.style.removeProperty('display');
+        } else {
+            return;
         }
 
         this.preLayoutUpdate();
@@ -155,6 +154,18 @@ export class DOMRoot extends Root {
 
         this.domElem.style.width = (wantedWidth).toString() + 'px';
         this.domElem.style.height = (wantedHeight).toString() + 'px';
+    }
+
+    override get enabled() {
+        return super.enabled;
+    }
+
+    override set enabled(enabled: boolean) {
+        if (!enabled && this._enabled !== enabled) {
+            this.domElem.style.display = 'none';
+        }
+
+        super.enabled = enabled;
     }
 
     override destroy(): void {
