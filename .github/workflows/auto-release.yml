@@ -89,6 +89,8 @@ jobs:
     needs: deploy-docs
     environment: Main
     runs-on: ubuntu-latest
+    permissions:
+      content: write
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
