@@ -301,8 +301,8 @@ export class Icon extends Widget {
         case IconFit.Contain:
         case IconFit.Cover:
         {
-            const widthRatio = this.idealWidth / wantedWidth;
-            const heightRatio = this.idealHeight / wantedHeight;
+            const widthRatio = wantedWidth === 0 ? 0 : this.idealWidth / wantedWidth;
+            const heightRatio = wantedHeight === 0 ? 0 : this.idealHeight / wantedHeight;
             let scale;
 
             if(this.fit === IconFit.Contain) {
