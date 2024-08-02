@@ -105,6 +105,12 @@ jobs:
           name: build
       - run: tar -xf build.tar.gz dist/
       - run: pnpm install --frozen-lockfile
+      - run: pnpm pack
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: lazy-widgets-[0-9]*.[0-9]*.[0-9]*.tgz
+          file_glob: true
       - run: pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
