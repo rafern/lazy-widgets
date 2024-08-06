@@ -4,8 +4,8 @@
         <script type='module'>
             import {
                 DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
-                DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
-                Variable, DefaultTextInputHandler, Background
+                DOMPointerDriver, Alignment, FlexAlignment, Variable,
+                SystemTextInputHandler, Background
             } from '../dist/index.js';
 
             // Create the root
@@ -15,6 +15,7 @@
                 new Background(
                     new Margin(
                         new Column([
+                            new Label("Make sure to use a mobile device in this demo, otherwise you won't see anything different"),
                             label,
                             new TextInput(new Variable('').watch(variable => {
                                 label.text = `Text input: ${variable.value}`;
@@ -33,9 +34,11 @@
                 )
             );
 
-            root.textInputHandler = DefaultTextInputHandler;
+            root.textInputHandler = SystemTextInputHandler;
 
-            // Create, bind DOM and register the pointer driver
+            // Create, bind DOM and register the pointer driver (note that no
+            // keyboard driver was registered but you can still type text into
+            // the TextInput widget)
             const pointerDriver = new DOMPointerDriver();
             pointerDriver.bindDOMElem(root, root.domElem);
             root.registerDriver(pointerDriver);

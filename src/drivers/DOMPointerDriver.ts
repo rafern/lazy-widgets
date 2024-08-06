@@ -84,7 +84,6 @@ export class DOMPointerDriver extends PointerDriver {
                 contextMenuListen: null,
             };
             this.domElems.set(root, rootBind);
-            domElem.style.touchAction = 'none';
         }
 
         if(root.enabled) {
@@ -114,8 +113,7 @@ export class DOMPointerDriver extends PointerDriver {
         let pointerID = this.pointers.get(event.pointerId);
 
         if(pointerID === undefined) {
-            const isMouse = event.pointerType === 'mouse';
-            if(isMouse) {
+            if(event.pointerType === 'mouse') {
                 pointerID = this.mousePointerID;
             } else {
                 pointerID = this.registerPointer(true);
@@ -134,12 +132,17 @@ export class DOMPointerDriver extends PointerDriver {
         const domElem = rootBind.domElem;
         if(rootBind.pointerListen === null) {
             rootBind.pointerListen = (event: PointerEvent) => {
-                this.handleCapture(event, this.movePointer(
+                this.handleCaptureWithTouchAction(event, domElem, this.movePointer(
                     root, this.getPointerID(event),
                     ...getPointerEventNormPos(event, domElem),
                     event.buttons,
                     ...unpackModifiers(event),
                 ));
+
+                // HACK prevent virtual keyboard flashes when moving cursor
+                if (root.textInputHandler) {
+                    event.preventDefault();
+                }
             }
 
             domElem.addEventListener('pointermove', rootBind.pointerListen);
@@ -149,6 +152,16 @@ export class DOMPointerDriver extends PointerDriver {
 
         if(rootBind.pointerleaveListen === null) {
             rootBind.pointerleaveListen = (event: PointerEvent) => {
+                const inputHandler = root.currentTextInputHandler;
+                if (inputHandler) {
+                    const curFocus = document.activeElement;
+                    if (curFocus && (inputHandler.domElems as readonly Element[]).indexOf(curFocus) >= 0) {
+                        // HACK prevent VK from stealing focus of root,
+                        //      preventing double-clicks in TextInput widgets
+                        event.preventDefault();
+                    }
+                }
+
                 this.handleCapture(
                     event, this.leavePointer(root, this.getPointerID(event))
                 );
@@ -242,7 +255,7 @@ export class DOMPointerDriver extends PointerDriver {
 
     /**
      * Handle the capture of a DOM event. If captured, then the event will be
-     * stopImmediatePropagation'ed.
+     * stopImmediatePropagation'ed, and preventDefault'ed if it's a wheel event.
      */
     private handleCapture(event: Event, captured: boolean) {
         if (captured) {
@@ -252,5 +265,15 @@ export class DOMPointerDriver extends PointerDriver {
                 event.preventDefault();
             }
         }
+    }
+
+    /**
+     * Similar to {@link DOMPointerDriver#handleCapture}, but also updates
+     * the DOM element's touchAction property to prevent scrolling if the event
+     * was captured.
+     */
+    private handleCaptureWithTouchAction(event: Event, domElem: HTMLElement, captured: boolean) {
+        this.handleCapture(event, captured);
+        domElem.style.touchAction = captured ? 'none' : 'auto';
     }
 }

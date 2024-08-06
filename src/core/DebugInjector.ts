@@ -425,7 +425,6 @@ export function injectDebugCode(): void {
                     : 'rgba(0, 255, 0, 0.5)';
                 ctx.fillRect(x, y - height, group.right - left, fullHeight);
                 textHelperAlternate.set(this, !alternate);
-                ctx.fillStyle = origFillStyle;
             } else {
                 let debugWidth = group.right - left;
                 ctx.fillStyle = debugWidth > 0 ? 'rgba(0, 0, 255, 0.5)'
@@ -438,6 +437,8 @@ export function injectDebugCode(): void {
 
                 ctx.fillRect(x, y - height, debugWidth, fullHeight);
             }
+
+            ctx.fillStyle = origFillStyle;
         }
 
         textHelperPaintGroupOrig.apply(this, [ctx, group, left, x, y]);

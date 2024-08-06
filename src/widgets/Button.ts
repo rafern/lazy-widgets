@@ -50,6 +50,11 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
         this.clickHelper.reset();
     }
 
+    protected override deactivate(): void {
+        super.deactivate();
+        this.clickHelper.reset();
+    }
+
     protected override handleEvent(event: WidgetEvent): Widget | null {
         if (event.propagation !== PropagationModel.Trickling) {
             if (event.isa(FocusEvent)) {

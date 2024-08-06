@@ -85,7 +85,10 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
     private startingScroll = 0;
     /** What was the normalised offset when starting drag? */
     private startingOffset = 0;
-    /** When was the last scroll attempt in milliseconds since Unix epoch? */
+    /**
+     * When was the last scroll attempt in milliseconds since Unix epoch? If 0,
+     * then there hasn't been a valid scroll recently.
+     */
     private lastScroll = 0;
     /** Was the horizontal scrollbar painted last frame? */
     private horizWasPainted = false;
@@ -322,8 +325,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
     /**
      * Handle a wheel scroll event. If scrolling fails due to being at the
      * limit, this returns true if the last scroll attempt happened less than
-     * 200 milliseconds ago. This behaviour is disabled if
-     * {@link PointerWheelEvent#fromDrag} is true.
+     * 200 milliseconds ago.
      *
      * @returns Returns true if this changed scroll was successful
      */
@@ -339,19 +341,24 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
 
         const success = newX !== oldX || newY !== oldY;
         const last = this.lastScroll;
-        const now = (new Date()).getTime();
-        this.lastScroll = now;
 
         if(success) {
+            this.lastScroll = (new Date()).getTime();
             return true;
         }
 
-        if(event.fromDrag) {
+        if (this.lastScroll === 0) {
             return false;
+        } else {
+            const now = (new Date()).getTime();
+            const elapsed = now - last;
+            if (elapsed < 200) {
+                this.lastScroll = now;
+                return true;
+            } else {
+                return false;
+            }
         }
-
-        const elapsed = now - last;
-        return elapsed < 200;
     }
 
     protected updateScrollLineHeight(): void {

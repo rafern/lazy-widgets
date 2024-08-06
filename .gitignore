@@ -5,3 +5,5 @@ lazy-widgets-*.tgz
 dist/
 docs/
 package-lock.json
+cert.pem
+key.pem

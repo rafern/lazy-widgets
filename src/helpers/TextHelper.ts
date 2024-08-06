@@ -3,7 +3,7 @@ import { multiFlagField } from '../decorators/FlagFields.js';
 import { FillStyle } from '../theme/FillStyle.js';
 import { DynMsg, Msg } from '../core/Strings.js';
 
-const WIDTH_OVERRIDING_CHARS = new Set(['\n', '\t']);
+const WIDTH_OVERRIDING_CHARS = new Set(['\n', '\t', ' ']);
 const ELLIPSIS = '...';
 
 /**
@@ -43,6 +43,9 @@ export interface BaseTextRenderGroup {
  * will therefore not be painted.
  *
  * Note that 0-width text render groups are valid and used for empty lines.
+ *
+ * Note also that, for optimisation reasons, text render groups will also be
+ * created for spaces. This maximises cache hits when calling measureTextDims.
  *
  * @category Helper
  */
@@ -215,6 +218,8 @@ export class TextHelper {
     private _lineSpacing = 0;
     /** The actual {@link TextHelper#tabWidth} in pixels. May be outdated */
     private _tabWidth = 0;
+    /** The width of a space in pixels. May be outdated */
+    private _spaceWidth = 0;
 
     /** Does the text need to be re-measured? */
     private measureDirty = true;
@@ -222,7 +227,7 @@ export class TextHelper {
     private maxWidthDirty = false;
     /** Does the line height or spacing need to be re-measured? */
     private lineHeightSpacingDirty = true;
-    /** Does the tab width need to be re-measured? */
+    /** Do the space and tab widths need to be re-measured? */
     private tabWidthDirty = true;
     /** Has the text (or properties associated with it) changed? */
     private _dirty = false;
@@ -397,6 +402,25 @@ export class TextHelper {
                 }
 
                 break;
+            } else if(this.text[groupStart] === ' ') {
+                // Make single group that contains all spaces
+                let groupEnd = groupStart + 1;
+                for (; groupEnd < end && this.text[groupEnd] === ' '; groupEnd++) {
+                    /* empty */
+                }
+
+                left += this.spaceWidth * (groupEnd - groupStart);
+
+                addedGroups.push({
+                    type: TextRenderGroupType.Range,
+                    rangeStart: groupStart,
+                    rangeEnd: groupEnd,
+                    right: left,
+                    overridesWidth: true,
+                    visible: false,
+                });
+
+                groupStart = groupEnd;
             } else {
                 // Find group end index; at next width-overriding character or
                 // at end
@@ -410,7 +434,12 @@ export class TextHelper {
                     nextTab = Infinity;
                 }
 
-                const groupEnd = Math.min(nextNewline, nextTab, end);
+                let nextSpace = this.text.indexOf(' ', groupStart + 1);
+                if(nextSpace === -1) {
+                    nextSpace = Infinity;
+                }
+
+                const groupEnd = Math.min(nextNewline, nextTab, nextSpace, end);
 
                 // Measure group
                 left = this.measureTextSlice(left, groupStart, groupEnd);
@@ -523,7 +552,8 @@ export class TextHelper {
         // Update tab width if needed
         if(this.tabWidthDirty) {
             this.tabWidthDirty = false;
-            this._tabWidth = measureTextDims(' ', this.font).width * this.tabWidth;
+            this._spaceWidth = measureTextDims(' ', this.font).width;
+            this._tabWidth = this._spaceWidth * this.tabWidth;
         }
 
         // Abort if measurement not needed
@@ -1088,14 +1118,19 @@ export class TextHelper {
         // Update line ranges if needed
         this.updateTextDims();
 
+        let referenceWidth = this.maxWidth;
+        if (!isFinite(referenceWidth)) {
+            referenceWidth = this.width;
+        }
+
         if(line < 0) {
             line = 0;
         } else if(line >= this._lineRanges.length) {
-            return this.width * ratio;
+            return referenceWidth * ratio;
         }
 
         const lineRange = this._lineRanges[line];
-        return (this.width - lineRange[lineRange.length - 1].right) * ratio;
+        return (referenceWidth - lineRange[lineRange.length - 1].right) * ratio;
     }
 
     /** The current text width. Re-measures text if neccessary. */
@@ -1148,6 +1183,12 @@ export class TextHelper {
     get actualTabWidth(): number {
         this.updateTextDims();
         return this._tabWidth;
+    }
+
+    /** Get the current space width in pixels. Re-measures if necessary */
+    get spaceWidth(): number {
+        this.updateTextDims();
+        return this._spaceWidth;
     }
 
     /**

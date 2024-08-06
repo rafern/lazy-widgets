@@ -23,6 +23,7 @@ import { type WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { type Box } from '../state/Box.js';
 import { type ValidatedBox } from '../state/ValidatedBox.js';
 import { Variable } from '../state/Variable.js';
+import { type TextInputHandler, TextInputHandlerEventType } from '../index.js';
 
 /**
  * Optional TextInput constructor properties.
@@ -171,6 +172,12 @@ export class TextInput extends Widget {
      */
     @watchField(TextInput.prototype.markDirtyCaret)
     tabModeEnabled = false;
+    /**
+     * Current text input handler. Make sure to call
+     * {@link TextInputHandler#dismiss} if you want to get rid of it; don't just
+     * set this to null.
+     */
+    protected currentTextInputHandler: TextInputHandler | null = null;
 
     constructor(variable: ValidatedBox<string, unknown> | Box<string> = new Variable(''), properties?: Readonly<TextInputProperties>) {
         // TextInputs clear their own background, have no children and don't
@@ -241,6 +248,14 @@ export class TextInput extends Widget {
         super.activate();
         this.blinkStart = 0;
         this.moveCursorTo(0, false);
+    }
+
+    protected override deactivate(): void {
+        if (this.currentTextInputHandler) {
+            this.currentTextInputHandler.dismiss();
+        }
+
+        super.deactivate();
     }
 
     protected override onThemeUpdated(property: string | null = null): void {
@@ -368,6 +383,10 @@ export class TextInput extends Widget {
             this.selectPos = this.cursorPos;
         }
 
+        if (this.currentTextInputHandler) {
+            this.currentTextInputHandler.select(this.selectPos, this.cursorPos);
+        }
+
         // Update cursor offset
         this.cursorOffsetDirty = true;
         this.markWholeAsDirty();
@@ -399,6 +418,10 @@ export class TextInput extends Widget {
         if(!select) {
             this.selectPos = this.cursorPos;
             this.selectOffset = this.cursorOffset;
+        }
+
+        if (this.currentTextInputHandler) {
+            this.currentTextInputHandler.select(this.selectPos, this.cursorPos);
         }
 
         // Start blinking cursor and mark component as dirty, to make sure that
@@ -642,6 +665,48 @@ export class TextInput extends Widget {
         return [startPos, pos];
     }
 
+    protected requestTextInput() {
+        const root = this.root;
+
+        if (!this.currentTextInputHandler) {
+            const handler = root.getTextInput((...eventData) => {
+                switch(eventData[0]) {
+                case TextInputHandlerEventType.Dismiss:
+                    if (handler === this.currentTextInputHandler) {
+                        this.currentTextInputHandler = null;
+                        this.root.dropFocus(FocusType.Keyboard, this);
+                    }
+                    break;
+                case TextInputHandlerEventType.Input: {
+                    const val = eventData[1];
+                    if (this.inputFilter !== null && !this.inputFilter(val)) {
+                        return;
+                    }
+                    this.variable.value = val;
+                    this.cursorOffsetDirty = true;
+                    // falls through
+                }
+                case TextInputHandlerEventType.MoveCursor: {
+                    const oldSelectPos = this.selectPos;
+                    const oldCursorPos = this.cursorPos;
+                    this.selectPos = eventData[eventData.length - 2] as number;
+                    this.cursorPos = eventData[eventData.length - 1] as number;
+                    if (this.selectPos !== oldSelectPos || this.cursorPos !== oldCursorPos) {
+                        this.cursorOffsetDirty = true;
+                        this.markWholeAsDirty();
+                    }
+                }
+                }
+            }, this.variable.value);
+            this.currentTextInputHandler = handler;
+        }
+
+        if (this.currentTextInputHandler) {
+            this.currentTextInputHandler.askInput(this.variable.value, this.selectPos, this.cursorPos);
+            root.requestFocus(FocusType.Keyboard, this);
+        }
+    }
+
     protected override handleEvent(baseEvent: WidgetEvent): Widget | null {
         if (baseEvent.propagation !== PropagationModel.Trickling) {
             if (baseEvent.isa(FocusEvent)) {
@@ -654,6 +719,11 @@ export class TextInput extends Widget {
                     this.cursorOffsetDirty = true;
                     this.tabModeEnabled = false;
                     this.autoScrollCaret();
+                    // FIXME this would break text input handlers, so it's
+                    //       disabled for now. this also means that tabbing into
+                    //       a widget will NOT open a text input handler, which
+                    //       is ok 90% of the time, but not perfect
+                    // this.requestTextInput();
                 }
 
                 return this;
@@ -662,6 +732,10 @@ export class TextInput extends Widget {
                 // pointer focus is lost
                 if(baseEvent.focusType === FocusType.Keyboard) {
                     this.blinkStart = 0;
+
+                    if (this.currentTextInputHandler) {
+                        this.currentTextInputHandler.dismiss();
+                    }
                 }
 
                 return this;
@@ -682,7 +756,6 @@ export class TextInput extends Widget {
             // Stop dragging if the pointer leaves the text input, since it
             // won't receive pointer release events outside the widget
             this.dragging = false;
-            this.lastClick = 0;
             this.clearPointerStyle();
             return this;
         } else if(event.isa(PointerWheelEvent)) {
@@ -773,6 +846,7 @@ export class TextInput extends Widget {
                     }
 
                     this.cursorOffsetDirty = true;
+                    this.requestTextInput();
                 }
 
                 // Request focus
@@ -781,19 +855,8 @@ export class TextInput extends Widget {
                 // Stop dragging
                 this.dragging = false;
 
-                // Get mobile-friendly text input if available
-                if(root.hasMobileTextInput) {
-                    root.getTextInput(this.text).then((newValue: string | null) => {
-                        if(newValue === null || (this.inputFilter !== null && !this.inputFilter(newValue))) {
-                            return;
-                        }
-
-                        if(this.text !== newValue) {
-                            this.text = newValue;
-                            this.moveCursorTo(newValue.length, false);
-                        }
-                    });
-                }
+                // Get text input handler if available
+                this.requestTextInput();
             }
 
             return this;

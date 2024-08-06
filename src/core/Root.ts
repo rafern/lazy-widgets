@@ -14,7 +14,7 @@ import { BlurEvent } from '../events/BlurEvent.js';
 import { PointerMoveEvent } from '../events/PointerMoveEvent.js';
 import type { PointerStyleHandler } from './PointerStyleHandler.js';
 import type { LayoutConstraints } from './LayoutConstraints.js';
-import type { TextInputHandler } from './TextInputHandler.js';
+import { TextInputHandlerEventType, type TextInputHandler, type TextInputHandlerEventData, type TextInputHandlerListener } from './TextInputHandler.js';
 import type { Widget } from '../widgets/Widget.js';
 import type { Driver } from './Driver.js';
 import type { CaptureList } from './CaptureList.js';
@@ -151,22 +151,15 @@ export class Root implements WidgetEventEmitter {
         [FocusType.Tab, null],
     ]);
     /**
-     * Handler for mobile-friendly text input. If not null, widgets that need
-     * text may call this to get a string.
+     * Text input handler constructor for environments where getting keyboard
+     * input is hard, such as mobile and WebXR. If not null, widgets that need
+     * text may call this to get strings and cursor positions as text is typed.
      *
-     * See {@link Root#hasMobileTextInput}, {@link Root#usingMobileTextInput}
-     * and {@link Root#getTextInput}
+     * See {@link Root#getTextInput}
      */
-    textInputHandler: TextInputHandler | null = null;
-    /**
-     * Is the mobile-friendly text input in use?
-     *
-     * For internal use only.
-     *
-     * See {@link Root#hasMobileTextInput}, {@link Root#usingMobileTextInput}
-     * and {@link Root#getTextInput}
-     */
-    protected _mobileTextInUse = false;
+    textInputHandler: (new (listener: TextInputHandlerListener) => TextInputHandler) | null = null;
+    /** See {@link Root#currentTextInputHandler}. For internal use only. */
+    private _currentTextInputHandler: TextInputHandler | null = null;
     /**
      * Has the warning for poorly captured TabSelectEvent events been issued?
      */
@@ -362,6 +355,15 @@ export class Root implements WidgetEventEmitter {
      */
     get canvas(): HTMLCanvasElement | OffscreenCanvas {
         return this.viewport.canvas;
+    }
+
+    /**
+     * The text input handler that is currently in use. `null` if none in use.
+     *
+     * See {@link Root#textInputHandler}.
+     */
+    get currentTextInputHandler(): TextInputHandler | null {
+        return this._currentTextInputHandler;
     }
 
     /**
@@ -844,50 +846,57 @@ export class Root implements WidgetEventEmitter {
     }
 
     /**
-     * Can {@link Root#getTextInput} be called? True if
-     * {@link Root#textInputHandler} is not null and
-     * {@link Root#usingMobileTextInput} is false.
+     * Handle initialization of a text input handler. You probably don't need to
+     * implement this method, unless you do something with the HTML elements
+     * returned by the input handler (such as listening to focus or blur
+     * events).
      */
-    get hasMobileTextInput(): boolean {
-        return this.textInputHandler !== null && !this._mobileTextInUse;
-    }
+    protected handleTextInputHandlerShow(_handler: TextInputHandler) {}
 
     /**
-     * Is {@link Root#getTextInput} in use?
-     *
-     * See {@link Root#_mobileTextInUse}.
+     * Dispose all resources associated with text input handler. You probably
+     * don't need to implement this method, unless you do something with the
+     * HTML elements returned by the input handler (such as listening to focus
+     * or blur events).
      */
-    get usingMobileTextInput(): boolean {
-        return this._mobileTextInUse;
-    }
+    protected handleTextInputHandlerDismiss(_handler: TextInputHandler) {}
 
     /**
-     * Get text input from the user. Used for mobile where keyboard events are
-     * hard to get.
+     * Instantiate a text input handler. Used for mobile or WebXR where keyboard
+     * events are hard to get. Note that this will replace the current handler
+     * if there is any.
      *
-     * @returns If this is already in use ({@link Root#usingMobileTextInput}), returns null, else, returns a string typed by the user.
+     * @returns If {@link Root#textInputHandler} is set, returns a new instance, otherwise, returns null.
      */
-    async getTextInput(initialInput = ''): Promise<string | null> {
-        // Only get if text input is currently available
-        // XXX even though this if statement is equivalent to
-        // hasMobileTextInput, typescript type inference is bad and only works
-        // if its done this way, else it thinks that textInputHandler may be
-        // null and throws an error when compiling
-        if(this.textInputHandler !== null && !this._mobileTextInUse) {
-            // Flag text input as in-use
-            this._mobileTextInUse = true;
-
-            // Get input from handler
-            const newInput = await this.textInputHandler(initialInput);
-
-            // Flag text input as not in-use
-            this._mobileTextInUse = false;
-
-            // Return new value
-            return newInput;
+    getTextInput(listener: TextInputHandlerListener, initialInput = '', selectStart?: number, selectEnd?: number): TextInputHandler | null {
+        if(this.textInputHandler === null) {
+            return null;
         }
 
-        return null;
+        if (selectStart === undefined) {
+            selectStart = initialInput.length;
+        }
+
+        if (selectEnd === undefined) {
+            selectEnd = selectStart;
+        }
+
+        if (this._currentTextInputHandler) {
+            this._currentTextInputHandler.dismiss();
+        }
+
+        const handler = new this.textInputHandler((...eventData: TextInputHandlerEventData) => {
+            if (eventData[0] === TextInputHandlerEventType.Dismiss) {
+                this.handleTextInputHandlerDismiss(handler);
+                this._currentTextInputHandler = null;
+            }
+
+            listener(...eventData);
+        });
+        this._currentTextInputHandler = handler;
+        this.handleTextInputHandlerShow(handler);
+
+        return this._currentTextInputHandler;
     }
 
     /**

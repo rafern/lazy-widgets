@@ -1,6 +1,6 @@
 {
   "name": "lazy-widgets",
-  "version": "0.8.8",
+  "version": "0.9.4",
   "description": "Typescript retained mode GUI for the HTML canvas API",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -9,12 +9,12 @@
   "exports": {
     ".": "./dist/index.js"
   },
-  "packageManager": "pnpm@8.6.9",
   "scripts": {
     "lint": "eslint src/ --ext .ts",
     "lint-fix": "eslint src/ --ext .ts --fix",
     "build": "tsc",
     "dev": "concurrently --kill-others 'http-server -c-1 .' 'tsc --watch --preserveWatchOutput'",
+    "dev-secure": "concurrently --kill-others 'http-server -S -c-1 .' 'tsc --watch --preserveWatchOutput'",
     "docs": "typedoc --options typedoc.json",
     "generate_theme": "node generate_theme.mjs",
     "test": "mocha",

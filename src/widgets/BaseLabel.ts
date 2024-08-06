@@ -83,6 +83,14 @@ export abstract class BaseLabel extends Widget {
         this.idealHeight = Math.max(Math.min(this.textHelper.height + this.textHelper.actualLineSpacing, maxHeight), minHeight);
     }
 
+    override finalizeBounds(): void {
+        super.finalizeBounds();
+        this.textHelper.maxWidth = this.width;
+        // XXX we don't want maxWidth to propagate damage; only if it actually
+        //     changes the text dimensions
+        this.textHelper.cleanDirtyFlag();
+    }
+
     protected override handlePainting(_dirtyRects: Array<Rect>): void {
         // Start clipping if text wrapping is disabled or the text vertically
         // overflows
