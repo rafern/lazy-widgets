@@ -337,6 +337,7 @@ export class Icon extends Widget {
     protected override handlePainting(_dirtyRects: Array<Rect>): void {
         // Abort if icon isn't ready yet
         if(this._isImage && !(this._media as HTMLImageElement).complete) {
+            this.lastSrc = null;
             return;
         }
 
