@@ -67,8 +67,8 @@
             "description": "The thickness of a {@link Slider}"
         },
         "bodyTextFont": {
-            "type": "font",
-            "default": "'1rem sans-serif'",
+            "type": "string",
+            "default": "'16px sans-serif'",
             "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font | font style} used for body text (most regular text)."
         },
         "bodyTextFill": {
@@ -112,8 +112,8 @@
             "description": "The background {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} used for input widgets like {@link TextInput} when text is selected."
         },
         "inputTextFont": {
-            "type": "font",
-            "default": "'1rem monospace'",
+            "type": "string",
+            "default": "'16px monospace'",
             "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font | font style} used for text in input widgets like {@link TextInput}."
         },
         "inputTextFill": {
