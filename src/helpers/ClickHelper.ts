@@ -88,6 +88,7 @@ export class ClickHelper extends GenericClickHelper {
      * @param bounds - A 4-tuple containing, respectively, left coordinate, right coordinate, top coordinate and bottom coordinate of clickable area, in pixels
      */
     handleClickEvent(event: TricklingEvent, root: Root, bounds: Bounds): void {
+        // TODO make bounds readonly
         if(event.isa(LeaveEvent)) {
             // Drop focus on this widget if this is a leave event
             root.dropFocus(FocusType.Pointer, this.widget);

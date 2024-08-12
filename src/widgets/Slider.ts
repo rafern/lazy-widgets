@@ -67,14 +67,14 @@ export class Slider extends Widget {
     };
 
     /** The slider's minimum value. */
-    private minValue: number;
+    protected readonly minValue: number;
     /** The slider's maximum value. */
-    private maxValue: number;
+    protected readonly maxValue: number;
     /**
      * The increments in which the slider changes value. If 0, there are no
      * fixed increments.
      */
-    private snapIncrement: number;
+    protected readonly snapIncrement: number;
     /** The helper for handling pointer clicks/drags */
     protected clickHelper: ClickHelper;
     /** Is this a vertical slider? */
@@ -89,7 +89,7 @@ export class Slider extends Widget {
     protected actualHeight = 0;
     /** Is the keyboard focusing this widget? */
     @damageField
-    private keyboardFocused = false;
+    protected keyboardFocused = false;
     /** The helper for keeping track of the slider value */
     readonly variable: Box<number>;
     /** The callback used for the {@link Slider#"variable"} */
@@ -99,7 +99,7 @@ export class Slider extends Widget {
      * glitchy behaviour when the slider is being used while the layout is
      * changing. For internal use only.
      */
-    private dragBounds: Bounds = [0, 0, 0, 0];
+    protected readonly dragBounds: Bounds = [0, 0, 0, 0];
 
     constructor(variable: Box<number> = new Variable(0), minValue = 0, maxValue = 1, properties?: Readonly<SliderProperties>) {
         // Sliders need a clear background, have no children and don't propagate
@@ -264,7 +264,10 @@ export class Slider extends Widget {
         if(event.isa(PointerPressEvent) || this.clickHelper.clickState !== ClickState.Hold) {
             const x = this.idealX + this.offsetX;
             const y = this.idealY + this.offsetY;
-            this.dragBounds = [ x, x + this.actualWidth, y, y + this.actualHeight ];
+            this.dragBounds[0] = x;
+            this.dragBounds[1] = x + this.actualWidth;
+            this.dragBounds[2] = y;
+            this.dragBounds[3] = y + this.actualHeight;
         }
 
         // Handle click event
