@@ -80,13 +80,13 @@ export class Slider extends Widget {
     /** Is this a vertical slider? */
     protected readonly vertical: boolean;
     /** The horizontal offset of the slider */
-    private offsetX = 0;
+    protected offsetX = 0;
     /** The vertical offset of the slider */
-    private offsetY = 0;
+    protected offsetY = 0;
     /** The actual width of the slider */
-    private actualWidth = 0;
+    protected actualWidth = 0;
     /** The actual height of the slider */
-    private actualHeight = 0;
+    protected actualHeight = 0;
     /** Is the keyboard focusing this widget? */
     @damageField
     private keyboardFocused = false;
