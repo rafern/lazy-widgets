@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, Icon, IconFit, Background,
+                ArtificialConstraint, Spacing, DOMPointerDriver, Slider,
+                Variable, LiveLabel, ObservableTransformer,
+            } from '../dist/index.js';
+
+            // Create the root
+            function makeDemoBox(canvasFill, flex, flexShrink) {
+                return new Background(new Spacing({ minHeight: 16 }), {
+                    canvasFill, flex, flexShrink,
+                });
+            }
+
+            const HEIGHT_LIMIT = 512;
+            const minHeight = new Variable(0);
+            const maxHeight = new Variable(HEIGHT_LIMIT);
+
+            const artificialConstraints = new ArtificialConstraint(new Column([
+                makeDemoBox('red', 0, 1),
+                makeDemoBox('green', 2, 0),
+                makeDemoBox('blue', 1, 2),
+                makeDemoBox('red', 0, 1),
+                makeDemoBox('green', 2, 0),
+                makeDemoBox('blue', 1, 2),
+            ]), [0, Infinity, minHeight.value, maxHeight.value]);
+
+            function onConstraintsChanged() {
+                artificialConstraints.constraints = [0, Infinity, minHeight.value, maxHeight.value];
+            }
+
+            minHeight.watch(onConstraintsChanged);
+            maxHeight.watch(onConstraintsChanged);
+
+            const root = new DOMRoot(
+                new Background(
+                    new Margin(
+                        new Column([
+                            new Label('Legend:'),
+                            new Margin(new Column([
+                                new Label('Red: flexShrink=1'),
+                                new Label('Green: flex=2'),
+                                new Label('Blue: flex=1, flexShrink=2'),
+                            ]), {
+                                containerPadding: {
+                                    left: 16, right: 16, top: 0, bottom: 0,
+                                },
+                            }),
+                            new LiveLabel(new ObservableTransformer(
+                                [minHeight],
+                                () => `Minimum height (${minHeight.value.toFixed(2)}px):`,
+                            )),
+                            new Slider(minHeight, 0, HEIGHT_LIMIT),
+                            new LiveLabel(new ObservableTransformer(
+                                [maxHeight],
+                                () => `Maximum height (${maxHeight.value.toFixed(2)}px):`,
+                            )),
+                            new Slider(maxHeight, 0, HEIGHT_LIMIT),
+                            new Margin(new Background(artificialConstraints, {
+                                canvasFill: 'white',
+                            })),
+                        ])
+                    )
+                )
+            );
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

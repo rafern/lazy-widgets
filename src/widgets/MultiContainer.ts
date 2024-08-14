@@ -118,8 +118,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
         // Resolve children's layout with loose constraints along the main axis
         // to get their wanted dimensions and calculate total flex ratio
-        let totalFlex = 0, crossLength = 0, minCrossAxis = 0;
-        let maxLength = this.vertical ? maxHeight : maxWidth;
+        let totalFlex = 0, totalFlexShrink = 0, crossLength = 0, minCrossAxis = 0;
 
         const alignment = this.multiContainerAlignment;
         if(alignment.cross === Alignment.Stretch) {
@@ -130,12 +129,21 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         }
 
         this.enabledChildCount = 0;
+        const spacing = this.multiContainerSpacing;
+        let usedSpace = 0;
+        let usedUnshrinkableSpace = 0;
+        let usedShrinkableScaledSpace = 0;
         for(const child of this._children) {
             // Resolve dimensions of disabled children with zero-width
             // constraints just so layout dirty flag is cleared
             if(!child.enabled) {
                 child.resolveDimensions(0, 0, 0, 0);
                 continue;
+            }
+
+            if (this.enabledChildCount !== 0) {
+                usedSpace += spacing;
+                usedUnshrinkableSpace += spacing;
             }
 
             this.enabledChildCount++;
@@ -148,7 +156,16 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             const [childWidth, childHeight] = child.idealDimensions;
 
+            const childLength = this.vertical ? child.idealDimensions[1] : child.idealDimensions[0];
+            usedSpace += childLength;
+            if (child.flexShrink === 0) {
+                usedUnshrinkableSpace += childLength;
+            } else {
+                usedShrinkableScaledSpace += childLength * child.flexShrink;
+            }
+
             totalFlex += child.flex;
+            totalFlexShrink += child.flexShrink;
             crossLength = Math.max(this.vertical ? childWidth : childHeight, crossLength);
         }
 
@@ -158,35 +175,28 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             crossLength = minCrossLength;
         }
 
-        // Get used space
-        const spacing = this.multiContainerSpacing;
-        let usedSpace = Math.max(this.enabledChildCount - 1, 0) * spacing;
-        for(const child of this._children) {
-            // Ignore disabled children
-            if(!child.enabled) {
-                continue;
-            }
-
-            usedSpace += this.vertical ? child.idealDimensions[1] : child.idealDimensions[0];
-        }
-
         // If we haven't reached the minimum length, treat it as the maximum
         // length so that the empty space needed to fit the required minimum
         // length is distributed properly
+        let targetLength = usedSpace;
         const minLength = this.vertical ? minHeight : minWidth;
+        const maxLength = this.vertical ? maxHeight : maxWidth;
         if (usedSpace < minLength) {
-            maxLength = minLength;
+            targetLength = minLength;
+        }
+        if (usedSpace > maxLength) {
+            targetLength = maxLength;
         }
 
         // Don't do flexbox calculations if free space is infinite
         // (unconstrained main axis) or if there isn't any free space.
-        const freeSpace = maxLength - usedSpace;
-        if(freeSpace === Infinity || freeSpace <= 0) {
+        const freeSpace = targetLength - usedSpace;
+        if(freeSpace === Infinity || freeSpace === 0 || (freeSpace < 0 && totalFlexShrink === 0)) {
             if(this.vertical) {
                 this.idealWidth = crossLength;
                 this.idealHeight = Math.max(Math.min(usedSpace, maxHeight), minHeight);
             } else {
-                this.idealWidth = Math.min(usedSpace, maxWidth);
+                this.idealWidth = Math.max(Math.min(usedSpace, maxWidth), minWidth);
                 this.idealHeight = crossLength;
             }
 
@@ -196,7 +206,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             // Resolve children's layout, but now with strict constraints so
             // that they stretch properly and shrink children if neccessary (on
             // overflow)
-            let spaceLeft = maxLength;
+            let spaceLeft = targetLength;
             for(const child of this._children) {
                 // Ignore disabled children
                 if(!child.enabled) {
@@ -225,53 +235,248 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         // free space. Calculate used space after flexbox calculations.
         let usedSpaceAfter = 0;
         let freeSpacePerFlex = 0;
-        if(totalFlex > 0) {
-            freeSpacePerFlex = freeSpace / totalFlex;
+        if (freeSpace > 0) {
+            if(totalFlex > 0) {
+                freeSpacePerFlex = freeSpace / totalFlex;
+            }
+        } else if (freeSpace < 0) {
+            if(totalFlexShrink > 0) {
+                freeSpacePerFlex = -1;
+            }
         }
 
-        for(const child of this._children) {
-            // Ignore disabled children
-            if(!child.enabled) {
-                continue;
+        if (freeSpacePerFlex >= 0) {
+            // grow
+            let needsSpacing = false;
+            for(const child of this._children) {
+                // Ignore disabled children
+                if(!child.enabled) {
+                    continue;
+                }
+
+                // Add spacing to used space if this is not the first widget
+                if(needsSpacing) {
+                    usedSpaceAfter += spacing;
+                } else {
+                    needsSpacing = true;
+                }
+
+                const oldChildLength = this.vertical ? child.idealDimensions[1] : child.idealDimensions[0];
+                const wantedLength = freeSpacePerFlex * child.flex + oldChildLength;
+
+                if(this.vertical) {
+                    child.resolveDimensions(
+                        minCrossAxis, maxWidth,
+                        wantedLength, wantedLength,
+                    );
+                } else {
+                    child.resolveDimensions(
+                        wantedLength, wantedLength,
+                        minCrossAxis, maxHeight,
+                    );
+                }
+
+                usedSpaceAfter += this.vertical ? child.idealDimensions[1] : child.idealDimensions[0];
+            }
+        } else if (usedUnshrinkableSpace >= targetLength) {
+            // shrink... except there's no space. fall back to 0-sized
+            // shrinkable widgets
+            let needsSpacing = false;
+            for(const child of this._children) {
+                // Ignore disabled children
+                if(!child.enabled) {
+                    continue;
+                }
+
+                // Add spacing to used space if this is not the first widget
+                if(needsSpacing) {
+                    usedSpaceAfter += spacing;
+                } else {
+                    needsSpacing = true;
+                }
+
+                if (child.flexShrink > 0) {
+                    if(this.vertical) {
+                        child.resolveDimensions(
+                            minCrossAxis, maxWidth,
+                            0, 0,
+                        );
+                    } else {
+                        child.resolveDimensions(
+                            0, 0,
+                            minCrossAxis, maxHeight,
+                        );
+                    }
+                } else {
+                    let childLength = this.vertical ? child.idealDimensions[1] : child.idealDimensions[0];
+                    if (childLength + usedSpaceAfter > targetLength) {
+                        childLength = Math.max(0, targetLength - usedSpaceAfter);
+                    }
+
+                    usedSpaceAfter += childLength;
+
+                    if(this.vertical) {
+                        child.resolveDimensions(
+                            minCrossAxis, maxWidth,
+                            childLength, childLength,
+                        );
+                    } else {
+                        child.resolveDimensions(
+                            childLength, childLength,
+                            minCrossAxis, maxHeight,
+                        );
+                    }
+                }
+            }
+        } else {
+            // shrink (potentially expensive because it's iterative)
+            // loosely follows the w3c flexbox algorithm:
+            // https://www.w3.org/TR/css-flexbox-1/#resolve-flexible-lengths
+            const wantedLengths = new Array<number>();
+            const frozen = new Array<boolean>();
+            for(const child of this._children) {
+                // Ignore disabled/non-shrinkable children
+                if(!child.enabled || child.flexShrink <= 0) {
+                    continue;
+                }
+
+                wantedLengths.push(this.vertical ? child.idealDimensions[1] : child.idealDimensions[0]);
+                frozen.push(false);
             }
 
-            // Add spacing to used space if this is not the first widget
-            if(usedSpaceAfter !== 0) {
-                usedSpaceAfter += spacing;
+            // TODO optimise this
+            const potentialSlack = targetLength - usedUnshrinkableSpace;
+            // TODO pick saner iteration limit?
+            for(let j = 0; j < 10; j++) {
+                // get current slack
+                let i = 0;
+                let remainingFreeSpace = potentialSlack;
+                let remainingThawedFreeSpace = potentialSlack;
+                for (const child of this._children) {
+                    // Ignored disabled children
+                    if (!child.enabled || child.flexShrink <= 0) {
+                        continue;
+                    }
+
+                    if (!frozen[i]) {
+                        remainingThawedFreeSpace -= wantedLengths[i];
+                    }
+                    remainingFreeSpace -= wantedLengths[i++];
+                }
+
+                if (remainingFreeSpace === 0) {
+                    break;
+                }
+
+                // update wanted lengths
+                i = 0;
+                let scaledFlexShrinkTotal = 0;
+                for (const child of this._children) {
+                    // Ignored disabled children
+                    if (!child.enabled || child.flexShrink <= 0) {
+                        continue;
+                    }
+
+                    if (!frozen[i]) {
+                        scaledFlexShrinkTotal += child.flexShrink * (this.vertical ? child.idealDimensions[1] : child.idealDimensions[0]);
+                    }
+                    i++
+                }
+
+                if (scaledFlexShrinkTotal === 0) {
+                    break;
+                }
+
+                i = 0;
+                let freezeAll = true;
+                for (const child of this._children) {
+                    // Ignored disabled children
+                    if (!child.enabled || child.flexShrink <= 0) {
+                        continue;
+                    }
+
+                    if (!frozen[i]) {
+                        const basis = this.vertical ? child.idealDimensions[1] : child.idealDimensions[0];
+                        const scaledFlexShrink = child.flexShrink * basis;
+                        wantedLengths[i] += scaledFlexShrink * remainingThawedFreeSpace / scaledFlexShrinkTotal;
+
+                        if (wantedLengths[i] <= 0) {
+                            wantedLengths[i] = 0;
+                            frozen[i] = true;
+                            freezeAll = false;
+                        }
+                    }
+                    i++
+                }
+
+                if (freezeAll) {
+                    break;
+                }
             }
 
-            const dedicatedSpace = freeSpacePerFlex * child.flex;
-            const [oldChildWidth, oldChildHeight] = child.idealDimensions;
-            if(this.vertical) {
-                const wantedLength = dedicatedSpace + oldChildHeight;
-                child.resolveDimensions(
-                    minCrossAxis, maxWidth,
-                    wantedLength, wantedLength,
-                );
-            } else {
-                const wantedLength = dedicatedSpace + oldChildWidth;
-                child.resolveDimensions(
-                    wantedLength, wantedLength,
-                    minCrossAxis, maxHeight,
-                );
-            }
+            // apply wanted lengths
+            let i = 0;
+            let needsSpacing = false;
+            for(const child of this._children) {
+                // Ignore disabled children
+                if(!child.enabled) {
+                    continue;
+                }
 
-            const [childWidth, childHeight] = child.idealDimensions;
-            usedSpaceAfter += this.vertical ? childHeight : childWidth;
+                // Add spacing to used space if this is not the first widget
+                if(needsSpacing) {
+                    usedSpaceAfter += spacing;
+                } else {
+                    needsSpacing = true;
+                }
+
+                if (child.flexShrink > 0) {
+                    // TODO handle clipping, just in case we ran into the
+                    //      iteration limit and the layout is bad?
+                    const wantedLength = wantedLengths[i++];
+                    if (this.vertical) {
+                        child.resolveDimensions(
+                            minCrossAxis, maxWidth,
+                            wantedLength, wantedLength,
+                        );
+                    } else {
+                        child.resolveDimensions(
+                            wantedLength, wantedLength,
+                            minCrossAxis, maxHeight,
+                        );
+                    }
+                } else {
+                    if (this.vertical) {
+                        const wantedLength = child.idealDimensions[1];
+                        child.resolveDimensions(
+                            minCrossAxis, maxWidth,
+                            wantedLength, wantedLength,
+                        );
+                    } else {
+                        const wantedLength = child.idealDimensions[0];
+                        child.resolveDimensions(
+                            wantedLength, wantedLength,
+                            minCrossAxis, maxHeight,
+                        );
+                    }
+                }
+
+                usedSpaceAfter += this.vertical ? child.idealDimensions[1] : child.idealDimensions[0];
+            }
         }
 
         // Resolve width and height
         if(this.vertical) {
             this.idealWidth = crossLength;
-            this.idealHeight = maxLength;
+            this.idealHeight = targetLength;
         } else {
-            this.idealWidth = maxLength;
+            this.idealWidth = targetLength;
             this.idealHeight = crossLength;
         }
 
         // Calculate final unused space; used for alignment. Clamp to zero just
         // in case XXX is that neccessary?
-        this.unusedSpace = Math.max(maxLength - usedSpaceAfter, 0);
+        this.unusedSpace = Math.max(targetLength - usedSpaceAfter, 0);
     }
 
     override resolvePosition(x: number, y: number): void {

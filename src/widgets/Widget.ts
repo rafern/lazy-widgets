@@ -24,6 +24,8 @@ export interface WidgetProperties extends ThemeProperties {
     enabled?: boolean;
     /** Sets {@link Widget#flex}. */
     flex?: number;
+    /** Sets {@link Widget#flexShrink}. */
+    flexShrink?: number;
     /** Sets {@link Widget#id}. */
     id?: string | null;
 }
@@ -87,6 +89,8 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     protected idealY = 0;
     /** {@link Widget#flex} but for internal use. */
     protected _flex;
+    /** {@link Widget#flexShrink} but for internal use. */
+    protected _flexShrink;
     /**
      * The {@link Root} that this widget is currently inside.
      *
@@ -151,11 +155,28 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         }
     }
 
+    /**
+     * How much this widget will shrink relative to other widgets in a flexbox
+     * container if the maximum size is exceeded. If changed, sets
+     * {@link Widget#_layoutDirty} to true.
+     */
+    get flexShrink(): number {
+        return this._flexShrink;
+    }
+
+    set flexShrink(flexShrink: number) {
+        if(flexShrink !== this._flexShrink) {
+            this._flexShrink = flexShrink;
+            this._layoutDirty = true;
+        }
+    }
+
     constructor(properties?: Readonly<WidgetProperties>) {
         super(properties);
 
         this._enabled = properties?.enabled ?? true;
         this._flex = properties?.flex ?? 0;
+        this._flexShrink = properties?.flexShrink ?? 0;
         this.id = properties?.id ?? null;
     }
 
