@@ -5,7 +5,6 @@ Typescript retained mode GUI for the HTML canvas API - a reboot of the
 
 This library's API is not stable and is expected to heavily change in the
 future. Planned features/changes:
-- Rewrite flexbox system to distribute final space instead of remaining space
 - Rewrite layout system to no longer use 2 stages, or to not unnecessarily mark widgets as dirty
 - Add decoration system
 - Rich text
