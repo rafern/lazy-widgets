@@ -4,8 +4,8 @@
         <script type='module'>
             import {
                 DOMRoot, Label, Margin, Column, Icon, IconFit, Background,
-                ArtificialConstraint, Spacing, DOMPointerDriver, Slider,
-                Variable, LiveLabel, ObservableTransformer,
+                Spacing, DOMPointerDriver, Slider, Variable, LiveLabel,
+                ObservableTransformer,
             } from '../dist/index.js';
 
             // Create the root
@@ -19,17 +19,18 @@
             const minHeight = new Variable(0);
             const maxHeight = new Variable(HEIGHT_LIMIT);
 
-            const artificialConstraints = new ArtificialConstraint(new Column([
+            const column = new Column([
                 makeDemoBox('red', 0, 1),
                 makeDemoBox('green', 2, 0),
                 makeDemoBox('blue', 1, 2),
                 makeDemoBox('red', 0, 1),
                 makeDemoBox('green', 2, 0),
                 makeDemoBox('blue', 1, 2),
-            ]), [0, Infinity, minHeight.value, maxHeight.value]);
+            ], { minWidth: minHeight.value, maxHeight: maxHeight.value });
 
             function onConstraintsChanged() {
-                artificialConstraints.constraints = [0, Infinity, minHeight.value, maxHeight.value];
+                column.minHeight = minHeight.value;
+                column.maxHeight = maxHeight.value;
             }
 
             minHeight.watch(onConstraintsChanged);
@@ -59,7 +60,7 @@
                                 () => `Maximum height (${maxHeight.value.toFixed(2)}px):`,
                             )),
                             new Slider(maxHeight, 0, HEIGHT_LIMIT),
-                            new Margin(new Background(artificialConstraints, {
+                            new Margin(new Background(column, {
                                 canvasFill: 'white',
                             })),
                         ])

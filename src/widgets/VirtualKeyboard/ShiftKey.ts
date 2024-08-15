@@ -15,19 +15,20 @@ export class ShiftKey extends VirtualKey {
         inputConfig: SpecializedVirtualKeyXMLInputConfig
     };
 
-    constructor(keyContext: KeyContext, minWidth = 84, minHeight = 24, properties?: Readonly<WidgetProperties>) {
+    constructor(keyContext: KeyContext, properties?: Readonly<WidgetProperties>) {
         super(
             'Shift',
             () => {
                 keyContext.shift = !keyContext.shift;
-                this.child.forced = keyContext.shift;
+                this.forced = keyContext.shift;
                 keyContext.callback('Shift');
             },
-            minWidth,
-            minHeight,
-            properties,
+            {
+                minWidth: 84,
+                ...properties,
+            }
         );
 
-        this.child.forced = keyContext.shift;
+        this.forced = keyContext.shift;
     }
 }

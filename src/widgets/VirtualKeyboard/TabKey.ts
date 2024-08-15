@@ -15,7 +15,7 @@ export class TabKey extends BasicVirtualKey {
         inputConfig: SpecializedVirtualKeyXMLInputConfig
     };
 
-    constructor(keyContext: KeyContext, minWidth = 48, minHeight = 24, properties?: Readonly<WidgetProperties>) {
-        super('Tab', 'Tab', keyContext, minWidth, minHeight, properties);
+    constructor(keyContext: KeyContext, properties?: Readonly<WidgetProperties>) {
+        super('Tab', 'Tab', keyContext, { minWidth: 48, ...properties });
     }
 }

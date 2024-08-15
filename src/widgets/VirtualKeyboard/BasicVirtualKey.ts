@@ -25,18 +25,6 @@ export class BasicVirtualKey extends VirtualKey {
                 mode: 'value',
                 validator: 'key-context',
             },
-            {
-                name: 'min-width',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            },
-            {
-                name: 'min-height',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            }
         ]
     };
 
@@ -45,13 +33,11 @@ export class BasicVirtualKey extends VirtualKey {
      * @param keyCode - The {@link https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values | key code} to emit in the keyContext's callback when the virtual key is pressed
      * @param keyContext - The {@link KeyContext} shared by other virtual keyboard key widgets.
      */
-    constructor(text: string, keyCode: string, keyContext: KeyContext, minWidth = 24, minHeight = 24, properties?: Readonly<WidgetProperties>) {
+    constructor(text: string, keyCode: string, keyContext: KeyContext, properties?: Readonly<WidgetProperties>) {
         super(
             text,
             () => keyContext.callback(keyCode),
-            minWidth,
-            minHeight,
-            properties,
+            properties
         );
     }
 }

@@ -29,18 +29,6 @@ export class GlyphVirtualKey extends VirtualKey {
                 mode: 'value',
                 validator: 'key-context',
             },
-            {
-                name: 'min-width',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            },
-            {
-                name: 'min-height',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            }
         ]
     };
 
@@ -53,20 +41,19 @@ export class GlyphVirtualKey extends VirtualKey {
      * @param altGlyph - The alternative glyph to emit/show when shift is held. Will be equal to glyph if set to null.
      * @param keyContext - The {@link KeyContext} shared by other keys to tell when shift is being held in a virtual keyboard.
      */
-    constructor(glyph: string, altGlyph: string | null, keyContext: Readonly<KeyContext>, minWidth = 24, minHeight = 24, properties?: Readonly<WidgetProperties>) {
+    constructor(glyph: string, altGlyph: string | null, keyContext: Readonly<KeyContext>, properties?: Readonly<WidgetProperties>) {
         super(
-            '', () => keyContext.callback(this.currentGlyph),
-            minWidth, minHeight, properties,
+            '', () => keyContext.callback(this.currentGlyph), properties,
         );
 
         this.glyph = glyph;
         this.altGlyph = altGlyph === null ? glyph : altGlyph;
         this.keyContext = keyContext;
-        this.child.child.text = this.currentGlyph;
+        this.child.text = this.currentGlyph;
     }
 
     override handlePreLayoutUpdate(): void {
-        this.child.child.text = this.currentGlyph;
+        this.child.text = this.currentGlyph;
 
         super.handlePreLayoutUpdate();
     }

@@ -15,19 +15,17 @@ export class ControlKey extends VirtualKey {
         inputConfig: SpecializedVirtualKeyXMLInputConfig
     };
 
-    constructor(keyContext: KeyContext, minWidth = 42, minHeight = 24, properties?: Readonly<WidgetProperties>) {
+    constructor(keyContext: KeyContext, properties?: Readonly<WidgetProperties>) {
         super(
             'Ctrl',
             () => {
                 keyContext.ctrl = !keyContext.ctrl;
-                this.child.forced = keyContext.ctrl;
+                this.forced = keyContext.ctrl;
                 keyContext.callback('Control');
             },
-            minWidth,
-            minHeight,
-            properties,
+            { minWidth: 42, ...properties }
         );
 
-        this.child.forced = keyContext.ctrl;
+        this.forced = keyContext.ctrl;
     }
 }

@@ -26,6 +26,14 @@ export interface WidgetProperties extends ThemeProperties {
     flex?: number;
     /** Sets {@link Widget#flexShrink}. */
     flexShrink?: number;
+    /** Sets {@link Widget#minWidth}. */
+    minWidth?: number;
+    /** Sets {@link Widget#maxWidth}. */
+    maxWidth?: number;
+    /** Sets {@link Widget#minHeight}. */
+    minHeight?: number;
+    /** Sets {@link Widget#maxHeight}. */
+    maxHeight?: number;
     /** Sets {@link Widget#id}. */
     id?: string | null;
 }
@@ -91,6 +99,14 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     protected _flex;
     /** {@link Widget#flexShrink} but for internal use. */
     protected _flexShrink;
+    /** {@link Widget#minWidth} but for internal use. */
+    protected _minWidth;
+    /** {@link Widget#maxWidth} but for internal use. */
+    protected _maxWidth;
+    /** {@link Widget#minHeight} but for internal use. */
+    protected _minHeight;
+    /** {@link Widget#maxHeight} but for internal use. */
+    protected _maxHeight;
     /**
      * The {@link Root} that this widget is currently inside.
      *
@@ -171,12 +187,76 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         }
     }
 
+    /**
+     * Minimum width of widget. Defaults to 0. If changed, sets
+     * {@link Widget#_minWidth} to true.
+     */
+    get minWidth(): number {
+        return this._minWidth;
+    }
+
+    set minWidth(minWidth: number) {
+        if(minWidth !== this._minWidth) {
+            this._minWidth = minWidth;
+            this._layoutDirty = true;
+        }
+    }
+
+    /**
+     * Maximum width of widget. Defaults to Infinity. If changed, sets
+     * {@link Widget#_maxWidth} to true.
+     */
+    get maxWidth(): number {
+        return this._maxWidth;
+    }
+
+    set maxWidth(maxWidth: number) {
+        if(maxWidth !== this._maxWidth) {
+            this._maxWidth = maxWidth;
+            this._layoutDirty = true;
+        }
+    }
+
+    /**
+     * Minimum height of widget. Defaults to 0. If changed, sets
+     * {@link Widget#_minHeight} to true.
+     */
+    get minHeight(): number {
+        return this._minHeight;
+    }
+
+    set minHeight(minHeight: number) {
+        if(minHeight !== this._minHeight) {
+            this._minHeight = minHeight;
+            this._layoutDirty = true;
+        }
+    }
+
+    /**
+     * Maximum height of widget. Defaults to Infinity. If changed, sets
+     * {@link Widget#_maxHeight} to true.
+     */
+    get maxHeight(): number {
+        return this._maxHeight;
+    }
+
+    set maxHeight(maxHeight: number) {
+        if(maxHeight !== this._maxHeight) {
+            this._maxHeight = maxHeight;
+            this._layoutDirty = true;
+        }
+    }
+
     constructor(properties?: Readonly<WidgetProperties>) {
         super(properties);
 
         this._enabled = properties?.enabled ?? true;
         this._flex = properties?.flex ?? 0;
         this._flexShrink = properties?.flexShrink ?? 0;
+        this._minWidth = properties?.minWidth ?? 0;
+        this._maxWidth = properties?.maxWidth ?? Infinity;
+        this._minHeight = properties?.minHeight ?? 0;
+        this._maxHeight = properties?.maxHeight ?? Infinity;
         this.id = properties?.id ?? null;
     }
 
@@ -521,6 +601,12 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
             this._layoutDirty = false;
             return;
         }
+
+        // Apply self-constraints
+        minWidth = Math.max(minWidth, this._minWidth);
+        minHeight = Math.max(minHeight, this._minHeight);
+        maxWidth = Math.min(maxWidth, this._maxWidth);
+        maxHeight = Math.min(maxHeight, this._maxHeight);
 
         // Validate constraints
         if(minWidth == Infinity) {

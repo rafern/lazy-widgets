@@ -14,7 +14,9 @@ export class EscapeKey extends BasicVirtualKey {
         inputConfig: SpecializedVirtualKeyXMLInputConfig
     };
 
-    constructor(keyContext: KeyContext, minWidth = 48, minHeight = 24, properties?: Readonly<WidgetProperties>) {
-        super('Esc', 'Escape', keyContext, minWidth, minHeight, properties);
+    constructor(keyContext: KeyContext, properties?: Readonly<WidgetProperties>) {
+        super('Esc', 'Escape', keyContext, {
+            minWidth: 48, ...properties
+        });
     }
 }

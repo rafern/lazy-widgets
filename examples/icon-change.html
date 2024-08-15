@@ -4,13 +4,13 @@
         <script type='module'>
             import {
                 DOMRoot, Label, Margin, Column, Icon, TextButton, Row,
-                DOMPointerDriver, ArtificialConstraint, Background
+                DOMPointerDriver, Background
             } from '../dist/index.js';
 
             // Create the root
             let alternative = false;
             let isVideo = false;
-            const icon = new Icon('banana.png');
+            const icon = new Icon('banana.png', { minHeight: 256, maxHeight: 256 });
 
             function changeImage(newIsVideo, wantsNewInstance) {
                 // Create a new instance if changing from a video to an image or
@@ -65,7 +65,7 @@
                 new Background(
                     new Margin(
                         new Column([
-                            new ArtificialConstraint(icon, [0, 256, 0, 256]),
+                            icon,
                             new Label('The icon should change between a banana and an apple'),
                             new Row([
                                 new TextButton('Change Icon.image.src').on('click', () => changeImage(false, false)),

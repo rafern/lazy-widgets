@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, LabelledRadioButton, Spacing,
+                DOMRoot, Label, Margin, Column, Spacing, RadioButton, Row,
                 DOMKeyboardDriver, DOMPointerDriver, Variable, Background
             } from '../dist/index.js';
 
@@ -17,11 +17,11 @@
                     new Margin(
                         new Column([
                             new Label('Select an option:'),
-                            new LabelledRadioButton('Option 1', variable, 'option_1_value'),
-                            new LabelledRadioButton('Option 2', variable, 'option_2_value'),
-                            new LabelledRadioButton('Option 3', variable, 'option_3_value'),
-                            new LabelledRadioButton('Option 4', variable, 'option_4_value'),
-                            new LabelledRadioButton('Option 5', variable, 'option_5_value'),
+                            new Row([new Label('Option 1'), new Spacing(), new RadioButton(variable, 'option_1_value')]),
+                            new Row([new Label('Option 2'), new Spacing(), new RadioButton(variable, 'option_2_value')]),
+                            new Row([new Label('Option 3'), new Spacing(), new RadioButton(variable, 'option_3_value')]),
+                            new Row([new Label('Option 4'), new Spacing(), new RadioButton(variable, 'option_4_value')]),
+                            new Row([new Label('Option 5'), new Spacing(), new RadioButton(variable, 'option_5_value')]),
                             new Spacing({ flex: 0, minHeight: 8 }),
                             label
                         ])

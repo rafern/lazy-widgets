@@ -27,28 +27,14 @@ export class VirtualKeyRow extends Row<VirtualKey> {
                 mode: 'value',
                 validator: 'key-context',
             },
-            {
-                name: 'min-width',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            },
-            {
-                name: 'min-height',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            }
         ]
     };
 
     /**
      * @param rowTemplate - Template for this row of virtual keys.
      * @param keyContext - The {@link KeyContext} to be shared among all virtual keys in this row.
-     * @param minWidth - The minWidth to use when creating {@link GlyphVirtualKey | GlyphVirtualKeys}.
-     * @param minHeight - The minHeight to use when creating {@link GlyphVirtualKey | GlyphVirtualKeys}.
      */
-    constructor(rowTemplate: VirtualKeyRowTemplate, keyContext: KeyContext, minWidth = 24, minHeight = 24, properties?: Readonly<WidgetProperties>) {
+    constructor(rowTemplate: VirtualKeyRowTemplate, keyContext: KeyContext, properties?: Readonly<WidgetProperties>) {
         super([], properties);
 
         const propertiesNoID = filterIDFromProperties(properties);
@@ -72,8 +58,6 @@ export class VirtualKeyRow extends Row<VirtualKey> {
                         glyphs[i],
                         altGlyph,
                         keyContext,
-                        minWidth,
-                        minHeight,
                         propertiesNoID,
                     ));
                 }

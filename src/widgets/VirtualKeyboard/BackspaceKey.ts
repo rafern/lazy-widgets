@@ -14,7 +14,9 @@ export class BackspaceKey extends BasicVirtualKey {
         inputConfig: SpecializedVirtualKeyXMLInputConfig
     };
 
-    constructor(keyContext: KeyContext, minWidth = 60, minHeight = 24, properties?: Readonly<WidgetProperties>) {
-        super('Backspace', 'Backspace', keyContext, minWidth, minHeight, properties);
+    constructor(keyContext: KeyContext, properties?: Readonly<WidgetProperties>) {
+        super('Backspace', 'Backspace', keyContext, {
+            minWidth: 60, ...properties
+        });
     }
 }

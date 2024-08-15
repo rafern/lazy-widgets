@@ -3,18 +3,20 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Icon, TextAlignMode,
-                ArtificialConstraint, Background
+                DOMRoot, Label, Margin, Column, Icon, TextAlignMode, Background
             } from '../dist/index.js';
 
             // Create the root
-            const icon = new Icon('banana.png');
+            const icon = new Icon('banana.png', {
+                minWidth: 128, maxWidth: 128, minHeight: 128, maxHeight: 128,
+            });
+
             const root = new DOMRoot(
                 new Background(
                     new Margin(
                         new Column([
                             new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }),
-                            new ArtificialConstraint(icon, [0, 128, 0, 128]),
+                            icon,
                             new Label('BANANA', { bodyTextAlign: TextAlignMode.Center })
                         ])
                     )

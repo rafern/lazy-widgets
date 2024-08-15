@@ -14,12 +14,9 @@ export class SpaceKey extends BasicVirtualKey {
         inputConfig: SpecializedVirtualKeyXMLInputConfig
     };
 
-    constructor(keyContext: KeyContext, minWidth = 84, minHeight = 24, properties?: Readonly<WidgetProperties>) {
-        properties = {
-            flex: 1,
-            ...properties
-        };
-
-        super('Space', ' ', keyContext, minWidth, minHeight, properties);
+    constructor(keyContext: KeyContext, properties?: Readonly<WidgetProperties>) {
+        super('Space', ' ', keyContext, {
+            flex: 1, minWidth: 84, ...properties
+        });
     }
 }

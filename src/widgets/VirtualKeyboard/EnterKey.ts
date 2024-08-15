@@ -14,7 +14,9 @@ export class EnterKey extends BasicVirtualKey {
         inputConfig: SpecializedVirtualKeyXMLInputConfig
     };
 
-    constructor(keyContext: KeyContext, minWidth = 72, minHeight = 24, properties?: Readonly<WidgetProperties>) {
-        super('Enter', 'Enter', keyContext, minWidth, minHeight, properties);
+    constructor(keyContext: KeyContext, properties?: Readonly<WidgetProperties>) {
+        super('Enter', 'Enter', keyContext, {
+            minWidth: 72, ...properties
+        });
     }
 }

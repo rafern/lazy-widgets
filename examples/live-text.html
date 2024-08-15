@@ -3,8 +3,8 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Margin, Column, LabelledRadioButton, DOMPointerDriver,
-                Background, LiveLabel, Spacing, Variable
+                DOMRoot, Margin, Column, DOMPointerDriver, Background, Label,
+                LiveLabel, Spacing, Variable, RadioButton, Row
             } from '../dist/index.js';
 
             // Create the root
@@ -37,9 +37,9 @@
                                 minHeight: 24,
                             }),
                             new LiveLabel(languageText),
-                            new LabelledRadioButton('English (en)', languageVariable, 'en'),
-                            new LabelledRadioButton('Português (pt)', languageVariable, 'pt'),
-                            new LabelledRadioButton('Français (fr)', languageVariable, 'fr'),
+                            new Row([new Label('English (en)'), new Spacing(), new RadioButton(languageVariable, 'en')]),
+                            new Row([new Label('Português (pt)'), new Spacing(), new RadioButton(languageVariable, 'pt')]),
+                            new Row([new Label('Français (fr)'), new Spacing(), new RadioButton(languageVariable, 'fr')]),
                         ]),
                     ),
                 ),

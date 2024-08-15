@@ -5,10 +5,9 @@
             import {
                 DOMRoot, Label, Margin, Column, Row, TextButton, TextInput,
                 DOMKeyboardDriver, DOMPointerDriver, Slider, FlexAlignment,
-                ScrollableViewportWidget, ScrollbarMode, LabelledCheckbox,
-                ArtificialConstraint, Container, Alignment, ThemeScope, Theme,
-                Variable, AxisCoupling, LabelledRadioButton, CanvasViewport,
-                Background
+                ScrollableViewportWidget, ScrollbarMode, RadioButton, Checkbox,
+                Container, Alignment, ThemeScope, Theme, Variable, Spacing,
+                AxisCoupling, CanvasViewport, Background
             } from '../dist/index.js';
 
             // Create viewport with its child
@@ -55,9 +54,9 @@
             function makeCouplingColumn(variable) {
                 return new Margin(
                     new Column([
-                        new LabelledRadioButton('None', variable, AxisCoupling.None),
-                        new LabelledRadioButton('Bi-directional', variable, AxisCoupling.Bi),
-                        new LabelledRadioButton('Uni-directional', variable, AxisCoupling.Uni)
+                        new Row([new Label('None'), new Spacing(), new RadioButton(variable, AxisCoupling.None)]),
+                        new Row([new Label('Bi-directional'), new Spacing(), new RadioButton(variable, AxisCoupling.Bi)]),
+                        new Row([new Label('Uni-directional'), new Spacing(), new RadioButton(variable, AxisCoupling.Uni)]),
                     ])
                 );
             }
@@ -65,59 +64,6 @@
             const mainColumn = new Column();
             const themeScopeTheme = new Theme({ canvasFill: 'purple' });
             let themeScope = new ThemeScope(viewport, themeScopeTheme);
-            const controls = new Container(
-                new ArtificialConstraint(
-                    new Column([
-                        new Label('Width coupling:'),
-                        makeCouplingColumn(widthCoupling),
-                        new Label('Height coupling:'),
-                        makeCouplingColumn(heightCoupling),
-                        new Label('Scrollbar mode:'),
-                        new Margin(
-                            new Column([
-                                new LabelledRadioButton('Overlay', scrollbarMode, ScrollbarMode.Overlay),
-                                new LabelledRadioButton('Layout', scrollbarMode, ScrollbarMode.Layout),
-                                new LabelledRadioButton('Hidden', scrollbarMode, ScrollbarMode.Hidden)
-                            ])
-                        ),
-                        widthLabel,
-                        new Slider(new Variable(initialMinWidth).watch(variable => {
-                            viewport.minWidth = variable.value;
-                            widthLabel.text = `Minimum width: ${variable.value}`;
-                        }), 0, 500, { snapIncrement: 1 }),
-                        heightLabel,
-                        new Slider(new Variable(initialMinHeight).watch(variable => {
-                            viewport.minHeight = variable.value;
-                            heightLabel.text = `Minimum height: ${variable.value}`;
-                        }), 0, 500, { snapIncrement: 1 }),
-                        new LabelledCheckbox('Use canvas:', new Variable(
-                            viewport instanceof CanvasViewport
-                        ).watch(variable => {
-                            const options = {
-                                minWidth: viewport.minWidth,
-                                minHeight: viewport.minHeight,
-                                widthCoupling: viewport.widthCoupling,
-                                heightCoupling: viewport.heightCoupling,
-                                scrollbarMode: viewport.scrollbarMode,
-                                useCanvas: variable.value
-                            };
-                            const child = viewport.child;
-
-                            mainColumn.remove(themeScope);
-
-                            viewport = new ScrollableViewportWidget(child, options);
-                            themeScope = new ThemeScope(viewport, themeScopeTheme);
-
-                            mainColumn.add(themeScope);
-                        }))
-                    ]),
-                    [0, 175, 0, Infinity]
-                )
-            );
-
-            controls.containerAlignment = {
-                horizontal: Alignment.Start, vertical: Alignment.Start,
-            };
 
             // Create the root
             const root = new DOMRoot(
@@ -126,7 +72,61 @@
                         mainColumn
                         .add([
                             new Label('Options:'),
-                            controls,
+                            new Container(
+                                new Column([
+                                    new Label('Width coupling:'),
+                                    makeCouplingColumn(widthCoupling),
+                                    new Label('Height coupling:'),
+                                    makeCouplingColumn(heightCoupling),
+                                    new Label('Scrollbar mode:'),
+                                    new Margin(
+                                        new Column([
+                                            new Row([new Label('Overlay'), new Spacing(), new RadioButton(scrollbarMode, ScrollbarMode.Overlay)]),
+                                            new Row([new Label('Layout'), new Spacing(), new RadioButton(scrollbarMode, ScrollbarMode.Layout)]),
+                                            new Row([new Label('Hidden'), new Spacing(), new RadioButton(scrollbarMode, ScrollbarMode.Hidden)]),
+                                        ])
+                                    ),
+                                    widthLabel,
+                                    new Slider(new Variable(initialMinWidth).watch(variable => {
+                                        viewport.minWidth = variable.value;
+                                        widthLabel.text = `Minimum width: ${variable.value}`;
+                                    }), 0, 500, { snapIncrement: 1 }),
+                                    heightLabel,
+                                    new Slider(new Variable(initialMinHeight).watch(variable => {
+                                        viewport.minHeight = variable.value;
+                                        heightLabel.text = `Minimum height: ${variable.value}`;
+                                    }), 0, 500, { snapIncrement: 1 }),
+                                    new Row([
+                                        new Label('Use canvas:'),
+                                        new Spacing(),
+                                        new RadioButton(new Variable(
+                                            viewport instanceof CanvasViewport
+                                        ).watch(variable => {
+                                            const options = {
+                                                minWidth: viewport.minWidth,
+                                                minHeight: viewport.minHeight,
+                                                widthCoupling: viewport.widthCoupling,
+                                                heightCoupling: viewport.heightCoupling,
+                                                scrollbarMode: viewport.scrollbarMode,
+                                                useCanvas: variable.value
+                                            };
+                                            const child = viewport.child;
+
+                                            mainColumn.remove(themeScope);
+
+                                            viewport = new ScrollableViewportWidget(child, options);
+                                            themeScope = new ThemeScope(viewport, themeScopeTheme);
+
+                                            mainColumn.add(themeScope);
+                                        }))
+                                    ]),
+                                ], { maxWidth: 175 }),
+                                {
+                                    containerAlignment: {
+                                        horizontal: Alignment.Start, vertical: Alignment.Start,
+                                    },
+                                },
+                            ),
                             new Label('Result:\n- Viewport is purple\n- Child is red'),
                             themeScope
                         ])

@@ -15,19 +15,17 @@ export class AltKey extends VirtualKey {
         inputConfig: SpecializedVirtualKeyXMLInputConfig
     };
 
-    constructor(keyContext: KeyContext, minWidth = 42, minHeight = 24, properties?: Readonly<WidgetProperties>) {
+    constructor(keyContext: KeyContext, properties?: Readonly<WidgetProperties>) {
         super(
             'Alt',
             () => {
                 keyContext.alt = !keyContext.alt;
-                this.child.forced = keyContext.alt;
+                this.forced = keyContext.alt;
                 keyContext.callback('Alt');
             },
-            minWidth,
-            minHeight,
-            properties,
+            { minWidth: 42, ...properties }
         );
 
-        this.child.forced = keyContext.alt;
+        this.forced = keyContext.alt;
     }
 }

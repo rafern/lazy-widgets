@@ -1,8 +1,8 @@
 import { Spacing } from './Spacing.js';
 import { BareWidgetXMLInputConfig } from '../xml/BareWidgetXMLInputConfig.js';
-import type { SpacingProperties } from './Spacing.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { type WidgetProperties } from './Widget.js';
 /**
  * A {@link Spacing} with a colored background, where the color is the same as
  * the theme's text color.
@@ -15,7 +15,7 @@ export class Separator extends Spacing {
         inputConfig: BareWidgetXMLInputConfig
     };
 
-    constructor(properties?: Readonly<SpacingProperties>) {
+    constructor(properties?: Readonly<WidgetProperties>) {
         super({
             minWidth: 1,
             minHeight: 1,

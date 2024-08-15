@@ -47,27 +47,13 @@ export class VirtualKeyboard extends Column {
                 mode: 'value',
                 validator: 'key-context',
             },
-            {
-                name: 'min-width',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            },
-            {
-                name: 'min-height',
-                mode: 'value',
-                validator: 'number',
-                optional: true,
-            }
         ]
     };
 
     /**
      * @param keyboardTemplate - By default, the virtual keyboard template is {@link defaultVirtualKeyboardTemplate}.
-     * @param minWidth - The minWidth to use when creating {@link GlyphVirtualKey | GlyphVirtualKeys}.
-     * @param minHeight - The minHeight to use when creating {@link GlyphVirtualKey | GlyphVirtualKeys}.
      */
-    constructor(keyboardDriver: KeyboardDriver, keyboardTemplate: VirtualKeyboardTemplate = defaultVirtualKeyboardTemplate, minWidth = 24, minHeight = 24, properties?: Readonly<WidgetProperties>) {
+    constructor(keyboardDriver: KeyboardDriver, keyboardTemplate: VirtualKeyboardTemplate = defaultVirtualKeyboardTemplate, properties?: Readonly<WidgetProperties>) {
         properties = {
             multiContainerAlignment: <FlexAlignment2D>{
                 main: FlexAlignment.SpaceBetween, cross: Alignment.Stretch,
@@ -96,8 +82,7 @@ export class VirtualKeyboard extends Column {
         const propertiesNoID = filterIDFromProperties(properties);
         for(const rowTemplate of keyboardTemplate) {
             this.add(new VirtualKeyRow(
-                rowTemplate, keyContext, minWidth, minHeight,
-                propertiesNoID,
+                rowTemplate, keyContext, propertiesNoID,
             ));
         }
     }

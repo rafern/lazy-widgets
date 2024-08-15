@@ -25,10 +25,6 @@ export interface ViewportWidgetProperties extends WidgetProperties {
     widthCoupling?: AxisCoupling,
     /** Sets {@link ViewportWidget#heightCoupling}. */
     heightCoupling?: AxisCoupling,
-    /** Sets {@link ViewportWidget#minWidth}. */
-    minWidth?: number,
-    /** Sets {@link ViewportWidget#minHeight}. */
-    minHeight?: number,
     /**
      * If true, then the {@link ViewportWidget} will use a
      * {@link CanvasViewport} instead of a {@link ClippedViewport}.
@@ -75,26 +71,6 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     /** See {@link ViewportWidget#heightCoupling}. For internal use only */
     private _heightCoupling: AxisCoupling;
     /**
-     * The minimum width that this widget will try to expand to.
-     *
-     * Will be automatically scaled depending on the current {@link Root}'s
-     * resolution.
-     *
-     * @decorator `@layoutField`
-     */
-    @layoutField
-    minWidth: number;
-    /**
-     * The minimum height that this widget will try to expand to.
-     *
-     * Will be automatically scaled depending on the current {@link Root}'s
-     * resolution.
-     *
-     * @decorator `@layoutField`
-     */
-    @layoutField
-    minHeight: number;
-    /**
      * The actual viewport object. Can be a {@link ClippedViewport} or a
      * {@link CanvasViewport}.
      */
@@ -140,8 +116,6 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
             this.internalViewport = new ClippedViewport(child);
         }
 
-        this.minWidth = properties?.minWidth ?? 0;
-        this.minHeight = properties?.minHeight ?? 0;
         this._widthCoupling = properties?.widthCoupling ?? AxisCoupling.None;
         this._heightCoupling = properties?.heightCoupling ?? AxisCoupling.None;
         this._constraints = properties?.constraints ?? [0, Infinity, 0, Infinity];
@@ -289,8 +263,8 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         // reserve space
         const rMaxWidth = Math.max(maxWidth - this.reservedX, 0);
         const rMaxHeight = Math.max(maxHeight - this.reservedY, 0);
-        let effectiveMinWidth = Math.min(Math.max(minWidth - this.reservedX, this.minWidth - this.reservedX, 0), rMaxWidth);
-        let effectiveMinHeight = Math.min(Math.max(minHeight - this.reservedY, this.minHeight - this.reservedY, 0), rMaxHeight);
+        let effectiveMinWidth = Math.min(Math.max(minWidth - this.reservedX, 0), rMaxWidth);
+        let effectiveMinHeight = Math.min(Math.max(minHeight - this.reservedY, 0), rMaxHeight);
 
         // Expand to the needed dimensions
         if(this._widthCoupling !== AxisCoupling.Bi) {
