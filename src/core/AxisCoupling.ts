@@ -26,11 +26,24 @@ export enum AxisCoupling {
      */
     Bi,
     /**
-     * Uni-directional coupling. The {@link ViewportWidget}'s axis will be
-     * resolved as a regular Widget, but the result will be transferred to the
-     * child's minimum axis length constraint.
+     * Uni-directional coupling, from the parent to the child. The
+     * {@link ViewportWidget}'s axis will be resolved as a regular Widget, but
+     * the result will be transferred to the child's minimum axis length
+     * constraint.
      *
      * Default axis coupling mode for {@link TextArea}.
      */
-    Uni,
+    ParentToChild,
+    /**
+     * Uni-directional coupling, from the child to the parent. The child's
+     * resolved axis length will be used as the {@link ViewportWidget}'s minimum
+     * axis length. Useful when combined with {@link Widget#flexShrink}.
+     *
+     * Default axis coupling mode for {@link TextArea}.
+     */
+    ChildToParent,
+    /**
+     * @deprecated Equivalent to {@link AxisCoupling#ParentToChild}. Use that instead
+     */
+    Uni = ParentToChild,
 }

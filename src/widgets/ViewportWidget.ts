@@ -266,10 +266,10 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         let effectiveMinHeight = Math.min(Math.max(minHeight - this.reservedY, 0), rMaxHeight);
 
         // Expand to the needed dimensions
-        if(this._widthCoupling !== AxisCoupling.Bi) {
+        if(this._widthCoupling !== AxisCoupling.Bi && this._widthCoupling !== AxisCoupling.ChildToParent) {
             this.idealWidth = effectiveMinWidth;
 
-            if(this._widthCoupling === AxisCoupling.Uni) {
+            if(this._widthCoupling === AxisCoupling.ParentToChild) {
                 effectiveMinWidth = this.idealWidth;
             }
         }
@@ -278,10 +278,10 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
             console.warn(DynMsg.MAYBE_DIMENSIONLESS('width'));
         }
 
-        if(this._heightCoupling !== AxisCoupling.Bi) {
+        if(this._heightCoupling !== AxisCoupling.Bi && this._heightCoupling !== AxisCoupling.ChildToParent) {
             this.idealHeight = effectiveMinHeight;
 
-            if(this._heightCoupling === AxisCoupling.Uni) {
+            if(this._heightCoupling === AxisCoupling.ParentToChild) {
                 effectiveMinHeight = this.idealHeight;
             }
         }
@@ -314,11 +314,11 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         this.internalViewport.resolveLayout();
 
         // Bi-couple wanted axes. Do regular layout for non-coupled axes.
-        if(this._widthCoupling === AxisCoupling.Bi) {
+        if(this._widthCoupling === AxisCoupling.Bi || this._widthCoupling === AxisCoupling.ChildToParent) {
             this.idealWidth = Math.max(0, child.idealDimensions[0]);
         }
 
-        if(this._heightCoupling === AxisCoupling.Bi) {
+        if(this._heightCoupling === AxisCoupling.Bi || this._heightCoupling === AxisCoupling.ChildToParent) {
             this.idealHeight = Math.max(0, child.idealDimensions[1]);
         }
     }

@@ -90,6 +90,10 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
      * then there hasn't been a valid scroll recently.
      */
     private lastScroll = 0;
+    /** What was the child width on the last layout finalization? */
+    private prevChildWidth = 0;
+    /** What was the child height on the last layout finalization? */
+    private prevChildHeight = 0;
     /** Was the horizontal scrollbar painted last frame? */
     private horizWasPainted = false;
     /** Was the vertical scrollbar painted last frame? */
@@ -557,37 +561,40 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         this.reservedX = reserve && this.heightCoupling !== AxisCoupling.Bi ? thickness : 0;
         this.reservedY = reserve && this.widthCoupling !== AxisCoupling.Bi ? thickness : 0;
 
-        // Get dimensions of child viewport before resolving them
-        let scrollbarsDirty = false;
-        const [oldChildWidth, oldChildHeight] = this.child.idealDimensions;
-        const oldPaintX = this.scrollbarNeedsPaint(false, oldChildWidth > this.effectiveWidth);
-        const oldPaintY = this.scrollbarNeedsPaint(true, oldChildHeight > this.effectiveHeight);
-
         // Resolve dimensions
         super.handleResolveDimensions(minWidth, maxWidth, minHeight, maxHeight);
 
+        // Expand dimensions to fit scrollbars
+        this.idealWidth = Math.min(Math.max(this.idealWidth + this.reservedX, minWidth), maxWidth);
+        this.idealHeight = Math.min(Math.max(this.idealHeight + this.reservedY, minHeight), maxHeight);
+    }
+
+    override finalizeBounds(): void {
+        super.finalizeBounds();
+
         // Mark as dirty if scrollbars changed (check this by comparing old dims
         // with new dims of child viewport)
+        // Get dimensions of child viewport before resolving them
+        let scrollbarsDirty = false;
         const [newChildWidth, newChildHeight] = this.child.idealDimensions;
         const newPaintX = this.scrollbarNeedsPaint(false, newChildWidth > this.effectiveWidth);
-        if ((oldPaintX !== newPaintX) || (newPaintX && newChildWidth !== oldChildWidth)) {
+        if ((this.horizWasPainted !== newPaintX) || (newPaintX && newChildWidth !== this.prevChildWidth)) {
             scrollbarsDirty = true;
         } else {
             const newPaintY = this.scrollbarNeedsPaint(true, newChildHeight > this.effectiveHeight);
-            scrollbarsDirty = (oldPaintY !== newPaintY) || (newPaintY && newChildHeight !== oldChildHeight);
+            scrollbarsDirty = (this.vertWasPainted !== newPaintY) || (newPaintY && newChildHeight !== this.prevChildHeight);
         }
+
+        this.prevChildWidth = newChildWidth;
+        this.prevChildHeight = newChildHeight;
 
         if (scrollbarsDirty) {
             this.markWholeAsDirty();
         }
 
         // Save dimensions to effective dimensions
-        this.effectiveWidth = this.idealWidth;
-        this.effectiveHeight = this.idealHeight;
-
-        // Expand dimensions to fit scrollbars
-        this.idealWidth = Math.min(Math.max(this.idealWidth + this.reservedX, minWidth), maxWidth);
-        this.idealHeight = Math.min(Math.max(this.idealHeight + this.reservedY, minHeight), maxHeight);
+        this.effectiveWidth = Math.max(0, this.width - this.reservedX);
+        this.effectiveHeight = Math.max(0, this.height - this.reservedY);
     }
 
     protected override handlePostLayoutUpdate(): void {
@@ -613,10 +620,8 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         const paintX = this.scrollbarNeedsPaint(false, xNeeded);
         const paintY = this.scrollbarNeedsPaint(true, yNeeded);
 
-        if(this.horizWasPainted !== paintX || this.vertWasPainted !== paintY) {
-            this.horizWasPainted = paintX;
-            this.vertWasPainted = paintY;
-        }
+        this.horizWasPainted = paintX;
+        this.vertWasPainted = paintY;
 
         // Paint viewport
         super.handlePainting(dirtyRects);

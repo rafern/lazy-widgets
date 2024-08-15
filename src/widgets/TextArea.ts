@@ -35,8 +35,8 @@ export class TextArea extends ScrollableViewportWidget<TextInput> {
     constructor(variable?: ValidatedBox<string, unknown> | Box<string>, properties?: Readonly<ScrollableViewportWidgetProperties & TextInputProperties>) {
         // default properties
         properties = {
-            widthCoupling: AxisCoupling.Uni,
-            heightCoupling: AxisCoupling.Uni,
+            widthCoupling: AxisCoupling.ParentToChild,
+            heightCoupling: AxisCoupling.ParentToChild,
             scrollbarMode: ScrollbarMode.Hidden,
             typeableTab: true,
             ...properties
