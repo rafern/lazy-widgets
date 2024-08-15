@@ -1,6 +1,5 @@
 import { ClippedViewport } from '../core/ClippedViewport.js';
 import { CanvasViewport } from '../core/CanvasViewport.js';
-import { layoutField } from '../decorators/FlagFields.js';
 import { AxisCoupling } from '../core/AxisCoupling.js';
 import { Widget, WidgetProperties } from './Widget.js';
 import { SingleParent } from './SingleParent.js';
