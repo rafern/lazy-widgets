@@ -23,7 +23,7 @@
         },
         "containerAlignment": {
             "type": "Alignment2D",
-            "default": "<Alignment2D>{horizontal: Alignment.Start, vertical: Alignment.Start}",
+            "default": "<Alignment2D>{horizontal: Alignment.Stretch, vertical: Alignment.Stretch}",
             "description": "The alignment in {@link Container} for when there is extra space."
         },
         "multiContainerSpacing": {

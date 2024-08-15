@@ -4,12 +4,16 @@ import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js
 import type { Alignment2D } from '../theme/Alignment2D.js';
 import type { Widget, WidgetProperties } from './Widget.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+
+// TODO remove, or move this to a separate "convenience widget" library
+
 /**
  * A {@link Container} with center alignment on both axes and default padding,
  * similar to {@link Center}.
  *
  * Can be constrained to a specific type of children.
  *
+ * @deprecated Prefer using {@link Container} directly. This will be removed in a future update
  * @category Widget
  */
 export class Margin<W extends Widget = Widget> extends Container<W> {

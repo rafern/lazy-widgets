@@ -148,7 +148,7 @@ export class BaseTheme implements ThemeProperties {
     private _containerAlignment?: Alignment2D;
 
     get containerAlignment(): Alignment2D {
-        return this._containerAlignment ?? this._fallbackTheme?.containerAlignment ?? <Alignment2D>{horizontal: Alignment.Start, vertical: Alignment.Start};
+        return this._containerAlignment ?? this._fallbackTheme?.containerAlignment ?? <Alignment2D>{horizontal: Alignment.Stretch, vertical: Alignment.Stretch};
     }
 
     set containerAlignment(value: Alignment2D | undefined) {
@@ -554,7 +554,7 @@ export class BaseTheme implements ThemeProperties {
     private _cursorIndicatorSize?: number;
 
     get cursorIndicatorSize(): number {
-        return this._cursorIndicatorSize ?? this._fallbackTheme?.cursorIndicatorSize ?? 5;
+        return this._cursorIndicatorSize ?? this._fallbackTheme?.cursorIndicatorSize ?? 6;
     }
 
     set cursorIndicatorSize(value: number | undefined) {
