@@ -61,37 +61,37 @@ export type VirtualKeyboardTemplate = Array<VirtualKeyRowTemplate>;
 
 function EnterKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): EnterKey {
     return new EnterKey(
-        keyContext, undefined, undefined, properties,
+        keyContext, properties,
     );
 }
 
 function ShiftKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): ShiftKey {
     return new ShiftKey(
-        keyContext, undefined, undefined, properties,
+        keyContext, properties,
     );
 }
 
 function BackspaceKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): BackspaceKey {
     return new BackspaceKey(
-        keyContext, undefined, undefined, properties,
+        keyContext, properties,
     );
 }
 
 function SpaceKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): SpaceKey {
     return new SpaceKey(
-        keyContext, undefined, undefined, properties,
+        keyContext, properties,
     );
 }
 
 function EscapeKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): EscapeKey {
     return new EscapeKey(
-        keyContext, undefined, undefined, properties,
+        keyContext, properties,
     );
 }
 
 function TabKeyTemplate(keyContext: KeyContext, properties?: Readonly<WidgetProperties>): TabKey {
     return new TabKey(
-        keyContext, undefined, undefined, properties,
+        keyContext, properties,
     );
 }
 
