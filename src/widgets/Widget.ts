@@ -631,17 +631,19 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         maxHeight = Math.min(maxHeight, this._maxHeight);
 
         // Validate constraints
+        // FIXME find a better solution for reporting constraint warnings
+        //       removed warnings for now
         if(minWidth == Infinity) {
             throw new Error(DynMsg.INVALID_VALUE('minWidth', minWidth));
         }
         if(minWidth > maxWidth) {
             // Not throwing here because floating pointer precision errors
             // sometimes trigger this due to tight constraints
-            console.warn(DynMsg.SWAPPED_MIN_MAX_DIMS(minWidth, maxWidth, 'minWidth', 'maxWidth'));
+            // console.warn(DynMsg.SWAPPED_MIN_MAX_DIMS(minWidth, maxWidth, 'minWidth', 'maxWidth'));
             minWidth = maxWidth;
         }
         if(minWidth < 0) {
-            console.warn(DynMsg.NEGATIVE_DIMS(minWidth, 'minWidth'));
+            // console.warn(DynMsg.NEGATIVE_DIMS(minWidth, 'minWidth'));
             minWidth = 0;
         }
 
@@ -649,11 +651,11 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
             throw new Error(DynMsg.INVALID_VALUE('minHeight', minHeight));
         }
         if(minHeight > maxHeight) {
-            console.warn(DynMsg.SWAPPED_MIN_MAX_DIMS(minHeight, maxHeight, 'minHeight', 'maxHeight'));
+            // console.warn(DynMsg.SWAPPED_MIN_MAX_DIMS(minHeight, maxHeight, 'minHeight', 'maxHeight'));
             minHeight = maxHeight;
         }
         if(minHeight < 0) {
-            console.warn(DynMsg.NEGATIVE_DIMS(minHeight, 'minHeight'));
+            // console.warn(DynMsg.NEGATIVE_DIMS(minHeight, 'minHeight'));
             minHeight = 0;
         }
 
@@ -663,10 +665,10 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         // Validate resolved dimensions, handling overflows, underflows and
         // invalid dimensions
         if(this.idealWidth < minWidth) {
-            console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealWidth, minWidth, true, false));
+            // console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealWidth, minWidth, true, false));
             this.idealWidth = minWidth;
         } else if(this.idealWidth > maxWidth) {
-            console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealWidth, maxWidth, true, true));
+            // console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealWidth, maxWidth, true, true));
             this.idealWidth = maxWidth;
         }
 
@@ -675,10 +677,10 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         }
 
         if(this.idealHeight < minHeight) {
-            console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealHeight, minHeight, false, false));
+            // console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealHeight, minHeight, false, false));
             this.idealHeight = minHeight;
         } else if(this.idealHeight > maxHeight) {
-            console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealHeight, maxHeight, false, true));
+            // console.warn(DynMsg.BROKEN_CONSTRAINTS(this.idealHeight, maxHeight, false, true));
             this.idealHeight = maxHeight;
         }
 
