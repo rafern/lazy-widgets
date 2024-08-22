@@ -26,6 +26,8 @@ export interface WidgetProperties extends ThemeProperties {
     flex?: number;
     /** Sets {@link Widget#flexShrink}. */
     flexShrink?: number;
+    /** Sets {@link Widget#flexBasis}. */
+    flexBasis?: number | null;
     /** Sets {@link Widget#minWidth}. */
     minWidth?: number;
     /** Sets {@link Widget#maxWidth}. */
@@ -99,6 +101,8 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     protected _flex;
     /** {@link Widget#flexShrink} but for internal use. */
     protected _flexShrink;
+    /** {@link Widget#flexBasis} but for internal use. */
+    protected _flexBasis;
     /** {@link Widget#minWidth} but for internal use. */
     protected _minWidth;
     /** {@link Widget#maxWidth} but for internal use. */
@@ -188,6 +192,23 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     }
 
     /**
+     * The starting length of this widget when inside a flexbox, which overrides
+     * the wanted/minimum length of this widget. If `null` (default), then the
+     * widget's wanted size will be used. If changed, sets
+     * {@link Widget#_layoutDirty} to true.
+     */
+    get flexBasis(): number | null {
+        return this._flexBasis;
+    }
+
+    set flexBasis(flexBasis: number | null) {
+        if(flexBasis !== this._flexBasis) {
+            this._flexBasis = flexBasis;
+            this._layoutDirty = true;
+        }
+    }
+
+    /**
      * Minimum width of widget. Defaults to 0. If changed, sets
      * {@link Widget#_minWidth} to true.
      */
@@ -253,6 +274,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         this._enabled = properties?.enabled ?? true;
         this._flex = properties?.flex ?? 0;
         this._flexShrink = properties?.flexShrink ?? 0;
+        this._flexBasis = properties?.flexBasis ?? null;
         this._minWidth = properties?.minWidth ?? 0;
         this._maxWidth = properties?.maxWidth ?? Infinity;
         this._minHeight = properties?.minHeight ?? 0;

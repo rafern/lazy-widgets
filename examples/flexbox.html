@@ -9,9 +9,10 @@
             } from '../dist/index.js';
 
             // Create the root
-            function makeDemoBox(canvasFill, flex, flexShrink) {
+            function makeDemoBox(canvasFill, flex, flexShrink, flexBasis, minHeight) {
                 return new Background(new Spacing({ minHeight: 16 }), {
-                    canvasFill, flex, flexShrink,
+                    canvasFill, flex, flexShrink, flexBasis, minHeight,
+                    containerPadding: { left: 0, right: 0, top: 0, bottom: 0 },
                 });
             }
 
@@ -20,12 +21,14 @@
             const maxHeight = new Variable(HEIGHT_LIMIT);
 
             const column = new Column([
-                makeDemoBox('red', 0, 1),
-                makeDemoBox('green', 2, 0),
-                makeDemoBox('blue', 1, 2),
-                makeDemoBox('red', 0, 1),
-                makeDemoBox('green', 2, 0),
-                makeDemoBox('blue', 1, 2),
+                makeDemoBox('red', 0, 1, null, 0),
+                makeDemoBox('green', 2, 0, 32, 0),
+                makeDemoBox('blue', 1, 2, null, 0),
+                makeDemoBox('yellow', 0, 1, null, 16),
+                makeDemoBox('purple', 0, 0, 16, 999),
+                makeDemoBox('red', 0, 1, null, 0),
+                makeDemoBox('green', 2, 0, 32, 0),
+                makeDemoBox('blue', 1, 2, null, 0),
             ], { minWidth: minHeight.value, maxHeight: maxHeight.value });
 
             function onConstraintsChanged() {
@@ -43,8 +46,10 @@
                             new Label('Legend:'),
                             new Margin(new Column([
                                 new Label('Red: flexShrink=1'),
-                                new Label('Green: flex=2'),
+                                new Label('Green: flex=2, flexBasis=32'),
                                 new Label('Blue: flex=1, flexShrink=2'),
+                                new Label('Yellow: flexShrink=2, minHeight=16'),
+                                new Label('Purple: flexBasis=16, minHeight=999'),
                             ]), {
                                 containerPadding: {
                                     left: 16, right: 16, top: 0, bottom: 0,

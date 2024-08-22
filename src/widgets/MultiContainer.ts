@@ -151,10 +151,20 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             this.enabledChildCount++;
 
-            if(this.vertical) {
-                child.resolveDimensions(minCrossAxis, maxWidth, 0, Infinity);
+            const basis = child.flexBasis;
+
+            if (basis === null) {
+                if (this.vertical) {
+                    child.resolveDimensions(minCrossAxis, maxWidth, 0, Infinity);
+                } else {
+                    child.resolveDimensions(0, Infinity, minCrossAxis, maxHeight);
+                }
             } else {
-                child.resolveDimensions(0, Infinity, minCrossAxis, maxHeight);
+                if (this.vertical) {
+                    child.resolveDimensions(minCrossAxis, maxWidth, basis, basis);
+                } else {
+                    child.resolveDimensions(basis, basis, minCrossAxis, maxHeight);
+                }
             }
 
             const [childWidth, childHeight] = child.idealDimensions;
