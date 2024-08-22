@@ -122,7 +122,8 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
         // Resolve children's layout with loose constraints along the main axis
         // to get their wanted dimensions and calculate total flex ratio
-        let totalFlex = 0, totalFlexShrink = 0, crossLength = 0, minCrossAxis = 0;
+        const minCrossLength = this.vertical ? minWidth : minHeight;
+        let totalFlex = 0, totalFlexShrink = 0, crossLength = minCrossLength, minCrossAxis = 0;
 
         const alignment = this.multiContainerAlignment;
         if(alignment.cross === Alignment.Stretch) {
@@ -178,12 +179,6 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             totalFlex += child.flex;
             totalFlexShrink += child.flexShrink;
             crossLength = Math.max(this.vertical ? childWidth : childHeight, crossLength);
-        }
-
-        // Clamp cross length
-        const minCrossLength = this.vertical ? minWidth : minHeight;
-        if(crossLength < minCrossLength) {
-            crossLength = minCrossLength;
         }
 
         // If we haven't reached the minimum length, treat it as the maximum
@@ -252,6 +247,8 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             }
         }
 
+        crossLength = minCrossLength;
+
         if (freeSpacePerFlex >= 0) {
             // grow
             let needsSpacing = false;
@@ -284,6 +281,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 }
 
                 usedSpaceAfter += child.idealDimensions[this.vertical ? 1 : 0];
+                crossLength = Math.max(child.idealDimensions[this.vertical ? 0 : 1], crossLength);
             }
         } else if (usedUnshrinkableSpace >= targetLength) {
             // shrink... except there's no space. fall back to 0-sized
@@ -334,6 +332,8 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                         );
                     }
                 }
+
+                crossLength = Math.max(child.idealDimensions[this.vertical ? 0 : 1], crossLength);
             }
         } else {
             // shrink (potentially expensive because it's iterative)
@@ -431,6 +431,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 }
 
                 usedSpaceAfter += child.idealDimensions[this.vertical ? 1 : 0];
+                crossLength = Math.max(child.idealDimensions[this.vertical ? 0 : 1], crossLength);
             }
         }
 
