@@ -36,6 +36,7 @@
                     // Change Icon.image
                     if(isVideo) {
                         const vid = document.createElement('video');
+                        vid.crossOrigin = 'anonymous';
                         vid.src = newSrc;
                         vid.loop = true;
                         vid.muted = true;
@@ -46,6 +47,7 @@
                     }
                     else {
                         const img = document.createElement('img');
+                        img.crossOrigin = 'anonymous';
                         img.src = newSrc;
                         icon.image = img;
                     }

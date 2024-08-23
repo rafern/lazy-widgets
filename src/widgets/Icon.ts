@@ -150,6 +150,7 @@ export class Icon extends Widget {
         if(typeof image === 'string') {
             if(videoRegex.test(image)) {
                 const videoElem = document.createElement('video');
+                videoElem.crossOrigin = 'anonymous';
                 videoElem.src = image;
                 // So that video poster shows. If you're passing your own video
                 // element then this won't be automatically set
@@ -158,6 +159,7 @@ export class Icon extends Widget {
                 this._isImage = false;
             } else {
                 const imgElem = document.createElement('img');
+                imgElem.crossOrigin = 'anonymous';
                 imgElem.src = image;
                 image = imgElem;
                 this._isImage = true;
