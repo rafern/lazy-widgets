@@ -278,7 +278,7 @@ export class Slider extends Widget {
         if(((this.clickHelper.clickStateChanged && this.clickHelper.wasClick) || this.clickHelper.clickState === ClickState.Hold)
             && this.clickHelper.pointerPos !== null) {
             // Interpolate value
-            const percent = this.clickHelper.pointerPos[0];
+            const percent = this.vertical ? (1 - this.clickHelper.pointerPos[1]) : this.clickHelper.pointerPos[0];
             this.value = this.minValue + percent * (this.maxValue - this.minValue);
         }
 
@@ -344,7 +344,8 @@ export class Slider extends Widget {
         const x = this.x + this.offsetX;
         const y = this.y + this.offsetY;
 
-        // Draw filled part of slider. Use accent colour if hovering or holding
+        // Setup style for filled part of slider. Use accent colour if hovering
+        // or holding
         const ctx = this.viewport.context;
         const useGlow = this.keyboardFocused || this.clickHelper.clickState === ClickState.Hover || this.clickHelper.clickState === ClickState.Hold;
         if(useGlow) {
@@ -352,19 +353,41 @@ export class Slider extends Widget {
         } else {
             ctx.fillStyle = this.primaryFill;
         }
-        const fullWidth = this.actualWidth * Math.max(0, Math.min(1, (this.value - this.minValue) / (this.maxValue - this.minValue)));
-        ctx.fillRect(x, y, fullWidth, this.actualHeight);
 
-        // Draw empty part of slider
-        const emptyWidth = this.actualWidth - fullWidth;
-        if (emptyWidth > 0) {
-            if(useGlow) {
-                ctx.fillStyle = this.backgroundGlowFill;
-            } else {
-                ctx.fillStyle = this.backgroundFill;
+        if (this.vertical) {
+            // bottom-to-top
+            // Draw full part of slider
+            const fullHeight = this.actualHeight * Math.max(0, Math.min(1, (this.value - this.minValue) / (this.maxValue - this.minValue)));
+            ctx.fillRect(x, y + this.actualHeight - fullHeight, this.actualWidth, fullHeight);
+
+            // Draw empty part of slider
+            const emptyHeight = this.actualHeight - fullHeight;
+            if (emptyHeight > 0) {
+                if(useGlow) {
+                    ctx.fillStyle = this.backgroundGlowFill;
+                } else {
+                    ctx.fillStyle = this.backgroundFill;
+                }
+
+                ctx.fillRect(x, y, this.actualWidth, emptyHeight);
             }
+        } else {
+            // left-to-right
+            // Draw full part of slider
+            const fullWidth = this.actualWidth * Math.max(0, Math.min(1, (this.value - this.minValue) / (this.maxValue - this.minValue)));
+            ctx.fillRect(x, y, fullWidth, this.actualHeight);
 
-            ctx.fillRect(x + fullWidth, y, emptyWidth, this.actualHeight);
+            // Draw empty part of slider
+            const emptyWidth = this.actualWidth - fullWidth;
+            if (emptyWidth > 0) {
+                if(useGlow) {
+                    ctx.fillStyle = this.backgroundGlowFill;
+                } else {
+                    ctx.fillStyle = this.backgroundFill;
+                }
+
+                ctx.fillRect(x + fullWidth, y, emptyWidth, this.actualHeight);
+            }
         }
     }
 
