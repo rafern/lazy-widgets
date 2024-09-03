@@ -5,8 +5,20 @@
  * @category Theme
  */
 export enum Alignment {
-    /** Give the extra space to the child, potentially stretching it. */
+    /**
+     * Give the maximum available space to the child (taking into account
+     * container padding), potentially stretching it.
+     */
     Stretch = 'stretch',
+    // TODO maybe make SoftStretch the default? it seems like a happy middle-
+    //      -ground between the nuclear-bomb-esque incompatible behaviour of
+    //      0.10, and the old behaviour of 0.9
+    /**
+     * Propagates minimum axis length to the child (taking into account
+     * container padding), potentially stretching it, but not growing it beyond
+     * the minimum container axis lenght unless necessary.
+     */
+    SoftStretch = 'soft-stretch',
     /**
      * Align the child to the start of the container, having the extra space at
      * the end. Equivalent to using a ratio of 0.

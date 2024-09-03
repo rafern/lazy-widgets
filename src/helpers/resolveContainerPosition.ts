@@ -15,7 +15,7 @@ export function resolveContainerPosition<W extends Widget>(x: number, y: number,
 
     // Horizontal offset
     let childX = x + padding.left;
-    if(alignment.horizontal !== Alignment.Stretch) {
+    if(alignment.horizontal !== Alignment.Stretch && alignment.horizontal !== Alignment.SoftStretch) {
         // Get free space for this axis
         const freeSpace = idealWidth - usedWidth;
 
@@ -30,7 +30,7 @@ export function resolveContainerPosition<W extends Widget>(x: number, y: number,
 
     // Vertical offset
     let childY = y + padding.top;
-    if(alignment.vertical !== Alignment.Stretch) {
+    if(alignment.vertical !== Alignment.Stretch && alignment.vertical !== Alignment.SoftStretch) {
         // Same logic as above, but for vertical axis
         const freeSpace = idealHeight - usedHeight;
 

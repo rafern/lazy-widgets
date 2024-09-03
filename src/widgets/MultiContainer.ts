@@ -128,9 +128,11 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         const alignment = this.multiContainerAlignment;
         if(alignment.cross === Alignment.Stretch) {
             minCrossAxis = this.vertical ? maxWidth : maxHeight;
-            if(minCrossAxis == Infinity) {
+            if(minCrossAxis === Infinity) {
                 minCrossAxis = this.vertical ? minWidth : minHeight;
             }
+        } else if(alignment.cross === Alignment.SoftStretch) {
+            minCrossAxis = this.vertical ? minWidth : minHeight;
         }
 
         this.enabledChildCount = 0;
@@ -457,7 +459,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         const around = alignment.main === FlexAlignment.SpaceAround;
         const between = alignment.main === FlexAlignment.SpaceBetween || around;
         const mainRatio = (between ? 0 : alignment.main as number);
-        const crossRatio = (alignment.cross === Alignment.Stretch ? 0 : alignment.cross);
+        const crossRatio = ((alignment.cross === Alignment.Stretch || alignment.cross === Alignment.SoftStretch) ? 0 : alignment.cross);
         const effectiveChildren = this.enabledChildCount - 1 + (around ? 2 : 0);
         let extraSpacing;
         if(effectiveChildren <= 0) {

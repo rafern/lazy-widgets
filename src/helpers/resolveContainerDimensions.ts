@@ -34,6 +34,8 @@ export function resolveContainerDimensions<W extends Widget>(minWidth: number, m
         } else {
             childMinWidth = Math.max(minWidth - hPadding, 0);
         }
+    } else if(alignment.horizontal === Alignment.SoftStretch) {
+        childMinWidth = Math.max(minWidth - hPadding, 0);
     }
 
     let childMinHeight = 0;
@@ -43,6 +45,8 @@ export function resolveContainerDimensions<W extends Widget>(minWidth: number, m
         } else {
             childMinHeight = Math.max(minHeight - vPadding, 0);
         }
+    } else if(alignment.vertical === Alignment.SoftStretch) {
+        childMinHeight = Math.max(minHeight - vPadding, 0);
     }
 
     // Resolve child's dimensions
