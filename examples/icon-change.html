@@ -26,8 +26,8 @@
                 let newSrc;
                 if(isVideo) {
                     newSrc = alternative
-                                ? 'http://upload.wikimedia.org/wikipedia/commons/7/79/Big_Buck_Bunny_small.ogv'
-                                : '320x240.ogg';
+                                ? 'https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.720p.vp9.webm'
+                                : 'https://upload.wikimedia.org/wikipedia/commons/transcoded/8/87/Schlossbergbahn.webm/Schlossbergbahn.webm.720p.vp9.webm';
                 }
                 else
                     newSrc = alternative ? 'apple.png' :  'banana.png';
@@ -73,7 +73,7 @@
                                 new TextButton('Change Icon.image.src').on('click', () => changeImage(false, false)),
                                 new TextButton('Change Icon.image').on('click', () => changeImage(false, true))
                             ]),
-                            new Label('The video should change between a test video and the big buck bunny trailer'),
+                            new Label('The video should change between two different test videos'),
                             new Row([
                                 new TextButton('Change Icon.image.src').on('click', () => changeImage(true, false)),
                                 new TextButton('Change Icon.image').on('click', () => changeImage(true, true))
