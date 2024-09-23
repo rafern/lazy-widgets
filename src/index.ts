@@ -60,6 +60,7 @@ export * from './events/UntargetableTricklingEvent.js';
 export * from './events/WidgetEvent.js';
 export * from './events/WidgetEventEmitter.js';
 // helpers
+export * from './helpers/AsyncImageBitmap.js';
 export * from './helpers/BaseClickHelper.js';
 export * from './helpers/Bounds.js';
 export * from './helpers/ButtonClickHelper.js';
