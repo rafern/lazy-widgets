@@ -13,7 +13,19 @@
                     new Margin(
                         new Column([
                             new Label('This should look red:'),
-                            new Icon(EffectImageBitmap.fromURL('banana.png', 0xFF0000)),
+                            new Icon(
+                                EffectImageBitmap.fromURL(
+                                    'banana.png',
+                                    {
+                                        tint: 0xFF0000,
+                                        resolution: 0.25,
+                                    }
+                                ),
+                                {
+                                    width: 347,
+                                    height: 223,
+                                },
+                            ),
                         ])
                     )
                 )

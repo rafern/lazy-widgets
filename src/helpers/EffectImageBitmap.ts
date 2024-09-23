@@ -2,7 +2,11 @@ import { AsyncImageBitmap } from './AsyncImageBitmap.js';
 import { BackingMediaSourceType, urlToBackingMediaSource } from './BackingMediaSource.js';
 
 // TODO support BackingMediaSource as backingMedia
-// TODO options object
+
+export interface EffectImageBitmapOptions {
+    tint?: number
+    resolution?: number;
+}
 
 export class EffectImageBitmap extends AsyncImageBitmap {
     private innerBitmap: ImageBitmap | null = null;
@@ -10,9 +14,14 @@ export class EffectImageBitmap extends AsyncImageBitmap {
     private lastSrc: string | null = null;
     private waiting = false;
     private _presentationHash = -1;
+    readonly tint: number;
+    readonly resolution: number;
 
-    constructor(readonly backingMedia: HTMLImageElement, readonly tint = 0xFFFFFF, readonly resolution = 1) {
+    constructor(readonly backingMedia: HTMLImageElement, options?: EffectImageBitmapOptions) {
         super();
+
+        this.tint = options?.tint ?? 0xFFFFFF;
+        this.resolution = options?.resolution ?? 1;
 
         // TODO should this be moved to an update-based approach?
         if (backingMedia.complete) {
@@ -24,13 +33,13 @@ export class EffectImageBitmap extends AsyncImageBitmap {
         }
     }
 
-    static fromURL(url: string, tint?: number, resolution?: number) {
+    static fromURL(url: string, options?: EffectImageBitmapOptions) {
         const [image, type] = urlToBackingMediaSource(url);
         if (type !== BackingMediaSourceType.HTMLImageElement) {
             throw new Error('Unsupported BackingMediaSource type');
         }
 
-        return new EffectImageBitmap(image as HTMLImageElement, tint, resolution);
+        return new EffectImageBitmap(image as HTMLImageElement, options);
     }
 
     override get width(): number {
