@@ -376,18 +376,13 @@ export class Icon extends Widget {
         let actualImage: CanvasImageSource;
         if (this._mediaType === BackingMediaSourceType.AsyncImageBitmap) {
             const aib = this._media as AsyncImageBitmap;
-            const pHash = aib.presentationHash;
-            if (pHash === this.lastPHash) {
-                return;
-            }
-
             const bitmap = aib.bitmap;
             if (!bitmap) {
                 return;
             }
 
             actualImage = bitmap;
-            this.lastPHash = pHash;
+            this.lastPHash = aib.presentationHash;
         } else {
             actualImage = this._media as CanvasImageSource;
         }
