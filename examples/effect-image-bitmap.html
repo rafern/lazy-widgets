@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Margin, Column, Icon, Background,
+                EffectImageBitmap
+            } from '../dist/index.js';
+
+            // Create the root
+            const root = new DOMRoot(
+                new Background(
+                    new Margin(
+                        new Column([
+                            new Label('This should look red:'),
+                            new Icon(EffectImageBitmap.fromURL('banana.png', 0xFF0000)),
+                        ])
+                    )
+                )
+            );
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

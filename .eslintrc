@@ -12,7 +12,8 @@
   ],
   "rules": {
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
-    "@typescript-eslint/no-shadow": ["error"],
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "warn",
     "tsdoc/syntax": "warn",
     "brace-style": "error",
     "curly": "error",
