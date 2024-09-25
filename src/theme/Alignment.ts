@@ -16,7 +16,13 @@ export enum Alignment {
     /**
      * Propagates minimum axis length to the child (taking into account
      * container padding), potentially stretching it, but not growing it beyond
-     * the minimum container axis lenght unless necessary.
+     * the minimum container axis length unless necessary.
+     *
+     * Does something similar in {@link MultiContainer} cross-axis lengths;
+     * propagates the minimum axis length and, if the final cross axis length
+     * exceeds the minimum axis length, then re-propagates the final axis length
+     * to all children, effectively stretching the MultiContainer contents on
+     * the cross axis without artificially growing the cross axis.
      */
     SoftStretch = 'soft-stretch',
     /**

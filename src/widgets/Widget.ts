@@ -697,22 +697,11 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
      * widget tree (the child of the {@link Root}). This retries dimension
      * resolving if there is at least one unconstrained axis so that flex layout
      * works even in infinite layout.
+     *
+     * @deprecated - This doesn't do anything different than {@link Widget#resolveDimensions} anymore, since now the layout resolution is done in a single pass.
      */
     resolveDimensionsAsTop(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
         this.resolveDimensions(minWidth, maxWidth, minHeight, maxHeight);
-
-        // Resolve dimensions again, now with maximum constraints. This is so
-        // that widgets that depend on max constraints, such as containers that
-        // handle flexbox layout, work properly. Only do this if constraints
-        // don't already have maximum dimensions.
-        if(maxWidth === Infinity || maxHeight === Infinity) {
-            this.resolveDimensions(
-                minWidth,
-                maxWidth === Infinity ? this.idealWidth : maxWidth,
-                minHeight,
-                maxHeight === Infinity ? this.idealHeight : maxHeight,
-            );
-        }
     }
 
     /**

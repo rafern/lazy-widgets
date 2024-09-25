@@ -10,6 +10,12 @@ import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 const FLEXBOX_EPSILON = 1e-6;
 const FLEXBOX_ITER_MAX = 8;
 
+function debugLog(widget: MultiContainer, ...args: any[]) {
+    if (widget.id === 'DEBUGME') {
+        console.debug(...args);
+    }
+}
+
 /**
  * A {@link MultiParent} which automatically paints children, adds spacing,
  * propagates events and handles layout.
@@ -122,24 +128,35 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
         // Resolve children's layout with loose constraints along the main axis
         // to get their wanted dimensions and calculate total flex ratio
+        const mainIdx = this.vertical ? 1 : 0;
+        const crossIdx = this.vertical ? 0 : 1;
         const minCrossLength = this.vertical ? minWidth : minHeight;
         let totalFlex = 0, totalFlexShrink = 0, crossLength = minCrossLength, minCrossAxis = 0;
 
         const alignment = this.multiContainerAlignment;
-        if(alignment.cross === Alignment.Stretch) {
+        let needsStretch = alignment.cross === Alignment.Stretch;
+        if(needsStretch) {
             minCrossAxis = this.vertical ? maxWidth : maxHeight;
             if(minCrossAxis === Infinity) {
-                minCrossAxis = this.vertical ? minWidth : minHeight;
+                minCrossAxis = minCrossLength;
             }
         } else if(alignment.cross === Alignment.SoftStretch) {
-            minCrossAxis = this.vertical ? minWidth : minHeight;
+            needsStretch = true;
+            minCrossAxis = minCrossLength;
         }
 
         this.enabledChildCount = 0;
         const spacing = this.multiContainerSpacing;
         let usedSpace = 0;
         let usedUnshrinkableSpace = 0;
-        for(const child of this._children) {
+        debugLog(this, ' START !!!!!', minCrossAxis, 'constraints', minWidth, maxWidth);
+        let minCrossAxisGrowIdx = 0;
+        const children = this._children;
+        const childCount = children.length;
+
+        for(let i = 0; i < childCount; i++) {
+            const child = children[i];
+
             // Resolve dimensions of disabled children with zero-width
             // constraints just so layout dirty flag is cleared
             if(!child.enabled) {
@@ -155,7 +172,6 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             this.enabledChildCount++;
 
             const basis = child.flexBasis;
-
             if (basis === null) {
                 if (this.vertical) {
                     child.resolveDimensions(minCrossAxis, maxWidth, 0, Infinity);
@@ -170,9 +186,8 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 }
             }
 
-            const [childWidth, childHeight] = child.idealDimensions;
-
-            const childLength = this.vertical ? childHeight : childWidth;
+            const childDimensions = child.idealDimensions;
+            const childLength = childDimensions[mainIdx];
             usedSpace += childLength;
             if (child.flexShrink === 0) {
                 usedUnshrinkableSpace += childLength;
@@ -180,7 +195,54 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             totalFlex += child.flex;
             totalFlexShrink += child.flexShrink;
-            crossLength = Math.max(this.vertical ? childWidth : childHeight, crossLength);
+            const childCrossLength = childDimensions[crossIdx];
+            crossLength = Math.max(childCrossLength, crossLength);
+
+            if (needsStretch && childCrossLength > minCrossAxis) {
+                minCrossAxis = childCrossLength;
+                minCrossAxisGrowIdx = i;
+                debugLog(this, '!!!!!', minCrossAxis);
+            }
+        }
+
+        // If we're stretching the cross axis, but one of the later children
+        // caused the minimum cross length to grow, then grow the earlier
+        // children to correct the missing cross length. Used space will need to
+        // be recalculated, since the main axis length is not guaranteed to be
+        // unchanged (we're not doing subtraction of old size and addition of
+        // new size to avoid floating point error)
+        if (minCrossAxisGrowIdx > 0) {
+            usedUnshrinkableSpace = usedSpace = spacing * (this.enabledChildCount - 1);
+
+            for(let i = 0; i < childCount; i++) {
+                const child = children[i];
+                if(!child.enabled) {
+                    continue;
+                }
+
+                if (i < minCrossAxisGrowIdx) {
+                    const basis = child.flexBasis;
+                    if (basis === null) {
+                        if (this.vertical) {
+                            child.resolveDimensions(minCrossAxis, maxWidth, 0, Infinity);
+                        } else {
+                            child.resolveDimensions(0, Infinity, minCrossAxis, maxHeight);
+                        }
+                    } else {
+                        if (this.vertical) {
+                            child.resolveDimensions(minCrossAxis, maxWidth, basis, basis);
+                        } else {
+                            child.resolveDimensions(basis, basis, minCrossAxis, maxHeight);
+                        }
+                    }
+                }
+
+                const childLength = child.idealDimensions[mainIdx];
+                usedSpace += childLength;
+                if (child.flexShrink === 0) {
+                    usedUnshrinkableSpace += childLength;
+                }
+            }
         }
 
         // If we haven't reached the minimum length, treat it as the maximum
@@ -200,6 +262,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         // (unconstrained main axis) or if there isn't any free space.
         const freeSpace = targetLength - usedSpace;
         if(freeSpace === Infinity || freeSpace === 0 || (freeSpace < 0 && totalFlexShrink === 0)) {
+            debugLog(this, '!!!! no flex', minCrossAxis, freeSpace, maxWidth);
             if(this.vertical) {
                 this.idealWidth = crossLength;
                 this.idealHeight = Math.max(Math.min(usedSpace, maxHeight), minHeight);
@@ -211,29 +274,34 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             // Set unused space to 0; no alignment should be done
             this.unusedSpace = 0;
 
-            // Resolve children's layout, but now with strict constraints so
-            // that they stretch properly and shrink children if neccessary (on
-            // overflow)
-            let spaceLeft = targetLength;
-            for(const child of this._children) {
-                // Ignore disabled children
-                if(!child.enabled) {
-                    continue;
+            // Shrink children where necessary (first children get priority
+            // since flexShrink is not being used)
+            if (freeSpace < 0) {
+                let spaceLeft = targetLength;
+                for (let i = 0; i < childCount; i++) {
+                    // Ignore disabled children
+                    const child = children[i];
+                    if(!child.enabled) {
+                        continue;
+                    }
+
+                    if (spaceLeft < child.idealDimensions[mainIdx]) {
+                        if(this.vertical) {
+                            child.resolveDimensions(minCrossAxis, maxWidth, spaceLeft, spaceLeft);
+                        } else {
+                            child.resolveDimensions(spaceLeft, spaceLeft, minCrossAxis, maxHeight);
+                        }
+
+                        spaceLeft = 0;
+                    } else {
+                        spaceLeft = Math.max(0, spaceLeft - child.idealDimensions[mainIdx] - spacing);
+                    }
                 }
-
-                const wantedLength = Math.min(spaceLeft, child.idealDimensions[this.vertical ? 1 : 0]);
-
-                if(this.vertical) {
-                    child.resolveDimensions(minCrossAxis, maxWidth, wantedLength, wantedLength);
-                } else {
-                    child.resolveDimensions(wantedLength, wantedLength, minCrossAxis, maxHeight);
-                }
-
-                spaceLeft = Math.max(0, spaceLeft - child.idealDimensions[this.vertical ? 1 : 0] - spacing);
             }
 
             return;
         }
+        debugLog(this, '!!!! flex');
 
         // Resolve children's layout with constraints restricted to distributed
         // free space. Calculate used space after flexbox calculations.
@@ -267,7 +335,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     needsSpacing = true;
                 }
 
-                const oldChildLength = child.idealDimensions[this.vertical ? 1 : 0];
+                const oldChildLength = child.idealDimensions[mainIdx];
                 const wantedLength = freeSpacePerFlex * child.flex + oldChildLength;
 
                 if(this.vertical) {
@@ -282,8 +350,8 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     );
                 }
 
-                usedSpaceAfter += child.idealDimensions[this.vertical ? 1 : 0];
-                crossLength = Math.max(child.idealDimensions[this.vertical ? 0 : 1], crossLength);
+                usedSpaceAfter += child.idealDimensions[mainIdx];
+                crossLength = Math.max(child.idealDimensions[crossIdx], crossLength);
             }
         } else if (usedUnshrinkableSpace >= targetLength) {
             // shrink... except there's no space. fall back to 0-sized
@@ -315,7 +383,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                         );
                     }
                 } else {
-                    let childLength = child.idealDimensions[this.vertical ? 1 : 0];
+                    let childLength = child.idealDimensions[mainIdx];
                     if (childLength + usedSpaceAfter > targetLength) {
                         childLength = Math.max(0, targetLength - usedSpaceAfter);
                     }
@@ -335,7 +403,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     }
                 }
 
-                crossLength = Math.max(child.idealDimensions[this.vertical ? 0 : 1], crossLength);
+                crossLength = Math.max(child.idealDimensions[crossIdx], crossLength);
             }
         } else {
             // shrink (potentially expensive because it's iterative)
@@ -353,7 +421,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     continue;
                 }
 
-                const childLength = child.idealDimensions[this.vertical ? 1 : 0];
+                const childLength = child.idealDimensions[mainIdx];
                 wantedLengths.push(childLength);
                 frozen.push(false);
 
@@ -377,7 +445,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     }
 
                     if (!frozen[i]) {
-                        const basis = child.idealDimensions[this.vertical ? 1 : 0];
+                        const basis = child.idealDimensions[mainIdx];
                         const scaledFlexShrink = child.flexShrink * basis;
                         wantedLengths[i] += scaledFlexShrink * remainingThawedFreeSpace / scaledFlexShrinkTotal;
 
@@ -415,7 +483,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     needsSpacing = true;
                 }
 
-                let wantedLength = child.flexShrink > 0 ? wantedLengths[i++] : child.idealDimensions[this.vertical ? 1 : 0];
+                let wantedLength = child.flexShrink > 0 ? wantedLengths[i++] : child.idealDimensions[mainIdx];
                 if (wantedLength + usedSpaceAfter > targetLength) {
                     wantedLength = Math.max(0, targetLength - usedSpaceAfter);
                 }
@@ -432,10 +500,12 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     );
                 }
 
-                usedSpaceAfter += child.idealDimensions[this.vertical ? 1 : 0];
-                crossLength = Math.max(child.idealDimensions[this.vertical ? 0 : 1], crossLength);
+                usedSpaceAfter += child.idealDimensions[mainIdx];
+                crossLength = Math.max(child.idealDimensions[crossIdx], crossLength);
             }
         }
+
+        // TODO do we need to handle cross-axis stretching here too?
 
         // Resolve width and height
         if(this.vertical) {
