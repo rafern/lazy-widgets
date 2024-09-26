@@ -34,33 +34,40 @@ export abstract class BaseLabel extends Widget {
 
         this.wrapMode = properties?.wrapMode ?? WrapMode.Shrink;
         this.textHelper = new TextHelper();
-        this.textHelper.wrapMode = this.wrapMode;
-    }
-
-    protected override onThemeUpdated(property: string | null = null): void {
-        super.onThemeUpdated(property);
-
-        if(property === null ||
-           property === 'bodyTextFont' ||
-           property === 'bodyTextHeight' ||
-           property === 'bodyTextSpacing' ||
-           property === 'wrapMode' ||
-           property === 'bodyTextAlign') {
-            this._layoutDirty = true;
-            this.markWholeAsDirty();
-        } else if(property === 'bodyTextFill') {
-            this.markWholeAsDirty();
-        }
-    }
-
-    protected override handlePreLayoutUpdate(): void {
-        // Update text helper variables
         this.textHelper.font = this.bodyTextFont;
         this.textHelper.lineHeight = this.bodyTextHeight;
         this.textHelper.lineSpacing = this.bodyTextSpacing;
         this.textHelper.wrapMode = this.wrapMode;
         this.textHelper.alignMode = this.bodyTextAlign;
+    }
 
+    protected override onThemeUpdated(property: string | null = null): void {
+        super.onThemeUpdated(property);
+
+        if(property === null) {
+            this.textHelper.font = this.bodyTextFont;
+            this.textHelper.lineHeight = this.bodyTextHeight;
+            this.textHelper.lineSpacing = this.bodyTextSpacing;
+            this.textHelper.wrapMode = this.wrapMode;
+            this.textHelper.alignMode = this.bodyTextAlign;
+            this._layoutDirty = true;
+            this.markWholeAsDirty();
+        } else if(property === 'bodyTextFill') {
+            this.markWholeAsDirty();
+        } else if(property === 'bodyTextFont') {
+            this.textHelper.font = this.bodyTextFont;
+        } else if(property === 'bodyTextHeight') {
+            this.textHelper.lineHeight = this.bodyTextHeight;
+        } else if(property === 'bodyTextSpacing') {
+            this.textHelper.lineSpacing = this.bodyTextSpacing;
+        } else if(property === 'wrapMode') {
+            this.textHelper.wrapMode = this.wrapMode;
+        } else if(property === 'bodyTextAlign') {
+            this.textHelper.alignMode = this.bodyTextAlign;
+        }
+    }
+
+    protected override handlePreLayoutUpdate(): void {
         // Mark as dirty if text helper is dirty
         if(this.textHelper.dirty) {
             this.markWholeAsDirty();
@@ -77,6 +84,8 @@ export abstract class BaseLabel extends Widget {
         this.idealHeight = Math.max(Math.min(this.textHelper.height + this.textHelper.actualLineSpacing, maxHeight), minHeight);
 
         if(this.textHelper.dirty) {
+            this.textHelper.maxWidth = this.idealWidth;
+            this.textHelper.cleanDirtyFlag();
             this.markWholeAsDirty();
         }
     }
