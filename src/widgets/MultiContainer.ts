@@ -272,8 +272,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 this.idealHeight = crossLength;
             }
 
-            // Set unused space to 0; no alignment should be done
-            this.unusedSpace = 0;
+            this.unusedSpace = Math.max(freeSpace, 0);
 
             // Shrink children where necessary (first children get priority
             // since flexShrink is not being used), and use strict constraints
