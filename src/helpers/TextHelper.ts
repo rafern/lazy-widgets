@@ -5,6 +5,7 @@ import { DynMsg, Msg } from '../core/Strings.js';
 
 const WIDTH_OVERRIDING_CHARS = new Set(['\n', '\t', ' ']);
 const ELLIPSIS = '...';
+const SPACE_REGEX = /\s/;
 
 /**
  * The type of a {@link TextRenderGroup}.
@@ -312,7 +313,7 @@ export class TextHelper {
         // group
         const group = range[groupIndex];
         if(group.overridesWidth) {
-            return left + group.right * (index - group.rangeStart) / (group.rangeEnd - group.rangeStart);
+            return left + (group.right - left) * (index - group.rangeStart) / (group.rangeEnd - group.rangeStart);
         } else {
             return this.measureTextSlice(left, group.rangeStart, index);
         }
@@ -622,11 +623,10 @@ export class TextHelper {
             this._lineRanges.length = 0;
             let range: LineRange = [];
             const text = this.text;
-            const spaceRegex = /\s/;
             let wordStart = -1;
 
             for(let i = 0; i <= text.length;) {
-                const isSpace = spaceRegex.test(text[i]);
+                const isSpace = SPACE_REGEX.test(text[i]);
                 const atEnd = i === text.length;
 
                 // If this is a whitespace, wrap the previous word and check
@@ -731,7 +731,7 @@ export class TextHelper {
                             const spaceGroupStart = i;
                             do {
                                 i++;
-                            } while(text[i] !== '\n' && spaceRegex.test(text[i]));
+                            } while(text[i] !== '\n' && SPACE_REGEX.test(text[i]));
 
                             const lastGroup = range[range.length - 1];
                             range.push({
