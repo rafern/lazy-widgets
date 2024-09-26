@@ -742,6 +742,11 @@ export class TextHelper {
                                 overridesWidth: true,
                                 visible: false,
                             });
+
+                            if (text[i] !== '\n') {
+                                this.hasWrappedLines = true;
+                            }
+
                             this._lineRanges.push(range);
                             range = [];
                             continue;
