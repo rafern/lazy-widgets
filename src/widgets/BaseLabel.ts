@@ -42,9 +42,10 @@ export abstract class BaseLabel extends Widget {
 
         if(property === null ||
            property === 'bodyTextFont' ||
-           property === 'labelMinWidth' ||
-           property === 'labelMinAscent' ||
-           property === 'labelMinDescent') {
+           property === 'bodyTextHeight' ||
+           property === 'bodyTextSpacing' ||
+           property === 'wrapMode' ||
+           property === 'bodyTextAlign') {
             this._layoutDirty = true;
             this.markWholeAsDirty();
         } else if(property === 'bodyTextFill') {
@@ -68,27 +69,16 @@ export abstract class BaseLabel extends Widget {
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
-        if(this.textHelper.dirty) {
-            this.markWholeAsDirty();
-        }
-
         this.textHelper.maxWidth = maxWidth;
-        // XXX we don't want maxWidth to propagate damage; only if it actually
-        //     changes the text dimensions
-        this.textHelper.cleanDirtyFlag();
 
         // extra spacing is added so that there is enough height to center the
         // text
         this.idealWidth = Math.max(Math.min(this.textHelper.width, maxWidth), minWidth);
         this.idealHeight = Math.max(Math.min(this.textHelper.height + this.textHelper.actualLineSpacing, maxHeight), minHeight);
-    }
 
-    override finalizeBounds(): void {
-        super.finalizeBounds();
-        this.textHelper.maxWidth = this.width;
-        // XXX we don't want maxWidth to propagate damage; only if it actually
-        //     changes the text dimensions
-        this.textHelper.cleanDirtyFlag();
+        if(this.textHelper.dirty) {
+            this.markWholeAsDirty();
+        }
     }
 
     protected override handlePainting(_dirtyRects: Array<Rect>): void {
