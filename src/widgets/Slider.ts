@@ -32,6 +32,12 @@ export interface SliderProperties extends WidgetProperties {
     vertical?: boolean
 }
 
+// TODO move minValue and maxValue to SliderProperties
+// TODO make vertical read-write instead of readonly
+// TODO make this easier to extend/customise. it's currently very hard to, for
+//      example, modify this class in a subclass to make it look like a material
+//      UI slider
+
 /**
  * A slider flexbox widget; can slide a numeric value from an inclusive minimum
  * value to an inclusive maximum value, with optional snapping along set
@@ -66,15 +72,12 @@ export class Slider extends Widget {
         ]
     };
 
-    /** The slider's minimum value. */
-    protected readonly minValue: number;
-    /** The slider's maximum value. */
-    protected readonly maxValue: number;
-    /**
-     * The increments in which the slider changes value. If 0, there are no
-     * fixed increments.
-     */
-    protected readonly snapIncrement: number;
+    /** See {@link Slider#minValue} */
+    private _minValue = 0;
+    /** See {@link Slider#maxValue} */
+    private _maxValue = 1;
+    /** See {@link Slider#snapIncrement} */
+    private _snapIncrement = 0;
     /** The helper for handling pointer clicks/drags */
     protected clickHelper: ClickHelper;
     /** Is this a vertical slider? */
@@ -106,28 +109,10 @@ export class Slider extends Widget {
         // events
         super(properties);
 
-        if(maxValue < minValue) {
-            throw new Error(DynMsg.SWAPPED_MIN_MAX(minValue, maxValue));
-        }
-        if(!isFinite(minValue) || isNaN(minValue)) {
-            throw new Error(DynMsg.INVALID_MIN(minValue));
-        }
-        if(!isFinite(maxValue) || isNaN(maxValue)) {
-            throw new Error(DynMsg.INVALID_MAX(maxValue));
-        }
-
-        const snapIncrement = properties?.snapIncrement ?? 0;
-        if(!isFinite(snapIncrement) || isNaN(snapIncrement)) {
-            throw new Error(DynMsg.INVALID_INC(maxValue));
-        }
-        if(snapIncrement < 0) {
-            throw new Error(DynMsg.NEGATIVE_INC(maxValue));
-        }
-
         this.clickHelper = new ClickHelper(this);
         this.minValue = minValue;
         this.maxValue = maxValue;
-        this.snapIncrement = snapIncrement;
+        this.snapIncrement = properties?.snapIncrement ?? 0;
         this.vertical = properties?.vertical ?? false;
         this.tabFocusable = true;
         this.variable = variable;
@@ -162,12 +147,82 @@ export class Slider extends Widget {
         return this.variable.value;
     }
 
+    /**
+     * The slider's minimum value.
+     *
+     * Changing this does not cause the value to be clamped; clamping occurs on
+     * value changes.
+     */
+    set minValue(minValue: number) {
+        if (this._minValue === minValue) {
+            return;
+        }
+
+        if(!isFinite(minValue) || isNaN(minValue)) {
+            throw new Error(DynMsg.INVALID_MIN(minValue));
+        }
+
+        this._minValue = minValue;
+    }
+
+    get minValue(): number {
+        return this._minValue;
+    }
+
+    /**
+     * The slider's maximum value.
+     *
+     * Changing this does not cause the value to be clamped; clamping occurs on
+     * value changes.
+     */
+    set maxValue(maxValue: number) {
+        if (this._maxValue === maxValue) {
+            return;
+        }
+
+        if(!isFinite(maxValue) || isNaN(maxValue)) {
+            throw new Error(DynMsg.INVALID_MAX(maxValue));
+        }
+
+        this._maxValue = maxValue;
+    }
+
+    get maxValue(): number {
+        return this._maxValue;
+    }
+
+    /**
+     * The increments in which the slider changes value. If 0, there are no
+     * fixed increments.
+     *
+     * Changing this does not cause the value to changed to match the increment;
+     * rounding occurs on value changes.
+     */
+    set snapIncrement(snapIncrement: number) {
+        if (this._snapIncrement === snapIncrement) {
+            return;
+        }
+
+        if(!isFinite(snapIncrement) || isNaN(snapIncrement)) {
+            throw new Error(DynMsg.INVALID_INC(snapIncrement));
+        }
+        if(snapIncrement < 0) {
+            throw new Error(DynMsg.NEGATIVE_INC(snapIncrement));
+        }
+
+        this._snapIncrement = snapIncrement;
+    }
+
+    get snapIncrement(): number {
+        return this._snapIncrement;
+    }
+
     /** Clamp a value to this slider's min and max values */
     protected clamp(value: number): number {
-        if(value < this.minValue) {
-            value = this.minValue;
-        } else if(value > this.maxValue) {
-            value = this.maxValue;
+        if(value < this._minValue) {
+            value = this._minValue;
+        } else if(value > this._maxValue) {
+            value = this._maxValue;
         }
 
         return value;
@@ -176,8 +231,8 @@ export class Slider extends Widget {
     /** Set the slider's value, optionally using an observer group */
     setValue(value: number, group?: unknown): void {
         // Snap to increments if needed
-        if(this.snapIncrement > 0) {
-            value = Math.round(value / this.snapIncrement) * this.snapIncrement;
+        if(this._snapIncrement > 0) {
+            value = Math.round(value / this._snapIncrement) * this._snapIncrement;
         }
 
         // Update value in variable
@@ -187,9 +242,9 @@ export class Slider extends Widget {
     protected stepValue(add: boolean, incMul: number): void {
         // Get snap increment. If the increment is not set, default to 1% of the
         // value range
-        let effectiveIncrement = this.snapIncrement;
+        let effectiveIncrement = this._snapIncrement;
         if(effectiveIncrement === 0) {
-            effectiveIncrement = 0.01 * (this.maxValue - this.minValue);
+            effectiveIncrement = 0.01 * (this._maxValue - this._minValue);
         }
 
         // Multiply increment (for holding shift)
@@ -279,7 +334,7 @@ export class Slider extends Widget {
             && this.clickHelper.pointerPos !== null) {
             // Interpolate value
             const percent = this.vertical ? (1 - this.clickHelper.pointerPos[1]) : this.clickHelper.pointerPos[0];
-            this.value = this.minValue + percent * (this.maxValue - this.minValue);
+            this.value = this._minValue + percent * (this._maxValue - this._minValue);
         }
 
         // Always flag as dirty if the click state changed (so glow colour takes
@@ -357,7 +412,7 @@ export class Slider extends Widget {
         if (this.vertical) {
             // bottom-to-top
             // Draw full part of slider
-            const fullHeight = this.actualHeight * Math.max(0, Math.min(1, (this.value - this.minValue) / (this.maxValue - this.minValue)));
+            const fullHeight = this.actualHeight * Math.max(0, Math.min(1, (this.value - this._minValue) / (this._maxValue - this._minValue)));
             ctx.fillRect(x, y + this.actualHeight - fullHeight, this.actualWidth, fullHeight);
 
             // Draw empty part of slider
@@ -374,7 +429,7 @@ export class Slider extends Widget {
         } else {
             // left-to-right
             // Draw full part of slider
-            const fullWidth = this.actualWidth * Math.max(0, Math.min(1, (this.value - this.minValue) / (this.maxValue - this.minValue)));
+            const fullWidth = this.actualWidth * Math.max(0, Math.min(1, (this.value - this._minValue) / (this._maxValue - this._minValue)));
             ctx.fillRect(x, y, fullWidth, this.actualHeight);
 
             // Draw empty part of slider
