@@ -163,9 +163,9 @@ export class TextHelper {
      * `WrapMode.Ellipsis`, then text will be wrapped and width will be set to
      * maxWidth.
      *
-     * @decorator `@multiFlagField(['_dirty', 'maxWidthDirty'])`
+     * @decorator `@multiFlagField(['_dirty', 'measureDirty'])`
      */
-    @multiFlagField(['_dirty', 'maxWidthDirty'])
+    @multiFlagField(['_dirty', 'measureDirty'])
     maxWidth = Infinity;
     /**
      * The height of each line of text when wrapped. If null, then the helper
@@ -224,8 +224,6 @@ export class TextHelper {
 
     /** Does the text need to be re-measured? */
     private measureDirty = true;
-    /** Has the maximum width been changed? */
-    private maxWidthDirty = false;
     /** Does the line height or spacing need to be re-measured? */
     private lineHeightSpacingDirty = true;
     /** Do the space and tab widths need to be re-measured? */
@@ -234,8 +232,6 @@ export class TextHelper {
     private _dirty = false;
     /** See {@link TextHelper#lineRanges}. For internal use only. */
     private _lineRanges: Array<LineRange> = [];
-    /** Are any of the lines wrapped? For internal use only. */
-    private hasWrappedLines = false;
 
     /**
      * Has the text (or properties associated with it) changed? Resets
@@ -523,33 +519,6 @@ export class TextHelper {
             }
         }
 
-        // If maximum width changed, check if text needs to be re-measured
-        if(this.maxWidthDirty && !this.measureDirty) {
-            if(this.maxWidth === Infinity) {
-                // No wrapping, but some lines were wrapped. Must re-measure
-                // text
-                if(this.hasWrappedLines) {
-                    this.measureDirty = true;
-                } else {
-                    // If text doesn't need to be re-measured, then the width
-                    // still needs to be updated as it's set to be equal to
-                    // maxWidth if maxWidth is not infinity
-                    this._width = 0;
-                    for(const range of this._lineRanges) {
-                        const width = range[range.length - 1].right;
-                        if(width > this._width) {
-                            this._width = width;
-                        }
-                    }
-                }
-            } else {
-                // Wrapping, must re-measure text
-                this.measureDirty = true;
-            }
-        }
-
-        this.maxWidthDirty = false;
-
         // Update tab width if needed
         if(this.tabWidthDirty) {
             this.tabWidthDirty = false;
@@ -564,7 +533,6 @@ export class TextHelper {
 
         // Mark as clean
         this.measureDirty = false;
-        this.hasWrappedLines = false;
 
         const fullLineHeight = this._lineHeight + this._lineSpacing;
         const notWrapping = this.maxWidth === Infinity || this.wrapMode === WrapMode.None || this.wrapMode === WrapMode.Ellipsis;
@@ -635,7 +603,6 @@ export class TextHelper {
                     // Try fitting word if any
                     if(wordStart >= 0 && !this.measureText(wordStart, i, this.maxWidth, range)) {
                         // Overflow, check if word fits in new line
-                        this.hasWrappedLines = true;
                         const newRange: LineRange = [];
                         if(this.measureText(wordStart, i, this.maxWidth, newRange)) {
                             // Fits in new line. Push old line to line ranges if
@@ -743,15 +710,10 @@ export class TextHelper {
                                 visible: false,
                             });
 
-                            if (text[i] !== '\n') {
-                                this.hasWrappedLines = true;
-                            }
-
                             this._lineRanges.push(range);
                             range = [];
                             continue;
                         } else if(this.wrapMode === WrapMode.Normal) {
-                            this.hasWrappedLines = true;
                             this._lineRanges.push(range);
                             range = [];
                             this.measureText(i, i + 1, Infinity, range);
