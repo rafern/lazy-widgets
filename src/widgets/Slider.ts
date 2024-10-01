@@ -163,6 +163,7 @@ export class Slider extends Widget {
         }
 
         this._minValue = minValue;
+        this.markWholeAsDirty();
     }
 
     get minValue(): number {
@@ -185,6 +186,7 @@ export class Slider extends Widget {
         }
 
         this._maxValue = maxValue;
+        this.markWholeAsDirty();
     }
 
     get maxValue(): number {
