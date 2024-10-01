@@ -261,16 +261,14 @@ export class TextInput extends Widget {
     protected override onThemeUpdated(property: string | null = null): void {
         super.onThemeUpdated(property);
 
-        if(property === null) {
+        if(property === null ||
+           property === 'inputTextInnerPadding' ||
+           property === 'inputTextFont' ||
+           property === 'inputTextHeight' ||
+           property === 'inputTextSpacing') {
             this._layoutDirty = true;
             this.markWholeAsDirty();
             this.cursorOffsetDirty = true;
-        } else if(property === 'inputTextInnerPadding' ||
-                property === 'inputTextFont' ||
-                property === 'inputTextHeight' ||
-                property === 'inputTextSpacing') {
-            this._layoutDirty = true;
-            this.markWholeAsDirty();
         } else if(property === 'inputBackgroundFill' ||
                 property === 'inputTextFill' ||
                 property === 'inputTextFillInvalid' ||
@@ -1111,6 +1109,17 @@ export class TextInput extends Widget {
         const effectiveMinWidth = Math.min(Math.max(this.inputTextMinWidth, minWidth), maxWidth);
         this.idealWidth = Math.min(Math.max(effectiveMinWidth, this.textHelper.width + padding), maxWidth);
         this.idealHeight = Math.min(Math.max(minHeight, this.textHelper.height + padding), maxHeight);
+    }
+
+    override finalizeBounds(): void {
+        const oldWidth = this.width;
+        const oldHeight = this.height;
+
+        super.finalizeBounds();
+
+        if (oldWidth !== this.width || oldHeight !== this.height) {
+            this.cursorOffsetDirty = true;
+        }
     }
 
     /**
