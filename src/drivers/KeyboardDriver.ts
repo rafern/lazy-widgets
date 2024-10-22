@@ -7,6 +7,12 @@ import type { Widget } from '../widgets/Widget.js';
 import type { Driver } from '../core/Driver.js';
 import type { Root } from '../core/Root.js';
 import type { CaptureList } from '../core/CaptureList.js';
+import { insertValueIntoOrderedSubsetList } from '../index.js';
+
+// TODO should enabledRoots be deprecated/removed? it was only needed for
+//      tab-focusing, but we have tabbableRoots now and nothing in the core or
+//      WLE integration libraries is using it
+
 /**
  * A group of Roots. When a {@link TabSelectEvent} is not captured by a
  * {@link Root} in a group, the TabSelectEvent is carried over to the next (or
@@ -34,6 +40,11 @@ export interface KeyboardDriverGroup {
      * {@link Root | Roots}.
      */
     enabledRoots: Array<Root>;
+    /**
+     * Similar to {@link KeyboardDriverGroup#enabledRoots}, but only contains
+     * enabled {@link Root | Roots} that are {@link Root#tabFocusable}.
+     */
+    tabbableRoots: Array<Root>;
     /**
      * Should {@link TabSelectEvent} events wrap-around to the other end of the
      * group if not captured by the last (or first) {@link Root}? If this is
@@ -218,43 +229,12 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
             // add to enabled roots list in group
             const group = this.getGroup(root);
 
-            // XXX `enabledRoots` is a subset of `roots` with the same order.
-            // this efficiently inserts an element into the subset, while
-            // keeping the same order as the superset
-            const roots = group.roots;
-            const rootsIndex = roots.indexOf(root);
-            if (rootsIndex < 0) {
-                throw new Error("Root is mapped to a group, but not in the group's Root list; this is a bug, please report it");
-            }
+            // XXX enabledRoots is an ordered subset of roots
+            insertValueIntoOrderedSubsetList(root, group.enabledRoots, group.roots);
 
-            // TODO verify this algorithm. i made it up and i can only test this
-            // once the wle integration is updated, so it's probably broken
-            let lastFound = -1;
-            let inserted = false;
-            const enabledRoots = group.enabledRoots;
-            const enabledRootCount = enabledRoots.length;
-            for (let i = 0; i < enabledRootCount; i++) {
-                // get index of this subset root in the superset
-                const otherRoot = enabledRoots[i];
-                if (otherRoot === root) {
-                    throw new Error('Root is already in enabledRoots set; this is a bug, please report it');
-                }
-
-                lastFound = roots.indexOf(otherRoot, lastFound + 1);
-
-                // if the superset index is after the inserted root's superset
-                // index, insert in-place
-                if (rootsIndex < lastFound) {
-                    enabledRoots.splice(i, 0, root);
-                    inserted = true;
-                    break;
-                }
-            }
-
-            // no insertion spot found, meaning that the inserted root needs to
-            // be placed after all the enabled roots. push to the end
-            if (!inserted) {
-                enabledRoots.push(root);
+            if (root.tabFocusable) {
+                // XXX tabbableRoots is an ordered subset of enabledRoots
+                insertValueIntoOrderedSubsetList(root, group.tabbableRoots, group.enabledRoots);
             }
 
             // add to access list
@@ -280,6 +260,16 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
             }
 
             group.enabledRoots.splice(groupIndex, 1);
+
+            // remove from tabbable roots list in group
+            if (root.tabFocusable) {
+                const tabGroupIndex = group.tabbableRoots.indexOf(root);
+                if (tabGroupIndex < 0) {
+                    throw new Error("Root not found in group's tabbable root list; this is a bug, please report it");
+                }
+
+                group.tabbableRoots.splice(tabGroupIndex, 1);
+            }
 
             // remove from access list
             this.accessList.splice(index, 1);
@@ -353,7 +343,7 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         if(root) {
             const captureList = root.dispatchEvent(event);
             const group = this.getGroup(root);
-            const rootCount = group.enabledRoots.length;
+            const rootCount = group.tabbableRoots.length;
 
             // check if there was any uncaptured TabSelectEvent event and carry
             // it over to another root in the same group
@@ -372,7 +362,7 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
                             }
                         }
 
-                        const nextRoot = group.enabledRoots[iNext];
+                        const nextRoot = group.tabbableRoots[iNext];
                         captureList.splice(i, 1);
                         captureList.push(...nextRoot.dispatchEvent(new TabSelectEvent(null, cEvent.reversed)));
 
@@ -421,6 +411,7 @@ export class KeyboardDriver<G extends KeyboardDriverGroup = KeyboardDriverGroup,
         const group = <G>{
             roots: new Array<Root>(),
             enabledRoots: new Array<Root>(),
+            tabbableRoots: new Array<Root>(),
             wrapsAround: !!options.wrapsAround,
         };
 

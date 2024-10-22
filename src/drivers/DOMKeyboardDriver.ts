@@ -164,7 +164,7 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
 
         // add listeners
         group.focusListen = async (focusEvent: FocusEvent) => {
-            if (!selectable || group.enabledRoots.length === 0) {
+            if (!selectable || group.tabbableRoots.length === 0) {
                 return;
             }
 
@@ -199,7 +199,7 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
 
                 // XXX must check enabled roots again because
                 // isTabInitiatedFocus is async, to avoid data races
-                const rootCount = group.enabledRoots.length;
+                const rootCount = group.tabbableRoots.length;
                 if (rootCount === 0) {
                     return;
                 }
@@ -209,7 +209,7 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
                 let i = directionReversed ? (rootCount - 1) : 0;
 
                 for (; i >= 0 && i < rootCount; i += delta) {
-                    const captureList = group.enabledRoots[i].dispatchEvent(new TabSelectEvent(null, directionReversed));
+                    const captureList = group.tabbableRoots[i].dispatchEvent(new TabSelectEvent(null, directionReversed));
                     for (const [event, captured] of captureList) {
                         if (captured && event.isa(TabSelectEvent)) {
                             return;

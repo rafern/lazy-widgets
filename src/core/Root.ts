@@ -93,6 +93,8 @@ export interface RootProperties {
     maxCanvasWidth?: number;
     /** Sets {@link Root#maxCanvasHeight}. */
     maxCanvasHeight?: number;
+    /** Sets {@link Root#tabFocusable}. */
+    tabFocusable?: boolean;
 }
 
 /**
@@ -203,6 +205,11 @@ export class Root implements WidgetEventEmitter {
      * from the root.
      */
     private hasDetached: () => boolean;
+    /**
+     * Can tab controls be used in this UI root? True by default. Can only be
+     * set once when the UI is created.
+     */
+    readonly tabFocusable: boolean;
 
     constructor(child: Widget, properties?: Readonly<RootProperties>) {
         this.hasDetached = () => !this.child.attached;
@@ -222,6 +229,8 @@ export class Root implements WidgetEventEmitter {
         if (properties?.maxCanvasHeight !== undefined) {
             this.viewport.maxCanvasHeight = properties.maxCanvasHeight;
         }
+
+        this.tabFocusable = properties?.tabFocusable ?? true;
     }
 
     /**
@@ -484,7 +493,7 @@ export class Root implements WidgetEventEmitter {
                 // special case for tab key with no currently focused widget;
                 // try to do tab selection. does not apply to virtual tab
                 // presses
-                if(event.isa(KeyPressEvent) && !event.virtual && event.key === 'Tab') {
+                if(this.tabFocusable && event.isa(KeyPressEvent) && !event.virtual && event.key === 'Tab') {
                     return [
                         [event, false],
                         ...this.dispatchEvent(new TabSelectEvent(this.getFocus(FocusType.Tab), event.shift))
@@ -509,7 +518,7 @@ export class Root implements WidgetEventEmitter {
 
         if(captured === null) {
             if(event.isa(KeyPressEvent)) {
-                if(event.key === 'Tab' && !event.virtual) {
+                if(this.tabFocusable && event.key === 'Tab' && !event.virtual) {
                     // special case for tab key; try to do tab selection. does
                     // not apply to virtual tab presses
                     captureList.push(

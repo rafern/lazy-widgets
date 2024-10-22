@@ -72,6 +72,7 @@ export * from './helpers/filterIDFromProperties.js';
 export * from './helpers/fromKebabCase.js';
 export * from './helpers/GenericClickHelper.js';
 export * from './helpers/getPointerEventNormPos.js';
+export * from './helpers/insertValueIntoOrderedSubsetList.js';
 export * from './helpers/isPower2.js';
 export * from './helpers/measureTextDims.js';
 export * from './helpers/BackingMediaSource.js';
