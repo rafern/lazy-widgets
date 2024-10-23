@@ -200,8 +200,8 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
 
         // Dispatch event to children. Front layers receive the event before the
         // back layers
-        for (const [layer, _name] of this.frontToBackLayers) {
-            const capturer = layer.child.dispatchEvent(event);
+        for (let i = this.layers.length - 1; i >= 0; i--) {
+            const capturer = this.layers[i].child.dispatchEvent(event);
             if (capturer) {
                 return capturer;
             }
@@ -230,20 +230,26 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
-        // Resolve child's dimensions and set own resolved dimensions to be
-        // equal to the maximum dimensions of layers which can expand
+        // resolve expanding layers
         this.idealWidth = 0;
         this.idealHeight = 0;
 
-        for (const [layer, _name] of this.backToFrontLayers) {
+        for (const layer of this.layers) {
+            if (!layer.canExpand) {
+                continue;
+            }
+
             const child = layer.child;
             child.resolveDimensions(minWidth, maxWidth, minHeight, maxHeight);
 
-            if (layer.canExpand) {
-                const [idealChildWidth, idealChildHeight] = child.idealDimensions;
-                this.idealWidth = Math.max(this.idealWidth, idealChildWidth);
-                this.idealHeight = Math.max(this.idealHeight, idealChildHeight);
-            }
+            const idealChildDims = child.idealDimensions;
+            this.idealWidth = Math.max(this.idealWidth, idealChildDims[0]);
+            this.idealHeight = Math.max(this.idealHeight, idealChildDims[1]);
+        }
+
+        // soft-stretch all layers to fit ideal dimensions
+        for (const layer of this.layers) {
+            layer.child.resolveDimensions(this.idealWidth, this.idealWidth, this.idealHeight, this.idealHeight);
         }
     }
 
@@ -258,7 +264,7 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Paint children. Back layers are painted before front layers
-        for (const [layer, _name] of this.backToFrontLayers) {
+        for (const layer of this.layers) {
             layer.child.paint(dirtyRects);
         }
     }
