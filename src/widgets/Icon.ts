@@ -268,9 +268,15 @@ export class Icon extends Widget {
         if(wantedWidth === null) {
             if(this.viewBox === null) {
                 switch(this._mediaType) {
-                case BackingMediaSourceType.HTMLImageElement:
-                    wantedWidth = (this._media as HTMLImageElement).naturalWidth;
-                    break;
+                case BackingMediaSourceType.HTMLImageElement: {
+                    const media = this._media as HTMLImageElement;
+                    wantedWidth = media.naturalWidth;
+                    // HACK firefox has a naturalWidth of 0 for some SVGs. note
+                    //      that images will likely have a bad aspect ratio
+                    if (wantedWidth === 0 && media.complete) {
+                        wantedWidth = 150;
+                    }
+                }   break;
                 case BackingMediaSourceType.HTMLVideoElement:
                     wantedWidth = (this._media as HTMLVideoElement).videoWidth;
                     break;
@@ -300,9 +306,15 @@ export class Icon extends Widget {
         if(wantedHeight === null) {
             if(this.viewBox === null) {
                 switch(this._mediaType) {
-                case BackingMediaSourceType.HTMLImageElement:
-                    wantedHeight = (this._media as HTMLImageElement).naturalHeight;
-                    break;
+                case BackingMediaSourceType.HTMLImageElement: {
+                    const media = this._media as HTMLImageElement;
+                    wantedHeight = media.naturalHeight;
+                    // HACK firefox has a naturalHeight of 0 for some SVGs. note
+                    //      that images will likely have a bad aspect ratio
+                    if (wantedHeight === 0 && media.complete) {
+                        wantedHeight = 150;
+                    }
+                }   break;
                 case BackingMediaSourceType.HTMLVideoElement:
                     wantedHeight = (this._media as HTMLVideoElement).videoHeight;
                     break;
