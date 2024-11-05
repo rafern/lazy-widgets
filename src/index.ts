@@ -21,6 +21,7 @@ export * from './core/TextInputHandler.js';
 export * from './core/Viewport.js';
 export * from './core/VirtualKeyboardRoot.js';
 export * from './core/VirtualKeyboardTemplate.js';
+export * from './core/WidgetConstructor.js';
 // decorators
 export * from './decorators/FlagFields.js';
 // drivers

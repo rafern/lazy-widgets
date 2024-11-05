@@ -1,6 +1,5 @@
 import { BaseXMLUIParser, XML_NAMESPACE_BASE } from './BaseXMLUIParser.js';
 import * as widgets from '../widgets/concrete-widgets.js';
-import { WidgetAutoXML } from './WidgetAutoXML.js';
 import { validateArray } from './validateArray.js';
 import { validateBoolean } from './validateBoolean.js';
 import { validateBox } from './validateBox.js';
@@ -319,7 +318,7 @@ export class XMLUIParser extends BaseXMLUIParser {
 
         // register factories for default widgets
         for (const ctor of Object.values(widgets)) {
-            this.autoRegisterFactory(ctor as ((new () => Widget) & { autoXML: WidgetAutoXML }));
+            this.autoRegisterFactory<Widget>(ctor);
         }
     }
 }

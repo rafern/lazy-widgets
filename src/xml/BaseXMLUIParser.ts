@@ -12,6 +12,7 @@ import type { XMLElementDeserializer } from './XMLElementDeserializer.js';
 import type { XMLParameterModeValidator } from './XMLParameterModeValidator.js';
 import type { XMLArgumentModifier } from './XMLArgumentModifier.js';
 import type { XMLPostInitHook } from './XMLPostInitHook.js';
+import type { WidgetConstructor } from '../core/WidgetConstructor.js';
 const RESERVED_PARAMETER_MODES = ['value', 'text', 'widget'];
 const RESERVED_ELEMENT_NAMES = ['script', 'ui-tree'];
 const RESERVED_IMPORTS = ['context', 'window', 'globalThis'];
@@ -402,7 +403,7 @@ export abstract class BaseXMLUIParser {
      * @param inputMapping - The input mapping for the widget factory
      * @param factory - A function which creates a new instance of a widget
      */
-    registerFactory<T extends Widget = Widget>(nameOrWidgetClass: string | (new (...args: unknown[]) => T), inputMapping: WidgetXMLInputConfig, factory: XMLWidgetFactory) {
+    registerFactory<T extends Widget = Widget>(nameOrWidgetClass: string | WidgetConstructor<T>, inputMapping: WidgetXMLInputConfig, factory: XMLWidgetFactory) {
         // handle constructors as names
         let factoryName = nameOrWidgetClass;
         if (typeof factoryName !== 'string') {
@@ -569,7 +570,7 @@ export abstract class BaseXMLUIParser {
      * @param widgetClass - The class of the widget that will be instantiated. The class name will be used for the element name, and the class constructor will be used for making the factory function.
      * @param inputMapping - The input mapping for the widget factory
      */
-    registerFactoryFromClass<T extends Widget>(widgetClass: new (...args: unknown[]) => T, inputMapping: WidgetXMLInputConfig): void {
+    registerFactoryFromClass<T extends Widget>(widgetClass: WidgetConstructor<T>, inputMapping: WidgetXMLInputConfig): void {
         this.registerFactory(widgetClass, inputMapping, (...args) => new widgetClass(...args));
     }
 
@@ -680,7 +681,7 @@ export abstract class BaseXMLUIParser {
      *
      * @param widgetClass - The class to auto-register
      */
-    autoRegisterFactory<T extends Widget = Widget>(widgetClass: (new (...args: unknown[]) => T) & { autoXML: WidgetAutoXML }) {
+    autoRegisterFactory<T extends Widget = Widget>(widgetClass: WidgetConstructor<T> & { autoXML: WidgetAutoXML }) {
         if (widgetClass.autoXML === null) {
             throw new Error('Widget class does not have an automatic XML factory config object set. Must be manually registered');
         }
