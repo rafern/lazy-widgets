@@ -85,34 +85,24 @@ export class Icon extends Widget {
     /** Has the user already been warned about the broken image? */
     private warnedBroken = false;
 
-    /**
-     * The current image rotation in radians.
-     *
-     * @decorator `@damageField`
-     */
+    /** The current image rotation in radians. */
     @damageField
     rotation = 0;
     /**
      * The view box of this Icon, useful if the image used for the icon is a
      * spritesheet. If null, the entire image will be used.
-     *
-     * @decorator `@damageLayoutArrayField(true)`
      */
     @damageLayoutArrayField(true)
     viewBox: Rect | null;
     /**
      * The wanted width. If null, the image's width will be used, taking
      * {@link Icon#viewBox} into account.
-     *
-     * @decorator `@layoutField`
      */
     @layoutField
     imageWidth: number | null = null;
     /**
      * The wanted height. If null, the image's height will be used, taking
      * {@link Icon#viewBox} into account.
-     *
-     * @decorator `@layoutField`
      */
     @layoutField
     imageHeight: number | null = null;

@@ -40,11 +40,7 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
 
     /** Theme property used for overriding the canvas colour. */
     private backgroundProperty = 'backgroundFill';
-    /**
-     * Is the button currently forced down?
-     *
-     * @decorator `@watchField(FilledButton.prototype.updateBackground)`
-     */
+    /** Is the button currently forced down? */
     @watchField(FilledButton.prototype.updateBackground)
     forced;
     /** The inherited theme for the child */

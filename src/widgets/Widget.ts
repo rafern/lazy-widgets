@@ -58,11 +58,8 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
      */
     static autoXML: WidgetAutoXML | null = null;
 
-    /**
-     * Is this widget enabled? If it isn't, it will act as if it doesn't exist,
-     * but will still be present in the UI tree.
-     */
-    private _enabled;
+    /** {@link Widget#enabled} but for internal use. */
+    private _enabled: boolean;
     /**
      * If this is true, widget needs their layout resolved. If implementing a
      * container, propagate this up.
@@ -136,10 +133,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     protected _parent: Widget | null = null;
     /** Can this widget be focused by pressing tab? */
     protected tabFocusable = false;
-    /**
-     * Is the Widget attached to a UI tree, enabled and in a UI sub-tree where
-     * all ascendants are enabled?
-     */
+    /** {@link Widget#active} but for internal use. */
     private _active = false;
     /** Typed user listeners attached to this Widget */
     private typedListeners: WidgetEventTypedListenerMap = new Map();
@@ -283,9 +277,8 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     }
 
     /**
-     * Is this widget enabled? If it isn't, it will act as if it doesn't exist.
-     *
-     * If getting, {@link Widget#_enabled} is returned.
+     * Is this widget enabled? If it isn't, it will act as if it doesn't exist,
+     * but will still be present in the UI tree.
      */
     set enabled(enabled: boolean) {
         if(enabled === this._enabled) {
@@ -606,7 +599,7 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
 
     /**
      * Wrapper for {@link Widget#handleResolveDimensions}. Does nothing if
-     * {@link Widget#_enabled} is false. If the resolved dimensions change,
+     * {@link Widget#enabled} is false. If the resolved dimensions change,
      * the widget is marked as dirty. {@link Widget#_layoutDirty} is set to
      * false. If the widget is not loose and the layout has non-infinite max
      * constraints, then the widget is stretched to fit max constraints. Must
@@ -993,9 +986,12 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     }
 
     /**
-     * Public getter for {@link Widget#_active}. Can only be updated by calling
-     * {@link Widget#updateActiveState}, although this should never be done
-     * manually; only done automatically by container Widgets and Roots.
+     * Is the Widget attached to a UI tree, enabled and in a UI sub-tree where
+     * all ascendants are enabled?
+     *
+     * Can only be updated by calling {@link Widget#updateActiveState}, although
+     * this should never be done manually; only done automatically by container
+     * Widgets and Roots.
      */
     get active() {
         return this._active;

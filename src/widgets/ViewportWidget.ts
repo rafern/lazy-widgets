@@ -79,14 +79,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
      * the resolution of the {@link Root} will be inherited automatically.
      */
     readonly useCanvas: boolean;
-    /**
-     * Child constraints for resolving layout. May be different than
-     * {@link ViewportWidget#internalViewport}'s constraints. By default, this
-     * is 0 minimum and Infinity maximum per axis.
-     *
-     * Will be automatically scaled depending on the current {@link Root}'s
-     * resolution.
-     */
+    /** {@link ViewportWidget#_constraints} but for internal use. */
     private _constraints: LayoutConstraints = [0, Infinity, 0, Infinity];
     /**
      * The amount of horizontal space to reserve. By default, no space is
@@ -146,9 +139,16 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     }
 
     /**
-     * Accessor for {@link ViewportWidget#_constraints}. Will also update the
-     * constraints of the {@link ViewportWidget#internalViewport | Viewport},
-     * but may be different due to {@link ViewportWidget#widthCoupling} or
+     * Child constraints for resolving layout. May be different than
+     * {@link ViewportWidget#internalViewport}'s constraints. By default, this
+     * is 0 minimum and Infinity maximum per axis.
+     *
+     * Will be automatically scaled depending on the current {@link Root}'s
+     * resolution.
+     *
+     * Will also update the constraints of the
+     * {@link ViewportWidget#internalViewport | Viewport}, but may be different
+     * due to {@link ViewportWidget#widthCoupling} or
      * {@link ViewportWidget#heightCoupling}.
      */
     set constraints(constraints: LayoutConstraints) {

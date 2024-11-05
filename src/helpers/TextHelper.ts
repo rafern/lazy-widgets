@@ -143,18 +143,10 @@ const CHARSET = '~!@#$%^&*()_+`1234567890-=qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;
  * @category Helper
  */
 export class TextHelper {
-    /**
-     * The current string of text.
-     *
-     * @decorator `@multiFlagField(['_dirty', 'measureDirty'])`
-     */
+    /** The current string of text. */
     @multiFlagField(['_dirty', 'measureDirty'])
     text = '';
-    /**
-     * The current font used for rendering text.
-     *
-     * @decorator `@multiFlagField(['_dirty', 'measureDirty', 'lineHeightSpacingDirty', 'tabWidthDirty'])`
-     */
+    /** The current font used for rendering text. */
     @multiFlagField(['_dirty', 'measureDirty', 'lineHeightSpacingDirty', 'tabWidthDirty'])
     font = '';
     /**
@@ -162,40 +154,28 @@ export class TextHelper {
      * {@link TextHelper#wrapMode} is not `WrapMode.None` and not
      * `WrapMode.Ellipsis`, then text will be wrapped and width will be set to
      * maxWidth.
-     *
-     * @decorator `@multiFlagField(['_dirty', 'measureDirty'])`
      */
     @multiFlagField(['_dirty', 'measureDirty'])
     maxWidth = Infinity;
     /**
      * The height of each line of text when wrapped. If null, then the helper
      * will try to automatically detect it.
-     *
-     * @decorator `@multiFlagField(['_dirty', 'measureDirty', 'lineHeightSpacingDirty'])`
      */
     @multiFlagField(['_dirty', 'measureDirty', 'lineHeightSpacingDirty'])
     lineHeight: number | null = null;
     /**
      * The amount of spacing between lines. If null, then the helper will try to
      * automatically detect it.
-     *
-     * @decorator `@multiFlagField(['_dirty', 'measureDirty', 'lineHeightSpacingDirty'])`
      */
     @multiFlagField(['_dirty', 'measureDirty', 'lineHeightSpacingDirty'])
     lineSpacing: number | null = null;
     /**
      * The amount of spaces that each tab character is equivalent to. By
      * default, it is equivalent to 4 spaces.
-     *
-     * @decorator `@multiFlagField(['_dirty', 'measureDirty', 'tabWidthDirty'])`
      */
     @multiFlagField(['_dirty', 'measureDirty', 'tabWidthDirty'])
     tabWidth = 4;
-    /**
-     * The mode for text wrapping
-     *
-     * @decorator `@multiFlagField(['_dirty', 'measureDirty'])`
-     */
+    /** The mode for text wrapping */
     @multiFlagField(['_dirty', 'measureDirty'])
     wrapMode: WrapMode = WrapMode.Normal;
     /**
@@ -228,14 +208,14 @@ export class TextHelper {
     private lineHeightSpacingDirty = true;
     /** Do the space and tab widths need to be re-measured? */
     private tabWidthDirty = true;
-    /** Has the text (or properties associated with it) changed? */
+    /** {@link TextHelper#dirty} but for internal use. */
     private _dirty = false;
     /** See {@link TextHelper#lineRanges}. For internal use only. */
     private _lineRanges: Array<LineRange> = [];
 
     /**
-     * Has the text (or properties associated with it) changed? Resets
-     * {@link TextHelper#_dirty} to false
+     * Has the text (or properties associated with it) changed? Resets to false
+     * after reading the current value.
      */
     get dirty(): boolean {
         const wasDirty = this._dirty;
@@ -243,9 +223,7 @@ export class TextHelper {
         return wasDirty;
     }
 
-    /**
-     * Resets {@link TextHelper#_dirty} to false
-     */
+    /** Resets {@link TextHelper#dirty} to false */
     cleanDirtyFlag() {
         this._dirty = false;
     }

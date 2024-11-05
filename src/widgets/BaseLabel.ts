@@ -23,8 +23,6 @@ export abstract class BaseLabel extends Widget {
     /**
      * Text wrapping mode. Used to control what happens when the text is too big
      * to fit in the label. Uses shrink-wrapping by default.
-     *
-     * @decorator `@layoutField`
      */
     @layoutField
     wrapMode: WrapMode;

@@ -318,8 +318,6 @@ export class Root implements WidgetEventEmitter {
      * notified by calling {@link Driver#onEnable} or {@link Driver#onDisable},
      * pointer style will be reset and all {@link Root#_foci | foci} will be
      * cleared ({@link Root#clearFocus}).
-     *
-     * See {@link Root#_enabled}
      */
     get enabled(): boolean {
         return this._enabled;

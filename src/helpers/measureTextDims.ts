@@ -1,6 +1,8 @@
 import { Msg } from "../core/Strings.js";
 /** The rendering context used for measuring text. */
 let measureContext: CanvasRenderingContext2D | null = null;
+/** The default font style. */
+let defaultFontStyle = '';
 
 /**
  * An LFU cache entry for `measureCache`. `font` and `text` are the paramenters
@@ -92,10 +94,12 @@ export function measureTextDims(text: string, font: string): TextMetrics {
         if(measureContext === null) {
             throw new Error(Msg.CANVAS_CONTEXT);
         }
+
+        defaultFontStyle = measureContext.font;
     }
 
     // Set font
-    measureContext.font = font;
+    measureContext.font = font === '' ? defaultFontStyle : font;
 
     // Measure text
     const metrics = measureContext.measureText(text);

@@ -88,29 +88,17 @@ export class TextInput extends Widget {
     private selectOffset: [number, number] = [0, 0];
     /** Does the cursor offset need to be updated? */
     private cursorOffsetDirty = false;
-    /** Is editing enabled? */
+    /** {@link TextInput#editingEnabled} but for internal use. */
     private _editingEnabled: boolean;
-    /**
-     * Is the text hidden?
-     *
-     * @decorator `@watchField(TextInput.prototype.hideTextWatchCallback)`
-     */
+    /** Is the text hidden? */
     @watchField(TextInput.prototype.hideTextWatchCallback)
     hideText: boolean;
     /** The helper for measuring/painting text */
     protected textHelper: TextHelper;
-    /**
-     * Current offset of the text in the text box. Used on overflow.
-     *
-     * @decorator `@damageArrayField()`
-     */
+    /** Current offset of the text in the text box. Used on overflow. */
     @damageArrayField()
     private offset = [0, 0];
-    /**
-     * Is text wrapping enabled? If not, text will be panned if needed
-     *
-     * @decorator `@layoutField`
-     */
+    /** Is text wrapping enabled? If not, text will be panned if needed */
     @layoutField
     wrapText: boolean;
     /**
@@ -299,9 +287,8 @@ export class TextInput extends Widget {
     /**
      * Is editing enabled?
      *
-     * Tied to {@link TextInput#_editingEnabled}. If changed, the whole widget
-     * is marked as dirty. If disabled, blinking stops and the cursor position
-     * is reset to the beginning.
+     * If changed, the whole widget is marked as dirty. If disabled, blinking
+     * stops and the cursor position is reset to the beginning.
      */
     get editingEnabled(): boolean {
         return this._editingEnabled;
