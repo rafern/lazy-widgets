@@ -1,6 +1,6 @@
 import { PassthroughWidget } from './PassthroughWidget.js';
 import type { Theme } from '../theme/Theme.js';
-import type { Widget } from './Widget.js';
+import type { Widget, WidgetProperties } from './Widget.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 /**
  * A {@link PassthroughWidget} which changes the theme of its child and
@@ -31,18 +31,31 @@ export class ThemeScope<W extends Widget = Widget> extends PassthroughWidget<W> 
     };
 
     /** The theme used for the child. */
-    private scopeTheme: Theme;
+    private _scopeTheme: Theme | undefined;
 
-    constructor(child: W, theme: Theme) {
-        super(child);
-        this.scopeTheme = theme;
+    constructor(child: W, theme?: Theme, properties?: Readonly<WidgetProperties>) {
+        super(child, properties);
+        this._scopeTheme = theme;
     }
 
     override set inheritedTheme(_theme: Theme | undefined) {
-        super.inheritedTheme = this.scopeTheme;
+        super.inheritedTheme = this._scopeTheme;
     }
 
     override get inheritedTheme(): Theme | undefined {
-        return this.scopeTheme;
+        return this._scopeTheme;
+    }
+
+    set scopeTheme(scopeTheme: Theme | undefined) {
+        if (this._scopeTheme === scopeTheme) {
+            return;
+        }
+
+        this._scopeTheme = scopeTheme;
+        super.inheritedTheme = this._scopeTheme;
+    }
+
+    get scopeTheme(): Theme | undefined {
+        return this._scopeTheme;
     }
 }
