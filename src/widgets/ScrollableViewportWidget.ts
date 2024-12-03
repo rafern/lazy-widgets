@@ -17,6 +17,9 @@ import type { TricklingEvent } from '../events/TricklingEvent.js';
 import type { Widget } from './Widget.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { safeRoundRect } from '../helpers/safeRoundRect.js';
+import { Msg } from '../core/Strings.js';
+
 /**
  * The mode for how a scrollbar is shown in a {@link ScrollableViewportWidget}.
  *
@@ -723,6 +726,22 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             bgHeight = thickness;
         }
 
+        // Apply padding
+        const pad = this.scrollbarPadding;
+        if (vertical) {
+            sY += pad.top;
+            sHeight = Math.max(0, sHeight - pad.top - pad.bottom);
+            if (sHeight === 0) {
+                ScrollableViewportWidget.warnInvisiblePad();
+            }
+        } else {
+            sX += pad.left;
+            sWidth = Math.max(0, sWidth - pad.left - pad.right);
+            if (sWidth === 0) {
+                ScrollableViewportWidget.warnInvisiblePad();
+            }
+        }
+
         return [
             [sX, sY, sWidth, sHeight],
             [bgX, bgY, bgWidth, bgHeight],
@@ -774,6 +793,26 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             ctx.fillStyle = this.backgroundGlowFill;
         }
 
+        const radii = this.scrollbarCornersRadii;
+        if (radii !== 0) {
+            ctx.save();
+            ctx.beginPath();
+            safeRoundRect(ctx, ...fillRect, radii);
+            ctx.clip();
+        }
+
         ctx.fillRect(...fillRect);
+
+        if (radii !== 0) {
+            ctx.restore();
+        }
+    }
+
+    protected static invisiblePadWarned = false;
+    protected static warnInvisiblePad() {
+        if (!ScrollableViewportWidget.invisiblePadWarned) {
+            ScrollableViewportWidget.invisiblePadWarned = true;
+            console.warn(Msg.SCROLLBAR_INVIS_PAD);
+        }
     }
 }

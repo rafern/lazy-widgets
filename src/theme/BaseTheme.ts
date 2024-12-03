@@ -112,6 +112,8 @@ export class BaseTheme implements ThemeProperties {
         this._tooltipFill = properties.tooltipFill;
         this._tooltipPadding = properties.tooltipPadding;
         this._tooltipRadii = properties.tooltipRadii;
+        this._scrollbarCornersRadii = properties.scrollbarCornersRadii;
+        this._scrollbarPadding = properties.scrollbarPadding;
         // XXX BASETHEME CTOR AUTO-GENERATED CODE END
     }
 
@@ -687,6 +689,34 @@ export class BaseTheme implements ThemeProperties {
         if(this._tooltipRadii !== value) {
             this._tooltipRadii = value;
             this.onThemeUpdated('tooltipRadii');
+        }
+    }
+
+    /** See {@link BaseTheme#scrollbarCornersRadii}. For internal use only. */
+    private _scrollbarCornersRadii?: CornerRadii;
+
+    get scrollbarCornersRadii(): CornerRadii {
+        return this._scrollbarCornersRadii ?? this._fallbackTheme?.scrollbarCornersRadii ?? 0;
+    }
+
+    set scrollbarCornersRadii(value: CornerRadii | undefined) {
+        if(this._scrollbarCornersRadii !== value) {
+            this._scrollbarCornersRadii = value;
+            this.onThemeUpdated('scrollbarCornersRadii');
+        }
+    }
+
+    /** See {@link BaseTheme#scrollbarPadding}. For internal use only. */
+    private _scrollbarPadding?: Padding;
+
+    get scrollbarPadding(): Padding {
+        return this._scrollbarPadding ?? this._fallbackTheme?.scrollbarPadding ?? <Padding>{left: 0, right: 0, top: 0, bottom: 0};
+    }
+
+    set scrollbarPadding(value: Padding | undefined) {
+        if(this._scrollbarPadding !== value) {
+            this._scrollbarPadding = value;
+            this.onThemeUpdated('scrollbarPadding');
         }
     }
 

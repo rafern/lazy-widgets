@@ -215,6 +215,16 @@
             "type": "CornerRadii",
             "default": "8",
             "description": "The radii to be used for rounding corners in {@link TooltipContainer}."
+        },
+        "scrollbarCornersRadii": {
+            "type": "CornerRadii",
+            "default": "0",
+            "description": "The radii to be used for rounding corners in {@link ScrollableViewportWidget} scrollbars."
+        },
+        "scrollbarPadding": {
+            "type": "Padding",
+            "default": "<Padding>{left: 0, right: 0, top: 0, bottom: 0}",
+            "description": "The {@link Padding} used in {@link ScrollableViewportWidget} scrollbars."
         }
     }
 }

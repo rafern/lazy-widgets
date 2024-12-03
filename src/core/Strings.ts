@@ -17,6 +17,7 @@ export const Msg = {
     NON_POW2_CANVAS: 'Canvas has a width or height that is not a power of 2, which may create mipmapping issues for 3D engines. Make sure to use power of 2 starting and maximum canvas dimensions.',
     DOM_DRIVER_REBIND: 'Re-binding DOM driver. Are you calling bindDOMElem with the same HTML element multiple times?',
     PARENTLESS_CLIPVP: 'Attempt to use ClippedViewport without a parent. If you are implementing a custom Root subclass, keep in mind that a Viewport with a rendering context must be used; ClippedViewport can\'t be used because it inherits a parent Viewport\'s rendering context.',
+    SCROLLBAR_INVIS_PAD: 'Scrollbar is invisible due to added padding consuming all available space. Consider using smaller padding to prevent this issue.',
 };
 
 function propStr(name: string | symbol): string {

@@ -94,5 +94,9 @@ export interface ThemeProperties {
     tooltipPadding?: Padding;
     /** The radii to be used for rounding corners in {@link TooltipContainer}. */
     tooltipRadii?: CornerRadii;
+    /** The radii to be used for rounding corners in {@link ScrollableViewportWidget} scrollbars. */
+    scrollbarCornersRadii?: CornerRadii;
+    /** The {@link Padding} used in {@link ScrollableViewportWidget} scrollbars. */
+    scrollbarPadding?: Padding;
     // XXX THEMEPROPERTIES AUTO-GENERATED CODE END
 }
