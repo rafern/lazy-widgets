@@ -64,42 +64,48 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
      * The effective viewport width (ideal width not occupied by a non-overlay
      * scrollbar), for scrollbar calculations. For internal use only.
      */
-    private effectiveWidth = 0;
+    protected effectiveWidth = 0;
     /**
      * The effective viewport height (ideal height not occupied by a non-overlay
      * scrollbar), for scrollbar calculations. For internal use only.
      */
-    private effectiveHeight = 0;
+    protected effectiveHeight = 0;
     /**
      * ClickHelper used for checking if the horizontal scrollbar has been
      * dragged
      */
-    private horizontalClickHelper: ClickHelper;
+    protected horizontalClickHelper: ClickHelper;
     /**
      * ClickHelper used for checking if the vertical scrollbar has been dragged
      */
-    private verticalClickHelper: ClickHelper;
+    protected verticalClickHelper: ClickHelper;
     /** Is the vertical scrollbar being dragged? If null, none is */
-    private verticalDragged: boolean | null = null;
+    protected verticalDragged: boolean | null = null;
     /** What was the starting scroll value before dragging? */
-    private startingScroll = 0;
+    protected startingScroll = 0;
     /** What was the normalised offset when starting drag? */
-    private startingOffset = 0;
+    protected startingOffset = 0;
     /**
      * When was the last scroll attempt in milliseconds since Unix epoch? If 0,
      * then there hasn't been a valid scroll recently.
      */
-    private lastScroll = 0;
+    protected lastScroll = 0;
     /** What was the child width on the last layout finalization? */
-    private prevChildWidth = 0;
+    protected prevChildWidth = 0;
     /** What was the child height on the last layout finalization? */
-    private prevChildHeight = 0;
+    protected prevChildHeight = 0;
     /** Was the horizontal scrollbar painted last frame? */
-    private horizWasPainted = false;
+    protected horizWasPainted = false;
     /** Was the vertical scrollbar painted last frame? */
-    private vertWasPainted = false;
-    /** The line height used for scrolling via wheel events. */
-    private _scrollLineHeight = 0;
+    protected vertWasPainted = false;
+    /**
+     * The line height used for scrolling via wheel events.
+     *
+     * Should only be read from, instead of written. Use
+     * {@link ScrollableViewportWidget#updateScrollLineHeight} to update this
+     * value instead.
+     */
+    protected scrollLineHeight = 0;
 
     constructor(child: W, properties?: Readonly<ScrollableViewportWidgetProperties>) {
         super(child, properties);
@@ -188,7 +194,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
     }
 
     /** Get the ClickHelper of a scrollbar */
-    private getClickHelper(vertical: boolean): ClickHelper {
+    protected getClickHelper(vertical: boolean): ClickHelper {
         if(vertical) {
             return this.verticalClickHelper;
         } else {
@@ -201,7 +207,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
      *
      * @returns Returns true if the event was captured
      */
-    private handleEventScrollbar(vertical: boolean, corner: boolean, event: TricklingEvent, root: Root): boolean {
+    protected handleEventScrollbar(vertical: boolean, corner: boolean, event: TricklingEvent, root: Root): boolean {
         // TODO repaint only scrollbars instead of everything if they just got
         //      hovered
         // Abort if the other scrollbar is being dragged
@@ -308,7 +314,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
     }
 
     /** Clamp offset in-place to valid scroll values. For internal use only. */
-    private clampOffset(offset: [number, number]): void {
+    protected clampOffset(offset: [number, number]): void {
         const [childWidth, childHeight] = this.child.idealDimensions;
 
         const minX = -(childWidth - this.effectiveWidth);
@@ -333,10 +339,10 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
      *
      * @returns Returns true if this changed scroll was successful
      */
-    private handleWheelEvent(event: PointerWheelEvent): boolean {
+    protected handleWheelEvent(event: PointerWheelEvent): boolean {
         const offset = this.offset;
         const [oldX, oldY] = offset;
-        const [dx, dy] = event.getDeltaPixels(true, this._scrollLineHeight, this.idealWidth, this.idealHeight);
+        const [dx, dy] = event.getDeltaPixels(true, this.scrollLineHeight, this.idealWidth, this.idealHeight);
         offset[0] -= event.shift ? dy : dx;
         offset[1] -= event.shift ? dx : dy;
         this.clampOffset(offset);
@@ -370,7 +376,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         textHelper.font = this.bodyTextFont;
         textHelper.lineHeight = this.bodyTextHeight;
         textHelper.lineSpacing = this.bodyTextSpacing;
-        this._scrollLineHeight = textHelper.fullLineHeight;
+        this.scrollLineHeight = textHelper.fullLineHeight;
     }
 
     protected override onThemeUpdated(property: string | null = null): void {
@@ -657,7 +663,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
      *
      * @returns Returns a 2-tuple with 2 4-tuples. The first one is the scrollbar fill rectangle and the second one is the background fill rectangle. Each rectangle 4-tuple contains, respectively, horizontal offset, vertical offset, width and height
      */
-    private getScrollbarRects(vertical: boolean, corner: boolean): [Bounds, Bounds] {
+    protected getScrollbarRects(vertical: boolean, corner: boolean): [Bounds, Bounds] {
         // Calculate basic scrollbar properties
         const overlay = this._scrollbarMode === ScrollbarMode.Overlay;
         const axisIndex = vertical ? 1 : 0;
@@ -724,7 +730,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
     }
 
     /** Check if a scrollbar needs to be painted */
-    private scrollbarNeedsPaint(vertical: boolean, needed: boolean): boolean {
+    protected scrollbarNeedsPaint(vertical: boolean, needed: boolean): boolean {
         if(this._scrollbarMode === ScrollbarMode.Hidden) {
             return false;
         }
@@ -741,7 +747,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
     }
 
     /** Paint a scrollbar. For internal use only */
-    private paintScrollbar(vertical: boolean, needed: boolean, corner: boolean): void {
+    protected paintScrollbar(vertical: boolean, needed: boolean, corner: boolean): void {
         // Get rectangles
         const [fillRect, bgRect] = this.getScrollbarRects(vertical, corner);
 
