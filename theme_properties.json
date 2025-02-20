@@ -68,7 +68,7 @@
         },
         "bodyTextFont": {
             "type": "font",
-            "default": "'16px sans-serif'",
+            "default": "'1rem sans-serif'",
             "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font | font style} used for body text (most regular text)."
         },
         "bodyTextFill": {
@@ -113,7 +113,7 @@
         },
         "inputTextFont": {
             "type": "font",
-            "default": "'16px monospace'",
+            "default": "'1rem monospace'",
             "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font | font style} used for text in input widgets like {@link TextInput}."
         },
         "inputTextFill": {
