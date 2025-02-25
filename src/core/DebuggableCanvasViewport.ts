@@ -54,6 +54,8 @@ export class DebuggableCanvasViewport extends CanvasViewport {
             throw new Error(Msg.CANVAS_CONTEXT);
         }
 
+        outputContext.fontKerning = 'normal';
+
         this.outputContext = outputContext;
     }
 

@@ -95,6 +95,7 @@ export function measureTextDims(text: string, font: string): TextMetrics {
             throw new Error(Msg.CANVAS_CONTEXT);
         }
 
+        measureContext.fontKerning = 'normal';
         defaultFontStyle = measureContext.font;
     }
 

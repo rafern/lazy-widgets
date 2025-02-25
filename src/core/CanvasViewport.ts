@@ -105,6 +105,14 @@ export class CanvasViewport extends BaseViewport {
             throw new Error(Msg.CANVAS_CONTEXT);
         }
 
+        // TODO make kerning configurable while defaulting to 'normal' kerning
+        //      like this instead of 'auto'. this will need changes to
+        //      TextHelper and measureTextDims
+        // XXX the default for this is 'auto', but this is inconsistent and WILL
+        //     cause rendering issues in some environments like some types of
+        //     PWAs
+        context.fontKerning = 'normal';
+
         this.context = context;
     }
 
