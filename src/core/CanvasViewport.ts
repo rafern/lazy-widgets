@@ -334,6 +334,12 @@ export class CanvasViewport extends BaseViewport {
 
                 this.canvas.width = newCanvasWidth;
                 this.canvas.height = newCanvasHeight;
+                // XXX resizing a canvas restores THE WHOLE CONTEXT, not just
+                //     the pixel data, unlike what MDN implies as of writing
+                //     this comment. because of this, we need to set the font
+                //     kerning to 'normal' again, otherwise it's going to be set
+                //     to 'auto'
+                this.context.fontKerning = 'normal';
                 this.markWholeAsDirty();
 
                 if(copyCanvas !== null) {
