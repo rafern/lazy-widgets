@@ -113,6 +113,7 @@ jobs:
         with:
           file: lazy-widgets-[0-9]*.[0-9]*.[0-9]*.tgz
           file_glob: true
+          overwrite: true
       - run: pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
