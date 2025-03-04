@@ -45,6 +45,8 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
      */
     @layoutArrayField(false)
     tooltipRect: Rect = [0, 0, 0, 0];
+    private idealTooltipWidth = 0;
+    private idealTooltipHeight = 0;
 
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
         super(child, properties);
@@ -77,8 +79,10 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
         this.child.postLayoutUpdate();
     }
 
-    protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
-        [this.idealWidth, this.idealHeight] = resolveContainerDimensions(minWidth, maxWidth, minHeight, maxHeight, this.tooltipPadding, startAlignment, this.child);
+    protected override handleResolveDimensions(_minWidth: number, maxWidth: number, _minHeight: number, maxHeight: number): void {
+        [this.idealTooltipWidth, this.idealTooltipHeight] = resolveContainerDimensions(0, maxWidth, 0, maxHeight, this.tooltipPadding, startAlignment, this.child);
+        this.idealWidth = Math.min(maxWidth, this.idealTooltipWidth);
+        this.idealHeight = Math.min(maxHeight, this.idealTooltipHeight);
     }
 
     override resolvePosition(x: number, y: number): void {
@@ -102,20 +106,20 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
 
         // decide whether to place tooltip above or below widget. fall back to
         // above the widget
-        const fitsAbove = spaceAbove >= this.idealHeight;
-        const fitsBelow = spaceBelow >= this.idealHeight;
+        const fitsAbove = spaceAbove >= this.idealTooltipHeight;
+        const fitsBelow = spaceBelow >= this.idealTooltipHeight;
 
         if (fitsAbove && fitsBelow) {
             if (this.cursorY <= (wY + 0.5 * wH)) {
                 // put above
-                y = wY - this.idealHeight;
+                y = wY - this.idealTooltipHeight;
             } else {
                 // put below
                 y = wBot;
             }
         } else if (fitsAbove) {
             // put above
-            y = wY - this.idealHeight;
+            y = wY - this.idealTooltipHeight;
         } else if (fitsBelow) {
             // put below
             y = wBot;
@@ -128,11 +132,11 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
 
         // clamp to bounds of parent
         const pRight = pX + pW;
-        if (x + this.idealWidth > pRight) {
-            x = pRight - this.idealWidth;
+        if (x + this.idealTooltipWidth > pRight) {
+            x = pRight - this.idealTooltipWidth;
         }
-        if (y + this.idealHeight > pBot) {
-            y = pBot - this.idealHeight;
+        if (y + this.idealTooltipHeight > pBot) {
+            y = pBot - this.idealTooltipHeight;
         }
         if (x < 0) {
             x = 0;
@@ -152,10 +156,10 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
         ctx.save();
 
         ctx.beginPath();
-        safeRoundRect(ctx, this.idealX, this.idealY, this.idealWidth, this.idealHeight, this.tooltipRadii);
+        safeRoundRect(ctx, this.idealX, this.idealY, this.idealTooltipWidth, this.idealTooltipHeight, this.tooltipRadii);
         ctx.clip();
         ctx.fillStyle = this.tooltipFill;
-        ctx.fillRect(this.idealX, this.idealY, this.idealWidth, this.idealHeight);
+        ctx.fillRect(this.idealX, this.idealY, this.idealTooltipWidth, this.idealTooltipHeight);
         this.child.paint(dirtyRects);
 
         ctx.restore();

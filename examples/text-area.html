@@ -3,22 +3,20 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Margin, Column, TextArea, Label, Variable,
+                DOMRoot, Column, TextArea, Label, Variable,
                 DOMKeyboardDriver, DOMPointerDriver, Background
             } from '../dist/index.js';
 
             // Create the root
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        new Column([
-                            new Label('Text area (200x200 minimum length):'),
-                            new TextArea(
-                                new Variable('Type some text here...'),
-                                { minWidth: 200, minHeight: 200 }
-                            )
-                        ])
-                    )
+                    new Column([
+                        new Label('Text area (200x200 minimum length):'),
+                        new TextArea(
+                            new Variable('Type some text here...'),
+                            { minWidth: 200, minHeight: 200 }
+                        )
+                    ])
                 )
             );
 

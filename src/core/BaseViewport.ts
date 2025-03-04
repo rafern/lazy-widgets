@@ -81,7 +81,7 @@ export abstract class BaseViewport implements Viewport {
 
     /**
      * Resolves the given child's layout by calling
-     * {@link Widget#resolveDimensionsAsTop} with the current
+     * {@link Widget#resolveDimensions} with the current
      * {@link Viewport#constraints}, {@link Widget#resolvePosition} and
      * {@link Widget#finalizeBounds}.
      *
@@ -100,7 +100,7 @@ export abstract class BaseViewport implements Viewport {
         // Resolve child's layout
         const [oldWidth, oldHeight] = this.child.dimensions;
 
-        this.child.resolveDimensionsAsTop(...this.constraints);
+        this.child.resolveDimensions(...this.constraints);
 
         if(this.relativeCoordinates) {
             this.child.resolvePosition(0, 0);

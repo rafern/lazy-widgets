@@ -1,7 +1,6 @@
 import { VirtualKeyboard } from '../widgets/VirtualKeyboard/VirtualKeyboard.js';
 import { VirtualKeyboardTemplate, defaultVirtualKeyboardTemplate } from './VirtualKeyboardTemplate.js';
 import { Root, RootProperties } from './Root.js';
-import { Margin } from '../widgets/Margin.js';
 import { Background } from '../widgets/Background.js';
 import type { KeyboardDriver } from '../drivers/KeyboardDriver.js';
 /**
@@ -18,8 +17,8 @@ export interface VirtualKeyboardRootProperties extends RootProperties {
 }
 
 /**
- * A {@link Root} containing a single {@link VirtualKeyboard} widget inside a
- * {@link Margin}. Automatically disables itself if not needed, but
+ * A {@link Root} containing a single {@link VirtualKeyboard} widget.
+ * Automatically disables itself if not needed, but
  * {@link VirtualKeyboardRoot#updateVisibility} must be called every frame for
  * this behaviour to occur.
  *
@@ -32,12 +31,13 @@ export class VirtualKeyboardRoot extends Root {
     constructor(keyboardDriver: KeyboardDriver, properties?: VirtualKeyboardRootProperties) {
         super(
             new Background(
-                new Margin(
-                    new VirtualKeyboard(
-                        keyboardDriver,
-                        properties?.keyboardTemplate ?? defaultVirtualKeyboardTemplate
-                    ),
+                new VirtualKeyboard(
+                    keyboardDriver,
+                    properties?.keyboardTemplate ?? defaultVirtualKeyboardTemplate
                 ),
+                {
+                    containerPadding: { left: 8, right: 8, top: 8, bottom: 8 },
+                },
             ),
             properties
         );

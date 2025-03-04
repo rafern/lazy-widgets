@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Icon, TextButton, Row,
+                DOMRoot, Label, Column, Icon, TextButton, Row,
                 DOMPointerDriver, Background
             } from '../dist/index.js';
 
@@ -65,22 +65,20 @@
 
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        new Column([
-                            icon,
-                            new Label('The icon should change between a banana and an apple'),
-                            new Row([
-                                new TextButton('Change Icon.image.src').on('click', () => changeImage(false, false)),
-                                new TextButton('Change Icon.image').on('click', () => changeImage(false, true))
-                            ]),
-                            new Label('The video should change between two different test videos'),
-                            new Row([
-                                new TextButton('Change Icon.image.src').on('click', () => changeImage(true, false)),
-                                new TextButton('Change Icon.image').on('click', () => changeImage(true, true))
-                            ]),
-                            new Label('Note that changing from an image to a video or vice versa can\'t be done by setting Icon.image.src, therefore, changing will be done with Icon.image if needed')
-                        ])
-                    )
+                    new Column([
+                        icon,
+                        new Label('The icon should change between a banana and an apple'),
+                        new Row([
+                            new TextButton('Change Icon.image.src').on('click', () => changeImage(false, false)),
+                            new TextButton('Change Icon.image').on('click', () => changeImage(false, true))
+                        ]),
+                        new Label('The video should change between two different test videos'),
+                        new Row([
+                            new TextButton('Change Icon.image.src').on('click', () => changeImage(true, false)),
+                            new TextButton('Change Icon.image').on('click', () => changeImage(true, true))
+                        ]),
+                        new Label('Note that changing from an image to a video or vice versa can\'t be done by setting Icon.image.src, therefore, changing will be done with Icon.image if needed')
+                    ])
                 )
             );
 

@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Spacing, RadioButton, Row,
+                DOMRoot, Label, Column, Spacing, RadioButton, Row,
                 DOMKeyboardDriver, DOMPointerDriver, Variable, Background
             } from '../dist/index.js';
 
@@ -14,18 +14,16 @@
 
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        new Column([
-                            new Label('Select an option:'),
-                            new Row([new Label('Option 1'), new Spacing(), new RadioButton(variable, 'option_1_value')]),
-                            new Row([new Label('Option 2'), new Spacing(), new RadioButton(variable, 'option_2_value')]),
-                            new Row([new Label('Option 3'), new Spacing(), new RadioButton(variable, 'option_3_value')]),
-                            new Row([new Label('Option 4'), new Spacing(), new RadioButton(variable, 'option_4_value')]),
-                            new Row([new Label('Option 5'), new Spacing(), new RadioButton(variable, 'option_5_value')]),
-                            new Spacing({ flex: 0, minHeight: 8 }),
-                            label
-                        ])
-                    )
+                    new Column([
+                        new Label('Select an option:'),
+                        new Row([new Label('Option 1'), new Spacing(), new RadioButton(variable, 'option_1_value')]),
+                        new Row([new Label('Option 2'), new Spacing(), new RadioButton(variable, 'option_2_value')]),
+                        new Row([new Label('Option 3'), new Spacing(), new RadioButton(variable, 'option_3_value')]),
+                        new Row([new Label('Option 4'), new Spacing(), new RadioButton(variable, 'option_4_value')]),
+                        new Row([new Label('Option 5'), new Spacing(), new RadioButton(variable, 'option_5_value')]),
+                        new Spacing({ flex: 0, minHeight: 8 }),
+                        label
+                    ])
                 )
             );
 

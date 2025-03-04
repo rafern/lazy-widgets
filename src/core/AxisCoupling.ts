@@ -42,8 +42,4 @@ export enum AxisCoupling {
      * Default axis coupling mode for {@link TextArea}.
      */
     ChildToParent,
-    /**
-     * @deprecated Equivalent to {@link AxisCoupling#ParentToChild}. Use that instead
-     */
-    Uni = ParentToChild,
 }

@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Margin, Column, DOMPointerDriver, Background,
+                DOMRoot, Column, DOMPointerDriver, Background,
                 LiveLabel, Variable, ObservableTransformer, TextButton
             } from '../dist/index.js';
 
@@ -14,31 +14,29 @@
 
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        new Column([
-                            new LiveLabel(new ObservableTransformer(
-                                [clicks], (inputs) => `Clicks: ${inputs[0].value}`,
-                            )),
-                            new LiveLabel(new ObservableTransformer(
-                                [timeAccum, clickAccum],
-                                () => {
-                                    let cps = 0;
-                                    if (timeAccum.value !== 0) {
-                                        cps = 1000 * clickAccum.value / timeAccum.value;
-                                        clickAccum.value = 0;
-                                        timeAccum.value = 0;
-                                    }
+                    new Column([
+                        new LiveLabel(new ObservableTransformer(
+                            [clicks], (inputs) => `Clicks: ${inputs[0].value}`,
+                        )),
+                        new LiveLabel(new ObservableTransformer(
+                            [timeAccum, clickAccum],
+                            () => {
+                                let cps = 0;
+                                if (timeAccum.value !== 0) {
+                                    cps = 1000 * clickAccum.value / timeAccum.value;
+                                    clickAccum.value = 0;
+                                    timeAccum.value = 0;
+                                }
 
-                                    return `Clicks per second: ${cps.toFixed(2)}`;
-                                },
-                                () => timeAccum.value >= 1000,
-                            )),
-                            new TextButton('Click me!').on(
-                                'click', () => { clicks.value++; clickAccum.value++ },
-                            ),
-                        ]),
-                        { minWidth: 200 },
-                    ),
+                                return `Clicks per second: ${cps.toFixed(2)}`;
+                            },
+                            () => timeAccum.value >= 1000,
+                        )),
+                        new TextButton('Click me!').on(
+                            'click', () => { clicks.value++; clickAccum.value++ },
+                        ),
+                    ]),
+                    { minWidth: 200 },
                 ),
             );
 

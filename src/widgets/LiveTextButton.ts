@@ -10,8 +10,8 @@ import type { LabelProperties } from './BaseLabel.js';
 import type { Observable } from '../state/Observable.js';
 /**
  * A {@link FilledButton} with a {@link LiveLabel}. Alignment is forced to be
- * horizontally centered and vertically stretching like in {@link TextMargin}.
- * Text-wrapping is disabled so that text is centered properly.
+ * horizontally centered and vertically stretching. Text-wrapping is disabled so
+ * that text is centered properly.
  *
  * @category Widget
  */

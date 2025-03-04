@@ -3,26 +3,24 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Icon, Background
+                DOMRoot, Label, Column, Icon, Background
             } from '../dist/index.js';
 
             // Create the root
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        new Column([
-                            new Label('Full spritesheet:'),
-                            new Icon('test-spritesheet.svg'),
-                            new Label('Top-left sprite (32x32 at 0,0):'),
-                            new Icon('test-spritesheet.svg', { viewBox: [0, 0, 32, 32] }),
-                            new Label('Top-right sprite (32x32 at 32,0):'),
-                            new Icon('test-spritesheet.svg', { viewBox: [32, 0, 32, 32] }),
-                            new Label('Bottom-left sprite (32x32 at 0,0):'),
-                            new Icon('test-spritesheet.svg', { viewBox: [0, 32, 32, 32] }),
-                            new Label('Bottom-right sprite (32x32 at 32,0):'),
-                            new Icon('test-spritesheet.svg', { viewBox: [32, 32, 32, 32] }),
-                        ])
-                    )
+                    new Column([
+                        new Label('Full spritesheet:'),
+                        new Icon('test-spritesheet.svg'),
+                        new Label('Top-left sprite (32x32 at 0,0):'),
+                        new Icon('test-spritesheet.svg', { viewBox: [0, 0, 32, 32] }),
+                        new Label('Top-right sprite (32x32 at 32,0):'),
+                        new Icon('test-spritesheet.svg', { viewBox: [32, 0, 32, 32] }),
+                        new Label('Bottom-left sprite (32x32 at 0,0):'),
+                        new Icon('test-spritesheet.svg', { viewBox: [0, 32, 32, 32] }),
+                        new Label('Bottom-right sprite (32x32 at 32,0):'),
+                        new Icon('test-spritesheet.svg', { viewBox: [32, 32, 32, 32] }),
+                    ])
                 )
             );
 

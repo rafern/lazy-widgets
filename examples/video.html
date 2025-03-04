@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Margin, Icon, Column, Row, TextButton,
+                DOMRoot, Icon, Column, Row, TextButton,
                 DOMPointerDriver, Background
             } from '../dist/index.js';
 
@@ -17,16 +17,14 @@
 
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        new Column([
-                            icon,
-                            new Row([
-                                button
-                            ], {
-                                multiContainerAlignment: { main: 0.5, cross: 0.5 }
-                            })
-                        ])
-                    )
+                    new Column([
+                        icon,
+                        new Row([
+                            button
+                        ], {
+                            multiContainerAlignment: { main: 0.5, cross: 0.5 }
+                        })
+                    ])
                 )
             );
 

@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Icon, TextAlignMode, Background
+                DOMRoot, Label, Column, Icon, TextAlignMode, Background
             } from '../dist/index.js';
 
             // Create the root
@@ -13,13 +13,11 @@
 
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        new Column([
-                            new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }),
-                            icon,
-                            new Label('BANANA', { bodyTextAlign: TextAlignMode.Center })
-                        ])
-                    )
+                    new Column([
+                        new Label('BANANA', { bodyTextAlign: TextAlignMode.Center }),
+                        icon,
+                        new Label('BANANA', { bodyTextAlign: TextAlignMode.Center })
+                    ])
                 )
             );
 

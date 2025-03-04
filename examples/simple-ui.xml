@@ -9,15 +9,13 @@
         });
     </script>
     <background>
-        <margin>
-            <column>
-                <label option:id="label">Hello world!</label>
-                <text-input variable="$textVariable" />
-                <row on:click="$buttonCallback" option:multi-container-alignment='@{ "main": 0.5, "cross": "stretch" }'>
-                    <text-button>Button 1</text-button>
-                    <text-button>Button 2</text-button>
-                </row>
-            </column>
-        </margin>
+        <column>
+            <label option:id="label">Hello world!</label>
+            <text-input variable="$textVariable" />
+            <row on:click="$buttonCallback" option:multi-container-alignment='@{ "main": 0.5, "cross": "stretch" }'>
+                <text-button>Button 1</text-button>
+                <text-button>Button 2</text-button>
+            </row>
+        </column>
     </background>
 </ui-tree>

@@ -16,8 +16,8 @@ const FLEXBOX_ITER_MAX = 8;
  *
  * Can be constrained to a specific type of children.
  *
- * Note that there is no padding. Put this inside a {@link Margin} if padding is
- * needed.
+ * Note that there is no padding. Put this inside a {@link Container} if padding
+ * is needed.
  *
  * @category Widget
  */

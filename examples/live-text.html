@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Margin, Column, DOMPointerDriver, Background, Label,
+                DOMRoot, Column, DOMPointerDriver, Background, Label,
                 LiveLabel, Spacing, Variable, RadioButton, Row
             } from '../dist/index.js';
 
@@ -29,19 +29,17 @@
 
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        new Column([
-                            new LiveLabel(helloText),
-                            new Spacing({
-                                flex: 0,
-                                minHeight: 24,
-                            }),
-                            new LiveLabel(languageText),
-                            new Row([new Label('English (en)'), new Spacing(), new RadioButton(languageVariable, 'en')]),
-                            new Row([new Label('Português (pt)'), new Spacing(), new RadioButton(languageVariable, 'pt')]),
-                            new Row([new Label('Français (fr)'), new Spacing(), new RadioButton(languageVariable, 'fr')]),
-                        ]),
-                    ),
+                    new Column([
+                        new LiveLabel(helloText),
+                        new Spacing({
+                            flex: 0,
+                            minHeight: 24,
+                        }),
+                        new LiveLabel(languageText),
+                        new Row([new Label('English (en)'), new Spacing(), new RadioButton(languageVariable, 'en')]),
+                        new Row([new Label('Português (pt)'), new Spacing(), new RadioButton(languageVariable, 'pt')]),
+                        new Row([new Label('Français (fr)'), new Spacing(), new RadioButton(languageVariable, 'fr')]),
+                    ]),
                 ),
             );
 

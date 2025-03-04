@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
+                DOMRoot, Label, Column, Row, TextInput, TextButton,
                 DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
                 Variable, Background, LayeredContainer, TextTooltip
             } from '../dist/index.js';
@@ -12,15 +12,13 @@
             const root = new DOMRoot(
                 LayeredContainer.fromDefaultLayerChild(
                     new Background(
-                        new Margin(
-                            new Column([
-                                new Label('Hover your cursor over the input to show a tooltip:'),
-                                new TextTooltip(
-                                    new TextInput(new Variable('Hover over this!')),
-                                    'I am a tooltip!'
-                                )
-                            ])
-                        )
+                        new Column([
+                            new Label('Hover your cursor over the input to show a tooltip:'),
+                            new TextTooltip(
+                                new TextInput(new Variable('Hover over this!')),
+                                'I am a tooltip!'
+                            )
+                        ])
                     )
                 )
             );

@@ -3,31 +3,29 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Icon, Background,
+                DOMRoot, Label, Column, Icon, Background,
                 EffectImageBitmap
             } from '../dist/index.js';
 
             // Create the root
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        new Column([
-                            new Label('This should look red:'),
-                            new Icon(
-                                EffectImageBitmap.fromURL(
-                                    'banana.png',
-                                    {
-                                        tint: 0xFF0000,
-                                        resolution: 0.25,
-                                    }
-                                ),
+                    new Column([
+                        new Label('This should look red:'),
+                        new Icon(
+                            EffectImageBitmap.fromURL(
+                                'banana.png',
                                 {
-                                    width: 347,
-                                    height: 223,
-                                },
+                                    tint: 0xFF0000,
+                                    resolution: 0.25,
+                                }
                             ),
-                        ])
-                    )
+                            {
+                                width: 347,
+                                height: 223,
+                            },
+                        ),
+                    ])
                 )
             );
 

@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Icon, IconFit, Background,
+                DOMRoot, Label, Container, Column, Icon, IconFit, Background,
                 Spacing, DOMPointerDriver, Slider, Variable, LiveLabel,
                 ObservableTransformer,
             } from '../dist/index.js';
@@ -41,35 +41,33 @@
 
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        new Column([
-                            new Label('Legend:'),
-                            new Margin(new Column([
-                                new Label('Red: flexShrink=1'),
-                                new Label('Green: flex=2, flexBasis=32'),
-                                new Label('Blue: flex=1, flexShrink=2'),
-                                new Label('Yellow: flexShrink=2, minHeight=16'),
-                                new Label('Purple: flexBasis=16, minHeight=999'),
-                            ]), {
-                                containerPadding: {
-                                    left: 16, right: 16, top: 0, bottom: 0,
-                                },
-                            }),
-                            new LiveLabel(new ObservableTransformer(
-                                [minHeight],
-                                () => `Minimum height (${minHeight.value.toFixed(2)}px):`,
-                            )),
-                            new Slider(minHeight, 0, HEIGHT_LIMIT),
-                            new LiveLabel(new ObservableTransformer(
-                                [maxHeight],
-                                () => `Maximum height (${maxHeight.value.toFixed(2)}px):`,
-                            )),
-                            new Slider(maxHeight, 0, HEIGHT_LIMIT),
-                            new Margin(new Background(column, {
-                                canvasFill: 'white',
-                            })),
-                        ])
-                    )
+                    new Column([
+                        new Label('Legend:'),
+                        new Container(new Column([
+                            new Label('Red: flexShrink=1'),
+                            new Label('Green: flex=2, flexBasis=32'),
+                            new Label('Blue: flex=1, flexShrink=2'),
+                            new Label('Yellow: flexShrink=2, minHeight=16'),
+                            new Label('Purple: flexBasis=16, minHeight=999'),
+                        ]), {
+                            containerPadding: {
+                                left: 16, right: 16, top: 0, bottom: 0,
+                            },
+                        }),
+                        new LiveLabel(new ObservableTransformer(
+                            [minHeight],
+                            () => `Minimum height (${minHeight.value.toFixed(2)}px):`,
+                        )),
+                        new Slider(minHeight, 0, HEIGHT_LIMIT),
+                        new LiveLabel(new ObservableTransformer(
+                            [maxHeight],
+                            () => `Maximum height (${maxHeight.value.toFixed(2)}px):`,
+                        )),
+                        new Slider(maxHeight, 0, HEIGHT_LIMIT),
+                        new Background(column, {
+                            canvasFill: 'white',
+                        }),
+                    ])
                 )
             );
 

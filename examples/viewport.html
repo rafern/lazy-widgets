@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Row, TextButton, TextInput,
+                DOMRoot, Label, Column, Row, TextButton, TextInput,
                 DOMKeyboardDriver, DOMPointerDriver, Slider, FlexAlignment,
                 ScrollableViewportWidget, ScrollbarMode, RadioButton, Checkbox,
                 Container, Alignment, ThemeScope, Theme, Variable, Spacing,
@@ -20,23 +20,21 @@
             let viewport = new ScrollableViewportWidget(
                 new ThemeScope(
                     new Background(
-                        new Margin(
-                            new Column([
-                                label,
-                                new TextInput(new Variable('').watch(variable => {
-                                    label.text = `Text input: ${variable.value}`;
-                                })),
-                                new Row([
-                                    new TextButton('Button 1'),
-                                    new TextButton('Button 2'),
-                                ], {
-                                    multiContainerAlignment: {
-                                        main: FlexAlignment.Center,
-                                        cross: Alignment.Stretch
-                                    },
-                                }).on('click', (ev) => label.text = `${ev.origin.child.text} clicked!`)
-                            ])
-                        ),
+                        new Column([
+                            label,
+                            new TextInput(new Variable('').watch(variable => {
+                                label.text = `Text input: ${variable.value}`;
+                            })),
+                            new Row([
+                                new TextButton('Button 1'),
+                                new TextButton('Button 2'),
+                            ], {
+                                multiContainerAlignment: {
+                                    main: FlexAlignment.Center,
+                                    cross: Alignment.Stretch
+                                },
+                            }).on('click', (ev) => label.text = `${ev.origin.child.text} clicked!`)
+                        ]),
                         {
                             containerAlignment: {
                                 horizontal: Alignment.Start,
@@ -64,14 +62,12 @@
             const scrollbarMode = new Variable(viewport.scrollbarMode).watch(variable => viewport.scrollbarMode = variable.value, true);
 
             function makeCouplingColumn(variable) {
-                return new Margin(
-                    new Column([
-                        new Row([new Label('None'), new Spacing(), new RadioButton(variable, AxisCoupling.None)]),
-                        new Row([new Label('Bi-directional'), new Spacing(), new RadioButton(variable, AxisCoupling.Bi)]),
-                        new Row([new Label('Parent-to-child'), new Spacing(), new RadioButton(variable, AxisCoupling.ParentToChild)]),
-                        new Row([new Label('Child-to-parent'), new Spacing(), new RadioButton(variable, AxisCoupling.ChildToParent)]),
-                    ])
-                );
+                return new Column([
+                    new Row([new Label('None'), new Spacing(), new RadioButton(variable, AxisCoupling.None)]),
+                    new Row([new Label('Bi-directional'), new Spacing(), new RadioButton(variable, AxisCoupling.Bi)]),
+                    new Row([new Label('Parent-to-child'), new Spacing(), new RadioButton(variable, AxisCoupling.ParentToChild)]),
+                    new Row([new Label('Child-to-parent'), new Spacing(), new RadioButton(variable, AxisCoupling.ChildToParent)]),
+                ]);
             }
 
             const mainColumn = new Column();
@@ -81,81 +77,77 @@
             // Create the root
             const root = new DOMRoot(
                 new Background(
-                    new Margin(
-                        mainColumn
-                        .add([
-                            new Label('Options:'),
-                            new Container(
+                    mainColumn
+                    .add([
+                        new Label('Options:'),
+                        new Container(
+                            new Column([
+                                new Label('Width coupling:'),
+                                makeCouplingColumn(widthCoupling),
+                                new Label('Height coupling:'),
+                                makeCouplingColumn(heightCoupling),
+                                new Label('Scrollbar mode:'),
                                 new Column([
-                                    new Label('Width coupling:'),
-                                    makeCouplingColumn(widthCoupling),
-                                    new Label('Height coupling:'),
-                                    makeCouplingColumn(heightCoupling),
-                                    new Label('Scrollbar mode:'),
-                                    new Margin(
-                                        new Column([
-                                            new Row([new Label('Overlay'), new Spacing(), new RadioButton(scrollbarMode, ScrollbarMode.Overlay)]),
-                                            new Row([new Label('Layout'), new Spacing(), new RadioButton(scrollbarMode, ScrollbarMode.Layout)]),
-                                            new Row([new Label('Hidden'), new Spacing(), new RadioButton(scrollbarMode, ScrollbarMode.Hidden)]),
-                                        ])
-                                    ),
-                                    minWidthLabel,
-                                    new Slider(new Variable(initialMinWidth).watch(variable => {
-                                        viewport.minWidth = variable.value;
-                                        minWidthLabel.text = `Minimum width: ${variable.value}`;
-                                    }), 0, 500, { snapIncrement: 1 }),
-                                    maxWidthLabel,
-                                    new Slider(new Variable(initialMaxWidth).watch(variable => {
-                                        viewport.maxWidth = variable.value;
-                                        maxWidthLabel.text = `Maximum width: ${variable.value}`;
-                                    }), 0, 500, { snapIncrement: 1 }),
-                                    minHeightLabel,
-                                    new Slider(new Variable(initialMinHeight).watch(variable => {
-                                        viewport.minHeight = variable.value;
-                                        minHeightLabel.text = `Minimum height: ${variable.value}`;
-                                    }), 0, 500, { snapIncrement: 1 }),
-                                    maxHeightLabel,
-                                    new Slider(new Variable(initialMaxHeight).watch(variable => {
-                                        viewport.maxHeight = variable.value;
-                                        maxHeightLabel.text = `Maximum height: ${variable.value}`;
-                                    }), 0, 500, { snapIncrement: 1 }),
-                                    new Row([
-                                        new Label('Use canvas:'),
-                                        new Spacing(),
-                                        new Checkbox(new Variable(
-                                            viewport instanceof CanvasViewport
-                                        ).watch(variable => {
-                                            const options = {
-                                                minWidth: viewport.minWidth,
-                                                maxWidth: viewport.maxWidth,
-                                                minHeight: viewport.minHeight,
-                                                maxHeight: viewport.maxHeight,
-                                                widthCoupling: viewport.widthCoupling,
-                                                heightCoupling: viewport.heightCoupling,
-                                                scrollbarMode: viewport.scrollbarMode,
-                                                useCanvas: variable.value
-                                            };
-                                            const child = viewport.child;
+                                    new Row([new Label('Overlay'), new Spacing(), new RadioButton(scrollbarMode, ScrollbarMode.Overlay)]),
+                                    new Row([new Label('Layout'), new Spacing(), new RadioButton(scrollbarMode, ScrollbarMode.Layout)]),
+                                    new Row([new Label('Hidden'), new Spacing(), new RadioButton(scrollbarMode, ScrollbarMode.Hidden)]),
+                                ]),
+                                minWidthLabel,
+                                new Slider(new Variable(initialMinWidth).watch(variable => {
+                                    viewport.minWidth = variable.value;
+                                    minWidthLabel.text = `Minimum width: ${variable.value}`;
+                                }), 0, 500, { snapIncrement: 1 }),
+                                maxWidthLabel,
+                                new Slider(new Variable(initialMaxWidth).watch(variable => {
+                                    viewport.maxWidth = variable.value;
+                                    maxWidthLabel.text = `Maximum width: ${variable.value}`;
+                                }), 0, 500, { snapIncrement: 1 }),
+                                minHeightLabel,
+                                new Slider(new Variable(initialMinHeight).watch(variable => {
+                                    viewport.minHeight = variable.value;
+                                    minHeightLabel.text = `Minimum height: ${variable.value}`;
+                                }), 0, 500, { snapIncrement: 1 }),
+                                maxHeightLabel,
+                                new Slider(new Variable(initialMaxHeight).watch(variable => {
+                                    viewport.maxHeight = variable.value;
+                                    maxHeightLabel.text = `Maximum height: ${variable.value}`;
+                                }), 0, 500, { snapIncrement: 1 }),
+                                new Row([
+                                    new Label('Use canvas:'),
+                                    new Spacing(),
+                                    new Checkbox(new Variable(
+                                        viewport instanceof CanvasViewport
+                                    ).watch(variable => {
+                                        const options = {
+                                            minWidth: viewport.minWidth,
+                                            maxWidth: viewport.maxWidth,
+                                            minHeight: viewport.minHeight,
+                                            maxHeight: viewport.maxHeight,
+                                            widthCoupling: viewport.widthCoupling,
+                                            heightCoupling: viewport.heightCoupling,
+                                            scrollbarMode: viewport.scrollbarMode,
+                                            useCanvas: variable.value
+                                        };
+                                        const child = viewport.child;
 
-                                            mainColumn.remove(themeScope);
+                                        mainColumn.remove(themeScope);
 
-                                            viewport = new ScrollableViewportWidget(child, options);
-                                            themeScope = new ThemeScope(viewport, themeScopeTheme);
+                                        viewport = new ScrollableViewportWidget(child, options);
+                                        themeScope = new ThemeScope(viewport, themeScopeTheme);
 
-                                            mainColumn.add(themeScope);
-                                        }))
-                                    ]),
-                                ], { maxWidth: 175 }),
-                                {
-                                    containerAlignment: {
-                                        horizontal: Alignment.Start, vertical: Alignment.Start,
-                                    },
+                                        mainColumn.add(themeScope);
+                                    }))
+                                ]),
+                            ], { maxWidth: 175 }),
+                            {
+                                containerAlignment: {
+                                    horizontal: Alignment.Start, vertical: Alignment.Start,
                                 },
-                            ),
-                            new Label('Result:\n- Viewport is purple\n- Child is red'),
-                            themeScope
-                        ])
-                    )
+                            },
+                        ),
+                        new Label('Result:\n- Viewport is purple\n- Child is red'),
+                        themeScope
+                    ])
                 )
             );
 

@@ -10,7 +10,7 @@
         <div id="bottom-container"></div>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Row, TextInput, TextButton,
+                DOMRoot, Label, Column, Row, TextInput, TextButton,
                 DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
                 Variable, Background
             } from '../dist/index.js';
@@ -26,23 +26,21 @@
 
                 const root = new DOMRoot(
                     new Background(
-                        new Margin(
-                            new Column([
-                                label,
-                                new TextInput(new Variable('').watch(variable => {
-                                    label.text = `Text input: ${variable.value}`;
-                                })),
-                                new Row([
-                                    new TextButton('Button 1'),
-                                    new TextButton('Button 2'),
-                                ], {
-                                    multiContainerAlignment: {
-                                        main: FlexAlignment.Center,
-                                        cross: Alignment.Stretch
-                                    },
-                                }).on('click', (ev) => label.text = `${ev.origin.child.text} clicked!`)
-                            ])
-                        ),
+                        new Column([
+                            label,
+                            new TextInput(new Variable('').watch(variable => {
+                                label.text = `Text input: ${variable.value}`;
+                            })),
+                            new Row([
+                                new TextButton('Button 1'),
+                                new TextButton('Button 2'),
+                            ], {
+                                multiContainerAlignment: {
+                                    main: FlexAlignment.Center,
+                                    cross: Alignment.Stretch
+                                },
+                            }).on('click', (ev) => label.text = `${ev.origin.child.text} clicked!`)
+                        ]),
                         wrapsAround ? {
                             canvasFill: 'rgba(255, 0, 0, 0.75)'
                         } : {}

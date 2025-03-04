@@ -16,8 +16,6 @@ import { validateObservable } from './validateObservable.js';
 import { validateString } from './validateString.js';
 import { validateTheme } from './validateTheme.js';
 import { validateValidatedBox } from './validateValidatedBox.js';
-import { validateValidatedVariable } from './validateValidatedVariable.js';
-import { validateVariable } from './validateVariable.js';
 import { validateWidget } from './validateWidget.js';
 import { fromKebabCase } from '../helpers/fromKebabCase.js';
 import { WidgetEventListener } from '../events/WidgetEventEmitter.js';
@@ -310,8 +308,6 @@ export class XMLUIParser extends BaseXMLUIParser {
         this.registerValidator('observable', validateObservable);
         this.registerValidator('string', validateString);
         this.registerValidator('theme', validateTheme);
-        this.registerValidator('validated-variable', validateValidatedVariable);
-        this.registerValidator('variable', validateVariable);
         this.registerValidator('widget', validateWidget);
         this.registerValidator('box', validateBox);
         this.registerValidator('validated-box', validateValidatedBox);

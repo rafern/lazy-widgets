@@ -562,19 +562,6 @@ export abstract class BaseXMLUIParser {
     }
 
     /**
-     * Similar to {@link BaseXMLUIParser#registerFactory}, except only a widget
-     * class and an input mapping need to be supplied. The widget class will be
-     * used to create a new factory; the factory will call the class constructor
-     * with the `new` keyword.
-     *
-     * @param widgetClass - The class of the widget that will be instantiated. The class name will be used for the element name, and the class constructor will be used for making the factory function.
-     * @param inputMapping - The input mapping for the widget factory
-     */
-    registerFactoryFromClass<T extends Widget>(widgetClass: WidgetConstructor<T>, inputMapping: WidgetXMLInputConfig): void {
-        this.registerFactory(widgetClass, inputMapping, (...args) => new widgetClass(...args));
-    }
-
-    /**
      * Register a built-in validator; assigns a string to a validator function,
      * so that the validator function can be referred to via a string instead of
      * via a function.
@@ -676,8 +663,9 @@ export abstract class BaseXMLUIParser {
 
     /**
      * Auto-register a factory for a given widget. Instead of passing an input
-     * mapping, the input mapping is supplied in the {@link Widget.autoXML}
-     * field of the widget class. If it's null, an error is thrown.
+     * mapping and name, these are instead supplied in the
+     * {@link Widget.autoXML} field of the widget class. If it's null, an error
+     * is thrown.
      *
      * @param widgetClass - The class to auto-register
      */
@@ -686,14 +674,9 @@ export abstract class BaseXMLUIParser {
             throw new Error('Widget class does not have an automatic XML factory config object set. Must be manually registered');
         }
 
-        if (Array.isArray(widgetClass.autoXML)) {
-            this.registerFactoryFromClass(widgetClass, widgetClass.autoXML);
-        } else {
-            const config = widgetClass.autoXML;
-            const nameOrClass = config.name ?? widgetClass;
-            const factory = config.factory ?? ((...args) => new widgetClass(...args));
-            this.registerFactory(nameOrClass, config.inputConfig, factory);
-        }
+        const config = widgetClass.autoXML;
+        const factory = config.factory ?? ((...args) => new widgetClass(...args));
+        this.registerFactory(config.name, config.inputConfig, factory);
     }
 
     /**

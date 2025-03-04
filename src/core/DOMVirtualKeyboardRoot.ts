@@ -1,5 +1,4 @@
 import { VirtualKeyboard } from '../widgets/concrete-widgets.js';
-import { Margin } from '../widgets/Margin.js';
 import { DOMRoot } from './DOMRoot.js';
 import { Background } from '../widgets/Background.js';
 import { defaultVirtualKeyboardTemplate } from './VirtualKeyboardTemplate.js';
@@ -19,12 +18,13 @@ export class DOMVirtualKeyboardRoot extends DOMRoot {
     constructor(keyboardDriver: KeyboardDriver, properties?: VirtualKeyboardRootProperties) {
         super(
             new Background(
-                new Margin(
-                    new VirtualKeyboard(
-                        keyboardDriver,
-                        properties?.keyboardTemplate ?? defaultVirtualKeyboardTemplate
-                    ),
+                new VirtualKeyboard(
+                    keyboardDriver,
+                    properties?.keyboardTemplate ?? defaultVirtualKeyboardTemplate
                 ),
+                {
+                    containerPadding: { left: 8, right: 8, top: 8, bottom: 8 },
+                }
             ),
             properties
         );

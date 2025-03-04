@@ -3,7 +3,7 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Margin, Column, Row, TextButton, ScrollbarMode,
+                DOMRoot, Label, Column, Row, TextButton, ScrollbarMode,
                 DOMKeyboardDriver, DOMPointerDriver, FlexAlignment, TextInput,
                 ScrollableViewportWidget, Alignment, Variable,
                 AxisCoupling, Background
@@ -16,31 +16,27 @@
             const root = new DOMRoot(
                 new Background (
                     new ScrollableViewportWidget(
-                        new Margin(
-                            column.add(
-                                new ScrollableViewportWidget(
-                                    new Margin(
-                                        new Column([
-                                            label,
-                                            new TextInput(new Variable('').watch(variable => {
-                                                label.text = `Text input: ${variable.value}`;
-                                            })),
-                                            new Row([
-                                                new TextButton('Button 1'),
-                                                new TextButton('Button 2'),
-                                            ], {
-                                                multiContainerAlignment: {
-                                                    main: FlexAlignment.Center,
-                                                    cross: Alignment.Stretch
-                                                },
-                                            }).on('click', (ev) => label.text = `${ev.origin.child.text} clicked!`)
-                                        ])
-                                    ),
-                                    {
-                                        minWidth: 170,
-                                        minHeight: 50
-                                    }
-                                )
+                        column.add(
+                            new ScrollableViewportWidget(
+                                new Column([
+                                    label,
+                                    new TextInput(new Variable('').watch(variable => {
+                                        label.text = `Text input: ${variable.value}`;
+                                    })),
+                                    new Row([
+                                        new TextButton('Button 1'),
+                                        new TextButton('Button 2'),
+                                    ], {
+                                        multiContainerAlignment: {
+                                            main: FlexAlignment.Center,
+                                            cross: Alignment.Stretch
+                                        },
+                                    }).on('click', (ev) => label.text = `${ev.origin.child.text} clicked!`)
+                                ]),
+                                {
+                                    minWidth: 170,
+                                    minHeight: 50
+                                }
                             )
                         ),
                         {

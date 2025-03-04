@@ -364,8 +364,6 @@ export function injectDebugCode(): void {
     injectStackTraceFeature(Widget, 'preLayoutUpdate');
     // stacktrace.Widget.resolveDimensions
     injectStackTraceFeature(Widget, 'resolveDimensions');
-    // stacktrace.Widget.resolveDimensionsAsTop
-    injectStackTraceFeature(Widget, 'resolveDimensionsAsTop');
     // stacktrace.Widget.resolvePosition
     injectStackTraceFeature(Widget, 'resolvePosition');
     // stacktrace.Widget.postLayoutUpdate
