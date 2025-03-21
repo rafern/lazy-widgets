@@ -5,6 +5,7 @@ import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { BackingMediaSource, BackingMediaSourceType, getBackingMediaSourceType, urlToBackingMediaSource } from '../helpers/BackingMediaSource.js';
 import { type AsyncImageBitmap } from '../helpers/AsyncImageBitmap.js';
+import { type Padding } from '../theme/Padding.js';
 
 // TODO rename this to MediaFit
 /**
@@ -34,6 +35,8 @@ export enum IconFit {
 }
 
 // TODO rename this to MediaProperties
+// TODO add a prefix to these properties. width and height are horribly generic
+//      names that could be confused with actual widget dimensions
 /**
  * Optional Icon constructor properties.
  *
@@ -49,10 +52,12 @@ export interface IconProperties extends WidgetProperties {
     /** Sets {@link Icon#height}. */
     height?: number | null,
     /** Sets {@link Icon#fit}. */
-    fit?: IconFit
+    fit?: IconFit,
+    /** Sets {@link Icon#mediaPadding}. */
+    mediaPadding?: Padding,
 }
 
-// TODO rename this to Media
+// TODO rename this to Media, and all related properties
 /**
  * A widget which displays a given image.
  *
@@ -70,38 +75,38 @@ export class Icon extends Widget {
         ]
     };
 
-    /** The current image data used by the icon. */
+    /** The current media data used by the icon. */
     private _media: BackingMediaSource;
     /** The current media type (image, video, etc...). */
     private _mediaType: BackingMediaSourceType;
     /**
      * The last source that the current image was using. Used for tracking if
      * the image source changed and if the image is fully loaded. Only used if
-     * image is not a video.
+     * the media is an HTMLImageElement.
      */
     private lastSrc: string | null = null;
     /** The last presentation hash if using an AsyncImageBitmap. */
     private lastPHash = -1;
-    /** Has the user already been warned about the broken image? */
+    /** Has the user already been warned about the broken media? */
     private warnedBroken = false;
 
-    /** The current image rotation in radians. */
+    /** The current media rotation in radians. */
     @damageField
     rotation = 0;
     /**
-     * The view box of this Icon, useful if the image used for the icon is a
-     * spritesheet. If null, the entire image will be used.
+     * The view box of this Icon, useful if the media used for the icon is a
+     * spritesheet. If null, the entire media will be used.
      */
     @damageLayoutArrayField(true)
     viewBox: Rect | null;
     /**
-     * The wanted width. If null, the image's width will be used, taking
+     * The wanted width. If null, the media's width will be used, taking
      * {@link Icon#viewBox} into account.
      */
     @layoutField
     imageWidth: number | null = null;
     /**
-     * The wanted height. If null, the image's height will be used, taking
+     * The wanted height. If null, the media's height will be used, taking
      * {@link Icon#viewBox} into account.
      */
     @layoutField
@@ -129,11 +134,16 @@ export class Icon extends Widget {
      */
     private frameCallback: ((now: DOMHighResTimeStamp, metadata: unknown /* VideoFrameMetadata */) => void) | null = null;
     /**
-     * The {@link IconFit} mode to use when the image dimensions don't match the
+     * The {@link IconFit} mode to use when the media dimensions don't match the
      * widget dimensions.
      */
     @damageField
     fit: IconFit;
+    /**
+     * The {@link Padding} to add to the media.
+     */
+    @layoutField
+    mediaPadding: Padding;
 
     constructor(image: BackingMediaSource | string, properties?: Readonly<IconProperties>) {
         // Icons need a clear background, have no children and don't propagate
@@ -152,6 +162,7 @@ export class Icon extends Widget {
         this.imageWidth = properties?.width ?? null;
         this.imageHeight = properties?.height ?? null;
         this.fit = properties?.fit ?? IconFit.Contain;
+        this.mediaPadding = properties?.mediaPadding ?? { left: 0, right: 0, top: 0, bottom: 0 };
         this.setupVideoEvents();
     }
 
@@ -253,6 +264,10 @@ export class Icon extends Widget {
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
+        const pad = this.mediaPadding;
+        const hPad = pad.left + pad.right;
+        const vPad = pad.top + pad.bottom;
+
         // Find dimensions
         let wantedWidth = this.imageWidth;
         if(wantedWidth === null) {
@@ -290,7 +305,8 @@ export class Icon extends Widget {
             }
         }
 
-        this.idealWidth = Math.max(Math.min(wantedWidth, maxWidth), minWidth);
+        this.idealWidth = Math.max(Math.min(wantedWidth + hPad, maxWidth), minWidth);
+        let idealWidthNoPad = Math.max(this.idealWidth - hPad, 0);
 
         let wantedHeight = this.imageHeight;
         if(wantedHeight === null) {
@@ -328,15 +344,16 @@ export class Icon extends Widget {
             }
         }
 
-        this.idealHeight = Math.max(Math.min(wantedHeight, maxHeight), minHeight);
+        this.idealHeight = Math.max(Math.min(wantedHeight + vPad, maxHeight), minHeight);
+        let idealHeightNoPad = Math.max(this.idealHeight - vPad, 0);
 
         // Find offset and actual image dimensions (preserving aspect ratio)
         switch(this.fit) {
         case IconFit.Contain:
         case IconFit.Cover:
         {
-            const widthRatio = wantedWidth === 0 ? 0 : this.idealWidth / wantedWidth;
-            const heightRatio = wantedHeight === 0 ? 0 : this.idealHeight / wantedHeight;
+            const widthRatio = wantedWidth === 0 ? 0 : idealWidthNoPad / wantedWidth;
+            const heightRatio = wantedHeight === 0 ? 0 : idealHeightNoPad / wantedHeight;
             let scale;
 
             if(this.fit === IconFit.Contain) {
@@ -349,19 +366,21 @@ export class Icon extends Widget {
             this.actualHeight = wantedHeight * scale;
 
             if (this.fit === IconFit.Contain) {
-                this.idealWidth = Math.max(Math.min(this.actualWidth, maxWidth), minWidth);
-                this.idealHeight = Math.max(Math.min(this.actualHeight, maxHeight), minHeight);
+                this.idealWidth = Math.max(Math.min(this.actualWidth + hPad, maxWidth), minWidth);
+                this.idealHeight = Math.max(Math.min(this.actualHeight + vPad, maxHeight), minHeight);
+                idealWidthNoPad = Math.max(this.idealWidth - hPad, 0);
+                idealHeightNoPad = Math.max(this.idealHeight - vPad, 0);
             }
 
-            this.offsetX = (this.idealWidth - this.actualWidth) / 2;
-            this.offsetY = (this.idealHeight - this.actualHeight) / 2;
+            this.offsetX = (idealWidthNoPad - this.actualWidth) / 2 + pad.left;
+            this.offsetY = (idealHeightNoPad - this.actualHeight) / 2 + pad.top;
             break;
         }
         case IconFit.Fill:
-            this.actualWidth = this.idealWidth;
-            this.actualHeight = this.idealHeight;
-            this.offsetX = 0;
-            this.offsetY = 0;
+            this.actualWidth = idealWidthNoPad;
+            this.actualHeight = idealHeightNoPad;
+            this.offsetX = pad.left;
+            this.offsetY = pad.top;
             break;
         default:
             throw new Error(DynMsg.INVALID_ENUM(this.fit, 'IconFit', 'fit'));
@@ -431,7 +450,7 @@ export class Icon extends Widget {
             if (!this.warnedBroken) {
                 this.warnedBroken = true;
                 console.error(err);
-                console.warn("Failed to paint image to Icon widget. Are you using an invalid image URL? This warning won't be shown again");
+                console.warn("Failed to paint image to Icon widget. Are you using an invalid URL? This warning won't be shown again");
             }
         }
 
