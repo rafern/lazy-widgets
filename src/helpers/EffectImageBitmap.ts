@@ -1,5 +1,6 @@
 import { AsyncImageBitmap } from './AsyncImageBitmap.js';
-import { BackingMediaSourceType, urlToBackingMediaSource } from './BackingMediaSource.js';
+import { urlToBackingMediaSource } from './BackingMediaSource.js';
+import { BackingMediaSourceType } from './BackingMediaSourceType.js';
 
 // TODO support BackingMediaSource as backingMedia
 

@@ -225,6 +225,11 @@
             "type": "Padding",
             "default": "<Padding>{left: 0, right: 0, top: 0, bottom: 0}",
             "description": "The {@link Padding} used in {@link ScrollableViewportWidget} scrollbars."
+        },
+        "mediaFallbackFill": {
+            "type": "FillStyle",
+            "default": "'transparent'",
+            "description": "The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} to use when media fails to load."
         }
     }
 }

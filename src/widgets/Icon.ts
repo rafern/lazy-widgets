@@ -3,9 +3,10 @@ import { Widget, WidgetProperties } from './Widget.js';
 import { DynMsg, Msg } from '../core/Strings.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
-import { BackingMediaSource, BackingMediaSourceType, getBackingMediaSourceType, urlToBackingMediaSource } from '../helpers/BackingMediaSource.js';
+import { BackingMediaSource, getBackingMediaSourceType, urlToBackingMediaSource } from '../helpers/BackingMediaSource.js';
 import { type AsyncImageBitmap } from '../helpers/AsyncImageBitmap.js';
 import { type Padding } from '../theme/Padding.js';
+import { BackingMediaSourceType } from '../helpers/BackingMediaSourceType.js';
 
 // TODO rename this to MediaFit
 /**
@@ -76,7 +77,7 @@ export class Icon extends Widget {
     };
 
     /** The current media data used by the icon. */
-    private _media: BackingMediaSource;
+    private _media: BackingMediaSource | null;
     /** The current media type (image, video, etc...). */
     private _mediaType: BackingMediaSourceType;
     /**
@@ -145,7 +146,7 @@ export class Icon extends Widget {
     @layoutField
     mediaPadding: Padding;
 
-    constructor(image: BackingMediaSource | string, properties?: Readonly<IconProperties>) {
+    constructor(image: BackingMediaSource | string | null, properties?: Readonly<IconProperties>) {
         // Icons need a clear background, have no children and don't propagate
         // events
         super(properties);
@@ -208,7 +209,7 @@ export class Icon extends Widget {
      *
      * If getting, returns {@link Icon#_media}.
      */
-    set image(image: BackingMediaSource) {
+    set image(image: BackingMediaSource | null) {
         if(image !== this._media) {
             if(this._media instanceof HTMLVideoElement) {
                 // Remove old event listeners in video. null checks aren't
@@ -233,7 +234,7 @@ export class Icon extends Widget {
         }
     }
 
-    get image(): BackingMediaSource {
+    get image(): BackingMediaSource | null {
         return this._media;
     }
 
@@ -271,7 +272,9 @@ export class Icon extends Widget {
         // Find dimensions
         let wantedWidth = this.imageWidth;
         if(wantedWidth === null) {
-            if(this.viewBox === null) {
+            if (this._media === null) {
+                wantedWidth = 0;
+            } else if (this.viewBox === null) {
                 switch(this._mediaType) {
                 case BackingMediaSourceType.HTMLImageElement: {
                     const media = this._media as HTMLImageElement;
@@ -310,7 +313,9 @@ export class Icon extends Widget {
 
         let wantedHeight = this.imageHeight;
         if(wantedHeight === null) {
-            if(this.viewBox === null) {
+            if (this._media === null) {
+                wantedHeight = 0;
+            } else if (this.viewBox === null) {
                 switch(this._mediaType) {
                 case BackingMediaSourceType.HTMLImageElement: {
                     const media = this._media as HTMLImageElement;
@@ -352,18 +357,24 @@ export class Icon extends Widget {
         case IconFit.Contain:
         case IconFit.Cover:
         {
-            const widthRatio = wantedWidth === 0 ? 0 : idealWidthNoPad / wantedWidth;
-            const heightRatio = wantedHeight === 0 ? 0 : idealHeightNoPad / wantedHeight;
-            let scale;
-
-            if(this.fit === IconFit.Contain) {
-                scale = Math.min(widthRatio, heightRatio);
+            if (this._media === null || (this._mediaType === BackingMediaSourceType.HTMLImageElement && !(this._media as HTMLImageElement).complete)) {
+                // XXX fallback for no media or not-yet-loaded images
+                this.actualWidth = idealWidthNoPad;
+                this.actualHeight = idealHeightNoPad;
             } else {
-                scale = Math.max(widthRatio, heightRatio);
-            }
+                const widthRatio = wantedWidth === 0 ? 0 : idealWidthNoPad / wantedWidth;
+                const heightRatio = wantedHeight === 0 ? 0 : idealHeightNoPad / wantedHeight;
 
-            this.actualWidth = wantedWidth * scale;
-            this.actualHeight = wantedHeight * scale;
+                let scale: number;
+                if(this.fit === IconFit.Contain) {
+                    scale = Math.min(widthRatio, heightRatio);
+                } else {
+                    scale = Math.max(widthRatio, heightRatio);
+                }
+
+                this.actualWidth = wantedWidth * scale;
+                this.actualHeight = wantedHeight * scale;
+            }
 
             if (this.fit === IconFit.Contain) {
                 this.idealWidth = Math.max(Math.min(this.actualWidth + hPad, maxWidth), minWidth);
@@ -388,13 +399,7 @@ export class Icon extends Widget {
     }
 
     protected override handlePainting(_dirtyRects: Array<Rect>): void {
-        // Abort if backing media isn't ready yet
-        if(this._mediaType === BackingMediaSourceType.HTMLImageElement && !(this._media as HTMLImageElement).complete) {
-            this.lastSrc = null;
-            return;
-        }
-
-        let actualImage: CanvasImageSource;
+        let actualImage: CanvasImageSource | null;
         if (this._mediaType === BackingMediaSourceType.AsyncImageBitmap) {
             const aib = this._media as AsyncImageBitmap;
             const bitmap = aib.bitmap;
@@ -404,8 +409,11 @@ export class Icon extends Widget {
 
             actualImage = bitmap;
             this.lastPHash = aib.presentationHash;
+        } else if(this._mediaType === BackingMediaSourceType.HTMLImageElement && !(this._media as HTMLImageElement).complete) {
+            this.lastSrc = null;
+            actualImage = null;
         } else {
-            actualImage = this._media as CanvasImageSource;
+            actualImage = this._media as CanvasImageSource | null;
         }
 
         // Translate, rotate and clip if rotation is not 0
@@ -431,26 +439,39 @@ export class Icon extends Widget {
         }
 
         // Draw image, with viewBox if it is not null
-        try {
-            if(this.viewBox === null) {
-                ctx.drawImage(
-                    actualImage,
-                    tdx, tdy, this.actualWidth, this.actualHeight,
-                );
-            } else {
-                ctx.drawImage(
-                    actualImage, ...this.viewBox,
-                    tdx, tdy, this.actualWidth, this.actualHeight,
-                );
+        if (actualImage) {
+            try {
+                if(this.viewBox === null) {
+                    ctx.drawImage(
+                        actualImage,
+                        tdx, tdy, this.actualWidth, this.actualHeight,
+                    );
+                } else {
+                    ctx.drawImage(
+                        actualImage, ...this.viewBox,
+                        tdx, tdy, this.actualWidth, this.actualHeight,
+                    );
+                }
+            } catch(err) {
+                // HACK even though complete is true, the image might be in a broken
+                // state, which is not easy to detect. to prevent a crash, catch the
+                // exception and log as a warning
+                if (!this.warnedBroken) {
+                    this.warnedBroken = true;
+                    console.error(err);
+                    console.warn("Failed to paint image to Icon widget. Are you using an invalid URL? This warning won't be shown again");
+                }
+
+                actualImage = null;
             }
-        } catch(err) {
-            // HACK even though complete is true, the image might be in a broken
-            // state, which is not easy to detect. to prevent a crash, catch the
-            // exception and log as a warning
-            if (!this.warnedBroken) {
-                this.warnedBroken = true;
-                console.error(err);
-                console.warn("Failed to paint image to Icon widget. Are you using an invalid URL? This warning won't be shown again");
+        }
+
+        // Draw fallback colour
+        if (!actualImage) {
+            const fill = this.mediaFallbackFill;
+            if (fill !== 'transparent') {
+                ctx.fillStyle = fill;
+                ctx.fillRect(tdx, tdy, this.actualWidth, this.actualHeight);
             }
         }
 

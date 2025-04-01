@@ -98,5 +98,7 @@ export interface ThemeProperties {
     scrollbarCornersRadii?: CornerRadii;
     /** The {@link Padding} used in {@link ScrollableViewportWidget} scrollbars. */
     scrollbarPadding?: Padding;
+    /** The {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle | fill style} to use when media fails to load. */
+    mediaFallbackFill?: FillStyle;
     // XXX THEMEPROPERTIES AUTO-GENERATED CODE END
 }

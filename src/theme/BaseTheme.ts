@@ -114,6 +114,7 @@ export class BaseTheme implements ThemeProperties {
         this._tooltipRadii = properties.tooltipRadii;
         this._scrollbarCornersRadii = properties.scrollbarCornersRadii;
         this._scrollbarPadding = properties.scrollbarPadding;
+        this._mediaFallbackFill = properties.mediaFallbackFill;
         // XXX BASETHEME CTOR AUTO-GENERATED CODE END
     }
 
@@ -717,6 +718,20 @@ export class BaseTheme implements ThemeProperties {
         if(this._scrollbarPadding !== value) {
             this._scrollbarPadding = value;
             this.onThemeUpdated('scrollbarPadding');
+        }
+    }
+
+    /** See {@link BaseTheme#mediaFallbackFill}. For internal use only. */
+    private _mediaFallbackFill?: FillStyle;
+
+    get mediaFallbackFill(): FillStyle {
+        return this._mediaFallbackFill ?? this._fallbackTheme?.mediaFallbackFill ?? 'transparent';
+    }
+
+    set mediaFallbackFill(value: FillStyle | undefined) {
+        if(this._mediaFallbackFill !== value) {
+            this._mediaFallbackFill = value;
+            this.onThemeUpdated('mediaFallbackFill');
         }
     }
 
