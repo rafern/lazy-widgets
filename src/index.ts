@@ -77,6 +77,7 @@ export * from './helpers/insertValueIntoOrderedSubsetList.js';
 export * from './helpers/isPower2.js';
 export * from './helpers/measureTextDims.js';
 export * from './helpers/BackingMediaSource.js';
+export * from './helpers/BackingMediaSourceType.js';
 export * from './helpers/mergeOverlappingRects.js';
 export * from './helpers/mergeRects.js';
 export * from './helpers/paintCircle.js';
