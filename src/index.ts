@@ -18,6 +18,7 @@ export * from './core/Root.js';
 export * from './core/Strings.js';
 export * from './core/SystemTextInputHandler.js';
 export * from './core/TextInputHandler.js';
+export * from './core/TooltipAxisBias.js';
 export * from './core/Viewport.js';
 export * from './core/VirtualKeyboardRoot.js';
 export * from './core/VirtualKeyboardTemplate.js';

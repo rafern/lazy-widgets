@@ -9,9 +9,18 @@ import { accessorAlias, layoutArrayField, layoutField } from '../decorators/Flag
 import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { TooltipAxisBias } from '../core/TooltipAxisBias.js';
+
 const startAlignment = <Alignment2D>{
     horizontal: Alignment.Start, vertical: Alignment.Start
 };
+
+export interface TooltipContainerProperties extends WidgetProperties {
+    /** Sets {@link TooltipContainer#horizontalBias}. */
+    horizontalBias?: TooltipAxisBias;
+    /** Sets {@link TooltipContainer#verticalBias}. */
+    verticalBias?: TooltipAxisBias;
+}
 
 /**
  * A container widget for a widget that will be shown when a {@link Tooltip} is
@@ -48,6 +57,19 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
     @accessorAlias('anchorY')
     cursorY!: number;
     /**
+     * Horizontal bias to apply to tooltip container. After anchor position by
+     * default (tooltip will tend to the right of the anchor).
+     */
+    @layoutField
+    horizontalBias!: TooltipAxisBias;
+    /**
+     * Vertical bias to apply to tooltip container. Automatically decided from
+     * anchor position by default (tooltip will tend to be above the wrapper if
+     * the anchor is on the top half of the wrapper, or below otherwise).
+     */
+    @layoutField
+    verticalBias!: TooltipAxisBias;
+    /**
      * A rectangle representing the dimensions and position of the
      * {@link Tooltip} that binds this box. Used for positioning.
      */
@@ -56,8 +78,11 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
     private idealTooltipWidth = 0;
     private idealTooltipHeight = 0;
 
-    constructor(child: W, properties?: Readonly<WidgetProperties>) {
+    constructor(child: W, properties?: Readonly<TooltipContainerProperties>) {
         super(child, properties);
+
+        this.horizontalBias = properties?.horizontalBias ?? TooltipAxisBias.After;
+        this.verticalBias = properties?.verticalBias ?? TooltipAxisBias.Auto;
     }
 
     protected override onThemeUpdated(property: string | null = null): void {
@@ -101,7 +126,7 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
         let pY = 0;
         let pW = Infinity;
         let pH = Infinity;
-        const [_wX, wY, _wW, wH] = this.tooltipRect;
+        const [wX, wY, wW, wH] = this.tooltipRect;
 
         if (this._parent) {
             [pX, pY, pW, pH] = this._parent.idealRect;
@@ -118,7 +143,8 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
         const fitsBelow = spaceBelow >= this.idealTooltipHeight;
 
         if (fitsAbove && fitsBelow) {
-            if (this.anchorY <= (wY + 0.5 * wH)) {
+            const vBias = this.verticalBias;
+            if (vBias === TooltipAxisBias.Before || (vBias === TooltipAxisBias.Auto && this.anchorY <= (wY + 0.5 * wH))) {
                 // put above
                 y = wY - this.idealTooltipHeight;
             } else {
@@ -136,7 +162,16 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
             y = this.anchorY;
         }
 
-        x = this.anchorX;
+        switch(this.horizontalBias) {
+        case TooltipAxisBias.Before:
+            x = this.anchorX - this.idealTooltipWidth;
+            break;
+        case TooltipAxisBias.After:
+            x = this.anchorX;
+            break;
+        default:
+            x = this.anchorX - ((this.anchorX <= (wX + 0.5 * wW)) ? 0 : this.idealTooltipWidth);
+        }
 
         // clamp to bounds of parent
         const pRight = pX + pW;
