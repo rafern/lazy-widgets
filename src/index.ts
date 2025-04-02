@@ -92,6 +92,7 @@ export * from './helpers/safeRoundRect.js';
 export * from './helpers/TabKeyHelper.js';
 export * from './helpers/TextHelper.js';
 export * from './helpers/toKebabCase.js';
+export * from './helpers/TextImageBitmap.js';
 export * from './helpers/TooltipController.js';
 export * from './helpers/whitespace-regex.js';
 export * from './helpers/WidgetEventEmitter-premade-functions.js';

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Column, Icon, TextAlignMode, Background,
+                TextImageBitmap
+            } from '../dist/index.js';
+
+            // Load icon font
+            new FontFace('fa-solid-900', 'url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts/fa-solid-900.ttf)', {
+                weight: '900',
+            }).load().then((font) => {
+                document.fonts.add(font);
+
+                // Create the root
+                const icon = new Icon(
+                    new TextImageBitmap(
+                        '\uf52e',
+                        '128px fa-solid-900',
+                        'lime'
+                    ),
+                    { minWidth: 128, maxWidth: 128, minHeight: 128, maxHeight: 128 }
+                );
+
+                const root = new DOMRoot(
+                    new Background(
+                        new Column([
+                            new Label('FROG', { bodyTextAlign: TextAlignMode.Center }),
+                            icon,
+                            new Label('FROG', { bodyTextAlign: TextAlignMode.Center })
+                        ])
+                    )
+                );
+
+                // Run the update loop
+                function updateLoop() {
+                    root.update();
+                    window.requestAnimationFrame(updateLoop);
+                }
+
+                window.requestAnimationFrame(updateLoop);
+
+                // Add root to body
+                document.body.appendChild(root.domElem);
+            });
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>
