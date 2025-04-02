@@ -47,15 +47,10 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
      */
     private _hoverStart = 0;
     /**
-     * The X pointer position for when the hovering started. For internal use
+     * The pointer position for when the hovering started. For internal use
      * only.
      */
-    private _hoverStartX = 0;
-    /**
-     * The Y pointer position for when the hovering started. For internal use
-     * only.
-     */
-    private _hoverStartY = 0;
+    private _hoverStartPos: [x: number, y: number] = [0, 0];
     /** The actual tooltip that will be shown when this wrapper is hovered. */
     readonly tooltipWidget: T;
     /** The tooltip controller used for managing tooltip visibility. */
@@ -70,7 +65,7 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
 
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
         super.attach(root, viewport, parent);
-        this.controller.findTopLayeredContainer(this);
+        this.controller.findTopLayeredContainer();
     }
 
     override detach(): void {
@@ -83,7 +78,7 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
 
         // show tooltip if hovered for long enough
         if (this._hoverStart !== 0 && !this.controller.hasLayer && (Date.now() - this._hoverStart) >= HOVER_TIME) {
-            this.controller.addLayer(this._hoverStartX, this._hoverStartY);
+            this.controller.addLayer(this._hoverStartPos);
         }
     }
 
@@ -96,16 +91,16 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
         if (event.isa(PointerMoveEvent)) {
             if (this._hoverStart === 0) {
                 this._hoverStart = Date.now();
-                this._hoverStartX = event.x;
-                this._hoverStartY = event.y;
+                this._hoverStartPos[0] = event.x;
+                this._hoverStartPos[1] = event.y;
             } else if (!this.controller.hasLayer) {
-                const xDiff = Math.abs(this._hoverStartX - event.x);
-                const yDiff = Math.abs(this._hoverStartY - event.y);
+                const xDiff = Math.abs(this._hoverStartPos[0] - event.x);
+                const yDiff = Math.abs(this._hoverStartPos[1] - event.y);
 
                 if (xDiff > SENSITIVITY_RADIUS || yDiff > SENSITIVITY_RADIUS) {
                     this._hoverStart = Date.now();
-                    this._hoverStartX = event.x;
-                    this._hoverStartY = event.y;
+                    this._hoverStartPos[0] = event.x;
+                    this._hoverStartPos[1] = event.y;
                 }
             }
         } else if (event.isa(LeaveEvent)) {
