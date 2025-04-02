@@ -1,7 +1,5 @@
-import { Layer } from '../core/Layer.js';
 import { LeaveEvent } from '../events/LeaveEvent.js';
 import { PointerMoveEvent } from '../events/PointerMoveEvent.js';
-import { LayeredContainer } from './LayeredContainer.js';
 import { PassthroughWidget } from './PassthroughWidget.js';
 import { TooltipContainer } from './TooltipContainer.js';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
@@ -9,6 +7,8 @@ import type { Root } from '../core/Root.js';
 import type { Viewport } from '../core/Viewport.js';
 import type { Widget, WidgetProperties } from './Widget.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { TooltipController } from '../helpers/TooltipController.js';
+
 const SENSITIVITY_RADIUS = 8;
 const HOVER_TIME = 1000;
 
@@ -41,10 +41,6 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
         ]
     };
 
-    /** The top-most container in the current UI tree. Internal use only */
-    private _topLayerContainer: LayeredContainer | null = null;
-    /** The currently created layer for the {@link Tooltip#tooltipWidget} */
-    private _layer: Layer<T> | null = null;
     /**
      * The timestamp for when the hovering started. 0 if not hovering. For
      * internal use only.
@@ -62,38 +58,23 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
     private _hoverStartY = 0;
     /** The actual tooltip that will be shown when this wrapper is hovered. */
     readonly tooltipWidget: T;
+    /** The tooltip controller used for managing tooltip visibility. */
+    private readonly controller: TooltipController<this, T>;
 
     constructor(child: W, tooltipWidget: T, properties?: Readonly<WidgetProperties>) {
         super(child, properties);
 
         this.tooltipWidget = tooltipWidget;
+        this.controller = new TooltipController(this, tooltipWidget);
     }
 
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
         super.attach(root, viewport, parent);
-
-        // find top-most layered container and use it do add/remove the tooltip
-        // widget
-        let focus = parent;
-        while (focus !== null) {
-            if (focus instanceof LayeredContainer) {
-                this._topLayerContainer = focus;
-            }
-
-            focus = focus.parent;
-        }
-
-        if (this._topLayerContainer === null) {
-            console.warn('Tooltip has no LayeredContainer ascendant. Tooltip will not be shown');
-        }
+        this.controller.findTopLayeredContainer(this);
     }
 
     override detach(): void {
-        if (this._layer) {
-            this.removeLayer();
-        }
-
-        this._topLayerContainer = null;
+        this.controller.clearTopLayeredContainer();
         super.detach();
     }
 
@@ -101,8 +82,8 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
         super.handlePreLayoutUpdate();
 
         // show tooltip if hovered for long enough
-        if (this._layer === null && this._hoverStart !== 0 && (Date.now() - this._hoverStart) >= HOVER_TIME) {
-            this.addLayer();
+        if (this._hoverStart !== 0 && !this.controller.hasLayer && (Date.now() - this._hoverStart) >= HOVER_TIME) {
+            this.controller.addLayer(this._hoverStartX, this._hoverStartY);
         }
     }
 
@@ -117,7 +98,7 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
                 this._hoverStart = Date.now();
                 this._hoverStartX = event.x;
                 this._hoverStartY = event.y;
-            } else if (this._layer === null) {
+            } else if (!this.controller.hasLayer) {
                 const xDiff = Math.abs(this._hoverStartX - event.x);
                 const yDiff = Math.abs(this._hoverStartY - event.y);
 
@@ -129,10 +110,7 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
             }
         } else if (event.isa(LeaveEvent)) {
             this._hoverStart = 0;
-
-            if (this._layer) {
-                this.removeLayer();
-            }
+            this.controller.removeLayer();
         }
 
         // dispatch event to child
@@ -141,62 +119,11 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
 
     override resolvePosition(x: number, y: number): void {
         super.resolvePosition(x, y);
-        this.updateTooltipRect();
+        this.controller.updateTooltipRect();
     }
 
     override finalizeBounds(): void {
         super.finalizeBounds();
-        this.updateTooltipRect();
-    }
-
-    /**
-     * Add a layer to the {@link Tooltip#tooltipWidget}. For internal use only.
-     */
-    private addLayer(): void {
-        if (this._topLayerContainer === null) {
-            return;
-        }
-
-        // add layer with tooltip widget
-        this._layer = <Layer<T>>{
-            child: this.tooltipWidget,
-            canExpand: false
-        };
-        this._topLayerContainer.pushLayer(this._layer);
-
-        // get cursor pos and this widget relative to layerered container.
-        // update tooltip widget with these positions
-        [this.tooltipWidget.cursorX, this.tooltipWidget.cursorY] = this.queryPointFromHere(this._hoverStartX, this._hoverStartY, this._topLayerContainer);
-        this.updateTooltipRect();
-    }
-
-    /**
-     * Update the {@link TooltipContainer#tooltipRect} of the
-     * {@link Tooltip#tooltipWidget}. For internal use only.
-     */
-    private updateTooltipRect() {
-        if (this._layer === null) {
-            return;
-        }
-
-        this.tooltipWidget.tooltipRect = this.queryRectFromHere(this.idealRect, this._topLayerContainer);
-    }
-
-    /**
-     * Remove the layer of the {@link Tooltip#tooltipWidget}
-     * ({@link Tooltip#_layer}). For internal use only.
-     */
-    private removeLayer(): void {
-        const layer = this._layer as Layer<T>;
-        const container = this._topLayerContainer as LayeredContainer;
-        const layerIndex = container.getLayerIndex(layer);
-
-        if (layerIndex) {
-            container.removeLayer(layerIndex);
-        } else {
-            console.warn('Could not find tooltip layer in LayeredContainer. Maybe it was removed externally?');
-        }
-
-        this._layer = null;
+        this.controller.updateTooltipRect();
     }
 }
