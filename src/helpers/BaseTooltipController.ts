@@ -8,7 +8,7 @@ import { type Widget } from '../widgets/Widget.js';
  * {@link Tooltip}, or to implement tooltip-like functionality, such as
  * dropdowns or context menus.
  */
-export class BaseTooltipController<W extends Widget, C extends Widget, O = void> {
+export abstract class BaseTooltipController<W extends Widget, C extends Widget, O = void> {
     /** The top-most container in the current UI tree */
     protected topLayeredContainer: LayeredContainer | null = null;
     /** The currently created layer for the {@link Tooltip#tooltipWidget} */
@@ -91,7 +91,7 @@ export class BaseTooltipController<W extends Widget, C extends Widget, O = void>
         }
 
         const layer = this.layer as Layer<C>;
-        const container = this.topLayeredContainer;
+        const container = this.topLayeredContainer!;
         const layerIndex = container.getLayerIndex(layer);
 
         if (layerIndex) {
