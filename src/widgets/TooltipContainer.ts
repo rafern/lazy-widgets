@@ -5,7 +5,7 @@ import { resolveContainerDimensions } from '../helpers/resolveContainerDimension
 import { resolveContainerPosition } from '../helpers/resolveContainerPosition.js';
 import { Alignment2D } from '../theme/Alignment2D.js';
 import { safeRoundRect } from '../helpers/safeRoundRect.js';
-import { layoutArrayField, layoutField } from '../decorators/FlagFields.js';
+import { accessorAlias, layoutArrayField, layoutField } from '../decorators/FlagFields.js';
 import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
@@ -26,19 +26,27 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
     };
 
     /**
-     * The horizontal component of the cursor position to place this tooltip
-     * around. Automatically set by {@link Tooltip} widget. Used for
-     * positioning.
+     * The horizontal component of the position to place this tooltip around.
+     * Automatically set by {@link Tooltip} widget. Used for positioning.
      */
     @layoutField
-    cursorX = 0;
+    anchorX = 0;
     /**
-     * The vertical component of the cursor position to place this tooltip
-     * around. Automatically set by {@link Tooltip} widget. Used for
-     * positioning.
+     * The vertical component of the position to place this tooltip around.
+     * Automatically set by {@link Tooltip} widget. Used for positioning.
      */
     @layoutField
-    cursorY = 0;
+    anchorY = 0;
+    /**
+     * @deprecated Use {@link TooltipContainer#anchorX} instead.
+     */
+    @accessorAlias('anchorX')
+    cursorX!: number;
+    /**
+     * @deprecated Use {@link TooltipContainer#anchorX} instead.
+     */
+    @accessorAlias('anchorY')
+    cursorY!: number;
     /**
      * A rectangle representing the dimensions and position of the
      * {@link Tooltip} that binds this box. Used for positioning.
@@ -110,7 +118,7 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
         const fitsBelow = spaceBelow >= this.idealTooltipHeight;
 
         if (fitsAbove && fitsBelow) {
-            if (this.cursorY <= (wY + 0.5 * wH)) {
+            if (this.anchorY <= (wY + 0.5 * wH)) {
                 // put above
                 y = wY - this.idealTooltipHeight;
             } else {
@@ -125,10 +133,10 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
             y = wBot;
         } else {
             // put on cursor
-            y = this.cursorY;
+            y = this.anchorY;
         }
 
-        x = this.cursorX;
+        x = this.anchorX;
 
         // clamp to bounds of parent
         const pRight = pX + pW;

@@ -219,7 +219,7 @@ export function damageLayoutArrayField(allowNonArrays = false): PropertyDecorato
  * @param fieldName - The name of the field to create an alias for.
  * @category Decorator
  */
-export function accessorAlias(fieldName: string): PropertyDecorator {
+export function accessorAlias(fieldName: string | symbol): PropertyDecorator {
     // eslint-disable-next-line @typescript-eslint/ban-types
     return function(target: Object, propertyKey: string | symbol): void {
         Object.defineProperty(target, propertyKey, {
