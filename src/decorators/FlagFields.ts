@@ -1,4 +1,5 @@
-import { DynMsg } from "../core/Strings.js";
+import { DynMsg } from '../core/Strings.js';
+
 /**
  * A decorator for a public field which sets calls a callback if the property's
  * value is changed.
@@ -210,4 +211,26 @@ export function damageLayoutArrayField(allowNonArrays = false): PropertyDecorato
         (this as Record<string | symbol, unknown>)._layoutDirty = true;
         Object.getPrototypeOf(this).markWholeAsDirty.apply(this);
     }, allowNonArrays);
+}
+
+/**
+ * A decorator for a public field which is an alias for another field.
+ *
+ * @param fieldName - The name of the field to create an alias for.
+ * @category Decorator
+ */
+export function accessorAlias(fieldName: string): PropertyDecorator {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    return function(target: Object, propertyKey: string | symbol): void {
+        Object.defineProperty(target, propertyKey, {
+            set: function(value) {
+                this[fieldName] = value;
+            },
+            get: function() {
+                return this[fieldName];
+            },
+            enumerable: true,
+            configurable: true,
+        });
+    }
 }
