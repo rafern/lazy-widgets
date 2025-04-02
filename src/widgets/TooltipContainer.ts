@@ -144,7 +144,9 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
 
         if (fitsAbove && fitsBelow) {
             const vBias = this.verticalBias;
-            if (vBias === TooltipAxisBias.Before || (vBias === TooltipAxisBias.Auto && this.anchorY <= (wY + 0.5 * wH))) {
+            // XXX it doesn't make sense to have a centre-biased vertical axis,
+            //     so assume the user meant to use automatic bias
+            if (vBias === TooltipAxisBias.Before || ((vBias === TooltipAxisBias.Center || vBias === TooltipAxisBias.Auto) && this.anchorY <= (wY + 0.5 * wH))) {
                 // put above
                 y = wY - this.idealTooltipHeight;
             } else {
@@ -165,6 +167,9 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
         switch(this.horizontalBias) {
         case TooltipAxisBias.Before:
             x = this.anchorX - this.idealTooltipWidth;
+            break;
+        case TooltipAxisBias.Center:
+            x = this.anchorX - this.idealTooltipWidth * 0.5;
             break;
         case TooltipAxisBias.After:
             x = this.anchorX;
