@@ -82,8 +82,8 @@ export abstract class BaseTooltipController<W extends Widget, C extends Widget, 
     }
 
     /**
-     * Remove the layer of the {@link TooltipController#tooltipContainer}
-     * ({@link TooltipController#layer}).
+     * Remove the layer of the {@link TooltipController#tooltipContainer} if
+     * there is any.
      */
     removeLayer(): void {
         if (!this.layer) {
