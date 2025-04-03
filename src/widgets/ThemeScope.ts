@@ -36,6 +36,7 @@ export class ThemeScope<W extends Widget = Widget> extends PassthroughWidget<W> 
     constructor(child: W, theme?: Theme, properties?: Readonly<WidgetProperties>) {
         super(child, properties);
         this._scopeTheme = theme;
+        super.inheritedTheme = theme;
     }
 
     override set inheritedTheme(_theme: Theme | undefined) {
