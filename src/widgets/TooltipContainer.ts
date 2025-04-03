@@ -10,6 +10,7 @@ import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { TooltipAxisBias } from '../core/TooltipAxisBias.js';
+import { PropagationModel, type WidgetEvent } from '../events/WidgetEvent.js';
 
 const startAlignment = <Alignment2D>{
     horizontal: Alignment.Start, vertical: Alignment.Start
@@ -93,6 +94,14 @@ export class TooltipContainer<W extends Widget = Widget> extends SingleParent<W>
             this.markWholeAsDirty();
         } else if (property === 'tooltipFill' || property === 'tooltipRadii') {
             this.markWholeAsDirty();
+        }
+    }
+
+    protected override handleEvent(event: WidgetEvent): Widget | null {
+        if (event.propagation === PropagationModel.Trickling) {
+            return this.child.dispatchEvent(event);
+        } else {
+            return super.handleEvent(event);
         }
     }
 
