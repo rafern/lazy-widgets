@@ -1,4 +1,4 @@
-import { Widget, WidgetProperties } from './Widget.js';
+import { Widget } from './Widget.js';
 import { SingleParent } from './SingleParent.js';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
 import { resolveContainerDimensions } from '../helpers/resolveContainerDimensions.js';
@@ -13,12 +13,6 @@ import type { Rect } from '../helpers/Rect.js';
  * @category Widget
  */
 export abstract class BaseContainer<W extends Widget = Widget> extends SingleParent<W> {
-    constructor(child: W, properties?: Readonly<WidgetProperties>) {
-        // Containers clear their own background, have a child and may propagate
-        // events
-        super(child, properties);
-    }
-
     protected override onThemeUpdated(property: string | null = null): void {
         super.onThemeUpdated(property);
 

@@ -3,16 +3,27 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Background, RoundedCorners
+                DOMRoot, Label, Background, RoundedCorners, Column,
+                CanvasContainer
             } from '../dist/index.js';
 
             // Create the root
             const root = new DOMRoot(
-                new RoundedCorners(
-                    new Background(
-                        new Label('Hello world!')
+                new Column([
+                    new RoundedCorners(
+                        new Background(
+                            new Label('I was rounded')
+                        )
+                    ),
+                    new CanvasContainer(
+                        new Background(
+                            new Label('I was made semi-transparent and had a filter applied')
+                        ),
+                        {
+                            containerPadding: {left: 0, right: 0, top: 0, bottom: 0}
+                        }
                     )
-                )
+                ])
             );
 
             // Update once; this is a static UI

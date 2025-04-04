@@ -7,10 +7,10 @@ import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js
 import type { Viewport } from '../core/Viewport.js';
 import type { Root } from '../core/Root.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
-import { SingleParent } from './SingleParent.js';
 import { viewportRelativePointToAbsolute } from '../helpers/viewportRelativePointToAbsolute.js';
 import { viewportRelativeRectToAbsolute } from '../helpers/viewportRelativeRectToAbsolute.js';
 import { clipRelativeRectToAbsoluteViewport } from '../helpers/clipRelativeRectToAbsoluteViewport.js';
+import { BaseContainer } from './BaseContainer.js';
 
 /**
  * Similar to {@link Container}, but the child is painted to a
@@ -18,18 +18,16 @@ import { clipRelativeRectToAbsoluteViewport } from '../helpers/clipRelativeRectT
  * if you have a niche reason for it. The intended use is to do effects on the
  * child by modifying how the canvas is painted in a base class.
  */
-export class CanvasContainer<W extends Widget = Widget> extends SingleParent<W> {
+export class CanvasContainer<W extends Widget = Widget> extends BaseContainer<W> {
     static override autoXML: WidgetAutoXML = {
         name: 'canvas-container',
         inputConfig: SingleParentXMLInputConfig
     };
 
-    /** The actual viewport object. */
+    /** Internal viewport for child widget. */
     protected readonly internalViewport: CanvasViewport;
 
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
-        // Viewport clears its own background, has a single child and propagates
-        // events
         super(child, properties);
 
         this.internalViewport = new CanvasViewport(child);
@@ -39,27 +37,20 @@ export class CanvasContainer<W extends Widget = Widget> extends SingleParent<W> 
         if (event.propagation === PropagationModel.Trickling) {
             return this.internalViewport.dispatchTricklingEvent(event as TricklingEvent);
         } else {
+            // XXX this is slightly inneficient, because all BaseContainer does
+            //     is check if it's a trickling event, otherwise, it calls
+            //     super.handleEvent. we know it isn't though, but the
+            //     alternative is to call the grandparent class' handleEvent,
+            //     which is horrible design
             return super.handleEvent(event);
         }
     }
 
     protected override handlePreLayoutUpdate(): void {
-        // Pre-layout update child
-        const child = this.child;
-        child.preLayoutUpdate();
-
-        // If child's layout is dirty, set self's layout as dirty
-        if (child.layoutDirty) {
-            this._layoutDirty = true;
-        }
+        super.handlePreLayoutUpdate();
 
         // Update viewport resolution if needed
         (this.internalViewport as CanvasViewport).resolution = this.root.resolution;
-    }
-
-    protected override handlePostLayoutUpdate(): void {
-        // Post-layout update child
-        this.child.postLayoutUpdate();
     }
 
     override finalizeBounds(): void {
@@ -76,6 +67,7 @@ export class CanvasContainer<W extends Widget = Widget> extends SingleParent<W> 
     }
 
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
+        // FIXME we shouldn't have to do this, this is horrible...
         // HACK Parent#attach attaches child widgets with this._viewport, but
         // we want to use this.internalViewport
         Widget.prototype.attach.call(this, root, viewport, parent);
@@ -90,7 +82,6 @@ export class CanvasContainer<W extends Widget = Widget> extends SingleParent<W> 
     }
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {
-        // Clear background and paint canvas
         this.internalViewport.paint(dirtyRects);
     }
 

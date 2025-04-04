@@ -1,7 +1,7 @@
 import { flagField } from '../decorators/FlagFields.js';
 import { roundToPower2 } from '../helpers/roundToPower2.js';
 import { isPower2 } from '../helpers/isPower2.js';
-import { BaseViewport } from './BaseViewport.js';
+import { BaseViewport, ClippedViewportRect } from './BaseViewport.js';
 import { Msg } from './Strings.js';
 import { mergeOverlappingRects } from '../helpers/mergeOverlappingRects.js';
 import type { Widget } from '../widgets/Widget.js';
@@ -450,6 +450,7 @@ export class CanvasViewport extends BaseViewport {
         let canvasSpaceDirtyRects: null | Array<Rect> = null;
 
         if (dirtyRects.length > 0) {
+            console.debug(`!!!! painting ${dirtyRects.length} rects`, dirtyRects);
             // clip to dirty rectangles (and translate if using atlas bleeding
             // prevention)
             this.context.save();
@@ -497,6 +498,8 @@ export class CanvasViewport extends BaseViewport {
                     dirtyRect[1] += 1;
                 }
             }
+        } else {
+            console.debug('!!!! nothing to paint');
         }
 
         // prevent bleeding by clearing out-of-bounds parts of canvas
@@ -553,10 +556,76 @@ export class CanvasViewport extends BaseViewport {
         return canvasSpaceDirtyRects;
     }
 
+    /**
+     * Paints the internal canvas to the
+     * {@link CanvasViewport#parent | parent viewport}. Note that you are
+     * assumed to have already called {@link CanvasViewport#paintToInternal},
+     * and must pass the {@link ClippedViewportRect} from
+     * {@link CanvasViewport#getClippedViewport}.
+     *
+     * You probably don't need to call this. Check {@link CanvasViewport#paint}
+     * instead.
+     */
+    paintToParentViewport(clippedViewportRect: Readonly<ClippedViewportRect>) {
+        const wClipped = clippedViewportRect[8];
+        const hClipped = clippedViewportRect[9];
+
+        if(this.parent === null || wClipped === 0 || hClipped === 0) {
+            return;
+        }
+
+        const [esx, esy] = this.effectiveScale;
+        const ctx = this.parent.context;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(clippedViewportRect[0], clippedViewportRect[1], clippedViewportRect[2], clippedViewportRect[3]);
+        ctx.clip();
+
+        const xDst = clippedViewportRect[6];
+        const yDst = clippedViewportRect[7];
+        let sx = (xDst - clippedViewportRect[4]) * esx;
+        let sy = (yDst - clippedViewportRect[5]) * esy;
+
+        if (this.preventAtlasBleeding) {
+            sx++;
+            sy++;
+        }
+
+        ctx.drawImage(
+            this.canvas,
+            sx,
+            sy,
+            wClipped * esx,
+            hClipped * esy,
+            xDst,
+            yDst,
+            wClipped,
+            hClipped,
+        );
+
+        ctx.restore();
+    }
+
     paint(extraDirtyRects: Array<Rect>): boolean {
-        const [vpX, vpY, vpW, vpH, origXDst, origYDst, xDst, yDst, wClipped, hClipped] = this.getClippedViewport();
+        const clippedViewportRect = this.getClippedViewport();
 
         // add extra damage regions to internally tracked damage region list
+        this.pushExtraDirtyRects(extraDirtyRects, clippedViewportRect);
+
+        // paint to internal canvas
+        const dirtyRects = this.paintToInternal();
+
+        // Paint to parent viewport, if any, and if inside bounds
+        this.paintToParentViewport(clippedViewportRect);
+
+        return dirtyRects !== null;
+    }
+
+    pushExtraDirtyRects(extraDirtyRects: ReadonlyArray<Rect>, clippedViewportRect: Readonly<ClippedViewportRect>) {
+        const origXDst = clippedViewportRect[4];
+        const origYDst = clippedViewportRect[5];
+
         for (const absRect of extraDirtyRects) {
             const left = Math.floor(absRect[0] - origXDst);
             const top = Math.floor(absRect[1] - origYDst);
@@ -567,44 +636,6 @@ export class CanvasViewport extends BaseViewport {
 
             this.pushDirtyRect([ left, top, width, height ]);
         }
-
-        // paint to internal canvas
-        const dirtyRects = this.paintToInternal();
-
-        // Paint to parent viewport, if any, and if inside bounds
-        if(this.parent !== null && wClipped !== 0 && hClipped !== 0) {
-            const [esx, esy] = this.effectiveScale;
-            const ctx = this.parent.context;
-
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(vpX, vpY, vpW, vpH);
-            ctx.clip();
-
-            let sx = (xDst - origXDst) * esx;
-            let sy = (yDst - origYDst) * esy;
-
-            if (this.preventAtlasBleeding) {
-                sx++;
-                sy++;
-            }
-
-            ctx.drawImage(
-                this.canvas,
-                sx,
-                sy,
-                wClipped * esx,
-                hClipped * esy,
-                xDst,
-                yDst,
-                wClipped,
-                hClipped,
-            );
-
-            ctx.restore();
-        }
-
-        return dirtyRects !== null;
     }
 
     protected pushDirtyRects(rects: Array<Rect>) {
