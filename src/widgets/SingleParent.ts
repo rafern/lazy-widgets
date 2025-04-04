@@ -12,6 +12,7 @@ export abstract class SingleParent<W extends Widget = Widget> extends Parent<W> 
      */
     constructor(readonly child: W, properties?: Readonly<WidgetProperties>) {
         super(properties);
+        child.inheritedTheme = this.inheritedTheme;
     }
 
     override [Symbol.iterator](): Iterator<W> {

@@ -22,6 +22,10 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
         super(properties);
 
         this._children = [...children];
+
+        for (const child of this._children) {
+            child.inheritedTheme = this.inheritedTheme;
+        }
     }
 
     override [Symbol.iterator](): Iterator<W> {
@@ -100,9 +104,10 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
 
                 if(pos !== -1) {
                     this._children.splice(pos, 1);
-                }
-                if(isAttached) {
-                    child.detach();
+                    child.inheritedTheme = undefined;
+                    if(isAttached) {
+                        child.detach();
+                    }
                 }
             }
         } else {
@@ -110,9 +115,10 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
 
             if(pos !== -1) {
                 this._children.splice(pos, 1);
-            }
-            if(isAttached) {
-                children.detach();
+                children.inheritedTheme = undefined;
+                if(isAttached) {
+                    children.detach();
+                }
             }
         }
 
@@ -132,7 +138,12 @@ export abstract class MultiParent<W extends Widget = Widget> extends Parent<W> {
     clearChildren(): this {
         if(this.attached) {
             for(const child of this._children) {
+                child.inheritedTheme = undefined;
                 child.detach();
+            }
+        } else {
+            for(const child of this._children) {
+                child.inheritedTheme = undefined;
             }
         }
 
