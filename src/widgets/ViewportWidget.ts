@@ -14,6 +14,10 @@ import type { Viewport } from '../core/Viewport.js';
 import type { Bounds } from '../helpers/Bounds.js';
 import type { Root } from '../core/Root.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { viewportRelativePointToAbsolute } from '../helpers/viewportRelativePointToAbsolute.js';
+import { viewportRelativeRectToAbsolute } from '../helpers/viewportRelativeRectToAbsolute.js';
+import { clipRelativeRectToAbsoluteViewport } from '../helpers/clipRelativeRectToAbsoluteViewport.js';
+
 /**
  * Optional ViewportWidget constructor properties.
  *
@@ -345,69 +349,19 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
     }
 
     override propagateDirtyRect(rect: Rect): void {
-        // convert damage region from relative coordinates to absolute
-        // coordinates if necessary
-        let left: number, top: number, right: number, bottom: number
-        if (this.internalViewport.relativeCoordinates) {
-            const vpX = this.internalViewport.rect[0] + this.internalViewport.offset[0];
-            const vpY = this.internalViewport.rect[1] + this.internalViewport.offset[1];
-
-            left = Math.floor(rect[0] + vpX);
-            top = Math.floor(rect[1] + vpY);
-            right = Math.ceil(rect[0] + rect[2] + vpX);
-            bottom = Math.ceil(rect[1] + rect[3] + vpY);
-        } else {
-            left = rect[0];
-            top = rect[1];
-            right = left + rect[2];
-            bottom = top + rect[3];
-        }
-
-        // clip dirty rects to avoid dirty rects being spammed from widgets that
-        // are offscreen and therefore won't be painted, causing a loop of
-        // constant dirty rects
-        const vpLeft = this.x;
-        const vpRight = vpLeft + this.width;
-        if (left < vpLeft) {
-            left = vpLeft;
-        }
-        if (right > vpRight) {
-            right = vpRight;
-        }
-
-        if (left >= right) {
+        const clippedRect = clipRelativeRectToAbsoluteViewport(this.internalViewport, this.rect, rect);
+        if (!clippedRect) {
             return;
         }
 
-        const vpTop = this.y;
-        const vpBottom = vpTop + this.height;
-        if (top < vpTop) {
-            top = vpTop;
-        }
-        if (bottom > vpBottom) {
-            bottom = vpBottom;
-        }
-
-        if (top >= bottom) {
-            return;
-        }
-
-        super.propagateDirtyRect([ left, top, right - left, bottom - top ]);
+        super.propagateDirtyRect(clippedRect);
     }
 
     override queryRect(rect: Rect, relativeTo: Widget | null = null): Rect {
         // convert rect from relative coordinates to absolute coordinates if
         // necessary
         if (this.internalViewport.relativeCoordinates) {
-            const vpX = this.internalViewport.rect[0] + this.internalViewport.offset[0];
-            const vpY = this.internalViewport.rect[1] + this.internalViewport.offset[1];
-
-            const left = rect[0] + vpX;
-            const top = rect[1] + vpY;
-            const right = rect[0] + rect[2] + vpX;
-            const bottom = rect[1] + rect[3] + vpY;
-
-            rect = [ left, top, right - left, bottom - top ];
+            rect = viewportRelativeRectToAbsolute(this.internalViewport, rect);
         }
 
         return super.queryRect(rect, relativeTo);
@@ -417,8 +371,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         // convert point from relative coordinates to absolute coordinates if
         // necessary
         if (this.internalViewport.relativeCoordinates) {
-            x += this.internalViewport.rect[0] + this.internalViewport.offset[0];
-            y += this.internalViewport.rect[1] + this.internalViewport.offset[1];
+            [x, y] = viewportRelativePointToAbsolute(this.internalViewport, x, y);
         }
 
         return super.queryPoint(x, y, relativeTo);

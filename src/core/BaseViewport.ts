@@ -5,6 +5,9 @@ import type { Widget } from '../widgets/Widget.js';
 import type { TricklingEvent } from '../events/TricklingEvent.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { Viewport } from './Viewport.js';
+
+export type ClippedViewportRect = [vpX: number, vpY: number, vpW: number, vpH: number, origXDst: number, origYDst: number, xDst: number, yDst: number, wClipped: number, hClipped: number];
+
 /**
  * The base implementation of the {@link Viewport} interface. See
  * {@link CanvasViewport} and {@link ClippedViewport}.
@@ -157,9 +160,11 @@ export abstract class BaseViewport implements Viewport {
 
     /**
      * Get the rect of the child alongside more extra information,
-     * clipped/clamped to the bounds of the viewport. For internal use only.
+     * clipped/clamped to the bounds of the viewport. Usually only for internal,
+     * but can be used externally if you know what you're doing.
      */
-    protected getClippedViewport(): [vpX: number, vpY: number, vpW: number, vpH: number, origXDst: number, origYDst: number, xDst: number, yDst: number, wClipped: number, hClipped: number] {
+    getClippedViewport(): ClippedViewportRect {
+        // TODO rename to getClippedViewportRect
         // Calculate child's source and destination
         const [vpX, vpY, vpW, vpH] = this.rect;
         const [innerWidth, innerHeight] = this.child.dimensions;
