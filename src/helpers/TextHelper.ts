@@ -476,13 +476,20 @@ export class TextHelper {
                 const metrics = measureTextDims(CHARSET, this.font);
 
                 if(this.lineHeight === null) {
-                    this._lineHeight = metrics.actualBoundingBoxAscent;
+                    const fontAscent = metrics.fontBoundingBoxAscent;
+                    if (fontAscent === undefined) {
+                        // HACK fallback for browsers that don't support this
+                        //      yet
+                        this._lineHeight = Math.max(metrics.actualBoundingBoxAscent, measureTextDims('M', this.font).actualBoundingBoxAscent + metrics.actualBoundingBoxDescent);
+                    } else {
+                        this._lineHeight = fontAscent;
+                    }
                 } else {
                     this._lineHeight = this.lineHeight;
                 }
 
                 if(this.lineSpacing === null) {
-                    this._lineSpacing = metrics.actualBoundingBoxDescent;
+                    this._lineSpacing = metrics.fontBoundingBoxDescent ?? metrics.actualBoundingBoxDescent;
                 } else {
                     this._lineSpacing = this.lineSpacing;
                 }
