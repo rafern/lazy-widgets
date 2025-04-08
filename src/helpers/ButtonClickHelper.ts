@@ -102,7 +102,10 @@ export class ButtonClickHelper extends CompoundClickHelper {
             if (event.key !== 'Enter') {
                 return [false, false];
             }
-        } else if (event.isa(PointerWheelEvent) || event.isa(PointerMoveEvent)) {
+        } else if (event.isa(PointerMoveEvent)) {
+            // do nothing; we should capture pointer move events to support
+            // nested buttons
+        } else if (event.isa(PointerWheelEvent)) {
             shouldCapture = this.pointerFocused;
         } else if (!(event.isa(LeaveEvent) || event instanceof PointerEvent)) {
             // Discard unhandled events
