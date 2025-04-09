@@ -51,6 +51,9 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
 
         this.forced = properties?.forced ?? false;
 
+        // TODO stop doing this. this would technically be a breaking change,
+        //      but it's a leftover from canvas-ui where we didn't have damage
+        //      regions and layered rendering
         // Make theme that will be inherited by child. Later, this theme's
         // canvasFill property will be changed, notifying the child. Make the
         // child inherit the theme. fallbackTheme is also later set when this

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Column, TextButton, DOMKeyboardDriver, Variable,
+                DOMPointerDriver, Background, FilledButton, TextAlignMode,
+                TextInput,
+            } from '../dist/index.js';
+
+            // Create the root
+            const label = new Label('This is a nested button:');
+
+            const root = new DOMRoot(
+                new Background(
+                    new Column([
+                        label,
+                        new FilledButton(
+                            new Column([
+                                new Label('Outer', { bodyTextAlign: TextAlignMode.Center }),
+                                new TextButton('Inner', { id: 'inner-button' }),
+                                new TextInput(new Variable('Type here')),
+                            ]),
+                            { id: 'outer-button' },
+                        ).on('click', (ev) => {
+                            label.text = `${ev.origin.id} clicked!`;
+                        }),
+                    ])
+                )
+            );
+
+            // Create, bind DOM and register the keyboard driver
+            const keyboardDriver = new DOMKeyboardDriver();
+            keyboardDriver.bindSingletRoot(root, { domElem: root.domElem });
+            root.registerDriver(keyboardDriver);
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

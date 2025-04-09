@@ -2,6 +2,7 @@ import { TextHelper, WrapMode } from '../helpers/TextHelper.js';
 import { layoutField } from '../decorators/FlagFields.js';
 import { Widget, WidgetProperties } from './Widget.js';
 import type { Rect } from '../helpers/Rect.js';
+
 /**
  * Optional TextInput constructor properties.
  *
@@ -103,8 +104,8 @@ export abstract class BaseLabel extends Widget {
         }
 
         // Paint text, vertically centered
-        const yOffset = (this.idealHeight - this.textHelper.height + this.textHelper.actualLineSpacing) / 2;
-        this.textHelper.paint(ctx, this.bodyTextFill, this.idealX, this.idealY + yOffset);
+        const yOffset = (this.height - this.textHelper.height) / 2;
+        this.textHelper.paint(ctx, this.bodyTextFill, this.x, this.y + yOffset);
 
         // Stop clipping if clipping was applied
         if(needsClip) {

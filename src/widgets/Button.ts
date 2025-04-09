@@ -9,6 +9,8 @@ import type { Widget } from './Widget.js';
 import type { TricklingEvent } from '../events/TricklingEvent.js';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { PointerEvent } from '../events/PointerEvent.js';
+import { LeaveEvent } from '../events/LeaveEvent.js';
 /**
  * A {@link BaseContainer} which can be {@link ClickHelper | clicked} as a
  * button. Since the button grabs all events, no events are propagated to the
@@ -68,8 +70,29 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
             }
         }
 
+        const tricklingEvent = event as TricklingEvent;
+        if (tricklingEvent.target !== this) {
+            const superCapture = super.handleEvent(event);
+            if (superCapture) {
+                if (event instanceof PointerEvent) {
+                    // XXX simulate an unhover, since the pointer is over some
+                    //     nested button now
+                    this.clickHelper.handleEvent(
+                        new LeaveEvent(this), this.root,
+                        this._clickable, this.bounds,
+                    );
+                }
+
+                return superCapture;
+            }
+
+            if (tricklingEvent.target !== null) {
+                return null;
+            }
+        }
+
         const [wasClick, capture] = this.clickHelper.handleEvent(
-            event as TricklingEvent, this.root, this._clickable, this.bounds
+            tricklingEvent, this.root, this._clickable, this.bounds
         );
 
         if(wasClick) {

@@ -109,6 +109,7 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
             const canExpand = layerInit.canExpand ?? true;
             const name = layerInit.name ?? null;
             const child = layerInit.child;
+            child.inheritedTheme = this.inheritedTheme;
 
             if (!child) {
                 throw new Error('A layer must have a child widget');
@@ -405,10 +406,13 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
      * @param layer - The layer to attach to the UI root.
      */
     private attachLayer(layer: Layer<W>) {
+        const child = layer.child;
+
         if (this.attached) {
-            layer.child.attach(this._root as Root, this._viewport as Viewport, this);
+            child.attach(this._root as Root, this._viewport as Viewport, this);
         }
 
+        child.inheritedTheme = this.inheritedTheme;
         this._layoutDirty = true;
     }
 
@@ -418,12 +422,14 @@ export class LayeredContainer<W extends Widget = Widget> extends Parent<W> {
      * @param layer - The layer to deatach from the UI root.
      */
     private detachLayer(layer: Layer<W>) {
+        const child = layer.child;
+
         if (this.attached) {
-            const child = layer.child;
             this.markAsDirty([...child.position, ...child.dimensions]);
             child.detach();
         }
 
+        child.inheritedTheme = undefined;
         this._layoutDirty = true;
     }
 
