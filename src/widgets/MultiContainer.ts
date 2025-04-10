@@ -139,6 +139,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             needsStretch = true;
             minCrossAxis = minCrossLength;
         }
+        const origMinCrossAxis = minCrossAxis;
 
         this.enabledChildCount = 0;
         const spacing = this.multiContainerSpacing;
@@ -396,7 +397,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         let iEnabled = 0;
         let usedSpaceAfter = 0;
         let needsSpacing = false;
-        crossLength = minCrossAxis;
+        crossLength = minCrossAxis = origMinCrossAxis;
         minCrossAxisGrowIdx = 0;
 
         for(const child of this._children) {
