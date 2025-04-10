@@ -159,7 +159,7 @@ export class DebuggableCanvasViewport extends CanvasViewport {
         }
     }
 
-    protected override pushDirtyRects(rects: Array<Rect>) {
+    override pushDirtyRects(rects: Array<Rect>) {
         for (const rect of rects) {
             this.addDebugEvent(rect, false);
         }
@@ -167,7 +167,7 @@ export class DebuggableCanvasViewport extends CanvasViewport {
         super.pushDirtyRects(rects);
     }
 
-    protected override pushDirtyRect(rect: Rect) {
+    override pushDirtyRect(rect: Rect) {
         this.addDebugEvent(rect, false);
 
         super.pushDirtyRect(rect);
