@@ -211,8 +211,6 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
      * @returns Returns true if the event was captured
      */
     protected handleEventScrollbar(vertical: boolean, corner: boolean, event: TricklingEvent, root: Root): boolean {
-        // TODO repaint only scrollbars instead of everything if they just got
-        //      hovered
         // Abort if the other scrollbar is being dragged
         if(this.verticalDragged !== null && this.verticalDragged !== vertical) {
             return false;
@@ -237,7 +235,7 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         const clickState = clickHelper.clickState;
         const stateChanged = clickHelper.clickStateChanged;
         if(stateChanged) {
-            this.markWholeAsDirty();
+            this.markAsDirty(bgRect);
         }
 
         if(clickState === ClickState.Hold) {
