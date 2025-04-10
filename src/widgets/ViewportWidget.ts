@@ -343,9 +343,7 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Clear background and paint canvas
-        // TODO just pass dirtyRects once the CanvasViewport.paint behaviour has
-        //      been changed
-        this.internalViewport.paint(this.useCanvas ? [] : dirtyRects);
+        this.internalViewport.paint(dirtyRects);
     }
 
     override propagateDirtyRect(rect: Rect): void {
