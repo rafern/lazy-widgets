@@ -141,6 +141,7 @@ export * from './widgets/BaseContainer.js';
 export * from './widgets/BaseLabel.js';
 export * from './widgets/Button.js';
 export * from './widgets/CanvasContainer.js';
+export * from './widgets/CanvasEffectsContainer.js';
 export * from './widgets/Checkbox.js';
 export * from './widgets/ClickableWidgetProperties.js';
 export * from './widgets/Column.js';

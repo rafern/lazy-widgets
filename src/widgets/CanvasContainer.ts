@@ -105,7 +105,7 @@ export class CanvasContainer<W extends Widget = Widget> extends BaseContainer<W>
      * you want to apply effects to the child widget.
      */
     protected paintInternalCanvas(clippedViewportRect: ClippedViewportRect) {
-        this.internalViewport.paintToParentViewport(clippedViewportRect);
+        this.internalViewport.paintToParentViewport(clippedViewportRect, false);
     }
 
     protected override handlePainting(_dirtyRects: Array<Rect>): void {
@@ -114,13 +114,26 @@ export class CanvasContainer<W extends Widget = Widget> extends BaseContainer<W>
         this.paintInternalCanvas(clippedViewportRect);
     }
 
+    /**
+     * Transform or discard a damage region from the child widget in the canvas.
+     * Override this method if you have non-local effects, such as shadows.
+     *
+     * The damage region is a mutable reference; you are expected to transform
+     * it if necessary.
+     *
+     * @returns `true` if the damage region should be propagated, or `false` otherwise
+     */
+    protected handleCanvasDamage(_rect: Rect) {
+        return true;
+    }
+
     override propagateDirtyRect(rect: Rect): void {
         // canvas viewports are painted independently, so we need to mark
         // regions in them as dirty
         this.internalViewport.pushDirtyRect([...rect]);
 
         const clippedRect = clipRelativeRectToAbsoluteViewport(this.internalViewport, this.rect, rect);
-        if (!clippedRect) {
+        if (!clippedRect || !this.handleCanvasDamage(clippedRect)) {
             return;
         }
 

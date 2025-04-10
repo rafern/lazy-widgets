@@ -564,7 +564,7 @@ export class CanvasViewport extends BaseViewport {
      * You probably don't need to call this. Check {@link CanvasViewport#paint}
      * instead.
      */
-    paintToParentViewport(clippedViewportRect: Readonly<ClippedViewportRect>) {
+    paintToParentViewport(clippedViewportRect: Readonly<ClippedViewportRect>, clip = true) {
         const wClipped = clippedViewportRect[8];
         const hClipped = clippedViewportRect[9];
 
@@ -575,10 +575,12 @@ export class CanvasViewport extends BaseViewport {
         const [esx, esy] = this.effectiveScale;
         const ctx = this.parent.context;
 
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(clippedViewportRect[0], clippedViewportRect[1], clippedViewportRect[2], clippedViewportRect[3]);
-        ctx.clip();
+        if (clip) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(clippedViewportRect[0], clippedViewportRect[1], clippedViewportRect[2], clippedViewportRect[3]);
+            ctx.clip();
+        }
 
         const xDst = clippedViewportRect[6];
         const yDst = clippedViewportRect[7];
@@ -602,7 +604,9 @@ export class CanvasViewport extends BaseViewport {
             hClipped,
         );
 
-        ctx.restore();
+        if (clip) {
+            ctx.restore();
+        }
     }
 
     /**

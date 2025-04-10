@@ -3,24 +3,31 @@
     <head>
         <script type='module'>
             import {
-                DOMRoot, Label, Background, RoundedCorners, Column,
-                CanvasContainer
+                DOMRoot, Label, Background, CanvasEffectsContainer, Column,
+                RoundedCorners, Container,
             } from '../dist/index.js';
 
             // Create the root
             const root = new DOMRoot(
                 new Column([
-                    new RoundedCorners(
-                        new Background(
-                            new Label('I was rounded')
-                        )
-                    ),
-                    new CanvasContainer(
-                        new Background(
-                            new Label('I was made semi-transparent and had a filter applied')
+                    new Container(
+                        new RoundedCorners(
+                            new Background(
+                                new Label('I was rounded')
+                            )
                         ),
                         {
-                            containerPadding: {left: 0, right: 0, top: 0, bottom: 0}
+                            containerPadding: {left: 0, right: 8, top: 0, bottom: 0},
+                        }
+                    ),
+                    new CanvasEffectsContainer(
+                        new Background(
+                            new Label('I was made semi-transparent and had a filter applied'),
+                        ),
+                        {
+                            containerPadding: {left: 0, right: 8, top: 0, bottom: 8},
+                            opacity: 0.5,
+                            filter: 'drop-shadow(4px 4px 2px black) sepia()',
                         }
                     )
                 ])

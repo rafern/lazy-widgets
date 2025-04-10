@@ -13,6 +13,8 @@ export { VirtualKeyboard } from './VirtualKeyboard/VirtualKeyboard.js';
 export { VirtualKeyRow } from './VirtualKeyboard/VirtualKeyRow.js';
 export { Background } from './Background.js';
 export { Button } from './Button.js';
+export { CanvasContainer } from './CanvasContainer.js';
+export { CanvasEffectsContainer } from './CanvasEffectsContainer.js';
 export { Checkbox } from './Checkbox.js';
 export { Column } from './Column.js';
 export { Container } from './Container.js';
