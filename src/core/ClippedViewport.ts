@@ -32,7 +32,7 @@ export class ClippedViewport extends BaseViewport {
 
     paint(extraDirtyRects: Array<Rect>): boolean {
         const wasDirty = extraDirtyRects.length > 0;
-        const [vpX, vpY, vpW, vpH, _origXDst, _origYDst, _xDst, _yDst, wClipped, hClipped] = this.getClippedViewport();
+        const [vpX, vpY, vpW, vpH, _origXDst, _origYDst, _xDst, _yDst, wClipped, hClipped] = this.getClippedViewportRect();
 
         // Abort if outside of bounds
         if(wClipped === 0 || hClipped === 0) {

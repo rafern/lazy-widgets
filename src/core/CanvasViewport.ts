@@ -559,7 +559,7 @@ export class CanvasViewport extends BaseViewport {
      * {@link CanvasViewport#parent | parent viewport}. Note that you are
      * assumed to have already called {@link CanvasViewport#paintToInternal},
      * and must pass the {@link ClippedViewportRect} from
-     * {@link CanvasViewport#getClippedViewport}.
+     * {@link CanvasViewport#getClippedViewportRect}.
      *
      * You probably don't need to call this. Check {@link CanvasViewport#paint}
      * instead.
@@ -625,7 +625,7 @@ export class CanvasViewport extends BaseViewport {
      * @returns Returns true if the child was re-painted, else, false.
      */
     override paint(_extraDirtyRects: ReadonlyArray<Rect>): boolean {
-        const clippedViewportRect = this.getClippedViewport();
+        const clippedViewportRect = this.getClippedViewportRect();
 
         // paint to internal canvas
         const dirtyRects = this.paintToInternal();

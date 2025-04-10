@@ -163,8 +163,7 @@ export abstract class BaseViewport implements Viewport {
      * clipped/clamped to the bounds of the viewport. Usually only for internal,
      * but can be used externally if you know what you're doing.
      */
-    getClippedViewport(): ClippedViewportRect {
-        // TODO rename to getClippedViewportRect
+    getClippedViewportRect(): ClippedViewportRect {
         // Calculate child's source and destination
         const [vpX, vpY, vpW, vpH] = this.rect;
         const [innerWidth, innerHeight] = this.child.dimensions;

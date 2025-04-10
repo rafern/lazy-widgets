@@ -109,7 +109,7 @@ export class CanvasContainer<W extends Widget = Widget> extends BaseContainer<W>
     }
 
     protected override handlePainting(_dirtyRects: Array<Rect>): void {
-        const clippedViewportRect = this.internalViewport.getClippedViewport();
+        const clippedViewportRect = this.internalViewport.getClippedViewportRect();
         this.internalViewport.paintToInternal();
         this.handleInternalCanvasPainting(clippedViewportRect);
     }
