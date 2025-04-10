@@ -619,19 +619,13 @@ export class CanvasViewport extends BaseViewport {
      * Note that, unlike other Viewport implementations, this implementation
      * doesn't actually need to have extraDirtyRects passed; an empty array will
      * suffice, assuming you're marking dirty regions with
-     * {@link CanvasViewport#pushDirtyRects}. In the future, the extraDirtyRects
-     * parameter **will be ignored**, but has been kept for now, for backwards
-     * compatibility.
+     * {@link CanvasViewport#pushDirtyRects}.
      *
-     * @param extraDirtyRects - Extra damage regions (not tracked internally) that need to be repainted. Can be an empty list if this is a root viewport.
+     * @param _extraDirtyRects - Ignored in this Viewport implementation, but would otherwise have the damage regions that need to be repainted.
      * @returns Returns true if the child was re-painted, else, false.
      */
-    override paint(extraDirtyRects: ReadonlyArray<Rect>): boolean {
+    override paint(_extraDirtyRects: ReadonlyArray<Rect>): boolean {
         const clippedViewportRect = this.getClippedViewport();
-
-        // add extra damage regions to internally tracked damage region list
-        // TODO remove
-        this.pushExtraDirtyRects(extraDirtyRects, clippedViewportRect);
 
         // paint to internal canvas
         const dirtyRects = this.paintToInternal();
@@ -640,26 +634,6 @@ export class CanvasViewport extends BaseViewport {
         this.paintToParentViewport(clippedViewportRect);
 
         return dirtyRects !== null;
-    }
-
-    /**
-     * @deprecated This API was a mistake and will be removed in the future. Use {@link CanvasViewport#pushDirtyRects} instead.
-     */
-    pushExtraDirtyRects(extraDirtyRects: ReadonlyArray<Rect>, clippedViewportRect: Readonly<ClippedViewportRect>) {
-        // TODO remove
-        const origXDst = clippedViewportRect[4];
-        const origYDst = clippedViewportRect[5];
-
-        for (const absRect of extraDirtyRects) {
-            const left = Math.floor(absRect[0] - origXDst);
-            const top = Math.floor(absRect[1] - origYDst);
-            const right = Math.ceil(absRect[0] + absRect[2] - origXDst);
-            const bottom = Math.ceil(absRect[1] + absRect[3] - origYDst);
-            const width = right - left;
-            const height = bottom - top;
-
-            this.pushDirtyRect([ left, top, width, height ]);
-        }
     }
 
     pushDirtyRects(rects: Array<Rect>) {
