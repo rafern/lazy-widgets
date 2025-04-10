@@ -12,7 +12,6 @@ import { ScrollEvent } from '../events/ScrollEvent.js';
 import type { LayoutConstraints } from '../core/LayoutConstraints.js';
 import type { Viewport } from '../core/Viewport.js';
 import type { Bounds } from '../helpers/Bounds.js';
-import type { Root } from '../core/Root.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { viewportRelativePointToAbsolute } from '../helpers/viewportRelativePointToAbsolute.js';
 import { viewportRelativeRectToAbsolute } from '../helpers/viewportRelativeRectToAbsolute.js';
@@ -325,20 +324,19 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
         }
     }
 
-    override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
-        // HACK Parent#attach attaches child widgets with this._viewport, but
-        // we want to use this.internalViewport
-        Widget.prototype.attach.call(this, root, viewport, parent);
-        this.internalViewport.parent = viewport;
-        this.child.attach(root, this.internalViewport, this);
+    protected override handleAttachment(): void {
+        // XXX don't call super.handleAttachment, otherwise the child is
+        //     attached to the parent viewport instead of the internal viewport
+        this.internalViewport.parent = this._viewport!;
+        this.child.attach(this._root!, this.internalViewport, this);
     }
 
-    override detach(): void {
+    protected override handleDetachment(): void {
         // unset parent viewport of internal viewport. using a clipped viewport
         // after this will crash; make sure to only use the viewport if the
         // widget is active
         this.internalViewport.parent = null;
-        super.detach();
+        super.handleDetachment();
     }
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {

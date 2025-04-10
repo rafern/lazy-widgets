@@ -1,7 +1,6 @@
 import { Widget } from '../widgets/Widget.js';
-import type { Viewport } from '../core/Viewport.js';
 import type { Theme } from '../theme/Theme.js';
-import type { Root } from '../core/Root.js';
+
 /**
  * A class for widgets which may have children.
  *
@@ -39,17 +38,13 @@ export abstract class Parent<W extends Widget = Widget> extends Widget implement
         return super.inheritedTheme;
     }
 
-    override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
-        super.attach(root, viewport, parent);
-
+    protected override handleAttachment(): void {
         for(const child of this) {
-            child.attach(root, viewport, this);
+            child.attach(this._root!, this._viewport!, this);
         }
     }
 
-    override detach(): void {
-        super.detach();
-
+    protected override handleDetachment(): void {
         for(const child of this) {
             child.detach();
         }

@@ -5,9 +5,7 @@ import { Variable } from '../state/Variable.js';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
 import { FocusEvent } from '../events/FocusEvent.js';
 import { BlurEvent } from '../events/BlurEvent.js';
-import type { Viewport } from '../core/Viewport.js';
 import type { TricklingEvent } from '../events/TricklingEvent.js';
-import type { Root } from '../core/Root.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
@@ -76,13 +74,11 @@ export class Checkbox extends Widget {
         this.markWholeAsDirty();
     }
 
-    override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
-        super.attach(root, viewport, parent);
+    protected override handleAttachment(): void {
         this.variable.watch(this.callback);
     }
 
-    override detach(): void {
-        super.detach();
+    protected override handleDetachment(): void {
         this.variable.unwatch(this.callback);
     }
 

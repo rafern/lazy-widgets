@@ -3,8 +3,6 @@ import { PointerMoveEvent } from '../events/PointerMoveEvent.js';
 import { PassthroughWidget } from './PassthroughWidget.js';
 import { TooltipContainer } from './TooltipContainer.js';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
-import type { Root } from '../core/Root.js';
-import type { Viewport } from '../core/Viewport.js';
 import type { Widget, WidgetProperties } from './Widget.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { TooltipController } from '../helpers/TooltipController.js';
@@ -63,14 +61,14 @@ export class Tooltip<W extends Widget = Widget, T extends TooltipContainer = Too
         this.controller = new TooltipController(this, tooltipWidget);
     }
 
-    override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
-        super.attach(root, viewport, parent);
+    protected override handleAttachment(): void {
+        super.handleAttachment();
         this.controller.findTopLayeredContainer();
     }
 
-    override detach(): void {
+    protected override handleDetachment(): void {
         this.controller.clearTopLayeredContainer();
-        super.detach();
+        super.handleDetachment();
     }
 
     protected override handlePreLayoutUpdate(): void {

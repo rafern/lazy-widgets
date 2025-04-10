@@ -4,8 +4,6 @@ import { Rect } from '../helpers/Rect.js';
 import { PropagationModel, WidgetEvent } from '../events/WidgetEvent.js';
 import { TricklingEvent } from '../events/TricklingEvent.js';
 import { SingleParentXMLInputConfig } from '../xml/SingleParentXMLInputConfig.js';
-import type { Viewport } from '../core/Viewport.js';
-import type { Root } from '../core/Root.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { viewportRelativePointToAbsolute } from '../helpers/viewportRelativePointToAbsolute.js';
 import { viewportRelativeRectToAbsolute } from '../helpers/viewportRelativeRectToAbsolute.js';
@@ -85,19 +83,17 @@ export class CanvasContainer<W extends Widget = Widget> extends BaseContainer<W>
         this.child.resolvePosition(0, 0);
     }
 
-    override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
-        // FIXME we shouldn't have to do this, this is horrible...
-        // HACK Parent#attach attaches child widgets with this._viewport, but
-        //      we want to use this.internalViewport
-        Widget.prototype.attach.call(this, root, viewport, parent);
-        this.internalViewport.parent = viewport;
-        this.child.attach(root, this.internalViewport, this);
+    protected override handleAttachment(): void {
+        // XXX don't call super.handleAttachment, otherwise the child is
+        //     attached to the parent viewport instead of the internal viewport
+        this.internalViewport.parent = this._viewport!;
+        this.child.attach(this._root!, this.internalViewport, this);
     }
 
-    override detach(): void {
+    protected override handleDetachment(): void {
         // unset parent viewport of internal viewport
         this.internalViewport.parent = null;
-        super.detach();
+        super.handleDetachment();
     }
 
     /**

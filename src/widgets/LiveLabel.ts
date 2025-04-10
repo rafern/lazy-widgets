@@ -1,11 +1,9 @@
 import { BaseLabel } from './BaseLabel.js';
 import type { LabelProperties } from './BaseLabel.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
-import type { Root } from '../core/Root.js';
-import type { Viewport } from '../core/Viewport.js';
-import type { Widget } from './Widget.js';
 import type { ObservableCallback } from '../state/ObservableCallback.js';
 import type { Observable } from '../state/Observable.js';
+
 /**
  * A widget which displays a line of text.
  *
@@ -84,16 +82,12 @@ export class LiveLabel extends BaseLabel {
         return this._textSource;
     }
 
-    override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
-        super.attach(root, viewport, parent);
-
+    protected override handleAttachment(): void {
         this._textWatcher = () => this.textDirty = true;
         this._textSource.watch(this._textWatcher, true);
     }
 
-    override detach(): void {
-        super.detach();
-
+    protected override handleDetachment(): void {
         if (this._textWatcher) {
             this._textSource.unwatch(this._textWatcher);
             this._textWatcher = null;

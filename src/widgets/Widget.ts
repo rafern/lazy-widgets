@@ -914,9 +914,38 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
     }
 
     /**
-     * Called when the Widget is attached to a UI tree. Should only be
-     * overridden by container widgets to attach children or for resource
-     * management, but `super.attach` must still be called.
+     * Called when the Widget is attached to a UI tree. Must be overridden by
+     * container widgets to attach children or for resource management, but
+     * `child.attach` must be called instead of `child.handleAttachment`.
+     *
+     * Note that, to call `attach` on a child widget, you need a root, viewport
+     * and parent. The parent would be `this`, but the root and viewport are not
+     * passed to this method, unlike in `attach`. This is because most of the
+     * time you won't be implementing a container widget, so these parameters
+     * are just an unnecessary hassle. Get them from `this.root` and
+     * `this.viewport` instead (or `this._root` and `this._viewport`),
+     * respectively.
+     *
+     * `super.handleAttachment` doesn't have to be called and does nothing by
+     * default, unless you are deriving a class that has overridden this method.
+     * If you're not sure, it's safe to call super anyway.
+     */
+    protected handleAttachment() {}
+
+    /**
+     * Called when the Widget is detached from a UI tree. Must be overridden by
+     * container widgets to detach children or for resource management, but
+     * `child.detach` must be called instead of `child.handleDetachment`.
+     *
+     * `super.handleDetachment` doesn't have to be called and does nothing by
+     * default, unless you are deriving a class that has overridden this method.
+     * If you're not sure, it's safe to call super anyway.
+     */
+    protected handleDetachment() {}
+
+    /**
+     * Called when the Widget is attached to a UI tree. Must never be
+     * overridden. See {@link Widget#handleAttachment} instead.
      *
      * If the widget is already in a UI tree (already has a {@link parent} or is
      * the {@link Root#child | root Widget}, both checked via
@@ -939,13 +968,13 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         this._root = root;
         this._viewport = viewport;
         this._parent = parent;
+        this.handleAttachment();
         this.updateActiveState();
     }
 
     /**
-     * Called when the Widget is detached from a UI tree. Should only be
-     * overridden by container widgets to detach children or for resource
-     * management, but `super.detach` must still be called.
+     * Called when the Widget is detached from a UI tree. Must never be
+     * overridden. See {@link Widget#handleDetachment} instead.
      *
      * Sets {@link Widget#_root}, {@link Widget#_viewport} and
      * {@link Widget#_parent} to null.
@@ -958,6 +987,8 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
         if (!this.attached) {
             throw new Error(DynMsg.INVALID_ATTACHMENT(false));
         }
+
+        this.handleDetachment();
 
         const root = this._root as Root;
 
