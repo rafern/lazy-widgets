@@ -11,6 +11,8 @@ import { viewportRelativePointToAbsolute } from '../helpers/viewportRelativePoin
 import { viewportRelativeRectToAbsolute } from '../helpers/viewportRelativeRectToAbsolute.js';
 import { clipRelativeRectToAbsoluteViewport } from '../helpers/clipRelativeRectToAbsoluteViewport.js';
 import { BaseContainer } from './BaseContainer.js';
+import { resolveContainerChildConstraints } from '../helpers/resolveContainerChildConstraints.js';
+import { ClippedViewportRect } from '../core/BaseViewport.js';
 
 /**
  * Similar to {@link Container}, but the child is painted to a
@@ -57,13 +59,30 @@ export class CanvasContainer<W extends Widget = Widget> extends BaseContainer<W>
         super.finalizeBounds();
 
         // Update viewport rect
-        this.internalViewport.rect = [this.x, this.y, this.width, this.height];
+        const padding = this.containerPadding;
+        this.internalViewport.rect = [
+            this.x + padding.left,
+            this.y + padding.top,
+            Math.max(0, this.width - padding.left - padding.right),
+            Math.max(0, this.height - padding.top - padding.bottom),
+        ];
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
-        this.internalViewport.constraints = [minWidth, maxWidth, minHeight, maxHeight];
+        const padding = this.containerPadding;
+        const hPadding = padding.left + padding.right;
+        const vPadding = padding.top + padding.bottom;
+        this.internalViewport.constraints = resolveContainerChildConstraints(minWidth, maxWidth, minHeight, maxHeight, hPadding, vPadding, this.containerAlignment);
         this.internalViewport.resolveLayout();
         [this.idealWidth, this.idealHeight] = this.child.idealDimensions;
+        this.idealWidth += hPadding;
+        this.idealHeight += vPadding;
+    }
+
+    override resolvePosition(x: number, y: number): void {
+        // FIXME we shouldn't have to do this, this is horrible...
+        Widget.prototype.resolvePosition.call(this, x, y);
+        this.child.resolvePosition(0, 0);
     }
 
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
@@ -81,11 +100,25 @@ export class CanvasContainer<W extends Widget = Widget> extends BaseContainer<W>
         super.detach();
     }
 
-    protected override handlePainting(dirtyRects: Array<Rect>): void {
-        this.internalViewport.paint(dirtyRects);
+    /**
+     * Paint the internal canvas to the parent viewport. Override this method if
+     * you want to apply effects to the child widget.
+     */
+    protected paintInternalCanvas(clippedViewportRect: ClippedViewportRect) {
+        this.internalViewport.paintToParentViewport(clippedViewportRect);
+    }
+
+    protected override handlePainting(_dirtyRects: Array<Rect>): void {
+        const clippedViewportRect = this.internalViewport.getClippedViewport();
+        this.internalViewport.paintToInternal();
+        this.paintInternalCanvas(clippedViewportRect);
     }
 
     override propagateDirtyRect(rect: Rect): void {
+        // canvas viewports are painted independently, so we need to mark
+        // regions in them as dirty
+        this.internalViewport.pushDirtyRect([...rect]);
+
         const clippedRect = clipRelativeRectToAbsoluteViewport(this.internalViewport, this.rect, rect);
         if (!clippedRect) {
             return;
