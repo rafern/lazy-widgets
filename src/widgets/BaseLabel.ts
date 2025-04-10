@@ -75,6 +75,7 @@ export abstract class BaseLabel extends Widget {
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
+        const oldMaxWidth = this.textHelper.maxWidth;
         this.textHelper.maxWidth = maxWidth;
 
         // extra spacing is added so that there is enough height to center the
@@ -85,7 +86,10 @@ export abstract class BaseLabel extends Widget {
         if(this.textHelper.dirty) {
             this.textHelper.maxWidth = this.idealWidth;
             this.textHelper.cleanDirtyFlag();
-            this.markWholeAsDirty();
+
+            if (this.idealWidth !== oldMaxWidth) {
+                this.markWholeAsDirty();
+            }
         }
     }
 
