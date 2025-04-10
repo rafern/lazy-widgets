@@ -79,7 +79,7 @@ export class CanvasEffectsContainer<W extends Widget = Widget> extends CanvasCon
         this.filter = properties?.filter ?? 'none';
     }
 
-    protected override paintInternalCanvas(clippedViewportRect: ClippedViewportRect): void {
+    protected override handleInternalCanvasPainting(clippedViewportRect: ClippedViewportRect): void {
         const ctx = this.viewport.context;
         ctx.save();
         ctx.globalAlpha = this.opacity;
@@ -92,7 +92,7 @@ export class CanvasEffectsContainer<W extends Widget = Widget> extends CanvasCon
             ctx.clip();
         }
 
-        super.paintInternalCanvas(clippedViewportRect);
+        super.handleInternalCanvasPainting(clippedViewportRect);
 
         ctx.restore();
     }

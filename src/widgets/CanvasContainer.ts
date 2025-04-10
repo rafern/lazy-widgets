@@ -104,14 +104,14 @@ export class CanvasContainer<W extends Widget = Widget> extends BaseContainer<W>
      * Paint the internal canvas to the parent viewport. Override this method if
      * you want to apply effects to the child widget.
      */
-    protected paintInternalCanvas(clippedViewportRect: ClippedViewportRect) {
+    protected handleInternalCanvasPainting(clippedViewportRect: ClippedViewportRect) {
         this.internalViewport.paintToParentViewport(clippedViewportRect, false);
     }
 
     protected override handlePainting(_dirtyRects: Array<Rect>): void {
         const clippedViewportRect = this.internalViewport.getClippedViewport();
         this.internalViewport.paintToInternal();
-        this.paintInternalCanvas(clippedViewportRect);
+        this.handleInternalCanvasPainting(clippedViewportRect);
     }
 
     /**
