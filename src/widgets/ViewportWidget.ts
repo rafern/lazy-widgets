@@ -343,10 +343,18 @@ export class ViewportWidget<W extends Widget = Widget> extends SingleParent<W> {
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Clear background and paint canvas
-        this.internalViewport.paint(dirtyRects);
+        // TODO just pass dirtyRects once the CanvasViewport.paint behaviour has
+        //      been changed
+        this.internalViewport.paint(this.useCanvas ? [] : dirtyRects);
     }
 
     override propagateDirtyRect(rect: Rect): void {
+        // canvas viewports are painted independently, so we need to mark
+        // regions in them as dirty
+        if (this.useCanvas) {
+            (this.internalViewport as CanvasViewport).pushDirtyRect([...rect]);
+        }
+
         const clippedRect = clipRelativeRectToAbsoluteViewport(this.internalViewport, this.rect, rect);
         if (!clippedRect) {
             return;

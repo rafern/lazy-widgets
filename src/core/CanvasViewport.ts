@@ -6,6 +6,7 @@ import { Msg } from './Strings.js';
 import { mergeOverlappingRects } from '../helpers/mergeOverlappingRects.js';
 import type { Widget } from '../widgets/Widget.js';
 import type { Rect } from '../helpers/Rect.js';
+
 /**
  * A {@link Viewport} with an internal canvas, where the rendering context used
  * for the Viewport is the internal canvas' context instead of an inherited
@@ -450,7 +451,6 @@ export class CanvasViewport extends BaseViewport {
         let canvasSpaceDirtyRects: null | Array<Rect> = null;
 
         if (dirtyRects.length > 0) {
-            console.debug(`!!!! painting ${dirtyRects.length} rects`, dirtyRects);
             // clip to dirty rectangles (and translate if using atlas bleeding
             // prevention)
             this.context.save();
@@ -498,8 +498,6 @@ export class CanvasViewport extends BaseViewport {
                     dirtyRect[1] += 1;
                 }
             }
-        } else {
-            console.debug('!!!! nothing to paint');
         }
 
         // prevent bleeding by clearing out-of-bounds parts of canvas
@@ -607,10 +605,28 @@ export class CanvasViewport extends BaseViewport {
         ctx.restore();
     }
 
-    paint(extraDirtyRects: Array<Rect>): boolean {
+    /**
+     * Paint the {@link Viewport#child} to the {@link Viewport#context} and, if
+     * it makes sense to do so, paint to the {@link Viewport#parent} Viewport's
+     * context.
+     *
+     * Nothing is done if the child was not re-painted.
+     *
+     * Note that, unlike other Viewport implementations, this implementation
+     * doesn't actually need to have extraDirtyRects passed; an empty array will
+     * suffice, assuming you're marking dirty regions with
+     * {@link CanvasViewport#pushDirtyRects}. In the future, the extraDirtyRects
+     * parameter **will be ignored**, but has been kept for now, for backwards
+     * compatibility.
+     *
+     * @param extraDirtyRects - Extra damage regions (not tracked internally) that need to be repainted. Can be an empty list if this is a root viewport.
+     * @returns Returns true if the child was re-painted, else, false.
+     */
+    override paint(extraDirtyRects: ReadonlyArray<Rect>): boolean {
         const clippedViewportRect = this.getClippedViewport();
 
         // add extra damage regions to internally tracked damage region list
+        // TODO remove
         this.pushExtraDirtyRects(extraDirtyRects, clippedViewportRect);
 
         // paint to internal canvas
@@ -622,7 +638,11 @@ export class CanvasViewport extends BaseViewport {
         return dirtyRects !== null;
     }
 
+    /**
+     * @deprecated This API was a mistake and will be removed in the future. Use {@link CanvasViewport#pushDirtyRects} instead.
+     */
     pushExtraDirtyRects(extraDirtyRects: ReadonlyArray<Rect>, clippedViewportRect: Readonly<ClippedViewportRect>) {
+        // TODO remove
         const origXDst = clippedViewportRect[4];
         const origYDst = clippedViewportRect[5];
 
@@ -638,11 +658,11 @@ export class CanvasViewport extends BaseViewport {
         }
     }
 
-    protected pushDirtyRects(rects: Array<Rect>) {
+    pushDirtyRects(rects: Array<Rect>) {
         this.dirtyRects.push(...rects);
     }
 
-    protected pushDirtyRect(rect: Rect) {
+    pushDirtyRect(rect: Rect) {
         this.dirtyRects.push(rect);
     }
 

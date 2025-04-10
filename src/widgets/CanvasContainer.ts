@@ -69,7 +69,7 @@ export class CanvasContainer<W extends Widget = Widget> extends BaseContainer<W>
     override attach(root: Root, viewport: Viewport, parent: Widget | null): void {
         // FIXME we shouldn't have to do this, this is horrible...
         // HACK Parent#attach attaches child widgets with this._viewport, but
-        // we want to use this.internalViewport
+        //      we want to use this.internalViewport
         Widget.prototype.attach.call(this, root, viewport, parent);
         this.internalViewport.parent = viewport;
         this.child.attach(root, this.internalViewport, this);
