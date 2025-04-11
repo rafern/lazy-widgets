@@ -187,10 +187,10 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             const childLength = childDimensions[mainIdx];
             usedSpace += childLength;
             if (child.flexShrink === 0) {
-                usedUnshrinkableSpace += childLength;
+                usedUnshrinkableSpace += child.flexBasis ?? childLength;
             }
             if (child.flex === 0) {
-                usedUngrowableSpace += childLength;
+                usedUngrowableSpace += child.flexBasis ?? childLength;
             }
 
             totalFlex += child.flex;
@@ -240,10 +240,10 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 const childLength = child.idealDimensions[mainIdx];
                 usedSpace += childLength;
                 if (child.flexShrink === 0) {
-                    usedUnshrinkableSpace += childLength;
+                    usedUnshrinkableSpace += child.flexBasis ?? childLength;
                 }
                 if (child.flex === 0) {
-                    usedUngrowableSpace += childLength;
+                    usedUngrowableSpace += child.flexBasis ?? childLength;
                 }
             }
         }
@@ -265,6 +265,10 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         // (unconstrained main axis) or if there isn't any free space.
         const freeSpace = targetLength - usedSpace;
         if(freeSpace === Infinity || freeSpace === 0 || (freeSpace > 0 && totalFlex <= 0) || (freeSpace < 0 && totalFlexShrink <= 0)) {
+            if (!this.vertical) {
+                console.debug(`!!!!! early escape: ${freeSpace}`);
+            }
+
             if(this.vertical) {
                 this.idealWidth = crossLength;
                 this.idealHeight = Math.max(Math.min(usedSpace, maxHeight), minHeight);
@@ -321,13 +325,31 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         // free space. Calculate used space after flexbox calculations. Loosely
         // follows the w3c flexbox algorithm:
         // https://www.w3.org/TR/css-flexbox-1/#resolve-flexible-lengths
+
+        // re-calculate initial free space, but this time preferring flex basis
+        // over min(intrinsic size, flex basis). if we don't do this, we are
+        // going to fail HARD when shrinking items that have a flex basis of 0.
+        // this basically turns a shrink operation into a grow operation, but
+        // using the shrink ratio instead of the grow ratio.
+        let actualInitialFreeSpace = targetLength;
+        for(const child of this._children) {
+            // Ignore disabled children
+            if(!child.enabled) {
+                continue;
+            }
+
+            actualInitialFreeSpace -= child.flexBasis ?? child.idealDimensions[mainIdx];
+        }
+
         const flexBaseSizes = new Array<number>();
         const unclampedTargetMainSizes = new Array<number>();
         const targetMainSizes = new Array<number>();
         const scaledFlexRatios = new Array<number>();
         const frozen = new Array<boolean>();
-        const shrink = freeSpace < 0;
-        const potentialSlack = targetLength - (shrink ? usedUnshrinkableSpace : usedUngrowableSpace);
+        const shrink = actualInitialFreeSpace < 0;
+        const useShrinkRatio = freeSpace < 0;
+        console.debug('!!!!! mode:',shrink,useShrinkRatio)
+        let potentialSlack = targetLength - (shrink ? usedUnshrinkableSpace : usedUngrowableSpace);
         let remainingThawedFreeSpace = potentialSlack;
         let scaledFlexTotal = 0;
 
@@ -335,7 +357,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         // more accurately
         for(const child of this._children) {
             // Ignore disabled/inflexible children
-            const childFlex = shrink ? child.flexShrink : child.flex;
+            const childFlex = useShrinkRatio ? child.flexShrink : child.flex;
             if(!child.enabled || childFlex <= 0) {
                 continue;
             }
@@ -347,29 +369,35 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             const hypotheticalMainSize = Math.max(Math.min(baseSize, maxSize), minSize);
             unclampedTargetMainSizes.push(0);
 
-            remainingThawedFreeSpace -= baseSize;
             if (shrink) {
                 if (baseSize < hypotheticalMainSize) {
                     targetMainSizes.push(hypotheticalMainSize);
                     frozen.push(true);
+                    potentialSlack -= hypotheticalMainSize;
+                    remainingThawedFreeSpace -= hypotheticalMainSize;
                 } else {
                     targetMainSizes.push(baseSize);
                     frozen.push(false);
                     scaledFlexTotal += childFlex * baseSize;
+                    remainingThawedFreeSpace -= baseSize;
                 }
             } else {
                 if (baseSize > hypotheticalMainSize) {
                     targetMainSizes.push(hypotheticalMainSize);
                     frozen.push(true);
+                    potentialSlack -= hypotheticalMainSize;
+                    remainingThawedFreeSpace -= hypotheticalMainSize;
                 } else {
                     targetMainSizes.push(baseSize);
                     frozen.push(false);
                     scaledFlexTotal += childFlex;
+                    remainingThawedFreeSpace -= baseSize;
                 }
             }
         }
 
         // update wanted lengths
+        console.debug('!!!!!! initial scaled flex total', scaledFlexTotal)
         for(let j = 0; j < FLEXBOX_ITER_MAX && Math.abs(scaledFlexTotal) > 0; j++) {
             let i = 0;
             let nextRemainingThawedFreeSpace = potentialSlack;
@@ -381,16 +409,12 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             // XXX we deviate from the spec here. they have a special case for
             //     flex factors less than 1, which can cause an overflow, but we
             //     don't want that behaviour in lazy-widgets
-            if (shrink) {
-                remainingThawedFreeSpace = -Math.abs(remainingThawedFreeSpace);
-            } else {
-                remainingThawedFreeSpace = Math.abs(remainingThawedFreeSpace);
-            }
+            console.debug(`!!!!!! iter ${j}. thawed free space: ${remainingThawedFreeSpace}, potentialSlack: ${potentialSlack}`);
 
             // distribute free space and find min/max violations
             for (const child of this._children) {
                 // Ignored disabled/inflexible children
-                const childFlex = shrink ? child.flexShrink : child.flex;
+                const childFlex = useShrinkRatio ? child.flexShrink : child.flex;
                 if (!child.enabled || childFlex <= 0) {
                     continue;
                 }
@@ -406,8 +430,14 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
                     const minSize = this.vertical ? child.minHeight : child.minWidth;
                     const maxSize = this.vertical ? child.maxHeight : child.maxWidth;
-                    const childUnclampedSize = basis + scaledFlex * remainingThawedFreeSpace / scaledFlexTotal;
+                    let childUnclampedSize: number;
+                    if (shrink) {
+                        childUnclampedSize = basis - scaledFlex * Math.abs(remainingThawedFreeSpace) / scaledFlexTotal;
+                    } else {
+                        childUnclampedSize = basis + scaledFlex * remainingThawedFreeSpace / scaledFlexTotal;
+                    }
                     const childClampedSize = Math.max(Math.min(childUnclampedSize, maxSize), minSize);
+                    console.debug('!!!!!', childUnclampedSize, childClampedSize)
 
                     totalViolation += childClampedSize - childUnclampedSize;
                     unclampedTargetMainSizes[i] = childUnclampedSize;
@@ -422,12 +452,14 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             let allFrozen = true;
             if (totalViolation === 0) {
                 // freeze all
+                console.debug(`!!!!!! freeze all`);
             } else if (totalViolation > 0) {
                 // freeze items with min violations
+                console.debug(`!!!!!! check min violations`);
                 i = 0;
                 for (const child of this._children) {
                     // Ignored disabled/inflexible/frozen children
-                    const childFlex = shrink ? child.flexShrink : child.flex;
+                    const childFlex = useShrinkRatio ? child.flexShrink : child.flex;
                     if (!child.enabled || childFlex <= 0) {
                         continue;
                     }
@@ -438,7 +470,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     } else {
                         if (childClampedSize > unclampedTargetMainSizes[i]) {
                             nextRemainingThawedFreeSpace -= childClampedSize;
+                            potentialSlack -= childClampedSize;
                             frozen[i] = true;
+                            console.debug(`!!!!!! min violation at index ${i}, size: ${childClampedSize}`);
                         } else {
                             nextRemainingThawedFreeSpace -= flexBaseSizes[i];
                             nextScaledFlexTotal += scaledFlexRatios[i];
@@ -450,10 +484,11 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 }
             } else if (totalViolation < 0) {
                 // freeze items with max violations
+                console.debug(`!!!!!! check max violations`);
                 i = 0;
                 for (const child of this._children) {
                     // Ignored disabled/inflexible/frozen children
-                    const childFlex = shrink ? child.flexShrink : child.flex;
+                    const childFlex = useShrinkRatio ? child.flexShrink : child.flex;
                     if (!child.enabled || childFlex <= 0) {
                         continue;
                     }
@@ -464,7 +499,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     } else {
                         if (childClampedSize < unclampedTargetMainSizes[i]) {
                             nextRemainingThawedFreeSpace -= childClampedSize;
+                            potentialSlack -= childClampedSize;
                             frozen[i] = true;
+                            console.debug(`!!!!!! max violation at index ${i}, size: ${childClampedSize}`);
                         } else {
                             nextRemainingThawedFreeSpace -= flexBaseSizes[i];
                             nextScaledFlexTotal += scaledFlexRatios[i];
@@ -480,7 +517,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 break;
             }
 
-            remainingThawedFreeSpace = Math.abs(nextRemainingThawedFreeSpace);
+            remainingThawedFreeSpace = nextRemainingThawedFreeSpace;
             scaledFlexTotal = nextScaledFlexTotal;
         }
 
@@ -505,7 +542,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 needsSpacing = true;
             }
 
-            const childFlex = shrink ? child.flexShrink : child.flex;
+            const childFlex = useShrinkRatio ? child.flexShrink : child.flex;
             let wantedLength = childFlex > 0 ? targetMainSizes[i++] : child.idealDimensions[mainIdx];
             if (wantedLength + usedSpaceAfter > targetLength) {
                 wantedLength = Math.max(0, targetLength - usedSpaceAfter);
@@ -554,7 +591,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     needsSpacing = true;
                 }
 
-                const childFlex = shrink ? child.flexShrink : child.flex;
+                const childFlex = useShrinkRatio ? child.flexShrink : child.flex;
                 let wantedLength = childFlex > 0 ? targetMainSizes[i++] : child.idealDimensions[mainIdx];
                 if (wantedLength + usedSpaceAfter > targetLength) {
                     wantedLength = Math.max(0, targetLength - usedSpaceAfter);

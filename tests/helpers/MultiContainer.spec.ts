@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Root, Row, Spacing, type Widget, WidgetProperties } from '../../src/index.js';
+import { Alignment, Container, Label, Root, Row, Spacing, type Widget, WidgetProperties } from '../../src/index.js';
 
 type TestElement = [
     widget: Widget,
@@ -33,8 +33,21 @@ function basicSpacing(minWidth: number, maxWidth = Infinity, flex = 0, flexShrin
         new Spacing({ flex, flexShrink, flexBasis, minWidth, maxWidth }),
         (i, widget) => {
             if (expectedWidth !== null) {
-                expect(widget.dimensions[0], `Widget at index ${i}`).approximately(expectedWidth, delta);
+                expect(widget.idealDimensions[0], `Widget at index ${i}`).approximately(expectedWidth, delta);
             }
+        }
+    ];
+}
+
+function intrinsicallySizedSpacing(intrinsicSize: number, flexShrink: number, flexBasis: number, expectedWidth: number, delta = 1): TestElement {
+    return [
+        new Container(new Spacing({ minWidth: intrinsicSize, minHeight: intrinsicSize, flex: 0 }), {
+            flexShrink, flexBasis,
+            containerPadding: { left: 0, right: 0, top: 0, bottom: 0 },
+            containerAlignment: { horizontal: Alignment.SoftStretch, vertical: Alignment.SoftStretch }
+        }),
+        (i, widget) => {
+            expect(widget.idealDimensions[0], `Widget at index ${i}`).approximately(expectedWidth, delta);
         }
     ];
 }
@@ -49,7 +62,7 @@ describe('MultiContainer tests', () => {
             multiContainerSpacing: 10,
         });
 
-        expect(row.dimensions[0]).to.equal(520);
+        expect(row.idealDimensions[0]).to.equal(520);
     });
 
     it('Flex has no effect when unconstrained', () => {
@@ -61,7 +74,7 @@ describe('MultiContainer tests', () => {
             multiContainerSpacing: 10,
         });
 
-        expect(row.dimensions[0]).to.equal(520);
+        expect(row.idealDimensions[0]).to.equal(520);
     });
 
     it('Flex distributes space correctly when constrained', () => {
@@ -74,7 +87,7 @@ describe('MultiContainer tests', () => {
             minWidth: 1020,
         });
 
-        expect(row.dimensions[0]).to.equal(1020);
+        expect(row.idealDimensions[0]).to.equal(1020);
     });
 
     it('Flex distributes space correctly when constrained and respects minimum element length', () => {
@@ -87,7 +100,7 @@ describe('MultiContainer tests', () => {
             minWidth: 1020,
         });
 
-        expect(row.dimensions[0]).to.equal(1020);
+        expect(row.idealDimensions[0]).to.equal(1020);
     });
 
     it('Flex distributes space correctly when constrained and respects maximum element length', () => {
@@ -100,7 +113,7 @@ describe('MultiContainer tests', () => {
             minWidth: 1020,
         });
 
-        expect(row.dimensions[0]).to.equal(1020);
+        expect(row.idealDimensions[0]).to.equal(1020);
     });
 
     it('Flex shrinks space correctly when constrained', () => {
@@ -115,10 +128,10 @@ describe('MultiContainer tests', () => {
             maxWidth: 1020,
         });
 
-        expect(elems[0][0].dimensions[0]).to.equal(elems[2][0].dimensions[0]);
-        expect(elems[1][0].dimensions[0]).to.be.lessThan(elems[0][0].dimensions[0]);
-        expect(elems[0][0].dimensions[0] + elems[1][0].dimensions[0] + elems[2][0].dimensions[0] + 20).to.equal(row.dimensions[0]);
-        expect(row.dimensions[0]).to.equal(1020);
+        expect(elems[0][0].idealDimensions[0]).to.equal(elems[2][0].idealDimensions[0]);
+        expect(elems[1][0].idealDimensions[0]).to.be.lessThan(elems[0][0].idealDimensions[0]);
+        expect(elems[0][0].idealDimensions[0] + elems[1][0].idealDimensions[0] + elems[2][0].idealDimensions[0] + 20).to.equal(row.idealDimensions[0]);
+        expect(row.idealDimensions[0]).to.equal(1020);
     });
 
     it('Flex shrinks space correctly when constrained and respects minimum element length', () => {
@@ -133,9 +146,26 @@ describe('MultiContainer tests', () => {
             maxWidth: 1020,
         });
 
-        expect(elems[0][0].dimensions[0]).to.equal(elems[2][0].dimensions[0]);
-        expect(elems[0][0].dimensions[0] + elems[1][0].dimensions[0] + elems[2][0].dimensions[0] + 20).to.equal(row.dimensions[0]);
-        expect(row.dimensions[0]).to.equal(1020);
+        expect(elems[0][0].idealDimensions[0]).to.equal(elems[2][0].idealDimensions[0]);
+        expect(elems[0][0].idealDimensions[0] + elems[1][0].idealDimensions[0] + elems[2][0].idealDimensions[0] + 20).to.equal(row.idealDimensions[0]);
+        expect(row.idealDimensions[0]).to.equal(1020);
+    });
+
+    it('Flex shrinks space correctly when using a flexBasis of 0', () => {
+        const elems = [
+            intrinsicallySizedSpacing(1000, 1, 0, 333.333),
+            intrinsicallySizedSpacing(1000, 1, 0, 333.333),
+            intrinsicallySizedSpacing(1000, 1, 0, 333.333),
+        ];
+
+        const row = setupTestRoot(elems, {
+            multiContainerSpacing: 10,
+            maxWidth: 1020,
+        });
+
+        expect(elems[0][0].idealDimensions[0]).to.equal(elems[2][0].idealDimensions[0]);
+        expect(elems[0][0].idealDimensions[0] + elems[1][0].idealDimensions[0] + elems[2][0].idealDimensions[0] + 20).to.equal(row.idealDimensions[0]);
+        expect(row.idealDimensions[0]).to.equal(1020);
     });
 
     // XXX we don't want to follow the CSS spec's small ratio behaviour
@@ -149,6 +179,29 @@ describe('MultiContainer tests', () => {
             minWidth: 1020,
         });
 
-        expect(row.dimensions[0]).to.equal(1020);
+        expect(row.idealDimensions[0]).to.equal(1020);
+    });
+
+    // XXX this might seem like a weird thing to test for, but this is a
+    //     recurring issue. this is because a label's height depends on its
+    //     width due to wrapping
+    it('Flex can distribute labels without cross-length growing unnecessarily', () => {
+        const elems: TestElement[] = [];
+        for (let i = 0; i < 3; i++) {
+            elems.push([
+                new Label(`Somewhat long test wrapping text (${i})`, { flexShrink: 1 }),
+                () => {}, // don't check width yet
+            ]);
+        }
+
+        const row = setupTestRoot(elems, {
+            multiContainerSpacing: 10,
+            minWidth: 1020,
+            maxWidth: 1020,
+        });
+
+        // TODO
+
+        expect(row.idealDimensions[0]).to.equal(1020);
     });
 });
