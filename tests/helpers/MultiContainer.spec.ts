@@ -24,7 +24,7 @@ function setupTestRoot(elements: TestElement[], properties?: Readonly<WidgetProp
     return row;
 }
 
-function basicSpacing(minWidth: number, maxWidth = Infinity, flex = 0, flexShrink = 0, flexBasis: number | null = null, expectedWidth?: number | null, delta = 0): TestElement {
+function basicSpacing(minWidth: number, maxWidth = Infinity, flex = 0, flexShrink = 0, flexBasis: number | null = null, expectedWidth?: number | null, delta = 1): TestElement {
     if (expectedWidth === undefined) {
         expectedWidth = minWidth;
     }
@@ -92,9 +92,9 @@ describe('MultiContainer tests', () => {
 
     it('Flex distributes space correctly when constrained and respects maximum element length', () => {
         const row = setupTestRoot([
-            basicSpacing(300, Infinity, 1, 0, 0, 333.333, 1),
-            basicSpacing(200, 333, 2, 0, 0, 333.333, 1),
-            basicSpacing(300, Infinity, 1, 0, 0, 333.333, 1),
+            basicSpacing(300, Infinity, 1, 0, 0, 333.333),
+            basicSpacing(200, 333, 2, 0, 0, 333.333),
+            basicSpacing(300, Infinity, 1, 0, 0, 333.333),
         ], {
             multiContainerSpacing: 10,
             minWidth: 1020,
@@ -135,6 +135,20 @@ describe('MultiContainer tests', () => {
 
         expect(elems[0][0].dimensions[0]).to.equal(elems[2][0].dimensions[0]);
         expect(elems[0][0].dimensions[0] + elems[1][0].dimensions[0] + elems[2][0].dimensions[0] + 20).to.equal(row.dimensions[0]);
+        expect(row.dimensions[0]).to.equal(1020);
+    });
+
+    // XXX we don't want to follow the CSS spec's small ratio behaviour
+    it('Flex can handle tiny ratios near zero without deviating from normal behaviour', () => {
+        const row = setupTestRoot([
+            basicSpacing(200, Infinity, 1e-32, 0, 0, 250),
+            basicSpacing(100, Infinity, 2e-32, 0, 0, 500),
+            basicSpacing(200, Infinity, 1e-32, 0, 0, 250),
+        ], {
+            multiContainerSpacing: 10,
+            minWidth: 1020,
+        });
+
         expect(row.dimensions[0]).to.equal(1020);
     });
 });

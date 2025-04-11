@@ -378,9 +378,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             // correct remaining free space (we calculate remaining free space
             // while distributing space)
-            // remainingThawedFreeSpace
-            // TODO?
-
+            // XXX we deviate from the spec here. they have a special case for
+            //     flex factors less than 1, which can cause an overflow, but we
+            //     don't want that behaviour in lazy-widgets
             if (shrink) {
                 remainingThawedFreeSpace = -Math.abs(remainingThawedFreeSpace);
             } else {
