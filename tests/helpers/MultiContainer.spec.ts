@@ -228,7 +228,7 @@ describe('MultiContainer tests', () => {
 
         setupTestRoot([
             [
-                new Label(testText, { flexBasis: 0, flex: 1 }),
+                new Label(testText),
                 (_i, widget) => {
                     expect(widget.idealDimensions[1]).to.be.approximately(elems[0][0].idealDimensions[1], 1);
                 },
