@@ -524,23 +524,26 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 );
             }
 
-            usedSpaceAfter += child.idealDimensions[mainIdx];
             const childCrossLength = child.idealDimensions[crossIdx];
             if (crossLength < childCrossLength) {
                 crossLength = childCrossLength;
                 if (needsStretch) {
                     minCrossAxis = childCrossLength;
                     minCrossAxisGrowIdx = iEnabled;
+                    // XXX reset used space because we're going to have to
+                    //     recalculate it for all of the widgets that come
+                    //     before this one
+                    usedSpaceAfter = 0;
                 }
             }
 
+            usedSpaceAfter += child.idealDimensions[mainIdx];
             iEnabled++;
         }
 
         // see <NOTE stretch-cross-axis>
         if (minCrossAxisGrowIdx > 0) {
             i = 0;
-            usedSpaceAfter = 0;
 
             for(iEnabled = 0; iEnabled < minCrossAxisGrowIdx; iEnabled++) {
                 const child = children[iEnabled];
@@ -548,9 +551,13 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     continue;
                 }
 
-                if(iEnabled !== 0) {
-                    usedSpaceAfter += spacing;
-                }
+                // XXX we're guaranteed to come before a widget, and we're
+                //     missing the spacing for the widget at minCrossAxisGrowIdx
+                //     so we don't need the iEnabled !== 0 check that we did
+                //     before here; instead of adding the spacing before the
+                //     widget, we're adding the spacing that comes after the
+                //     widget
+                usedSpaceAfter += spacing;
 
                 const childFlex = shrink ? child.flexShrink : child.flex;
                 let wantedLength = childFlex > 0 ? targetMainSizes[i++] : child.idealDimensions[mainIdx];
