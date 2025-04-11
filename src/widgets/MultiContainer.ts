@@ -7,7 +7,6 @@ import type { TricklingEvent } from '../events/TricklingEvent.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 
-const FLEXBOX_EPSILON = 1e-6;
 const FLEXBOX_ITER_MAX = 8;
 
 /**
