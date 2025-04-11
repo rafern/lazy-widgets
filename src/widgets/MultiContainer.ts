@@ -321,7 +321,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         // free space. Calculate used space after flexbox calculations. Loosely
         // follows the w3c flexbox algorithm:
         // https://www.w3.org/TR/css-flexbox-1/#resolve-flexible-lengths
+        const unclampedLengths = new Array<number>();
         const wantedLengths = new Array<number>();
+        const scaledFlexRatios = new Array<number>();
         const frozen = new Array<boolean>();
         const shrink = freeSpace < 0;
         const potentialSlack = targetLength - (shrink ? usedUnshrinkableSpace : usedUngrowableSpace);
@@ -347,15 +349,22 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             }
         }
 
-        let remainingThawedFreeSpace = remainingFreeSpace;
+        let remainingThawedFreeSpace = Math.abs(remainingFreeSpace);
 
         // update wanted lengths
-        for(let j = 0; j < FLEXBOX_ITER_MAX && Math.abs(remainingFreeSpace) > FLEXBOX_EPSILON && scaledFlexTotal > 0; j++) {
+        for(let j = 0; j < FLEXBOX_ITER_MAX/* && Math.abs(remainingFreeSpace) > FLEXBOX_EPSILON*/ /*&& Math.abs(scaledFlexTotal) > 0*/; j++) {
+            console.debug('!!!! iter', j);
             let i = 0;
             let nextRemainingFreeSpace = potentialSlack;
             let nextRemainingThawedFreeSpace = potentialSlack;
             let nextScaledFlexTotal = 0;
+            let totalViolation = 0;
 
+            if (shrink) {
+                remainingThawedFreeSpace = -remainingThawedFreeSpace;
+            }
+
+            // distribute free space and find min/max violations
             for (const child of this._children) {
                 // Ignored disabled/inflexible children
                 const childFlex = shrink ? child.flexShrink : child.flex;
@@ -372,23 +381,78 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                         scaledFlex = childFlex;
                     }
 
-                    wantedLengths[i] += scaledFlex * remainingThawedFreeSpace / scaledFlexTotal;
+                    const minSize = this.vertical ? child.minHeight : child.minWidth;
+                    const maxSize = this.vertical ? child.maxHeight : child.maxWidth;
+                    const childUnclampedSize = wantedLengths[i] + scaledFlex * remainingThawedFreeSpace / scaledFlexTotal;
+                    const childClampedSize = Math.max(Math.min(childUnclampedSize, maxSize), minSize);
 
-                    if (shrink && wantedLengths[i] <= 0) {
-                        wantedLengths[i] = 0;
-                        frozen[i] = true;
-                    }
-
-                    nextRemainingThawedFreeSpace -= wantedLengths[i];
-                    nextScaledFlexTotal += scaledFlex;
+                    totalViolation += childClampedSize - childUnclampedSize;
+                    unclampedLengths[i] = childUnclampedSize;
+                    wantedLengths[i] = childClampedSize;
+                    scaledFlexRatios[i] = scaledFlex;
                 }
 
                 nextRemainingFreeSpace -= wantedLengths[i];
                 i++;
             }
 
+            // freeze over-flexed items
+            if (totalViolation === 0) {
+                // freeze all
+                console.debug('!!!! freeze all');
+                break;
+            } else if (totalViolation > 0) {
+                console.debug('!!!! freeze all with min violations');
+                // freeze items with min violations
+                i = 0;
+                for (const child of this._children) {
+                    // Ignored disabled/inflexible/frozen children
+                    const childFlex = shrink ? child.flexShrink : child.flex;
+                    if (!child.enabled || childFlex <= 0) {
+                        continue;
+                    }
+
+                    if (!frozen[i]) {
+                        const childClampedSize = wantedLengths[i];
+                        if (childClampedSize > unclampedLengths[i]) {
+                            console.debug('!!!! min violation at index', i);
+                            frozen[i] = true;
+                        } else {
+                            nextRemainingThawedFreeSpace -= childClampedSize;
+                            nextScaledFlexTotal += scaledFlexRatios[i];
+                        }
+                    }
+
+                    i++;
+                }
+            } else if (totalViolation < 0) {
+                console.debug('!!!! freeze all with max violations');
+                // freeze items with max violations
+                i = 0;
+                for (const child of this._children) {
+                    // Ignored disabled/inflexible/frozen children
+                    const childFlex = shrink ? child.flexShrink : child.flex;
+                    if (!child.enabled || childFlex <= 0) {
+                        continue;
+                    }
+
+                    if (!frozen[i]) {
+                        const childClampedSize = wantedLengths[i];
+                        if (childClampedSize < unclampedLengths[i]) {
+                            console.debug('!!!! max violation at index', i);
+                            frozen[i] = true;
+                        } else {
+                            nextRemainingThawedFreeSpace -= childClampedSize;
+                            nextScaledFlexTotal += scaledFlexRatios[i];
+                        }
+                    }
+
+                    i++;
+                }
+            }
+
             remainingFreeSpace = nextRemainingFreeSpace;
-            remainingThawedFreeSpace = nextRemainingThawedFreeSpace;
+            remainingThawedFreeSpace = Math.abs(nextRemainingThawedFreeSpace);
             scaledFlexTotal = nextScaledFlexTotal;
         }
 
