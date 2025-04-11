@@ -187,9 +187,12 @@ export abstract class Widget extends BaseTheme implements WidgetEventEmitter {
 
     /**
      * The starting length of this widget when inside a flexbox, which overrides
-     * the wanted/minimum length of this widget. If `null` (default), then the
-     * widget's wanted size will be used. If changed, sets
-     * {@link Widget#_layoutDirty} to true.
+     * the intrinsic length of this widget (the natural length of the content).
+     * If `null` (default), then the widget's intrinsic length will be used. If
+     * changed, sets {@link Widget#_layoutDirty} to true.
+     *
+     * Note that, if set, minimum and maximum self-constraints will still be
+     * respected.
      */
     get flexBasis(): number | null {
         return this._flexBasis;

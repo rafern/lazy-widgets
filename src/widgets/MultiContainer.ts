@@ -168,18 +168,21 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
             this.enabledChildCount++;
 
-            if (this.vertical) {
-                child.resolveDimensions(minCrossAxis, maxWidth, 0, Infinity);
-            } else {
-                child.resolveDimensions(0, Infinity, minCrossAxis, maxHeight);
-            }
-
             const basis = child.flexBasis;
-            if (basis !== null) {
+            if (basis === null) {
                 if (this.vertical) {
-                    child.resolveDimensions(minCrossAxis, maxWidth, basis, Infinity);
+                    child.resolveDimensions(minCrossAxis, maxWidth, 0, Infinity);
                 } else {
-                    child.resolveDimensions(basis, Infinity, minCrossAxis, maxHeight);
+                    child.resolveDimensions(0, Infinity, minCrossAxis, maxHeight);
+                }
+            } else {
+                const minSize = this.vertical ? child.minHeight : child.minWidth;
+                const maxSize = this.vertical ? child.maxHeight : child.maxWidth;
+                const initialSize = Math.max(Math.min(basis, maxSize), minSize);
+                if (this.vertical) {
+                    child.resolveDimensions(minCrossAxis, maxWidth, initialSize, initialSize);
+                } else {
+                    child.resolveDimensions(initialSize, initialSize, minCrossAxis, maxHeight);
                 }
             }
 
@@ -221,18 +224,21 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 }
 
                 if (i < minCrossAxisGrowIdx) {
-                    if (this.vertical) {
-                        child.resolveDimensions(minCrossAxis, maxWidth, 0, Infinity);
-                    } else {
-                        child.resolveDimensions(0, Infinity, minCrossAxis, maxHeight);
-                    }
-
                     const basis = child.flexBasis;
-                    if (basis !== null) {
+                    if (basis === null) {
                         if (this.vertical) {
-                            child.resolveDimensions(minCrossAxis, maxWidth, basis, Infinity);
+                            child.resolveDimensions(minCrossAxis, maxWidth, 0, Infinity);
                         } else {
-                            child.resolveDimensions(basis, Infinity, minCrossAxis, maxHeight);
+                            child.resolveDimensions(0, Infinity, minCrossAxis, maxHeight);
+                        }
+                    } else {
+                        const minSize = this.vertical ? child.minHeight : child.minWidth;
+                        const maxSize = this.vertical ? child.maxHeight : child.maxWidth;
+                        const initialSize = Math.max(Math.min(basis, maxSize), minSize);
+                        if (this.vertical) {
+                            child.resolveDimensions(minCrossAxis, maxWidth, initialSize, initialSize);
+                        } else {
+                            child.resolveDimensions(initialSize, initialSize, minCrossAxis, maxHeight);
                         }
                     }
                 }
@@ -376,16 +382,9 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             let nextScaledFlexTotal = 0;
             let totalViolation = 0;
 
-            // correct remaining free space (we calculate remaining free space
-            // while distributing space)
             // XXX we deviate from the spec here. they have a special case for
             //     flex factors less than 1, which can cause an overflow, but we
             //     don't want that behaviour in lazy-widgets
-            if (shrink) {
-                remainingThawedFreeSpace = -Math.abs(remainingThawedFreeSpace);
-            } else {
-                remainingThawedFreeSpace = Math.abs(remainingThawedFreeSpace);
-            }
 
             // distribute free space and find min/max violations
             for (const child of this._children) {
@@ -406,7 +405,12 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
 
                     const minSize = this.vertical ? child.minHeight : child.minWidth;
                     const maxSize = this.vertical ? child.maxHeight : child.maxWidth;
-                    const childUnclampedSize = basis + scaledFlex * remainingThawedFreeSpace / scaledFlexTotal;
+                    let childUnclampedSize: number;
+                    if (shrink) {
+                        childUnclampedSize = basis - scaledFlex * Math.abs(remainingThawedFreeSpace) / scaledFlexTotal;
+                    } else {
+                        childUnclampedSize = basis + scaledFlex * remainingThawedFreeSpace / scaledFlexTotal;
+                    }
                     const childClampedSize = Math.max(Math.min(childUnclampedSize, maxSize), minSize);
 
                     totalViolation += childClampedSize - childUnclampedSize;
@@ -480,7 +484,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 break;
             }
 
-            remainingThawedFreeSpace = Math.abs(nextRemainingThawedFreeSpace);
+            remainingThawedFreeSpace = nextRemainingThawedFreeSpace;
             scaledFlexTotal = nextScaledFlexTotal;
         }
 
