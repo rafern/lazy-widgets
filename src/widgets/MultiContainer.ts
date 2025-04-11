@@ -492,7 +492,6 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         let i = 0;
         let iEnabled = 0;
         let usedSpaceAfter = 0;
-        let needsSpacing = false;
         crossLength = minCrossAxis = origMinCrossAxis;
         minCrossAxisGrowIdx = 0;
 
@@ -503,10 +502,8 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             }
 
             // Add spacing to used space if this is not the first widget
-            if(needsSpacing) {
+            if(iEnabled !== 0) {
                 usedSpaceAfter += spacing;
-            } else {
-                needsSpacing = true;
             }
 
             const childFlex = shrink ? child.flexShrink : child.flex;
@@ -544,7 +541,6 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         if (minCrossAxisGrowIdx > 0) {
             i = 0;
             usedSpaceAfter = 0;
-            needsSpacing = false;
 
             for(iEnabled = 0; iEnabled < minCrossAxisGrowIdx; iEnabled++) {
                 const child = children[iEnabled];
@@ -552,10 +548,8 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     continue;
                 }
 
-                if(needsSpacing) {
+                if(iEnabled !== 0) {
                     usedSpaceAfter += spacing;
-                } else {
-                    needsSpacing = true;
                 }
 
                 const childFlex = shrink ? child.flexShrink : child.flex;
