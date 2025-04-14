@@ -491,6 +491,8 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         let i = 0;
         let iEnabled = 0;
         let usedSpaceAfter = 0;
+        let usedSpaceFromStart = 0;
+        let firstEnabled = true;
         crossLength = minCrossAxis = origMinCrossAxis;
         minCrossAxisGrowIdx = 0;
 
@@ -501,14 +503,15 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
             }
 
             // Add spacing to used space if this is not the first widget
-            if(iEnabled !== 0) {
+            if(!firstEnabled) {
                 usedSpaceAfter += spacing;
+                usedSpaceFromStart += spacing;
             }
 
             const childFlex = shrink ? child.flexShrink : child.flex;
             let wantedLength = childFlex > 0 ? targetMainSizes[i++] : child.idealDimensions[mainIdx];
-            if (wantedLength + usedSpaceAfter > targetLength) {
-                wantedLength = Math.max(0, targetLength - usedSpaceAfter);
+            if (wantedLength + usedSpaceFromStart > targetLength) {
+                wantedLength = Math.max(0, targetLength - usedSpaceFromStart);
             }
 
             if (this.vertical) {
@@ -528,21 +531,28 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 crossLength = childCrossLength;
                 if (needsStretch) {
                     minCrossAxis = childCrossLength;
-                    minCrossAxisGrowIdx = iEnabled;
-                    // XXX reset used space because we're going to have to
-                    //     recalculate it for all of the widgets that come
-                    //     before this one
-                    usedSpaceAfter = 0;
+                    if (!firstEnabled) {
+                        minCrossAxisGrowIdx = iEnabled;
+                        // XXX reset used space because we're going to have to
+                        //     recalculate it for all of the widgets that come
+                        //     before this one
+                        usedSpaceAfter = 0;
+                    }
                 }
             }
 
-            usedSpaceAfter += child.idealDimensions[mainIdx];
+            const childLen = child.idealDimensions[mainIdx];
+            usedSpaceAfter += childLen;
+            usedSpaceFromStart += childLen;
+            firstEnabled = false;
             iEnabled++;
         }
 
         // see <NOTE stretch-cross-axis>
         if (minCrossAxisGrowIdx > 0) {
             i = 0;
+            usedSpaceFromStart = 0;
+            firstEnabled = true;
 
             for(iEnabled = 0; iEnabled < minCrossAxisGrowIdx; iEnabled++) {
                 const child = children[iEnabled];
@@ -550,18 +560,15 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     continue;
                 }
 
-                // XXX we're guaranteed to come before a widget, and we're
-                //     missing the spacing for the widget at minCrossAxisGrowIdx
-                //     so we don't need the iEnabled !== 0 check that we did
-                //     before here; instead of adding the spacing before the
-                //     widget, we're adding the spacing that comes after the
-                //     widget
-                usedSpaceAfter += spacing;
+                if(!firstEnabled) {
+                    usedSpaceAfter += spacing;
+                    usedSpaceFromStart += spacing;
+                }
 
                 const childFlex = shrink ? child.flexShrink : child.flex;
                 let wantedLength = childFlex > 0 ? targetMainSizes[i++] : child.idealDimensions[mainIdx];
-                if (wantedLength + usedSpaceAfter > targetLength) {
-                    wantedLength = Math.max(0, targetLength - usedSpaceAfter);
+                if (wantedLength + usedSpaceFromStart > targetLength) {
+                    wantedLength = Math.max(0, targetLength - usedSpaceFromStart);
                 }
 
                 if (this.vertical) {
@@ -576,8 +583,18 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                     );
                 }
 
-                usedSpaceAfter += child.idealDimensions[mainIdx];
+                const childLen = child.idealDimensions[mainIdx];
+                usedSpaceAfter += childLen;
+                usedSpaceFromStart += childLen;
+                firstEnabled = false;
             }
+
+            // XXX we're missing the spacing for the widget at
+            //     minCrossAxisGrowIdx, so add it here
+            usedSpaceAfter += spacing;
+            // XXX commented out because it's not necessary, but if we ever use
+            //     this after this point, we need to uncomment this line
+            // usedSpaceFromStart += childLen;
         }
 
         // Resolve width and height
