@@ -496,7 +496,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         crossLength = minCrossAxis = origMinCrossAxis;
         minCrossAxisGrowIdx = 0;
 
-        for(const child of this._children) {
+        for(const child of children) {
             // Ignore disabled children
             if(!child.enabled) {
                 continue;
@@ -551,11 +551,11 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
         // see <NOTE stretch-cross-axis>
         if (minCrossAxisGrowIdx > 0) {
             i = 0;
+            iEnabled = 0;
             usedSpaceFromStart = 0;
             firstEnabled = true;
 
-            for(iEnabled = 0; iEnabled < minCrossAxisGrowIdx; iEnabled++) {
-                const child = children[iEnabled];
+            for(const child of children) {
                 if(!child.enabled) {
                     continue;
                 }
@@ -587,6 +587,7 @@ export class MultiContainer<W extends Widget = Widget> extends MultiParent<W> {
                 usedSpaceAfter += childLen;
                 usedSpaceFromStart += childLen;
                 firstEnabled = false;
+                iEnabled++;
             }
 
             // XXX we're missing the spacing for the widget at
