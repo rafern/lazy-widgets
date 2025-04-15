@@ -720,8 +720,14 @@ export class Root implements WidgetEventEmitter {
      *
      * If the target widget doesn't capture the dispatched {@link FocusEvent},
      * then the focus is not changed.
+     *
+     * Does nothing if the widget is inactive or doesn't belong to this UI root.
      */
     requestFocus(focusType: FocusType, widget: Widget): void {
+        if (!widget.active || widget.root !== this) {
+            return;
+        }
+
         if(widget !== null) {
             // Replace focus if current focus is not the desired one
             const capturer = this.giveFocus(focusType, widget);
@@ -1125,8 +1131,14 @@ export class Root implements WidgetEventEmitter {
      * Request a pointer style. If the pointer style has a lower priority than
      * the current pointer style, it won't be displayed, but will still be
      * queued up in case the higher-priority style is cleared.
+     *
+     * Does nothing if the widget is inactive or doesn't belong to this UI root.
      */
     requestPointerStyle(widget: Widget, pointerStyle: string, source?: unknown): void {
+        if (!widget.active || widget.root !== this) {
+            return;
+        }
+
         // remove old pointer style requested by source (unless it's the same or
         // missing)
         let needsUpdate = false;
