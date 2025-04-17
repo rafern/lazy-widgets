@@ -37,9 +37,9 @@ export class TextImageBitmap extends AsyncImageBitmap {
         const ascent = metrics.fontBoundingBoxAscent ?? metrics.actualBoundingBoxAscent;
         const descent = metrics.fontBoundingBoxDescent ?? metrics.actualBoundingBoxDescent;
         const hangingBaseline = metrics.hangingBaseline ?? measureTextDims('M', font).actualBoundingBoxAscent;
-        const pad = Math.max(ascent - hangingBaseline, descent);
-        this.height = hangingBaseline + pad * 2;
-        this.width = Math.max(metrics.width, this.height);
+        const pad = Math.ceil(Math.max(ascent - hangingBaseline, descent));
+        this.height = Math.ceil(hangingBaseline + pad * 2);
+        this.width = Math.max(Math.ceil(metrics.width), this.height);
 
         this.resolution = options?.resolution ?? 1;
 
@@ -54,7 +54,7 @@ export class TextImageBitmap extends AsyncImageBitmap {
         context.textAlign = 'center';
         context.font = font;
         context.fillStyle = fillStyle;
-        context.fillText(text, this.width * 0.5, this.height - pad);
+        context.fillText(text, Math.trunc(this.width * 0.5), this.height - pad);
 
         createImageBitmap(canvas).then((bitmap) => {
             this._presentationHash++;
