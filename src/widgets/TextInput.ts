@@ -776,8 +776,8 @@ export class TextInput extends Widget {
                 // Update cursor position (and offset) from click position
                 const padding = this.inputTextInnerPadding;
                 this.moveCursorFromOffset(
-                    event.x - this.idealX - padding + this.offset[0],
-                    event.y - this.idealY - padding + this.offset[1],
+                    event.x - this.idealX - padding.left + this.offset[0],
+                    event.y - this.idealY - padding.top + this.offset[1],
                     (!isPress && this.dragging) || (isPress && event.shift),
                 );
 
@@ -1005,8 +1005,8 @@ export class TextInput extends Widget {
         const padding = this.inputTextInnerPadding;
         const innerWidth = this.textHelper.width;
         const innerHeight = this.textHelper.height;
-        const usableWidth = this.idealWidth - padding * 2;
-        const usableHeight = this.idealHeight - padding * 2;
+        const usableWidth = this.idealWidth - padding.left - padding.right;
+        const usableHeight = this.idealHeight - padding.top - padding.bottom;
         const candidateOffset = this.offset;
         const [cursorX, cursorY] = this.cursorOffset;
 
@@ -1083,15 +1083,16 @@ export class TextInput extends Widget {
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
         // Only expand to the needed dimensions, but take minimum width from
         // theme into account
-        const padding = 2 * this.inputTextInnerPadding;
-        this.textHelper.maxWidth = this.wrapText ? Math.max(maxWidth - padding, 0) : Infinity;
+        const padding = this.inputTextInnerPadding;
+        const hPadding = padding.left + padding.right;
+        this.textHelper.maxWidth = this.wrapText ? Math.max(maxWidth - hPadding, 0) : Infinity;
         if(this.textHelper.dirty) {
             this.markWholeAsDirty();
         }
 
         const effectiveMinWidth = Math.min(Math.max(this.inputTextMinWidth, minWidth), maxWidth);
-        this.idealWidth = Math.min(Math.max(effectiveMinWidth, this.textHelper.width + padding), maxWidth);
-        this.idealHeight = Math.min(Math.max(minHeight, this.textHelper.height + padding), maxHeight);
+        this.idealWidth = Math.min(Math.max(effectiveMinWidth, this.textHelper.width + hPadding), maxWidth);
+        this.idealHeight = Math.min(Math.max(minHeight, this.textHelper.height + padding.top + padding.bottom), maxHeight);
     }
 
     override finalizeBounds(): void {
@@ -1112,8 +1113,8 @@ export class TextInput extends Widget {
     protected get caretRect(): Rect {
         const padding = this.inputTextInnerPadding;
         return [
-            padding + this.cursorOffset[0] - this.offset[0],
-            padding + this.cursorOffset[1] - this.offset[1],
+            padding.left + this.cursorOffset[0] - this.offset[0],
+            padding.top + this.cursorOffset[1] - this.offset[1],
             this.cursorThickness,
             this.textHelper.fullLineHeight,
         ];
@@ -1152,8 +1153,8 @@ export class TextInput extends Widget {
                 const left = Math.min(this.cursorOffset[0], this.selectOffset[0]);
                 const right = Math.max(this.cursorOffset[0], this.selectOffset[0]);
                 ctx.fillRect(
-                    this.idealX + padding + left - this.offset[0],
-                    this.idealY + padding + this.cursorOffset[1] - this.offset[1],
+                    this.idealX + padding.left + left - this.offset[0],
+                    this.idealY + padding.top + this.cursorOffset[1] - this.offset[1],
                     right - left,
                     this.textHelper.fullLineHeight,
                 );
@@ -1170,22 +1171,22 @@ export class TextInput extends Widget {
 
                 // Top line:
                 const fullLineHeight = this.textHelper.fullLineHeight;
-                const topWidth = this.idealWidth + this.offset[0] - topOffset[0] - padding;
+                const topWidth = this.idealWidth + this.offset[0] - topOffset[0] - padding.left;
                 if(topWidth > 0) {
                     ctx.fillRect(
-                        this.idealX + padding + topOffset[0] - this.offset[0],
-                        this.idealY + padding + topOffset[1] - this.offset[1],
+                        this.idealX + padding.left + topOffset[0] - this.offset[0],
+                        this.idealY + padding.top + topOffset[1] - this.offset[1],
                         topWidth,
                         fullLineHeight,
                     );
                 }
 
                 // Bottom line:
-                const bottomWidth = bottomOffset[0] + padding - this.offset[0];
+                const bottomWidth = bottomOffset[0] + padding.left - this.offset[0];
                 if(bottomWidth > 0) {
                     ctx.fillRect(
                         this.idealX,
-                        this.idealY + padding + bottomOffset[1] - this.offset[1],
+                        this.idealY + padding.top + bottomOffset[1] - this.offset[1],
                         bottomWidth,
                         fullLineHeight,
                     );
@@ -1197,7 +1198,7 @@ export class TextInput extends Widget {
                 if(middleHeight > 0) {
                     ctx.fillRect(
                         this.idealX,
-                        this.idealY + padding + middleYOffset - this.offset[1],
+                        this.idealY + padding.top + middleYOffset - this.offset[1],
                         this.idealWidth,
                         middleHeight,
                     );
@@ -1220,8 +1221,8 @@ export class TextInput extends Widget {
 
         this.textHelper.paint(
             ctx, fillStyle,
-            this.idealX + padding - this.offset[0],
-            this.idealY + padding - this.offset[1],
+            this.idealX + padding.left - this.offset[0],
+            this.idealY + padding.top - this.offset[1],
         );
 
         // Paint blink

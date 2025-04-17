@@ -484,13 +484,13 @@ export class BaseTheme implements ThemeProperties {
     }
 
     /** See {@link BaseTheme#inputTextInnerPadding}. For internal use only. */
-    private _inputTextInnerPadding?: number;
+    private _inputTextInnerPadding?: Padding;
 
-    get inputTextInnerPadding(): number {
-        return this._inputTextInnerPadding ?? this._fallbackTheme?.inputTextInnerPadding ?? 2;
+    get inputTextInnerPadding(): Padding {
+        return this._inputTextInnerPadding ?? this._fallbackTheme?.inputTextInnerPadding ?? <Padding>{left: 2, right: 2, top: 2, bottom: 2};
     }
 
-    set inputTextInnerPadding(value: number | undefined) {
+    set inputTextInnerPadding(value: Padding | undefined) {
         if(this._inputTextInnerPadding !== value) {
             this._inputTextInnerPadding = value;
             this.onThemeUpdated('inputTextInnerPadding');

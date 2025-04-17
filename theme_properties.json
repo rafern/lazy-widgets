@@ -142,8 +142,8 @@
             "description": "The spacing between each line of text in input widgets like {@link TextInput}. If null, it will be automatically detected."
         },
         "inputTextInnerPadding": {
-            "type": "number",
-            "default": "2",
+            "type": "Padding",
+            "default": "<Padding>{left: 2, right: 2, top: 2, bottom: 2}",
             "description": "The {@link Padding} between text and border used for text input widgets like {@link TextInput}."
         },
         "inputTextMinWidth": {

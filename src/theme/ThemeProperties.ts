@@ -65,7 +65,7 @@ export interface ThemeProperties {
     /** The spacing between each line of text in input widgets like {@link TextInput}. If null, it will be automatically detected. */
     inputTextSpacing?: number | null;
     /** The {@link Padding} between text and border used for text input widgets like {@link TextInput}. */
-    inputTextInnerPadding?: number;
+    inputTextInnerPadding?: Padding;
     /** The default minimum width of text input widgets like {@link TextInput}. */
     inputTextMinWidth?: number;
     /** The default text alignment mode of text input widgets like {@link TextInput}. */
