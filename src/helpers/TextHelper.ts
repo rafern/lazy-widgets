@@ -147,7 +147,7 @@ export class TextHelper {
     @multiFlagField(['_dirty', 'measureDirty'])
     text = '';
     /** The current font used for rendering text. */
-    @multiFlagField(['_dirty', 'measureDirty', 'lineHeightSpacingDirty', 'tabWidthDirty'])
+    @multiFlagField(['_dirty', 'measureDirty', 'lineMetricsDirty', 'tabWidthDirty'])
     font = '';
     /**
      * The current maximum text width. If not Infinite and
@@ -158,16 +158,22 @@ export class TextHelper {
     @multiFlagField(['_dirty', 'measureDirty'])
     maxWidth = Infinity;
     /**
+     * The em size of the text. If null, then the helper will try to
+     * automatically detect it.
+     */
+    @multiFlagField(['_dirty', 'measureDirty', 'lineMetricsDirty'])
+    emSize: number | null = null;
+    /**
      * The height of each line of text when wrapped. If null, then the helper
      * will try to automatically detect it.
      */
-    @multiFlagField(['_dirty', 'measureDirty', 'lineHeightSpacingDirty'])
+    @multiFlagField(['_dirty', 'measureDirty', 'lineMetricsDirty'])
     lineHeight: number | null = null;
     /**
      * The amount of spacing between lines. If null, then the helper will try to
      * automatically detect it.
      */
-    @multiFlagField(['_dirty', 'measureDirty', 'lineHeightSpacingDirty'])
+    @multiFlagField(['_dirty', 'measureDirty', 'lineMetricsDirty'])
     lineSpacing: number | null = null;
     /**
      * The amount of spaces that each tab character is equivalent to. By
@@ -193,6 +199,8 @@ export class TextHelper {
     private _width = 0;
     /** The current total text height. May be outdated. */
     private _height = 0;
+    /** The current {@link TextHelper#emSize}. May be outdated */
+    private _emSize = 0;
     /** The current {@link TextHelper#lineHeight}. May be outdated */
     private _lineHeight = 0;
     /** The current {@link TextHelper#lineSpacing}. May be outdated */
@@ -204,8 +212,8 @@ export class TextHelper {
 
     /** Does the text need to be re-measured? */
     private measureDirty = true;
-    /** Does the line height or spacing need to be re-measured? */
-    private lineHeightSpacingDirty = true;
+    /** Does the em size, line height or line spacing need to be re-measured? */
+    private lineMetricsDirty = true;
     /** Do the space and tab widths need to be re-measured? */
     private tabWidthDirty = true;
     /** {@link TextHelper#dirty} but for internal use. */
@@ -465,22 +473,32 @@ export class TextHelper {
      * false. Does nothing if measurement is not needed.
      */
     private updateTextDims(): void {
-        // Update line height or line spacing if needed
-        if(this.lineHeightSpacingDirty) {
-            this.lineHeightSpacingDirty = false;
+        // Update line metrics if needed
+        if(this.lineMetricsDirty) {
+            this.lineMetricsDirty = false;
 
             const oldLineHeight = this._lineHeight;
             const oldLineSpacing = this._lineSpacing;
 
-            if(this.lineHeight === null || this.lineSpacing === null) {
-                const metrics = measureTextDims(CHARSET, this.font);
+            if(this.emSize === null || this.lineHeight === null || this.lineSpacing === null) {
+                const charsetMetrics = measureTextDims(CHARSET, this.font);
+
+                if (this.emSize === null) {
+                    let emSize = charsetMetrics!.emHeightAscent;
+                    // HACK fallbacks for browsers that don't support these yet
+                    if (emSize === undefined) {
+                        emSize = measureTextDims('M', this.font).actualBoundingBoxAscent;
+                    }
+
+                    this._emSize = emSize;
+                }
 
                 if(this.lineHeight === null) {
-                    const fontAscent = metrics.fontBoundingBoxAscent;
+                    const fontAscent = charsetMetrics!.fontBoundingBoxAscent;
                     if (fontAscent === undefined) {
                         // HACK fallback for browsers that don't support this
                         //      yet
-                        this._lineHeight = Math.max(metrics.actualBoundingBoxAscent, measureTextDims('M', this.font).actualBoundingBoxAscent + metrics.actualBoundingBoxDescent);
+                        this._lineHeight = Math.max(charsetMetrics!.actualBoundingBoxAscent, this._emSize + charsetMetrics!.actualBoundingBoxDescent);
                     } else {
                         this._lineHeight = fontAscent;
                     }
@@ -489,11 +507,14 @@ export class TextHelper {
                 }
 
                 if(this.lineSpacing === null) {
-                    this._lineSpacing = metrics.fontBoundingBoxDescent ?? metrics.actualBoundingBoxDescent;
+                    this._lineSpacing = charsetMetrics!.fontBoundingBoxDescent ?? charsetMetrics!.actualBoundingBoxDescent;
                 } else {
                     this._lineSpacing = this.lineSpacing;
                 }
+
+                console.debug('!!!!!!!', this.font, this._emSize, this._lineHeight, this._lineSpacing);
             } else {
+                this._emSize = this.emSize;
                 this._lineHeight = this.lineHeight;
                 this._lineSpacing = this.lineSpacing;
             }
