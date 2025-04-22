@@ -421,7 +421,7 @@ export class TextInput extends Widget {
     moveCursorLine(delta: number, select: boolean): void {
         this.moveCursorFromOffset(
             this.cursorOffset[0],
-            this.cursorOffset[1] + (0.5 + delta) * this.textHelper.fullLineHeight,
+            this.cursorOffset[1] + (0.5 + delta) * this.textHelper.fullLineHeight + this.textHelper.firstLineVerticalOffset,
             select,
         );
     }
@@ -776,8 +776,8 @@ export class TextInput extends Widget {
                 // Update cursor position (and offset) from click position
                 const padding = this.inputTextInnerPadding;
                 this.moveCursorFromOffset(
-                    event.x - this.idealX - padding.left + this.offset[0],
-                    event.y - this.idealY - padding.top + this.offset[1],
+                    event.x - this.x - padding.left + this.offset[0],
+                    event.y - this.y - padding.top + this.offset[1],
                     (!isPress && this.dragging) || (isPress && event.shift),
                 );
 
@@ -1005,8 +1005,8 @@ export class TextInput extends Widget {
         const padding = this.inputTextInnerPadding;
         const innerWidth = this.textHelper.width;
         const innerHeight = this.textHelper.height;
-        const usableWidth = this.idealWidth - padding.left - padding.right;
-        const usableHeight = this.idealHeight - padding.top - padding.bottom;
+        const usableWidth = this.width - padding.left - padding.right;
+        const usableHeight = this.height - padding.top - padding.bottom;
         const candidateOffset = this.offset;
         const [cursorX, cursorY] = this.cursorOffset;
 
@@ -1045,11 +1045,11 @@ export class TextInput extends Widget {
             if(fullLineHeight >= usableHeight) {
                 // Edge case - TextInput is not tall enough for a single line.
                 // Pan so that at least the bottom of the line is visible
-                candidateOffset[1] = cursorY + Math.max(this.textHelper.actualLineHeight - usableHeight, 0);
+                candidateOffset[1] = cursorY + Math.max(this.textHelper.actualLineHeight + this.textHelper.firstLineVerticalOffset - usableHeight, 0);
             } else {
                 const deadZone = usableHeight < 2 * fullLineHeight ? 0 : fullLineHeight / 2;
                 const top = candidateOffset[1] + deadZone;
-                const bottom = candidateOffset[1] + usableHeight - deadZone - fullLineHeight;
+                const bottom = candidateOffset[1] + usableHeight - deadZone - fullLineHeight - this.textHelper.firstLineVerticalOffset;
 
                 // Pan up or down
                 if(cursorY < top) {
@@ -1112,18 +1112,20 @@ export class TextInput extends Widget {
      */
     protected get caretRect(): Rect {
         const padding = this.inputTextInnerPadding;
+        const rawCaretY = this.cursorOffset[1] - this.offset[1];
+        const caretY = Math.round(rawCaretY);
         return [
             padding.left + this.cursorOffset[0] - this.offset[0],
-            padding.top + this.cursorOffset[1] - this.offset[1],
+            padding.top + caretY,
             this.cursorThickness,
-            this.textHelper.fullLineHeight,
+            Math.floor(this.textHelper.fullLineHeight + rawCaretY) - caretY,
         ];
     }
 
     /** Similar to {@link TextInput#caretRect}, but uses absolute positions. */
     protected get caretAbsoluteRect(): Rect {
         const [x, y, w, h] = this.caretRect;
-        return [x + this.idealX, y + this.idealY, w, h];
+        return [x + this.x, y + this.y, w, h];
     }
 
     /** Similar to {@link TextInput#caretRect}, but gets bounds instead. */
@@ -1152,11 +1154,13 @@ export class TextInput extends Widget {
                 // Same line
                 const left = Math.min(this.cursorOffset[0], this.selectOffset[0]);
                 const right = Math.max(this.cursorOffset[0], this.selectOffset[0]);
+                const rawCaretY = this.cursorOffset[1] - this.offset[1];
+                const caretY = Math.round(rawCaretY);
                 ctx.fillRect(
-                    this.idealX + padding.left + left - this.offset[0],
-                    this.idealY + padding.top + this.cursorOffset[1] - this.offset[1],
-                    right - left,
-                    this.textHelper.fullLineHeight,
+                    this.x + padding.left + Math.floor(left - this.offset[0]),
+                    this.y + padding.top + caretY,
+                    right - Math.floor(left),
+                    Math.floor(this.textHelper.fullLineHeight + rawCaretY) - caretY,
                 );
             } else {
                 // Spans multiple lines
@@ -1171,11 +1175,11 @@ export class TextInput extends Widget {
 
                 // Top line:
                 const fullLineHeight = this.textHelper.fullLineHeight;
-                const topWidth = this.idealWidth + this.offset[0] - topOffset[0] - padding.left;
+                const topWidth = this.width + Math.ceil(this.offset[0] - topOffset[0] - padding.left);
                 if(topWidth > 0) {
                     ctx.fillRect(
-                        this.idealX + padding.left + topOffset[0] - this.offset[0],
-                        this.idealY + padding.top + topOffset[1] - this.offset[1],
+                        this.x + padding.left + Math.floor(topOffset[0] - this.offset[0]),
+                        this.y + padding.top + Math.round(topOffset[1] - this.offset[1]),
                         topWidth,
                         fullLineHeight,
                     );
@@ -1183,23 +1187,25 @@ export class TextInput extends Widget {
 
                 // Bottom line:
                 const bottomWidth = bottomOffset[0] + padding.left - this.offset[0];
+                const bottomRawCaretY = bottomOffset[1] - this.offset[1];
+                const bottomCaretY = Math.round(bottomRawCaretY);
                 if(bottomWidth > 0) {
                     ctx.fillRect(
-                        this.idealX,
-                        this.idealY + padding.top + bottomOffset[1] - this.offset[1],
+                        this.x,
+                        this.y + padding.top + bottomCaretY,
                         bottomWidth,
-                        fullLineHeight,
+                        Math.floor(fullLineHeight + bottomRawCaretY) - bottomCaretY,
                     );
                 }
 
                 // Middle lines:
-                const middleYOffset = topOffset[1] + fullLineHeight;
-                const middleHeight = bottomOffset[1] - middleYOffset;
+                const middleYOffset = Math.round(topOffset[1] + fullLineHeight);
+                const middleHeight = bottomCaretY - middleYOffset;
                 if(middleHeight > 0) {
                     ctx.fillRect(
-                        this.idealX,
-                        this.idealY + padding.top + middleYOffset - this.offset[1],
-                        this.idealWidth,
+                        this.x,
+                        this.y + padding.top + middleYOffset - this.offset[1],
+                        this.width,
                         middleHeight,
                     );
                 }
@@ -1221,8 +1227,8 @@ export class TextInput extends Widget {
 
         this.textHelper.paint(
             ctx, fillStyle,
-            this.idealX + padding.left - this.offset[0],
-            this.idealY + padding.top - this.offset[1],
+            this.x + padding.left - this.offset[0],
+            this.y + padding.top - this.offset[1],
         );
 
         // Paint blink

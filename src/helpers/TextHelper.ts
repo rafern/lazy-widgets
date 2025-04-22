@@ -209,6 +209,16 @@ export class TextHelper {
     private _tabWidth = 0;
     /** The width of a space in pixels. May be outdated */
     private _spaceWidth = 0;
+    /**
+     * Last calculated value for {@link TextHelper#firstLineVerticalOffset}. May
+     * be outdated.
+     */
+    private _firstLineVerticalOffset = 0;
+    /**
+     * Last calculated value for {@link TextHelper#realLineHeight}. May be
+     * outdated.
+     */
+    private _realLineHeight = 0;
 
     /** Does the text need to be re-measured? */
     private measureDirty = true;
@@ -477,6 +487,7 @@ export class TextHelper {
         if(this.lineMetricsDirty) {
             this.lineMetricsDirty = false;
 
+            const oldEmSize = this._emSize;
             const oldLineHeight = this._lineHeight;
             const oldLineSpacing = this._lineSpacing;
 
@@ -484,24 +495,17 @@ export class TextHelper {
                 const charsetMetrics = measureTextDims(CHARSET, this.font);
 
                 if (this.emSize === null) {
-                    let emSize = charsetMetrics!.emHeightAscent;
+                    // XXX somehow, hangingBaseline gives much better results
+                    //     than emHeightAscent and i have no idea why
                     // HACK fallbacks for browsers that don't support these yet
-                    if (emSize === undefined) {
-                        emSize = measureTextDims('M', this.font).actualBoundingBoxAscent;
-                    }
-
-                    this._emSize = emSize;
+                    this._emSize = charsetMetrics!.hangingBaseline ?? measureTextDims('M', this.font).actualBoundingBoxAscent;
+                } else {
+                    this._emSize = this.emSize;
                 }
 
                 if(this.lineHeight === null) {
-                    const fontAscent = charsetMetrics!.fontBoundingBoxAscent;
-                    if (fontAscent === undefined) {
-                        // HACK fallback for browsers that don't support this
-                        //      yet
-                        this._lineHeight = Math.max(charsetMetrics!.actualBoundingBoxAscent, this._emSize + charsetMetrics!.actualBoundingBoxDescent);
-                    } else {
-                        this._lineHeight = fontAscent;
-                    }
+                    // HACK fallback for browsers that don't support this yet
+                    this._lineHeight = charsetMetrics!.fontBoundingBoxAscent ?? charsetMetrics!.actualBoundingBoxAscent;
                 } else {
                     this._lineHeight = this.lineHeight;
                 }
@@ -511,16 +515,19 @@ export class TextHelper {
                 } else {
                     this._lineSpacing = this.lineSpacing;
                 }
-
-                console.debug('!!!!!!!', this.font, this._emSize, this._lineHeight, this._lineSpacing);
             } else {
                 this._emSize = this.emSize;
                 this._lineHeight = this.lineHeight;
                 this._lineSpacing = this.lineSpacing;
             }
 
-            // If line height or spacing changed, text needs to be re-measured
-            if(oldLineHeight !== this._lineHeight || oldLineSpacing !== this._lineSpacing) {
+            const startPad = this._lineHeight - this._emSize;
+            this._firstLineVerticalOffset = Math.max(this._lineSpacing, startPad) - startPad;
+            const verticalEdgePad = Math.max(this._lineHeight - this._emSize, this._lineSpacing);
+            this._realLineHeight = verticalEdgePad * 2 + this._emSize;
+
+            // If line metrics changed, text needs to be re-measured
+            if(oldEmSize !== this._emSize || oldLineHeight !== this._lineHeight || oldLineSpacing !== this._lineSpacing) {
                 this.measureDirty = true;
             }
         }
@@ -547,7 +554,7 @@ export class TextHelper {
             // Special case for empty string; set height to height of single
             // line and width to 0 if maxWidth is not set or maxWidth if set and
             // wrap mode is not None
-            this._height = fullLineHeight;
+            this._height = this._realLineHeight;
             this._width = notWrapping ? 0 : this.maxWidth;
             this._lineRanges.length = 1;
             this._lineRanges[0] = [{
@@ -562,7 +569,6 @@ export class TextHelper {
             // Don't wrap text, but split lines when there's a newline character
             this._lineRanges.length = 0;
             let lineStart = 0;
-            this._height = 0;
             this._width = 0;
 
             const text = this.text;
@@ -578,7 +584,6 @@ export class TextHelper {
                 this.measureText(lineStart, end, Infinity, range);
                 this._lineRanges.push(range);
 
-                this._height += fullLineHeight;
                 const width = range[range.length - 1].right;
                 if(width > this._width) {
                     this._width = width;
@@ -592,6 +597,8 @@ export class TextHelper {
                 // Set start of next line
                 lineStart = end;
             }
+
+            this._height = fullLineHeight * Math.max(this._lineRanges.length - 1, 0) + this._realLineHeight;
         } else {
             // Wrap text
             this._lineRanges.length = 0;
@@ -738,7 +745,7 @@ export class TextHelper {
 
             // Calculate dimensions
             this._width = this.maxWidth;
-            this._height = fullLineHeight * this._lineRanges.length;
+            this._height = fullLineHeight * Math.max(this._lineRanges.length - 1, 0) + this._realLineHeight;
         }
 
         // handle horizontal overflow
@@ -838,7 +845,7 @@ export class TextHelper {
 
         // Paint line (or lines) of text
         const fullLineHeight = this.fullLineHeight;
-        let yOffset = y + this._lineHeight;
+        let yOffset = y + this._lineHeight + this._firstLineVerticalOffset;
         for(let line = 0; line < this._lineRanges.length; line++) {
             let left = 0;
             const shift = this.getLineShift(line);
@@ -870,7 +877,7 @@ export class TextHelper {
         // If index is 0, an invalid negative number or there are no lines, it
         // is at the beginning
         if(index <= 0 || this._lineRanges.length === 0) {
-            return [this.getLineShift(0), 0];
+            return [this.getLineShift(0), this._firstLineVerticalOffset];
         }
 
         // Check which line the index is in
@@ -907,7 +914,7 @@ export class TextHelper {
         // Get horizontal offset
         return [
             this.getLineRangeWidthUntil(lineRange, index) + this.getLineShift(line),
-            line * this.fullLineHeight,
+            line * this.fullLineHeight + this._firstLineVerticalOffset,
         ];
     }
 
@@ -924,12 +931,13 @@ export class TextHelper {
         // no lines, default to index 0
         const fullLineHeight = this.fullLineHeight;
         const firstShift = this.getLineShift(0);
-        if(this.text === '' || (offset[0] <= firstShift && offset[1] < fullLineHeight) || offset[1] < 0) {
-            return [0, [firstShift, 0]];
+        const unshiftedY = offset[1] - this._firstLineVerticalOffset;
+        if(this.text === '' || (offset[0] <= firstShift && unshiftedY < fullLineHeight) || unshiftedY < 0) {
+            return [0, [firstShift, this._firstLineVerticalOffset]];
         }
 
         // Find line being selected
-        const line = Math.floor(offset[1] / fullLineHeight);
+        const line = Math.floor(unshiftedY / fullLineHeight);
 
         // Update line ranges if needed
         this.updateTextDims();
@@ -941,7 +949,7 @@ export class TextHelper {
         }
 
         // If this is an empty line, stop
-        const yOffset = line * fullLineHeight;
+        const yOffset = line * fullLineHeight + this._firstLineVerticalOffset;
         const range = this._lineRanges[line];
         const shift = this.getLineShift(line);
         const lineStart = range[0].rangeStart;
@@ -1135,6 +1143,15 @@ export class TextHelper {
     }
 
     /**
+     * Get the current em size, even if {@link TextHelper#emSize} is null.
+     * Re-measures em size if neccessary.
+     */
+    get actualEmSize(): number {
+        this.updateTextDims();
+        return this._emSize;
+    }
+
+    /**
      * Get the current line height, even if {@link TextHelper#lineHeight} is
      * null. Re-measures line height if neccessary.
      */
@@ -1173,5 +1190,29 @@ export class TextHelper {
     get fullLineHeight(): number {
         this.updateTextDims();
         return this._lineHeight + this._lineSpacing;
+    }
+
+    /**
+     * Get the vertical offset of the first line, caused by fonts with
+     * unbalanced font ascent and descent.
+     *
+     * Equivalent to
+     * `max(lineSpacing, lineHeight - emSize) - (lineHeight - emSize)`
+     */
+    get firstLineVerticalOffset(): number {
+        this.updateTextDims();
+        return this._firstLineVerticalOffset;
+    }
+
+    /**
+     * Get the height of a single line, assuming that it's the only line in the
+     * text, and that the vertical padding might therefore not match line ascent
+     * and descent.
+     *
+     * Equivalent to `max(lineSpacing, lineHeight - emSize) * 2 + emSize)`
+     */
+    get realLineHeight(): number {
+        this.updateTextDims();
+        return this._realLineHeight;
     }
 }

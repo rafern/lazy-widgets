@@ -78,10 +78,8 @@ export abstract class BaseLabel extends Widget {
         const oldMaxWidth = this.textHelper.maxWidth;
         this.textHelper.maxWidth = maxWidth;
 
-        // extra spacing is added so that there is enough height to center the
-        // text
         this.idealWidth = Math.max(Math.min(this.textHelper.width, maxWidth), minWidth);
-        this.idealHeight = Math.max(Math.min(this.textHelper.height + this.textHelper.actualLineSpacing, maxHeight), minHeight);
+        this.idealHeight = Math.max(Math.min(this.textHelper.height, maxHeight), minHeight);
 
         if(this.textHelper.dirty) {
             this.textHelper.maxWidth = this.idealWidth;
