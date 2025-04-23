@@ -26,7 +26,7 @@ export class WidgetSlot<W extends Widget = Widget> extends Parent<W> {
     private _child: W | null = null;
 
     /**
-     * @param child - The optional single child of this widget. Can be changed later via either {@link WidgetSlot#child} or {@link WidgetSlot#transferChild}.
+     * @param child - The optional single child of this widget. Can be changed later via either {@link WidgetSlot#child}, {@link WidgetSlot#transferChildTo} or {@link WidgetSlot#swapChildWith}.
      */
     constructor(child: W | null = null, properties?: Readonly<WidgetProperties>) {
         super(properties);
