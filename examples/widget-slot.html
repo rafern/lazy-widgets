@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type='module'>
+            import {
+                DOMRoot, Label, Column, Row, TextInput, TextButton,
+                DOMKeyboardDriver, DOMPointerDriver, Alignment, FlexAlignment,
+                Variable, Background, WidgetSlot, TextAlignMode,
+            } from '../dist/index.js';
+
+            // Create the root
+            const label = new Label('Hello world!');
+            const transferrableWidget = new Column([
+                label,
+                new TextInput(new Variable('').watch(variable => {
+                    label.text = `Text input: ${variable.value}`;
+                })),
+                new Row([
+                    new TextButton('Button 1'),
+                    new TextButton('Button 2'),
+                ], {
+                    multiContainerAlignment: {
+                        main: FlexAlignment.Center,
+                        cross: Alignment.Stretch
+                    },
+                }).on('click', (ev) => label.text = `${ev.origin.child.text} clicked!`)
+            ]);
+
+            const slotA = new WidgetSlot(transferrableWidget);
+            const slotB = new WidgetSlot();
+
+            const root = new DOMRoot(
+                new Background(
+                    new Column([
+                        new Row([
+                            new Background(
+                                new Column([ new Label('Slot A:'), slotA ]),
+                                { canvasFill: 'red' },
+                            ),
+                            new Background(
+                                new Column([ new Label('Slot B:', { bodyTextAlign: TextAlignMode.End }), slotB ]),
+                                { canvasFill: 'blue' },
+                            ),
+                        ]),
+                        new TextButton('Swap between slots').on('click', () => {
+                            slotA.swapChildWith(slotB);
+                        }),
+                    ]),
+                )
+            );
+
+            // Create, bind DOM and register the keyboard driver
+            const keyboardDriver = new DOMKeyboardDriver();
+            keyboardDriver.bindSingletRoot(root, { domElem: root.domElem });
+            root.registerDriver(keyboardDriver);
+
+            // Create, bind DOM and register the pointer driver
+            const pointerDriver = new DOMPointerDriver();
+            pointerDriver.bindDOMElem(root, root.domElem);
+            root.registerDriver(pointerDriver);
+
+            // Run the update loop
+            function updateLoop() {
+                root.update();
+                window.requestAnimationFrame(updateLoop);
+            }
+
+            window.requestAnimationFrame(updateLoop);
+
+            // Add root to body
+            document.body.appendChild(root.domElem);
+        </script>
+        <noscript>
+            Please enable Javascript. This example may not work if running via file:// URIs
+        </noscript>
+    </head>
+    <body>
+    </body>
+</html>

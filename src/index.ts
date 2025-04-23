@@ -175,6 +175,7 @@ export * from './widgets/Tooltip.js';
 export * from './widgets/TooltipContainer.js';
 export * from './widgets/ViewportWidget.js';
 export * from './widgets/Widget.js';
+export * from './widgets/WidgetSlot.js';
 // xml
 export * from './xml/BareWidgetXMLInputConfig.js';
 export * from './xml/BaseXMLUIParser.js';
