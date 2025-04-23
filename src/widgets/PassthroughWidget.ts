@@ -24,8 +24,6 @@ export class PassthroughWidget<W extends Widget = Widget> extends SingleParent<W
     };
 
     constructor(child: W, properties?: Readonly<WidgetProperties>) {
-        // Passthrough widgets dont need a clear background, have a child and
-        // propagate events
         super(child, properties);
     }
 

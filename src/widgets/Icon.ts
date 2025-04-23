@@ -147,8 +147,6 @@ export class Icon extends Widget {
     mediaPadding: Padding;
 
     constructor(image: BackingMediaSource | string | null, properties?: Readonly<IconProperties>) {
-        // Icons need a clear background, have no children and don't propagate
-        // events
         super(properties);
 
         if(typeof image === 'string') {

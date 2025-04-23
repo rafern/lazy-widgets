@@ -23,7 +23,6 @@ export class Spacing extends Widget {
             ...properties
         };
 
-        // Spacing needs clear, never has children and doesn't propagate events
         super(properties);
     }
 

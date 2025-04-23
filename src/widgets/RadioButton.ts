@@ -63,8 +63,6 @@ export class RadioButton<V> extends Widget {
      * @param value - The value that will be used to set the {@link RadioButton#"variable"} when the radio button is clicked
      */
     constructor(variable: Box<V>, value: V, properties?: Readonly<ClickableWidgetProperties>) {
-        // Radio buttons need a clear background, have no children and don't
-        // propagate events
         super(properties);
 
         this._clickable = properties?.clickable ?? true;

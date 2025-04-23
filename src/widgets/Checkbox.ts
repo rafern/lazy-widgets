@@ -59,8 +59,6 @@ export class Checkbox extends Widget {
      * @param variable - The {@link Box} where the value will be stored.
      */
     constructor(variable: Box<boolean> = new Variable(false), properties?: Readonly<ClickableWidgetProperties>) {
-        // Checkboxes need a clear background, have no children and don't
-        // propagate events
         super(properties);
 
         this._clickable = properties?.clickable ?? true;

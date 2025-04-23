@@ -166,8 +166,6 @@ export class TextInput extends Widget {
     protected currentTextInputHandler: TextInputHandler | null = null;
 
     constructor(variable: ValidatedBox<string, unknown> | Box<string> = new Variable(''), properties?: Readonly<TextInputProperties>) {
-        // TextInputs clear their own background, have no children and don't
-        // propagate events
         super(properties);
 
         this.tabFocusable = true;

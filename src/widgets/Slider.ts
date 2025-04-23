@@ -103,8 +103,6 @@ export class Slider extends Widget {
     protected readonly dragBounds: Bounds = [0, 0, 0, 0];
 
     constructor(variable: Box<number> = new Variable(0), minValue = 0, maxValue = 1, properties?: Readonly<SliderProperties>) {
-        // Sliders need a clear background, have no children and don't propagate
-        // events
         super(properties);
 
         this.clickHelper = new ClickHelper(this);
