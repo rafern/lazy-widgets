@@ -42,3 +42,4 @@ export { ThemeScope } from './ThemeScope.js';
 export { Tooltip } from './Tooltip.js';
 export { TooltipContainer } from './TooltipContainer.js';
 export { ViewportWidget } from './ViewportWidget.js';
+export { WidgetSlot } from './WidgetSlot.js';
