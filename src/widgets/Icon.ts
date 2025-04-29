@@ -71,7 +71,7 @@ export class Icon extends Widget {
             {
                 mode: 'value',
                 name: 'image',
-                validator: 'image-source'
+                validator: 'nullable:image-source'
             }
         ]
     };

@@ -16,12 +16,12 @@ export class IconButton extends Button<Icon> {
             {
                 mode: 'value',
                 name: 'image',
-                validator: 'image-source'
+                validator: 'nullable:image-source'
             }
         ]
     };
 
-    constructor(image: BackingMediaSource | string, properties?: Readonly<IconProperties & ClickableWidgetProperties>) {
+    constructor(image: BackingMediaSource | string | null, properties?: Readonly<IconProperties & ClickableWidgetProperties>) {
         super(new Icon(image, filterIDFromProperties(properties)), properties);
     }
 }
