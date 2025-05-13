@@ -70,7 +70,7 @@ export class EffectImageBitmap extends AsyncImageBitmap {
                 throw new Error('Could not create 2D offscreen context');
             }
 
-            this.ctx = ctx;
+            this.ctx = ctx as BackingCanvasContext;
         }
 
         return this.ctx;
