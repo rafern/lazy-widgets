@@ -1,4 +1,5 @@
 import { AsyncImageBitmap } from './AsyncImageBitmap.js';
+import { createBackingCanvas, type BackingCanvasContext } from './BackingCanvas.js';
 import { urlToBackingMediaSource } from './BackingMediaSource.js';
 import { BackingMediaSourceType } from './BackingMediaSourceType.js';
 
@@ -11,7 +12,7 @@ export interface EffectImageBitmapOptions {
 
 export class EffectImageBitmap extends AsyncImageBitmap {
     private innerBitmap: ImageBitmap | null = null;
-    private ctx: OffscreenCanvasRenderingContext2D | null = null;
+    private ctx: BackingCanvasContext | null = null;
     private lastSrc: string | null = null;
     private waiting = false;
     private _presentationHash = -1;
@@ -63,7 +64,7 @@ export class EffectImageBitmap extends AsyncImageBitmap {
 
             this.ctx.globalCompositeOperation = 'source-over';
         } else {
-            const canvas = new OffscreenCanvas(width, height);
+            const canvas = createBackingCanvas(width, height);
             const ctx = canvas.getContext('2d');
             if (!ctx) {
                 throw new Error('Could not create 2D offscreen context');

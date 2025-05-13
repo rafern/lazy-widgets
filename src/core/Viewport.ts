@@ -2,6 +2,8 @@ import type { LayoutConstraints } from './LayoutConstraints.js';
 import type { Widget } from '../widgets/Widget.js';
 import type { TricklingEvent } from '../events/TricklingEvent.js';
 import type { Rect } from '../helpers/Rect.js';
+import { type BackingCanvasContext } from '../helpers/BackingCanvas.js';
+
 /**
  * Viewports are constrained rectangles that can be painted to. Viewports have a
  * rendering context associated with them, either by inheriting them from a
@@ -29,9 +31,7 @@ export interface Viewport {
      * {@link CanvasViewport}) will always use the same context, while others
      * (such as {@link ClippedViewport}) will occasionally change the context.
      */
-    readonly context: CanvasRenderingContext2D;
-    // TODO ^^^ remove readonly once typescript ~~stops being bad~~ introduces
-    // getters in interfaces
+    readonly context: BackingCanvasContext;
     /**
      * Layout constraints of viewport when resolving widget's layout. A 4-tuple
      * containing, respectively, minimum width, maximum width, minimum height

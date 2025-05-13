@@ -21,6 +21,7 @@ import type { CaptureList } from './CaptureList.js';
 import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerMap, WidgetEventUntypedListenerList } from '../events/WidgetEventEmitter.js';
 import { LeaveRootEvent } from '../events/LeaveRootEvent.js';
 import { type Rect } from '../helpers/Rect.js';
+import { type BackingCanvas } from '../helpers/BackingCanvas.js';
 /**
  * Allowed cursor styles and in order of priority; lower indices have higher
  * priority
@@ -360,7 +361,7 @@ export class Root implements WidgetEventEmitter {
      * The {@link Root#viewport}'s {@link CanvasViewport#canvas | canvas}. The
      * canvas must not be modified directly; consider it output-only.
      */
-    get canvas(): HTMLCanvasElement {
+    get canvas(): BackingCanvas {
         return this.viewport.canvas;
     }
 

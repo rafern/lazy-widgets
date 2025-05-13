@@ -1,11 +1,13 @@
 import { CornerRadii, NonUniformCornerRadius } from '../widgets/CornerRadii.js';
+import { type BackingCanvasContext } from './BackingCanvas.js';
+
 /**
  * CanvasRenderingContext2D.roundRect, but safe to use in browsers without
  * support, like Firefox.
  *
  * @category Helper
  */
-export function safeRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radii: CornerRadii) {
+export function safeRoundRect(ctx: BackingCanvasContext, x: number, y: number, w: number, h: number, radii: CornerRadii) {
     // XXX implemented by following the spec:
     // https://html.spec.whatwg.org/multipage/canvas.html#dom-context-2d-roundrect
     // note that the implementation deviates slightly from the spec; no subpath

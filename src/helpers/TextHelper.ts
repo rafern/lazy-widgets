@@ -2,6 +2,7 @@ import { measureTextDims } from '../helpers/measureTextDims.js';
 import { multiFlagField } from '../decorators/FlagFields.js';
 import { FillStyle } from '../theme/FillStyle.js';
 import { DynMsg, Msg } from '../core/Strings.js';
+import { type BackingCanvasContext } from './BackingCanvas.js';
 
 const WIDTH_OVERRIDING_CHARS = new Set(['\n', '\t', ' ']);
 const ELLIPSIS = '...';
@@ -806,7 +807,7 @@ export class TextHelper {
      * Used mainly for injecting debug code; you won't get much use out of this
      * method unless you have a very specific need.
      */
-    paintGroup(ctx: CanvasRenderingContext2D, group: TextRenderGroup, left: number, x: number, y: number): void {
+    paintGroup(ctx: BackingCanvasContext, group: TextRenderGroup, left: number, x: number, y: number): void {
         if (!group.visible || group.right <= left) {
             // invisible or zero-width text group, don't bother rendering it
             return;
@@ -833,7 +834,7 @@ export class TextHelper {
     }
 
     /** Paint all line ranges. */
-    paint(ctx: CanvasRenderingContext2D, fillStyle: FillStyle, x: number, y: number): void {
+    paint(ctx: BackingCanvasContext, fillStyle: FillStyle, x: number, y: number): void {
         // Apply fill style and font
         ctx.save();
         ctx.font = this.font;

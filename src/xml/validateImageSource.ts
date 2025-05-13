@@ -1,4 +1,5 @@
-// TODO support HTMLCanvasElement - needs changes to Icon class
+import { type BackingCanvas } from '../helpers/BackingCanvas.js';
+
 /**
  * A validator function which checks whether an input value is an image source.
  * An image source can be a string, an HTMLImageElement or an HTMLVideoElement.
@@ -6,8 +7,8 @@
  *
  * @category XML
  */
-export function validateImageSource(value: unknown): [value: string | HTMLImageElement | HTMLVideoElement, stop: boolean] {
-    if (typeof value === 'string' || value instanceof HTMLImageElement || value instanceof HTMLVideoElement) {
+export function validateImageSource(value: unknown): [value: string | HTMLImageElement | HTMLVideoElement | BackingCanvas, stop: boolean] {
+    if (typeof value === 'string' || value instanceof HTMLImageElement || value instanceof HTMLVideoElement || value instanceof HTMLCanvasElement || value instanceof OffscreenCanvas) {
         return [value, false];
     }
 

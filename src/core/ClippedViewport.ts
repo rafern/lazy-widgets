@@ -2,6 +2,8 @@ import { BaseViewport } from "./BaseViewport.js";
 import { Msg } from './Strings.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { Widget } from "../widgets/Widget.js";
+import { type BackingCanvasContext } from '../helpers/BackingCanvas.js';
+
 /**
  * A {@link Viewport} which inherits a rendering context from the closest parent
  * Viewport and paints {@link Widget | Widgets} by clipping them to the
@@ -10,7 +12,7 @@ import type { Widget } from "../widgets/Widget.js";
  * @category Core
  */
 export class ClippedViewport extends BaseViewport {
-    get context(): CanvasRenderingContext2D {
+    get context(): BackingCanvasContext {
         if(this.parent === null) {
             throw Msg.PARENTLESS_CLIPVP;
         }

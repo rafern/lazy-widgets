@@ -6,6 +6,7 @@ import { Msg } from './Strings.js';
 import { mergeOverlappingRects } from '../helpers/mergeOverlappingRects.js';
 import type { Widget } from '../widgets/Widget.js';
 import type { Rect } from '../helpers/Rect.js';
+import { type BackingCanvas, type BackingCanvasContext, createBackingCanvas } from '../helpers/BackingCanvas.js';
 
 /**
  * A {@link Viewport} with an internal canvas, where the rendering context used
@@ -21,10 +22,10 @@ import type { Rect } from '../helpers/Rect.js';
  * @category Core
  */
 export class CanvasViewport extends BaseViewport {
-    readonly context: CanvasRenderingContext2D;
+    readonly context: BackingCanvasContext;
 
     /** The internal canvas. Widgets are painted to this */
-    readonly canvas: HTMLCanvasElement;
+    readonly canvas: BackingCanvas;
     /** Current maximum canvas width. For internal use only. */
     private _maxCanvasWidth: number;
     /** Current maximum canvas height. For internal use only. */
@@ -93,15 +94,13 @@ export class CanvasViewport extends BaseViewport {
         this.preventAtlasBleeding = preventAtlasBleeding;
 
         // Create internal canvas
-        this.canvas = document.createElement('canvas');
-        this.canvas.width = startingWidth;
-        this.canvas.height = startingHeight;
+        this.canvas = createBackingCanvas(startingWidth, startingHeight);
 
         this._maxCanvasWidth = 16384;
         this._maxCanvasHeight = 16384;
 
         // Get context out of canvas
-        const context = this.canvas.getContext('2d', { alpha: true });
+        const context = this.canvas.getContext('2d', { alpha: true }) as BackingCanvasContext;
         if(context === null) {
             throw new Error(Msg.CANVAS_CONTEXT);
         }
@@ -316,11 +315,9 @@ export class CanvasViewport extends BaseViewport {
                 let copyCanvas = null;
 
                 if(needsCopying) {
-                    copyCanvas = document.createElement('canvas');
-                    copyCanvas.width = oldCanvasWidth;
-                    copyCanvas.height = oldCanvasHeight;
+                    copyCanvas = createBackingCanvas(oldCanvasWidth, oldCanvasHeight);
 
-                    const copyCtx = copyCanvas.getContext('2d');
+                    const copyCtx = copyCanvas.getContext('2d') as BackingCanvasContext;
                     if(copyCtx === null) {
                         throw new Error(Msg.CANVAS_CONTEXT);
                     }

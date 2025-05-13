@@ -2,18 +2,19 @@ import { CanvasViewport } from './CanvasViewport.js';
 import { Msg } from './Strings.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { Widget } from '../widgets/Widget.js';
+import { type BackingCanvasContext, type BackingCanvas, createBackingCanvas } from '../helpers/BackingCanvas.js';
 type DebugEvent = [ rect: Rect, timestamp: number, isMerged: boolean ];
 const DEBUG_EVENT_TIMEOUT = 1000;
 
 export class DebuggableCanvasViewport extends CanvasViewport {
     /** The overlay canvas. Dirty rects are painted to this */
-    readonly overlayCanvas: HTMLCanvasElement;
+    readonly overlayCanvas: BackingCanvas;
     /** The overlay canvas's context */
-    readonly overlayContext: CanvasRenderingContext2D;
+    readonly overlayContext: BackingCanvasContext;
     /** The internal canvas with the overlay applied on top of it (output) */
-    readonly outputCanvas: HTMLCanvasElement;
+    readonly outputCanvas: BackingCanvas;
     /** The output canvas's context */
-    readonly outputContext: CanvasRenderingContext2D;
+    readonly outputContext: BackingCanvasContext;
     /** The list of recently pushed dirty rects, with their timestamps */
     readonly events = new Set<DebugEvent>();
     /** Is the overlay enabled? Disabled by default */
@@ -31,12 +32,10 @@ export class DebuggableCanvasViewport extends CanvasViewport {
         super(child, resolution, preventBleeding, preventAtlasBleeding, startingWidth, startingHeight);
 
         // make overlay canvas
-        this.overlayCanvas = document.createElement('canvas');
-        this.overlayCanvas.width = startingWidth;
-        this.overlayCanvas.height = startingHeight;
+        this.overlayCanvas = createBackingCanvas(startingWidth, startingHeight);
 
         // get context out of overlay canvas
-        const overlayContext = this.overlayCanvas.getContext('2d', { alpha: true });
+        const overlayContext = this.overlayCanvas.getContext('2d', { alpha: true }) as BackingCanvasContext;
         if(overlayContext === null) {
             throw new Error(Msg.CANVAS_CONTEXT);
         }
@@ -44,12 +43,10 @@ export class DebuggableCanvasViewport extends CanvasViewport {
         this.overlayContext = overlayContext;
 
         // make output canvas
-        this.outputCanvas = document.createElement('canvas');
-        this.outputCanvas.width = startingWidth;
-        this.outputCanvas.height = startingHeight;
+        this.outputCanvas = createBackingCanvas(startingWidth, startingHeight);
 
         // get context out of output canvas
-        const outputContext = this.outputCanvas.getContext('2d', { alpha: true });
+        const outputContext = this.outputCanvas.getContext('2d', { alpha: true }) as BackingCanvasContext;
         if(outputContext === null) {
             throw new Error(Msg.CANVAS_CONTEXT);
         }

@@ -1,3 +1,5 @@
+import { type BackingCanvasContext } from "./BackingCanvas.js";
+
 const TAU = Math.PI * 2;
 
 /**
@@ -7,7 +9,7 @@ const TAU = Math.PI * 2;
  *
  * @category Helper
  */
-export function paintCircle(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number): void {
+export function paintCircle(ctx: BackingCanvasContext, x: number, y: number, radius: number): void {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, TAU);
     ctx.fill();

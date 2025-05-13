@@ -5,6 +5,7 @@ import type { Widget } from '../widgets/Widget.js';
 import type { TricklingEvent } from '../events/TricklingEvent.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { Viewport } from './Viewport.js';
+import { type BackingCanvasContext } from '../helpers/BackingCanvas.js';
 
 export type ClippedViewportRect = [vpX: number, vpY: number, vpW: number, vpH: number, origXDst: number, origYDst: number, xDst: number, yDst: number, wClipped: number, hClipped: number];
 
@@ -17,7 +18,7 @@ export type ClippedViewportRect = [vpX: number, vpY: number, vpW: number, vpH: n
 export abstract class BaseViewport implements Viewport {
     readonly relativeCoordinates: boolean;
     readonly child: Widget;
-    abstract readonly context: CanvasRenderingContext2D;
+    abstract readonly context: BackingCanvasContext;
     @watchArrayField(BaseViewport.prototype.relayoutAndReposition)
     constraints: LayoutConstraints;
     @watchArrayField(BaseViewport.prototype.relayoutAndReposition)
