@@ -7,14 +7,14 @@ import type { ObservableCallback } from './ObservableCallback.js';
 //       user callback.
 /**
  * An {@link Observable} which transforms a list of input Observables into a
- * single value efficiently.
+ * single value efficiently. Only watches inputs while the transformer is being
+ * watched.
  *
  * @category State Management
  */
 export class ObservableTransformer<V, I extends Iterable<Observable<U>> | [Observable<U>], U = unknown> implements Observable<V> {
     private dirty = true;
     private cache!: V;
-    private watcher: ObservableCallback<U> | null;
     /** The function callbacks called when the value is changed */
     private callbacks = new Array<ObservableCallback<V>>();
 
@@ -37,35 +37,31 @@ export class ObservableTransformer<V, I extends Iterable<Observable<U>> | [Obser
      * @param transformer - The actual transformer function. Takes in a list of input observables, and outputs a single value.
      * @param decider - Decides whether the transformer's output value needs to be updated or not. If `undefined` (the default), then the value is always assumed to need to be updated whenever an input watcher is invoked.
      */
-    constructor(readonly inputs: I, readonly transformer: (inputs: I) => V, readonly decider?: (inputs: I) => boolean) {
-        this.watcher = (_source: Observable<unknown>, group?: unknown) => {
-            if (this.decider === undefined || this.decider(this.inputs)) {
-                this.dirty = true;
+    constructor(readonly inputs: I, readonly transformer: (inputs: I) => V, readonly decider?: (inputs: I) => boolean) { }
 
-                for (const callback of this.callbacks) {
-                    callback(this, group);
-                }
+    private handleInputChange(group?: unknown) {
+        if (this.decider === undefined || this.decider(this.inputs)) {
+            this.dirty = true;
+
+            for (const callback of this.callbacks) {
+                callback(this, group);
             }
-        };
-
-        for (const input of this.inputs) {
-            input.watch(this.watcher);
         }
     }
 
-    destroy() {
-        if (this.watcher === null) {
-            return;
-        }
-
-        for (const input of this.inputs) {
-            input.unwatch(this.watcher);
-        }
-
-        this.watcher = null;
-    }
+    private readonly watcher: ObservableCallback<U> = (_source: Observable<unknown>, group?: unknown) => {
+        this.handleInputChange(group);
+    };
 
     watch(callback: ObservableCallback<V>, callNow = false, group?: unknown): this {
+        if (this.callbacks.length === 0) {
+            for (const input of this.inputs) {
+                input.watch(this.watcher);
+            }
+
+            this.handleInputChange();
+        }
+
         this.callbacks.push(callback);
 
         if(callNow) {
@@ -82,6 +78,12 @@ export class ObservableTransformer<V, I extends Iterable<Observable<U>> | [Obser
             console.warn('unwatch called, but watcher was not registered');
         } else {
             this.callbacks.splice(i, 1);
+
+            if (this.callbacks.length === 0) {
+                for (const input of this.inputs) {
+                    input.unwatch(this.watcher);
+                }
+            }
         }
 
         return this;
