@@ -247,7 +247,8 @@ export class TextInput extends Widget {
            property === 'inputTextInnerPadding' ||
            property === 'inputTextFont' ||
            property === 'inputTextHeight' ||
-           property === 'inputTextSpacing') {
+           property === 'inputTextSpacing' ||
+           property === 'inputTextLetterSpacing') {
             this._layoutDirty = true;
             this.markWholeAsDirty();
             this.cursorOffsetDirty = true;
@@ -972,6 +973,7 @@ export class TextInput extends Widget {
         this.textHelper.font = this.inputTextFont;
         this.textHelper.lineHeight = this.inputTextHeight;
         this.textHelper.lineSpacing = this.inputTextSpacing;
+        this.textHelper.letterSpacing = this.inputTextLetterSpacing;
         this.textHelper.alignMode = this.inputTextAlign;
 
         // Mark as dirty if text helper is dirty

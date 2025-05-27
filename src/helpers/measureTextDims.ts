@@ -15,7 +15,14 @@ let defaultFontStyle = '';
  * removed first, even if they have a large amount of hits. If there are no
  * expired entries, the last entry (least total hits) is removed instead.
  */
-type CacheEntry = [font: string, text: string, metrics: TextMetrics, hits: number, lastHit: number];
+type CacheEntry = {
+    font: string,
+    text: string,
+    letterSpacing: number,
+    metrics: TextMetrics,
+    hits: number,
+    lastHit: number,
+};
 
 /**
  * The LFU cache of measured text. Contains a limited amount of text
@@ -32,6 +39,10 @@ const measureCacheLimit = 64;
  */
 const expiryThreshold = 10000;
 
+export interface MeasureTextDimsOptions {
+    letterSpacing?: number;
+}
+
 /**
  * Measures the dimensions of a given string of text with a given font.
  *
@@ -42,8 +53,9 @@ const expiryThreshold = 10000;
  *
  * @category Helper
  */
-export function measureTextDims(text: string, font: string): TextMetrics {
+export function measureTextDims(text: string, font: string, options?: Readonly<MeasureTextDimsOptions>): TextMetrics {
     const measureTime = (new Date()).getTime();
+    const letterSpacing = options?.letterSpacing ?? 0;
 
     // Get cached value
     let cacheHit: CacheEntry | null = null;
@@ -51,7 +63,7 @@ export function measureTextDims(text: string, font: string): TextMetrics {
     let removalIdx = measureCache.length - 1;
     for(let i = 0; i < measureCache.length; i++) {
         const cacheVal = measureCache[i];
-        if(cacheVal[0] === font && cacheVal[1] === text) {
+        if(cacheVal.font === font && cacheVal.text === text && cacheVal.letterSpacing === letterSpacing) {
             cacheHit = cacheVal;
             cacheHitIdx = i;
             break;
@@ -59,7 +71,7 @@ export function measureTextDims(text: string, font: string): TextMetrics {
 
         // Mark last expired cache entry for removal. If none is found, the last
         // entry in the cache (even if not expired) is marked for removal.
-        if(measureTime - cacheVal[4] > expiryThreshold) {
+        if(measureTime - cacheVal.lastHit > expiryThreshold) {
             removalIdx = i;
         }
     }
@@ -67,13 +79,13 @@ export function measureTextDims(text: string, font: string): TextMetrics {
     // If there was a cache hit, increment hits, update last hit time, bump in
     // cache and return cached metrics
     if(cacheHit) {
-        const newFreq = ++cacheHit[3];
-        cacheHit[4] = measureTime;
+        const newFreq = ++cacheHit.hits;
+        cacheHit.lastHit = measureTime;
 
         if(cacheHitIdx > 0) {
             let candidateIdx = 0;
             for(; candidateIdx < cacheHitIdx; candidateIdx++) {
-                if(measureCache[candidateIdx][3] <= newFreq) {
+                if(measureCache[candidateIdx].hits <= newFreq) {
                     break;
                 }
             }
@@ -84,7 +96,7 @@ export function measureTextDims(text: string, font: string): TextMetrics {
             }
         }
 
-        return cacheHit[2];
+        return cacheHit.metrics;
     }
 
     // Get canvas context if not yet got
@@ -101,6 +113,7 @@ export function measureTextDims(text: string, font: string): TextMetrics {
 
     // Set font
     measureContext.font = font === '' ? defaultFontStyle : font;
+    measureContext.letterSpacing = `${letterSpacing}px`;
 
     // Measure text
     const metrics = measureContext.measureText(text);
@@ -114,12 +127,14 @@ export function measureTextDims(text: string, font: string): TextMetrics {
 
         let candidateIdx = 0;
         for(; candidateIdx < measureCache.length; candidateIdx++) {
-            if(measureCache[candidateIdx][3] <= 1) {
+            if(measureCache[candidateIdx].hits <= 1) {
                 break;
             }
         }
 
-        measureCache.splice(candidateIdx, 0, [font, text, metrics, 1, measureTime]);
+        measureCache.splice(candidateIdx, 0, {
+            font, text, metrics, hits: 1, lastHit: measureTime, letterSpacing,
+        });
     }
 
     return metrics;

@@ -42,6 +42,8 @@ export interface ThemeProperties {
     bodyTextHeight?: number | null;
     /** The spacing between each line of text in body text (most regular text). If null, it will be automatically detected. */
     bodyTextSpacing?: number | null;
+    /** The spacing between each letter in body text (most regular text). */
+    bodyTextLetterSpacing?: number;
     /** The default text alignment mode of body text (most regular text). */
     bodyTextAlign?: TextAlignMode | number;
     /** The length in pixels used for {@link Checkbox}. */
@@ -64,6 +66,8 @@ export interface ThemeProperties {
     inputTextHeight?: number | null;
     /** The spacing between each line of text in input widgets like {@link TextInput}. If null, it will be automatically detected. */
     inputTextSpacing?: number | null;
+    /** The spacing between each letter in input widgets like {@link TextInput}. */
+    inputTextLetterSpacing?: number;
     /** The {@link Padding} between text and border used for text input widgets like {@link TextInput}. */
     inputTextInnerPadding?: Padding;
     /** The default minimum width of text input widgets like {@link TextInput}. */

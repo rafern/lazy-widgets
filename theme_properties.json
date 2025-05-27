@@ -86,6 +86,11 @@
             "default": "null",
             "description": "The spacing between each line of text in body text (most regular text). If null, it will be automatically detected."
         },
+        "bodyTextLetterSpacing": {
+            "type": "number",
+            "default": "0",
+            "description": "The spacing between each letter in body text (most regular text)."
+        },
         "bodyTextAlign": {
             "type": "TextAlignMode | number",
             "default": "TextAlignMode.Start",
@@ -140,6 +145,11 @@
             "type": "number | null",
             "default": "null",
             "description": "The spacing between each line of text in input widgets like {@link TextInput}. If null, it will be automatically detected."
+        },
+        "inputTextLetterSpacing": {
+            "type": "number",
+            "default": "0",
+            "description": "The spacing between each letter in input widgets like {@link TextInput}."
         },
         "inputTextInnerPadding": {
             "type": "Padding",

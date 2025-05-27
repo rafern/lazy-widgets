@@ -1,4 +1,4 @@
-import { measureTextDims } from '../helpers/measureTextDims.js';
+import { measureTextDims, type MeasureTextDimsOptions } from '../helpers/measureTextDims.js';
 import { multiFlagField } from '../decorators/FlagFields.js';
 import { FillStyle } from '../theme/FillStyle.js';
 import { DynMsg, Msg } from '../core/Strings.js';
@@ -195,6 +195,9 @@ export class TextHelper {
      */
     @multiFlagField(['_dirty'])
     alignMode: TextAlignMode | number = TextAlignMode.Start;
+    /** The letter spacing, in pixels. Defaults to 0 (no extra spacing). */
+    @multiFlagField(['_dirty', 'measureDirty', 'lineMetricsDirty', 'tabWidthDirty', 'measureOptionsDirty'])
+    letterSpacing: number = 0;
 
     /** The current largest text width. May be outdated. */
     private _width = 0;
@@ -231,6 +234,10 @@ export class TextHelper {
     private _dirty = false;
     /** See {@link TextHelper#lineRanges}. For internal use only. */
     private _lineRanges: Array<LineRange> = [];
+    /** Do the measure options need to be changed? */
+    private measureOptionsDirty = true;
+    /** Options to be used when measuring text slices. For internal use only. */
+    private measureOptions: MeasureTextDimsOptions = {};
 
     /**
      * Has the text (or properties associated with it) changed? Resets to false
@@ -258,7 +265,7 @@ export class TextHelper {
      * @returns Returns the new horizontal offset
      */
     private measureTextSlice(left: number, start: number, end: number): number {
-        const metrics = measureTextDims(this.text.slice(start, end), this.font);
+        const metrics = measureTextDims(this.text.slice(start, end), this.font, this.measureOptions);
         if(left === 0) {
             return metrics.width + Math.max(0, metrics.actualBoundingBoxLeft);
         } else {
@@ -485,6 +492,12 @@ export class TextHelper {
      */
     private updateTextDims(): void {
         // Update line metrics if needed
+        if(this.measureOptionsDirty) {
+            this.measureOptionsDirty = false;
+
+            this.measureOptions = { letterSpacing: this.letterSpacing };
+        }
+
         if(this.lineMetricsDirty) {
             this.lineMetricsDirty = false;
 
@@ -536,7 +549,7 @@ export class TextHelper {
         // Update tab width if needed
         if(this.tabWidthDirty) {
             this.tabWidthDirty = false;
-            this._spaceWidth = measureTextDims(' ', this.font).width;
+            this._spaceWidth = measureTextDims(' ', this.font).width + this.letterSpacing;
             this._tabWidth = this._spaceWidth * this.tabWidth;
         }
 
@@ -753,7 +766,7 @@ export class TextHelper {
         let actualMaxWidth = this.maxWidth;
         let hasEllipsis = false;
         if (this.wrapMode === WrapMode.Ellipsis) {
-            const ellipsisWidth = measureTextDims(ELLIPSIS, this.font).width;
+            const ellipsisWidth = measureTextDims(ELLIPSIS, this.font, this.measureOptions).width;
             // only add ellipsis if they fit, otherwise just clip
             if (ellipsisWidth <= this.maxWidth) {
                 hasEllipsis = true;
@@ -838,6 +851,7 @@ export class TextHelper {
         // Apply fill style and font
         ctx.save();
         ctx.font = this.font;
+        ctx.letterSpacing = `${this.letterSpacing}px`;
         ctx.fillStyle = fillStyle;
         ctx.textBaseline = 'alphabetic';
 

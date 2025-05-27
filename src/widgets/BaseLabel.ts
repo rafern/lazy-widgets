@@ -36,6 +36,7 @@ export abstract class BaseLabel extends Widget {
         this.textHelper.font = this.bodyTextFont;
         this.textHelper.lineHeight = this.bodyTextHeight;
         this.textHelper.lineSpacing = this.bodyTextSpacing;
+        this.textHelper.letterSpacing = this.bodyTextLetterSpacing;
         this.textHelper.wrapMode = this.wrapMode;
         this.textHelper.alignMode = this.bodyTextAlign;
     }
@@ -47,6 +48,7 @@ export abstract class BaseLabel extends Widget {
             this.textHelper.font = this.bodyTextFont;
             this.textHelper.lineHeight = this.bodyTextHeight;
             this.textHelper.lineSpacing = this.bodyTextSpacing;
+            this.textHelper.letterSpacing = this.bodyTextLetterSpacing;
             this.textHelper.wrapMode = this.wrapMode;
             this.textHelper.alignMode = this.bodyTextAlign;
             this._layoutDirty = true;
@@ -59,6 +61,8 @@ export abstract class BaseLabel extends Widget {
             this.textHelper.lineHeight = this.bodyTextHeight;
         } else if(property === 'bodyTextSpacing') {
             this.textHelper.lineSpacing = this.bodyTextSpacing;
+        } else if(property === 'bodyTextLetterSpacing') {
+            this.textHelper.letterSpacing = this.bodyTextLetterSpacing;
         } else if(property === 'wrapMode') {
             this.textHelper.wrapMode = this.wrapMode;
         } else if(property === 'bodyTextAlign') {

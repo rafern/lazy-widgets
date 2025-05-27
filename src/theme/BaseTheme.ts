@@ -86,6 +86,7 @@ export class BaseTheme implements ThemeProperties {
         this._bodyTextFill = properties.bodyTextFill;
         this._bodyTextHeight = properties.bodyTextHeight;
         this._bodyTextSpacing = properties.bodyTextSpacing;
+        this._bodyTextLetterSpacing = properties.bodyTextLetterSpacing;
         this._bodyTextAlign = properties.bodyTextAlign;
         this._checkboxLength = properties.checkboxLength;
         this._checkboxInnerPadding = properties.checkboxInnerPadding;
@@ -97,6 +98,7 @@ export class BaseTheme implements ThemeProperties {
         this._inputTextFillInvalid = properties.inputTextFillInvalid;
         this._inputTextHeight = properties.inputTextHeight;
         this._inputTextSpacing = properties.inputTextSpacing;
+        this._inputTextLetterSpacing = properties.inputTextLetterSpacing;
         this._inputTextInnerPadding = properties.inputTextInnerPadding;
         this._inputTextMinWidth = properties.inputTextMinWidth;
         this._inputTextAlign = properties.inputTextAlign;
@@ -329,6 +331,20 @@ export class BaseTheme implements ThemeProperties {
         }
     }
 
+    /** See {@link BaseTheme#bodyTextLetterSpacing}. For internal use only. */
+    private _bodyTextLetterSpacing?: number;
+
+    get bodyTextLetterSpacing(): number {
+        return this._bodyTextLetterSpacing ?? this._fallbackTheme?.bodyTextLetterSpacing ?? 0;
+    }
+
+    set bodyTextLetterSpacing(value: number | undefined) {
+        if(this._bodyTextLetterSpacing !== value) {
+            this._bodyTextLetterSpacing = value;
+            this.onThemeUpdated('bodyTextLetterSpacing');
+        }
+    }
+
     /** See {@link BaseTheme#bodyTextAlign}. For internal use only. */
     private _bodyTextAlign?: TextAlignMode | number;
 
@@ -480,6 +496,20 @@ export class BaseTheme implements ThemeProperties {
         if(this._inputTextSpacing !== value) {
             this._inputTextSpacing = value;
             this.onThemeUpdated('inputTextSpacing');
+        }
+    }
+
+    /** See {@link BaseTheme#inputTextLetterSpacing}. For internal use only. */
+    private _inputTextLetterSpacing?: number;
+
+    get inputTextLetterSpacing(): number {
+        return this._inputTextLetterSpacing ?? this._fallbackTheme?.inputTextLetterSpacing ?? 0;
+    }
+
+    set inputTextLetterSpacing(value: number | undefined) {
+        if(this._inputTextLetterSpacing !== value) {
+            this._inputTextLetterSpacing = value;
+            this.onThemeUpdated('inputTextLetterSpacing');
         }
     }
 
