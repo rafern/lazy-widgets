@@ -4,7 +4,8 @@
         <script type='module'>
             import {
                 DOMRoot, Column, DOMPointerDriver, Background, Label,
-                LiveLabel, Spacing, Variable, RadioButton, Row
+                LiveLabel, Spacing, Variable, RadioButton, Row, ClickProxy,
+                ComplementaryClickHelper,
             } from '../dist/index.js';
 
             // Create the root
@@ -27,6 +28,18 @@
             const languageVariable = new Variable('en');
             languageVariable.watch(changeLanguage, true);
 
+            function makeLanguageRow(code, lang) {
+                const complementaryClickHelper = new ComplementaryClickHelper();
+                return new ClickProxy(
+                    new Row([
+                        new Label(`${lang} (${code})`),
+                        new Spacing(),
+                        new RadioButton(languageVariable, code, { complementaryClickHelper }),
+                    ]),
+                    complementaryClickHelper,
+                );
+            }
+
             const root = new DOMRoot(
                 new Background(
                     new Column([
@@ -36,9 +49,9 @@
                             minHeight: 24,
                         }),
                         new LiveLabel(languageText),
-                        new Row([new Label('English (en)'), new Spacing(), new RadioButton(languageVariable, 'en')]),
-                        new Row([new Label('Português (pt)'), new Spacing(), new RadioButton(languageVariable, 'pt')]),
-                        new Row([new Label('Français (fr)'), new Spacing(), new RadioButton(languageVariable, 'fr')]),
+                        makeLanguageRow('en', 'English'),
+                        makeLanguageRow('pt', 'Português'),
+                        makeLanguageRow('fr', 'Français'),
                     ]),
                 ),
             );

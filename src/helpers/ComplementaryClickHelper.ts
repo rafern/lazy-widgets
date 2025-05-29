@@ -2,6 +2,10 @@ import { type BaseClickHelper } from './BaseClickHelper.js';
 import { CompoundClickHelper } from './CompoundClickHelper.js';
 
 export class ComplementaryClickHelper extends CompoundClickHelper {
+    constructor() {
+        super([]);
+    }
+
     /**
      * Attach a ClickHelper to the list of complementing ClickHelpers. Note that
      * duplicates are allowed.

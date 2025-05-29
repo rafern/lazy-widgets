@@ -146,6 +146,7 @@ export * from './widgets/CanvasContainer.js';
 export * from './widgets/CanvasEffectsContainer.js';
 export * from './widgets/Checkbox.js';
 export * from './widgets/ClickableWidgetProperties.js';
+export * from './widgets/ClickProxy.js';
 export * from './widgets/Column.js';
 export * from './widgets/Container.js';
 export * from './widgets/CornerRadii.js';
