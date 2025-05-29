@@ -73,6 +73,7 @@ export * from './helpers/ButtonClickHelper.js';
 export * from './helpers/ClickHelper.js';
 export * from './helpers/ClickState.js';
 export * from './helpers/clipRelativeRectToAbsoluteViewport.js';
+export * from './helpers/ComplementaryClickHelper.js';
 export * from './helpers/CompoundClickHelper.js';
 export * from './helpers/EffectImageBitmap.js';
 export * from './helpers/filterIDFromProperties.js';

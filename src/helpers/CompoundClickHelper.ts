@@ -1,18 +1,17 @@
-import { GenericClickHelper } from "./GenericClickHelper.js";
 import { BaseClickHelper } from "./BaseClickHelper.js";
 import { ClickState } from "./ClickState.js";
 /**
- * A class that mixes multiple {@link GenericClickHelper} instances into one.
+ * A class that mixes multiple {@link BaseClickHelper} instances into one.
  * Useful if you want a widget to be both clickable by a pointer and by the
  * enter key
  *
  * @category Helper
  */
 export class CompoundClickHelper implements BaseClickHelper {
-    /** The {@link GenericClickHelper} instances being mixed */
-    private clickHelpers: GenericClickHelper[];
+    /** The {@link BaseClickHelper} instances being mixed */
+    protected clickHelpers: BaseClickHelper[];
 
-    constructor(clickHelpers: GenericClickHelper[]) {
+    constructor(clickHelpers: BaseClickHelper[]) {
         this.clickHelpers = clickHelpers;
     }
 

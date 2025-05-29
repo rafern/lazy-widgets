@@ -69,7 +69,7 @@ export class RadioButton<V> extends Widget {
         this.tabFocusable = true;
         this.variable = variable;
         this.value = value;
-        this.clickHelper = new ButtonClickHelper(this);
+        this.clickHelper = new ButtonClickHelper(this, properties?.complementaryClickHelper);
         this.callback = this.handleChange.bind(this);
         this._wasSelected = this.selected;
     }

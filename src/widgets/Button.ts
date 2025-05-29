@@ -35,7 +35,7 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
         super(child, properties);
 
         this._clickable = properties?.clickable ?? true;
-        this.clickHelper = new ButtonClickHelper(this);
+        this.clickHelper = new ButtonClickHelper(this, properties?.complementaryClickHelper);
         this.tabFocusable = true;
     }
 

@@ -14,6 +14,9 @@ import type { Widget } from "../widgets/Widget.js";
 import type { TricklingEvent } from "../events/TricklingEvent.js";
 import type { Root } from "../core/Root.js";
 import type { Bounds } from "./Bounds.js";
+import { type ComplementaryClickHelper } from "./ComplementaryClickHelper.js";
+import { type BaseClickHelper } from "./BaseClickHelper.js";
+
 /**
  * A {@link CompoundClickHelper} specialised for {@link Button}-like widgets.
  * Handles pointer clicks and enter key-presses if the widget has a keyboard
@@ -34,10 +37,16 @@ export class ButtonClickHelper extends CompoundClickHelper {
     private widget: Widget;
     private pointerFocused = false;
 
-    constructor(widget: Widget) {
+    constructor(widget: Widget, complementaryClickHelper?: ComplementaryClickHelper) {
         const pointerClickHelper = new ClickHelper(widget);
         const keyboardClickHelper = new GenericClickHelper(widget);
-        super([pointerClickHelper, keyboardClickHelper])
+        const helpers: BaseClickHelper[] = [pointerClickHelper, keyboardClickHelper];
+
+        if (complementaryClickHelper) {
+            helpers.push(complementaryClickHelper);
+        }
+
+        super(helpers);
 
         this.pointerClickHelper = pointerClickHelper;
         this.keyboardClickHelper = keyboardClickHelper;

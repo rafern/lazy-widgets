@@ -65,7 +65,7 @@ export class Checkbox extends Widget {
         this.tabFocusable = true;
         this.variable = variable;
         this.callback = this.handleChange.bind(this);
-        this.clickHelper = new ButtonClickHelper(this);
+        this.clickHelper = new ButtonClickHelper(this, properties?.complementaryClickHelper);
     }
 
     protected handleChange(): void {
