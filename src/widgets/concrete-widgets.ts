@@ -16,6 +16,7 @@ export { Button } from './Button.js';
 export { CanvasContainer } from './CanvasContainer.js';
 export { CanvasEffectsContainer } from './CanvasEffectsContainer.js';
 export { Checkbox } from './Checkbox.js';
+export { ClickProxy } from './ClickProxy.js';
 export { Column } from './Column.js';
 export { Container } from './Container.js';
 export { FilledButton } from './FilledButton.js';

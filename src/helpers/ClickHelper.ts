@@ -8,6 +8,7 @@ import { LeaveEvent } from '../events/LeaveEvent.js';
 import type { TricklingEvent } from '../events/TricklingEvent.js';
 import type { Root } from '../core/Root.js';
 import type { Bounds } from './Bounds.js';
+
 /**
  * An aggregate helper class for widgets that can be clicked.
  *

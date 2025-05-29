@@ -1,8 +1,11 @@
+import { BlurEvent } from '../events/BlurEvent.js';
+import { FocusEvent } from '../events/FocusEvent.js';
 import { LeaveEvent } from '../events/LeaveEvent.js';
 import { PointerEvent } from '../events/PointerEvent.js';
 import { type TricklingEvent } from '../events/TricklingEvent.js';
 import { PropagationModel, type WidgetEvent } from '../events/WidgetEvent.js';
 import { ClickHelper } from '../helpers/ClickHelper.js';
+import { ClickState } from '../helpers/ClickState.js';
 import { ComplementaryClickHelper } from '../helpers/ComplementaryClickHelper.js';
 import { type WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { PassthroughWidget } from './PassthroughWidget.js';
@@ -56,8 +59,19 @@ export class ClickProxy<W extends Widget = Widget> extends PassthroughWidget<W> 
     }
 
     protected override handleEvent(event: WidgetEvent): Widget | null {
+        // FIXME if you have a nested button or clickproxy, and they both share
+        //       a compoundclickhelper, the hover state can't be transferred
+        //       perfectly; there's a single event which causes the state to
+        //       transition to a released state, instead of hover. i couldn't
+        //       find a fix for this
         if (event.propagation !== PropagationModel.Trickling) {
-            return super.handleEvent(event);
+            if (event.isa(FocusEvent)) {
+                return this;
+            } else if (event.isa(BlurEvent)) {
+                return this;
+            } else {
+                return super.handleEvent(event);
+            }
         }
 
         const tricklingEvent = event as TricklingEvent;
