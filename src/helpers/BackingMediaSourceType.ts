@@ -1,4 +1,4 @@
-export const enum BackingMediaSourceType {
+export enum BackingMediaSourceType {
     /** A HTMLImageElement. */
     HTMLImageElement,
     /** A HTMLVideoElement. */

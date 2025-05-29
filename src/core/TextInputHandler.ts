@@ -1,4 +1,4 @@
-export const enum TextInputHandlerEventType {
+export enum TextInputHandlerEventType {
     Dismiss,
     Input,
     MoveCursor,
