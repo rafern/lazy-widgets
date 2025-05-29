@@ -7,15 +7,16 @@ import { ClickState } from "./ClickState.js";
  *
  * @category Helper
  */
-export class CompoundClickHelper implements BaseClickHelper {
+export class CompoundClickHelper extends BaseClickHelper {
     /** The {@link BaseClickHelper} instances being mixed */
     protected clickHelpers: BaseClickHelper[];
 
     constructor(clickHelpers: BaseClickHelper[]) {
+        super();
         this.clickHelpers = clickHelpers;
     }
 
-    get clickState(): ClickState {
+    override get clickState(): ClickState {
         let highestState = ClickState.Released;
         for(const clickHelper of this.clickHelpers) {
             if(clickHelper.clickState > highestState) {
@@ -37,7 +38,7 @@ export class CompoundClickHelper implements BaseClickHelper {
      * state changed, compare the aforementioned values. This is the default
      * behaviour so that clicks aren't dropped.
      */
-    get clickStateChanged(): boolean {
+    override get clickStateChanged(): boolean {
         for(const clickHelper of this.clickHelpers) {
             if(clickHelper.clickStateChanged) {
                 return true;
@@ -52,7 +53,7 @@ export class CompoundClickHelper implements BaseClickHelper {
      * property for each click helper is only true if the
      * {@link BaseClickHelper#clickStateChanged} property is also true.
      */
-    get wasClick(): boolean {
+    override get wasClick(): boolean {
         for(const clickHelper of this.clickHelpers) {
             if(clickHelper.wasClick && clickHelper.clickStateChanged) {
                 return true;
@@ -63,7 +64,7 @@ export class CompoundClickHelper implements BaseClickHelper {
     }
 
     /** Resets each click helper instance being mixed. */
-    reset(): void {
+    override reset(): void {
         for(const clickHelper of this.clickHelpers) {
             clickHelper.reset();
         }
@@ -73,7 +74,7 @@ export class CompoundClickHelper implements BaseClickHelper {
      * Unsets the {@link BaseClickHelper#clickStateChanged} flag in each click
      * helper instance being mixed.
      */
-    doneProcessing() {
+    override doneProcessing() {
         for(const clickHelper of this.clickHelpers) {
             clickHelper.doneProcessing();
         }

@@ -12,16 +12,17 @@ import { ClickState } from './ClickState.js';
  *
  * @category Helper
  */
-export class GenericClickHelper implements BaseClickHelper {
-    clickState: ClickState = ClickState.Released;
-    clickStateChanged = false;
-    wasClick = false;
+export class GenericClickHelper extends BaseClickHelper {
+    override clickState: ClickState = ClickState.Released;
+    override clickStateChanged = false;
+    override wasClick = false;
     protected widget: Widget;
 
     /**
      * @param widget - The Widget aggregating this helper
      */
     constructor(widget: Widget) {
+        super();
         this.widget = widget;
     }
 
@@ -43,11 +44,11 @@ export class GenericClickHelper implements BaseClickHelper {
         }
     }
 
-    doneProcessing() {
+    override doneProcessing() {
         this.clickStateChanged = false;
     }
 
-    reset(): void {
+    override reset(): void {
         this.clickState = ClickState.Released;
         this.clickStateChanged = true;
         this.wasClick = false;
