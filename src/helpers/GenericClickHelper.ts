@@ -1,6 +1,8 @@
 import { BaseClickHelper } from './BaseClickHelper.js';
-import { Widget } from '../widgets/Widget.js';
+import { type Widget } from '../widgets/Widget.js';
 import { ClickState } from './ClickState.js';
+import { ClickHelperEventType } from './ClickHelperEventType.js';
+
 /**
  * An aggregate helper class for widgets that can be clicked, in the general
  * sense that the widget is/has a button or is clickable. This does not mean
@@ -13,9 +15,7 @@ import { ClickState } from './ClickState.js';
  * @category Helper
  */
 export class GenericClickHelper extends BaseClickHelper {
-    override clickState: ClickState = ClickState.Released;
-    override clickStateChanged = false;
-    override wasClick = false;
+    private _clickState: ClickState = ClickState.Released;
     protected widget: Widget;
 
     /**
@@ -27,30 +27,34 @@ export class GenericClickHelper extends BaseClickHelper {
     }
 
     /**
-     * Set {@link GenericClickHelper#clickState} and update
-     * {@link GenericClickHelper#lastClickState} if current one differs. Updates
-     * {@link GenericClickHelper#wasClick} and
-     * {@link GenericClickHelper#clickStateChanged} flags.
+     * Sets {@link GenericClickHelper#clickState} and dispatches events if
+     * current one differs.
      */
     setClickState(clickState: ClickState, inside: boolean): void {
-        if(this.clickState !== clickState) {
-            const lastClickState = this.clickState;
-            this.clickState = clickState;
+        const lastClickState = this._clickState;
+        if(lastClickState === clickState) {
+            return;
+        }
 
-            // If last state was a hold and pointer is still inside click
-            // area, this was a click
-            this.wasClick = inside && lastClickState === ClickState.Hold;
-            this.clickStateChanged = true;
+        this._clickState = clickState;
+        // If last state was a hold and pointer is still inside click area, this
+        // was a click
+        const wasClick = inside && lastClickState === ClickState.Hold;
+
+        this.dispatchEvent(ClickHelperEventType.StateChanged);
+        if (wasClick) {
+            this.dispatchEvent(ClickHelperEventType.Clicked);
         }
     }
 
-    override doneProcessing() {
-        this.clickStateChanged = false;
+    override get clickState(): ClickState {
+        return this._clickState;
     }
 
     override reset(): void {
-        this.clickState = ClickState.Released;
-        this.clickStateChanged = true;
-        this.wasClick = false;
+        if (this._clickState !== ClickState.Released) {
+            this._clickState = ClickState.Released;
+            this.dispatchEvent(ClickHelperEventType.StateChanged);
+        }
     }
 }

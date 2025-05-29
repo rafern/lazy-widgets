@@ -19,6 +19,8 @@ import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { safeRoundRect } from '../helpers/safeRoundRect.js';
 import { Msg } from '../core/Strings.js';
+import { ClickHelperEventType } from '../helpers/ClickHelperEventType.js';
+import { type ClickHelperEventListener } from '../helpers/ClickHelperEventListener.js';
 
 /**
  * The mode for how a scrollbar is shown in a {@link ScrollableViewportWidget}.
@@ -109,10 +111,16 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
      * value instead.
      */
     protected scrollLineHeight = 0;
+    private readonly handleVerticalClickHelperEvent: ClickHelperEventListener;
+    private readonly handleHorizontalClickHelperEvent: ClickHelperEventListener;
+    private verticalStateChanged = false;
+    private horizontalStateChanged = false;
 
     constructor(child: W, properties?: Readonly<ScrollableViewportWidgetProperties>) {
         super(child, properties);
 
+        this.handleVerticalClickHelperEvent = this.handleClickHelperEvent.bind(this, true);
+        this.handleHorizontalClickHelperEvent = this.handleClickHelperEvent.bind(this, false);
         this._scrollbarMode = properties?.scrollbarMode ?? ScrollbarMode.Overlay;
         this.horizontalClickHelper = new ClickHelper(this);
         this.verticalClickHelper = new ClickHelper(this);
@@ -232,12 +240,21 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         const clickHelper = this.getClickHelper(vertical);
         clickHelper.handleClickEvent(event, root, clickArea);
 
-        const clickState = clickHelper.clickState;
-        const stateChanged = clickHelper.clickStateChanged;
+        // HACK lazy way of implementing this, instead of doing it in the event
+        //      handler. would also be more expensive to do it all in the event
+        //      handler
+        const stateChanged = vertical ? this.verticalStateChanged : this.horizontalStateChanged;
         if(stateChanged) {
+            if (vertical) {
+                this.verticalStateChanged = false;
+            } else {
+                this.horizontalStateChanged = false;
+            }
+
             this.markAsDirty(bgRect);
         }
 
+        const clickState = clickHelper.clickState;
         if(clickState === ClickState.Hold) {
             // Abort if state is not valid, but grab the event
             if(clickHelper.pointerPos === null || !(event instanceof PointerEvent)) {
@@ -613,12 +630,6 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
         this.offset = offset;
     }
 
-    protected override handlePreLayoutUpdate() {
-        super.handlePreLayoutUpdate();
-        this.horizontalClickHelper.doneProcessing();
-        this.verticalClickHelper.doneProcessing();
-    }
-
     protected override handlePainting(dirtyRects: Array<Rect>): void {
         // Check which scrollbars need painting
         const [childWidth, childHeight] = this.child.idealDimensions;
@@ -812,5 +823,31 @@ export class ScrollableViewportWidget<W extends Widget = Widget> extends Viewpor
             ScrollableViewportWidget.invisiblePadWarned = true;
             console.warn(Msg.SCROLLBAR_INVIS_PAD);
         }
+    }
+
+    private handleClickHelperEvent(vertical: boolean, event: ClickHelperEventType): void {
+        if (event === ClickHelperEventType.StateChanged) {
+            if (vertical) {
+                this.verticalStateChanged = true;
+            } else {
+                this.horizontalStateChanged = true;
+            }
+        }
+    }
+
+    protected override activate(): void {
+        super.activate();
+        this.verticalStateChanged = false;
+        this.horizontalStateChanged = false;
+        this.verticalClickHelper.reset();
+        this.horizontalClickHelper.reset();
+        this.verticalClickHelper.addEventListener(this.handleVerticalClickHelperEvent);
+        this.horizontalClickHelper.addEventListener(this.handleHorizontalClickHelperEvent);
+    }
+
+    protected override deactivate(): void {
+        this.horizontalClickHelper.removeEventListener(this.handleHorizontalClickHelperEvent);
+        this.verticalClickHelper.removeEventListener(this.handleVerticalClickHelperEvent);
+        super.deactivate();
     }
 }

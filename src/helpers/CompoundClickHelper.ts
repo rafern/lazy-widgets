@@ -1,5 +1,7 @@
 import { BaseClickHelper } from "./BaseClickHelper.js";
+import { ClickHelperEventType } from "./ClickHelperEventType.js";
 import { ClickState } from "./ClickState.js";
+
 /**
  * A class that mixes multiple {@link BaseClickHelper} instances into one.
  * Useful if you want a widget to be both clickable by a pointer and by the
@@ -10,13 +12,49 @@ import { ClickState } from "./ClickState.js";
 export class CompoundClickHelper extends BaseClickHelper {
     /** The {@link BaseClickHelper} instances being mixed */
     protected clickHelpers: BaseClickHelper[];
+    private _clickState: ClickState = ClickState.Released;
+    protected refs = 0;
 
     constructor(clickHelpers: BaseClickHelper[]) {
         super();
         this.clickHelpers = clickHelpers;
+        this.updateClickState();
     }
 
-    override get clickState(): ClickState {
+    /**
+     * Start listening to all ClickHelpers events. Must be called when a widget
+     * that uses this CompoundClickHelper is attached to the UI tree
+     * (handleAttachment).
+     */
+    ref() {
+        if (this.refs++ > 0) {
+            return;
+        }
+
+        for (const helper of this.clickHelpers) {
+            helper.addEventListener(this.handleDependentEvent);
+        }
+    }
+
+    /**
+     * Stop listening to all ClickHelpers events. Must be called when a widget
+     * that uses this CompoundClickHelper is detached from the UI tree
+     * (handleDetachment).
+     */
+    unref() {
+        if (this.refs === 0) {
+            console.warn('CompoundClickHelper double-unreferenced');
+            return;
+        }
+
+        if (--this.refs === 0) {
+            for (const helper of this.clickHelpers) {
+                helper.removeEventListener(this.handleDependentEvent);
+            }
+        }
+    }
+
+    private updateClickState() {
         let highestState = ClickState.Released;
         for(const clickHelper of this.clickHelpers) {
             if(clickHelper.clickState > highestState) {
@@ -24,59 +62,32 @@ export class CompoundClickHelper extends BaseClickHelper {
             }
         }
 
-        return highestState;
+        this._clickState = highestState;
     }
 
-    /**
-     * See {@link BaseClickHelper#clickStateChanged}.
-     *
-     * Note that this does not check if the combined state has changed, it only
-     * check if any of the states in {@link CompoundClickHelper#clickHelpers}
-     * has changed, meaning that this can be true while
-     * {@link CompoundClickHelper#clickState} is equal to
-     * {@link CompoundClickHelper#lastClickState}. To check whether the combined
-     * state changed, compare the aforementioned values. This is the default
-     * behaviour so that clicks aren't dropped.
-     */
-    override get clickStateChanged(): boolean {
-        for(const clickHelper of this.clickHelpers) {
-            if(clickHelper.clickStateChanged) {
-                return true;
+    protected readonly handleDependentEvent = (eventType: ClickHelperEventType) => {
+        switch (eventType) {
+        case ClickHelperEventType.Clicked:
+            this.dispatchEvent(eventType);
+            break;
+        case ClickHelperEventType.StateChanged: {
+            const oldState = this._clickState;
+            this.updateClickState();
+            if (oldState !== this._clickState) {
+                this.dispatchEvent(eventType);
             }
+        }   break;
         }
-
-        return false;
     }
 
-    /**
-     * Similar to {@link BaseClickHelper#wasClick}, except that the wasClick
-     * property for each click helper is only true if the
-     * {@link BaseClickHelper#clickStateChanged} property is also true.
-     */
-    override get wasClick(): boolean {
-        for(const clickHelper of this.clickHelpers) {
-            if(clickHelper.wasClick && clickHelper.clickStateChanged) {
-                return true;
-            }
-        }
-
-        return false;
+    override get clickState(): ClickState {
+        return this._clickState;
     }
 
     /** Resets each click helper instance being mixed. */
     override reset(): void {
         for(const clickHelper of this.clickHelpers) {
             clickHelper.reset();
-        }
-    }
-
-    /**
-     * Unsets the {@link BaseClickHelper#clickStateChanged} flag in each click
-     * helper instance being mixed.
-     */
-    override doneProcessing() {
-        for(const clickHelper of this.clickHelpers) {
-            clickHelper.doneProcessing();
         }
     }
 }

@@ -11,6 +11,8 @@ import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { PointerEvent } from '../events/PointerEvent.js';
 import { LeaveEvent } from '../events/LeaveEvent.js';
+import { ClickHelperEventType } from '../helpers/ClickHelperEventType.js';
+import { type ClickHelperEventListener } from '../helpers/ClickHelperEventListener.js';
 /**
  * A {@link BaseContainer} which can be {@link ClickHelper | clicked} as a
  * button. Since the button grabs all events, no events are propagated to the
@@ -30,6 +32,7 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
     protected clickHelper: ButtonClickHelper;
     /** See {@link Button#clickable} */
     private _clickable: boolean;
+    private _handleClickHelperEvent: ClickHelperEventListener;
 
     constructor(child: W, properties?: Readonly<ClickableWidgetProperties>) {
         super(child, properties);
@@ -37,6 +40,7 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
         this._clickable = properties?.clickable ?? true;
         this.clickHelper = new ButtonClickHelper(this, properties?.complementaryClickHelper);
         this.tabFocusable = true;
+        this._handleClickHelperEvent = this.handleClickHelperEvent.bind(this);
     }
 
     /**
@@ -47,14 +51,23 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
         this.dispatchEvent(new ClickEvent(this));
     }
 
+    protected handleClickHelperEvent(event: ClickHelperEventType): void {
+        if (event === ClickHelperEventType.Clicked) {
+            this.click();
+        }
+    }
+
     protected override activate(): void {
         super.activate();
         this.clickHelper.reset();
+        this.clickHelper.ref();
+        this.clickHelper.addEventListener(this._handleClickHelperEvent);
     }
 
     protected override deactivate(): void {
+        this.clickHelper.unref();
+        this.clickHelper.removeEventListener(this._handleClickHelperEvent);
         super.deactivate();
-        this.clickHelper.reset();
     }
 
     protected override handleEvent(event: WidgetEvent): Widget | null {
@@ -91,20 +104,9 @@ export class Button<W extends Widget = Widget> extends BaseContainer<W> {
             }
         }
 
-        const [wasClick, capture] = this.clickHelper.handleEvent(
+        return this.clickHelper.handleEvent(
             tricklingEvent, this.root, this._clickable, this.bounds
-        );
-
-        if(wasClick) {
-            this.click();
-        }
-
-        return capture ? this : null;
-    }
-
-    protected override handlePreLayoutUpdate() {
-        super.handlePreLayoutUpdate();
-        this.clickHelper.doneProcessing();
+        ) ? this : null;
     }
 
     /**

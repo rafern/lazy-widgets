@@ -17,6 +17,7 @@ import type { Bounds } from '../helpers/Bounds.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { type Box } from '../state/Box.js';
+import { ClickHelperEventType } from '../helpers/ClickHelperEventType.js';
 
 /**
  * Optional Slider constructor properties.
@@ -119,6 +120,17 @@ export class Slider extends Widget {
         this.markWholeAsDirty();
     }
 
+    protected handleSlide() {
+        const pointerPos = this.clickHelper.pointerPos;
+        if (!pointerPos) {
+            return;
+        }
+
+        // Interpolate value
+        const percent = this.vertical ? (1 - pointerPos[1]) : pointerPos[0];
+        this.value = this._minValue + percent * (this._maxValue - this._minValue);
+    }
+
     protected override handleAttachment(): void {
         this.variable.watch(this.callback);
     }
@@ -127,9 +139,26 @@ export class Slider extends Widget {
         this.variable.unwatch(this.callback);
     }
 
+    private readonly handleClickHelperEvent = (event: ClickHelperEventType) => {
+        switch (event) {
+        case ClickHelperEventType.Clicked:
+            this.handleSlide();
+            break;
+        case ClickHelperEventType.StateChanged:
+            this.markWholeAsDirty();
+            break;
+        }
+    };
+
     protected override activate(): void {
         super.activate();
         this.clickHelper.reset();
+        this.clickHelper.addEventListener(this.handleClickHelperEvent);
+    }
+
+    protected override deactivate(): void {
+        this.clickHelper.removeEventListener(this.handleClickHelperEvent);
+        super.deactivate();
     }
 
     /** The slider's value */
@@ -326,17 +355,8 @@ export class Slider extends Widget {
 
         // If this was a click or the slider is currently being held, update
         // value
-        if(((this.clickHelper.clickStateChanged && this.clickHelper.wasClick) || this.clickHelper.clickState === ClickState.Hold)
-            && this.clickHelper.pointerPos !== null) {
-            // Interpolate value
-            const percent = this.vertical ? (1 - this.clickHelper.pointerPos[1]) : this.clickHelper.pointerPos[0];
-            this.value = this._minValue + percent * (this._maxValue - this._minValue);
-        }
-
-        // Always flag as dirty if the click state changed (so glow colour takes
-        // effect)
-        if(this.clickHelper.clickStateChanged) {
-            this.markWholeAsDirty();
+        if(this.clickHelper.clickState === ClickState.Hold && this.clickHelper.pointerPos !== null) {
+            this.handleSlide();
         }
 
         return this;
@@ -440,10 +460,5 @@ export class Slider extends Widget {
                 ctx.fillRect(x + fullWidth, y, emptyWidth, this.actualHeight);
             }
         }
-    }
-
-    protected override handlePreLayoutUpdate() {
-        super.handlePreLayoutUpdate();
-        this.clickHelper.doneProcessing();
     }
 }

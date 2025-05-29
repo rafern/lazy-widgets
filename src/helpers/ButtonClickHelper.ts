@@ -100,16 +100,16 @@ export class ButtonClickHelper extends CompoundClickHelper {
      * @param root - The root from {@link Widget#handleEvent}
      * @param enabled - Is the button being clicked enabled? If not, then the click state will remain unchanged, but the event will be captured
      * @param bounds - The bounding box to be used for detecting pointer clicks
-     * @returns Returns a 2-tuple containing, respective, whether a click occurred, and whether the event should be captured
+     * @returns True if the event should be captured, false otherwise
      */
-    handleEvent(event: TricklingEvent, root: Root, enabled: boolean, bounds: Bounds): [wasClick: boolean, capture: boolean] {
+    handleEvent(event: TricklingEvent, root: Root, enabled: boolean, bounds: Bounds): boolean {
         let shouldCapture = true;
         if (event instanceof KeyEvent) {
             // Discard non-enter key events
 
             // don't capture non-enter presses so that tab selection works
             if (event.key !== 'Enter') {
-                return [false, false];
+                return false;
             }
         } else if (event.isa(PointerMoveEvent)) {
             // do nothing; we should capture pointer move events to support
@@ -118,16 +118,15 @@ export class ButtonClickHelper extends CompoundClickHelper {
             shouldCapture = this.pointerFocused;
         } else if (!(event.isa(LeaveEvent) || event instanceof PointerEvent)) {
             // Discard unhandled events
-            return [false, false];
+            return false;
         }
 
         // Abort if not enabled, but still absorb events
         if(!enabled) {
-            return [false, shouldCapture];
+            return shouldCapture;
         }
 
         // Update button state
-        const clickStateAlreadyChanged = this.clickStateChanged;
         if(event.isa(KeyPressEvent)) {
             this.keyboardClickHelper.setClickState(ClickState.Hold, true);
             this.widget.autoScroll();
@@ -138,9 +137,6 @@ export class ButtonClickHelper extends CompoundClickHelper {
         }
 
         // Check if button was pressed and call callback if so
-        return [
-            !clickStateAlreadyChanged && this.clickStateChanged && this.wasClick,
-            shouldCapture
-        ];
+        return shouldCapture;
     }
 }

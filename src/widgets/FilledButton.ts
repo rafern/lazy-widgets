@@ -10,6 +10,7 @@ import type { ThemeProperties } from '../theme/ThemeProperties.js';
 import type { Widget, WidgetProperties } from './Widget.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
+import { ClickHelperEventType } from '../helpers/ClickHelperEventType.js';
 /**
  * Optional FilledButton constructor properties.
  *
@@ -146,12 +147,12 @@ export class FilledButton<W extends Widget = Widget> extends Button<W> {
         }
     }
 
-    protected override handlePreLayoutUpdate() {
-        if (this.clickHelper.clickStateChanged) {
+    protected override handleClickHelperEvent(event: ClickHelperEventType): void {
+        super.handleClickHelperEvent(event);
+
+        if (event === ClickHelperEventType.StateChanged) {
             this.updateBackground();
         }
-
-        super.handlePreLayoutUpdate();
     }
 
     protected override handlePainting(dirtyRects: Array<Rect>): void {

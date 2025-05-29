@@ -37,20 +37,21 @@ export class ClickProxy<W extends Widget = Widget> extends PassthroughWidget<W> 
     protected override activate(): void {
         super.activate();
         this.clickHelper.reset();
+        this.complementaryClickHelper.ref();
     }
 
     protected override deactivate(): void {
+        this.complementaryClickHelper.unref();
         super.deactivate();
-        this.clickHelper.reset();
     }
 
     protected override handleAttachment(): void {
-        this.complementaryClickHelper.attachClickHelper(this.clickHelper);
+        this.complementaryClickHelper.addClickHelper(this.clickHelper);
         super.handleAttachment();
     }
 
     protected override handleDetachment(): void {
-        this.complementaryClickHelper.detachClickHelper(this.clickHelper);
+        this.complementaryClickHelper.removeClickHelper(this.clickHelper);
         super.handleDetachment();
     }
 

@@ -10,6 +10,7 @@ import type { TricklingEvent } from '../events/TricklingEvent.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import type { ClickableWidgetProperties } from './ClickableWidgetProperties.js';
+import { ClickHelperEventType } from '../helpers/ClickHelperEventType.js';
 
 /**
  * A radio button widget; used for selecting one of many options. Uses a shared
@@ -133,19 +134,12 @@ export class RadioButton<V> extends Widget {
 
         const x = this.idealX + this.offsetX;
         const y = this.idealY + this.offsetY;
-        const [wasClick, capture] = this.clickHelper.handleEvent(
+        return this.clickHelper.handleEvent(
             event as TricklingEvent,
             this.root,
             this._clickable,
             [x, x + this.actualLength, y, y + this.actualLength]
-        );
-
-        // Select radio button if button was clicked
-        if(wasClick) {
-            this.select();
-        }
-
-        return capture ? this : null;
+        ) ? this : null;
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
@@ -220,9 +214,28 @@ export class RadioButton<V> extends Widget {
         this.variable.unwatch(this.callback);
     }
 
+    private readonly handleClickHelperEvent = (event: ClickHelperEventType) => {
+        switch (event) {
+        case ClickHelperEventType.Clicked:
+            this.select();
+            break;
+        case ClickHelperEventType.StateChanged:
+            this.markWholeAsDirty();
+            break;
+        }
+    };
+
     protected override activate(): void {
         super.activate();
         this.clickHelper.reset();
+        this.clickHelper.ref();
+        this.clickHelper.addEventListener(this.handleClickHelperEvent);
+    }
+
+    protected override deactivate(): void {
+        this.clickHelper.unref();
+        this.clickHelper.removeEventListener(this.handleClickHelperEvent);
+        super.deactivate();
     }
 
     /**
@@ -241,17 +254,5 @@ export class RadioButton<V> extends Widget {
         this._clickable = clickable;
         this.clickHelper.reset();
         this.markWholeAsDirty();
-    }
-
-    protected override handlePreLayoutUpdate() {
-        super.handlePreLayoutUpdate();
-
-        // Always mark as dirty if the click state changed (so glow colour takes
-        // effect). Toggle value if clicked
-        if(this.clickHelper.clickStateChanged) {
-            this.markWholeAsDirty();
-        }
-
-        this.clickHelper.doneProcessing();
     }
 }
