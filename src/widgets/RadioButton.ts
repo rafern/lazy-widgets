@@ -145,12 +145,6 @@ export class RadioButton<V> extends Widget {
             this.select();
         }
 
-        // Always mark as dirty if the click state changed (so glow colour takes
-        // effect). Toggle value if clicked
-        if(this.clickHelper.clickStateChanged) {
-            this.markWholeAsDirty();
-        }
-
         return capture ? this : null;
     }
 
@@ -251,6 +245,13 @@ export class RadioButton<V> extends Widget {
 
     protected override handlePreLayoutUpdate() {
         super.handlePreLayoutUpdate();
+
+        // Always mark as dirty if the click state changed (so glow colour takes
+        // effect). Toggle value if clicked
+        if(this.clickHelper.clickStateChanged) {
+            this.markWholeAsDirty();
+        }
+
         this.clickHelper.doneProcessing();
     }
 }

@@ -142,12 +142,6 @@ export class Checkbox extends Widget {
             this.checked = !this.checked;
         }
 
-        // Always mark as dirty if the click state changed (so glow colour takes
-        // effect). Toggle value if clicked
-        if(this.clickHelper.clickStateChanged) {
-            this.markWholeAsDirty();
-        }
-
         return capture ? this : null;
     }
 
@@ -229,6 +223,13 @@ export class Checkbox extends Widget {
 
     protected override handlePreLayoutUpdate() {
         super.handlePreLayoutUpdate();
+
+        // Always mark as dirty if the click state changed (so glow colour takes
+        // effect). Toggle value if clicked
+        if(this.clickHelper.clickStateChanged) {
+            this.markWholeAsDirty();
+        }
+
         this.clickHelper.doneProcessing();
     }
 }
