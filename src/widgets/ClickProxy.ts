@@ -5,7 +5,6 @@ import { PointerEvent } from '../events/PointerEvent.js';
 import { type TricklingEvent } from '../events/TricklingEvent.js';
 import { PropagationModel, type WidgetEvent } from '../events/WidgetEvent.js';
 import { ClickHelper } from '../helpers/ClickHelper.js';
-import { ClickState } from '../helpers/ClickState.js';
 import { ComplementaryClickHelper } from '../helpers/ComplementaryClickHelper.js';
 import { type WidgetAutoXML } from '../xml/WidgetAutoXML.js';
 import { PassthroughWidget } from './PassthroughWidget.js';
