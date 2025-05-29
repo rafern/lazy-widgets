@@ -15,17 +15,6 @@ export class CompoundClickHelper implements BaseClickHelper {
         this.clickHelpers = clickHelpers;
     }
 
-    get lastClickState(): ClickState {
-        let highestState = ClickState.Released;
-        for(const clickHelper of this.clickHelpers) {
-            if(clickHelper.lastClickState > highestState) {
-                highestState = clickHelper.lastClickState;
-            }
-        }
-
-        return highestState;
-    }
-
     get clickState(): ClickState {
         let highestState = ClickState.Released;
         for(const clickHelper of this.clickHelpers) {

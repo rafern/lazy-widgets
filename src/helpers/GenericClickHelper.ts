@@ -13,7 +13,6 @@ import { ClickState } from './ClickState.js';
  * @category Helper
  */
 export class GenericClickHelper implements BaseClickHelper {
-    lastClickState: ClickState = ClickState.Released;
     clickState: ClickState = ClickState.Released;
     clickStateChanged = false;
     wasClick = false;
@@ -34,12 +33,12 @@ export class GenericClickHelper implements BaseClickHelper {
      */
     setClickState(clickState: ClickState, inside: boolean): void {
         if(this.clickState !== clickState) {
-            this.lastClickState = this.clickState;
+            const lastClickState = this.clickState;
             this.clickState = clickState;
 
             // If last state was a hold and pointer is still inside click
             // area, this was a click
-            this.wasClick = inside && this.lastClickState === ClickState.Hold;
+            this.wasClick = inside && lastClickState === ClickState.Hold;
             this.clickStateChanged = true;
         }
     }
@@ -49,7 +48,6 @@ export class GenericClickHelper implements BaseClickHelper {
     }
 
     reset(): void {
-        this.lastClickState = ClickState.Released;
         this.clickState = ClickState.Released;
         this.clickStateChanged = true;
         this.wasClick = false;

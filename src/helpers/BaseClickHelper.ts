@@ -7,8 +7,6 @@ import { ClickState } from "./ClickState.js";
  * @category Helper
  */
 export interface BaseClickHelper {
-    /** Last click state */
-    get lastClickState(): ClickState;
     /** The current click state */
     get clickState(): ClickState;
     /** Did the last click event handle result in a click state change? */
