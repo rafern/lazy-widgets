@@ -1,4 +1,9 @@
-interface ConcurrentCollectionIterator {
+/**
+ * Context for a {@link ConcurrentCollection} being iterated.
+ *
+ * @internal
+ */
+export interface ConcurrentCollectionIterator {
     nextIndex: number;
 }
 
