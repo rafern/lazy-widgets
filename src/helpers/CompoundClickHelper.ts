@@ -18,7 +18,6 @@ export class CompoundClickHelper extends BaseClickHelper {
     constructor(clickHelpers: BaseClickHelper[]) {
         super();
         this.clickHelpers = clickHelpers;
-        this.updateClickState();
     }
 
     /**
@@ -30,6 +29,8 @@ export class CompoundClickHelper extends BaseClickHelper {
         if (this.refs++ > 0) {
             return;
         }
+
+        this.updateClickState();
 
         for (const helper of this.clickHelpers) {
             helper.addEventListener(this.handleDependentEvent);
