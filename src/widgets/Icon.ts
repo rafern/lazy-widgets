@@ -250,8 +250,8 @@ export class Icon extends Widget {
                 idealHeightNoPad = Math.max(this.idealHeight - vPad, 0);
             }
 
-            this.offsetX = (idealWidthNoPad - this.actualWidth) / 2 + pad.left;
-            this.offsetY = (idealHeightNoPad - this.actualHeight) / 2 + pad.top;
+            this.offsetX = Math.round((idealWidthNoPad - this.actualWidth) / 2 + pad.left);
+            this.offsetY = Math.round((idealHeightNoPad - this.actualHeight) / 2 + pad.top);
             break;
         }
         case IconFit.Fill:
