@@ -1,7 +1,7 @@
-import { AsyncImageBitmap } from './AsyncImageBitmap.js';
+import { AsyncMedia } from './AsyncMedia.js';
 import { BackingMediaSourceType } from './BackingMediaSourceType.js';
 
-export type BackingMediaSource = CanvasImageSource | AsyncImageBitmap;
+export type BackingMediaSource = CanvasImageSource | AsyncMedia;
 
 export function getBackingMediaSourceType(media: BackingMediaSource | null): BackingMediaSourceType {
     if (media instanceof Element) {
@@ -16,10 +16,12 @@ export function getBackingMediaSourceType(media: BackingMediaSource | null): Bac
             case 'IMAGE': return BackingMediaSourceType.SVGImageElement;
             }
         }
-    } else if (media instanceof AsyncImageBitmap) {
-        return BackingMediaSourceType.AsyncImageBitmap;
+    } else if (media instanceof AsyncMedia) {
+        return BackingMediaSourceType.AsyncMedia;
     } else if (media instanceof VideoFrame) {
         return BackingMediaSourceType.VideoFrame;
+    } else if (media instanceof ImageBitmap) {
+        return BackingMediaSourceType.ImageBitmap;
     }
 
     return BackingMediaSourceType.Immediate;

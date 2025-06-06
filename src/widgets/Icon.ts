@@ -1,12 +1,12 @@
 import { damageField, layoutField, damageLayoutArrayField } from '../decorators/FlagFields.js';
 import { Widget, WidgetProperties } from './Widget.js';
-import { DynMsg, Msg } from '../core/Strings.js';
+import { DynMsg } from '../core/Strings.js';
 import type { Rect } from '../helpers/Rect.js';
 import type { WidgetAutoXML } from '../xml/WidgetAutoXML.js';
-import { BackingMediaSource, getBackingMediaSourceType, urlToBackingMediaSource } from '../helpers/BackingMediaSource.js';
-import { type AsyncImageBitmap } from '../helpers/AsyncImageBitmap.js';
+import { BackingMediaSource, urlToBackingMediaSource } from '../helpers/BackingMediaSource.js';
 import { type Padding } from '../theme/Padding.js';
-import { BackingMediaSourceType } from '../helpers/BackingMediaSourceType.js';
+import { BackingMediaWrapper } from '../helpers/BackingMediaWrapper.js';
+import { BackingMediaEventType } from '../helpers/BackingMediaEventType.js';
 
 // TODO rename this to MediaFit
 /**
@@ -77,17 +77,7 @@ export class Icon extends Widget {
     };
 
     /** The current media data used by the icon. */
-    private _media: BackingMediaSource | null;
-    /** The current media type (image, video, etc...). */
-    private _mediaType: BackingMediaSourceType;
-    /**
-     * The last source that the current image was using. Used for tracking if
-     * the image source changed and if the image is fully loaded. Only used if
-     * the media is an HTMLImageElement.
-     */
-    private lastSrc: string | null = null;
-    /** The last presentation hash if using an AsyncImageBitmap. */
-    private lastPHash = -1;
+    private _media: BackingMediaWrapper | null;
     /** Has the user already been warned about the broken media? */
     private warnedBroken = false;
 
@@ -121,20 +111,6 @@ export class Icon extends Widget {
     /** Actual image height. */
     private actualHeight = 0;
     /**
-     * Listener for video loadedmetadata and canplay events. Saved so it can be
-     * removed when needed.
-     */
-    private loadedmetadataListener: ((event: Event) => void) | null = null;
-    /**
-     * Listener for video canplay event. Saved so it can be removed when needed.
-     */
-    private canplayListener: ((event: Event) => void) | null = null;
-    /**
-     * Used for requestVideoFrameCallback. If null, then callback is being done
-     * by marking the whole widget as dirty, which may be wasteful.
-     */
-    private frameCallback: ((now: DOMHighResTimeStamp, metadata: unknown /* VideoFrameMetadata */) => void) | null = null;
-    /**
      * The {@link IconFit} mode to use when the media dimensions don't match the
      * widget dimensions.
      */
@@ -150,52 +126,38 @@ export class Icon extends Widget {
         super(properties);
 
         if(typeof image === 'string') {
-            [image, this._mediaType] = urlToBackingMediaSource(image);
-        } else {
-            this._mediaType = getBackingMediaSourceType(image);
+            image = urlToBackingMediaSource(image)[0];
         }
 
-        this._media = image;
+        this._media = image === null ? null : new BackingMediaWrapper(image);
         this.rotation = properties?.rotation ?? 0;
         this.viewBox = properties?.viewBox ?? null;
         this.imageWidth = properties?.width ?? null;
         this.imageHeight = properties?.height ?? null;
         this.fit = properties?.fit ?? IconFit.Contain;
         this.mediaPadding = properties?.mediaPadding ?? { left: 0, right: 0, top: 0, bottom: 0 };
-        this.setupVideoEvents();
     }
 
-    /**
-     * Setup event listeners for video. Has no effect if {@link Icon#image} is
-     * not a video
-     */
-    private setupVideoEvents() {
-        if(this._mediaType === BackingMediaSourceType.HTMLVideoElement) {
-            const video = this._media as HTMLVideoElement;
-            // Add event listeners
-            // loadedmetadata is so that we resize the widget when we know the
-            // video dimensions
-            this.loadedmetadataListener = _event => this._layoutDirty = true;
-            video.addEventListener('loadedmetadata', this.loadedmetadataListener);
-            // canplay is so that the first video frame is always displayed
-            this.canplayListener = _event => this.markWholeAsDirty();
-            video.addEventListener('canplay', this.canplayListener);
+    private readonly onMediaEvent = (ev: BackingMediaEventType) => {
+        switch (ev) {
+        case BackingMediaEventType.Dirty:
+            this.markWholeAsDirty();
+            break;
+        case BackingMediaEventType.Resized:
+            this._layoutDirty = true;
+            break;
+        }
+    };
 
-            if('requestVideoFrameCallback' in video) {
-                console.warn(Msg.VIDEO_API_AVAILABLE);
+    protected override handleAttachment(): void {
+        if (this._media) {
+            this._media.addEventListener(this.onMediaEvent);
+        }
+    }
 
-                const originalVideo = video;
-                this.frameCallback = (_now, _metadata) => {
-                    // Mark widget as dirty when there is a new frame so that it
-                    // is painted
-                    if(this._media === originalVideo && this.frameCallback !== null) {
-                        this.markWholeAsDirty();
-                        video.requestVideoFrameCallback(this.frameCallback);
-                    }
-                }
-
-                video.requestVideoFrameCallback(this.frameCallback);
-            }
+    protected override handleDetachment(): void {
+        if (this._media) {
+            this._media.removeEventListener(this.onMediaEvent);
         }
     }
 
@@ -209,57 +171,20 @@ export class Icon extends Widget {
      */
     set image(image: BackingMediaSource | null) {
         if(image !== this._media) {
-            if(this._media instanceof HTMLVideoElement) {
-                // Remove old event listeners in video. null checks aren't
-                // needed, but adding them anyways so that typescript doesn't
-                // complain
-                if(this.loadedmetadataListener !== null) {
-                    this._media.removeEventListener('loadedmetadata', this.loadedmetadataListener);
-                }
-                if(this.canplayListener !== null) {
-                    this._media.removeEventListener('canplay', this.canplayListener);
-                }
+            if (this._media && this.attached) {
+                this._media.removeEventListener(this.onMediaEvent);
             }
 
-            this._media = image;
-            this._mediaType = getBackingMediaSourceType(image);
-            this.lastPHash = -1;
-            this.lastSrc = null;
-            this.loadedmetadataListener = null;
-            this.canplayListener = null;
-            this.frameCallback = null;
-            this.setupVideoEvents();
+            this._media = image === null ? null : new BackingMediaWrapper(image);
+
+            if (this._media && this.attached) {
+                this._media.addEventListener(this.onMediaEvent);
+            }
         }
     }
 
     get image(): BackingMediaSource | null {
-        return this._media;
-    }
-
-    protected override handlePreLayoutUpdate(): void {
-        // Icons only needs to be re-drawn if image changed, which is tracked by
-        // the image setter, or if the source changed, but not if the icon isn't
-        // loaded yet. If this is a playing video, icon only needs to be
-        // re-drawn if video is playing
-        if(this._mediaType === BackingMediaSourceType.HTMLVideoElement) {
-            if(!(this._media as HTMLVideoElement).paused && this.frameCallback === null) {
-                this.markWholeAsDirty();
-            }
-        } else if(this._mediaType === BackingMediaSourceType.HTMLImageElement) {
-            const img = this._media as HTMLImageElement;
-            const curSrc = img.src;
-            if(curSrc !== this.lastSrc && img.complete) {
-                this._layoutDirty = true;
-                this.lastSrc = curSrc;
-                this.markWholeAsDirty();
-            }
-        } else if (this._mediaType === BackingMediaSourceType.AsyncImageBitmap) {
-            const aib = this._media as AsyncImageBitmap;
-            if(aib.presentationHash !== this.lastPHash && aib.bitmap) {
-                this._layoutDirty = true;
-                this.markWholeAsDirty();
-            }
-        }
+        return this._media === null ? null : this._media.source;
     }
 
     protected override handleResolveDimensions(minWidth: number, maxWidth: number, minHeight: number, maxHeight: number): void {
@@ -273,34 +198,7 @@ export class Icon extends Widget {
             if (this._media === null) {
                 wantedWidth = 0;
             } else if (this.viewBox === null) {
-                switch(this._mediaType) {
-                case BackingMediaSourceType.HTMLImageElement: {
-                    const media = this._media as HTMLImageElement;
-                    wantedWidth = media.naturalWidth;
-                    // HACK firefox has a naturalWidth of 0 for some SVGs. note
-                    //      that images will likely have a bad aspect ratio
-                    if (wantedWidth === 0 && media.complete) {
-                        wantedWidth = 150;
-                    }
-                }   break;
-                case BackingMediaSourceType.HTMLVideoElement:
-                    wantedWidth = (this._media as HTMLVideoElement).videoWidth;
-                    break;
-                case BackingMediaSourceType.SVGImageElement: {
-                    const baseVal = (this._media as SVGImageElement).width.baseVal;
-                    if (baseVal.unitType === SVGLength.SVG_LENGTHTYPE_PX) {
-                        wantedWidth = baseVal.value;
-                    } else {
-                        baseVal.convertToSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PX);
-                        wantedWidth = baseVal.valueInSpecifiedUnits;
-                    }
-                }   break;
-                case BackingMediaSourceType.VideoFrame:
-                    wantedWidth = (this._media as VideoFrame).codedWidth;
-                    break;
-                default:
-                    wantedWidth = (this._media as Exclude<BackingMediaSource, HTMLImageElement | SVGImageElement | HTMLVideoElement | VideoFrame>).width;
-                }
+                wantedWidth = this._media.width;
             } else {
                 wantedWidth = this.viewBox[2];
             }
@@ -314,34 +212,7 @@ export class Icon extends Widget {
             if (this._media === null) {
                 wantedHeight = 0;
             } else if (this.viewBox === null) {
-                switch(this._mediaType) {
-                case BackingMediaSourceType.HTMLImageElement: {
-                    const media = this._media as HTMLImageElement;
-                    wantedHeight = media.naturalHeight;
-                    // HACK firefox has a naturalHeight of 0 for some SVGs. note
-                    //      that images will likely have a bad aspect ratio
-                    if (wantedHeight === 0 && media.complete) {
-                        wantedHeight = 150;
-                    }
-                }   break;
-                case BackingMediaSourceType.HTMLVideoElement:
-                    wantedHeight = (this._media as HTMLVideoElement).videoHeight;
-                    break;
-                case BackingMediaSourceType.SVGImageElement: {
-                    const baseVal = (this._media as SVGImageElement).height.baseVal;
-                    if (baseVal.unitType === SVGLength.SVG_LENGTHTYPE_PX) {
-                        wantedHeight = baseVal.value;
-                    } else {
-                        baseVal.convertToSpecifiedUnits(SVGLength.SVG_LENGTHTYPE_PX);
-                        wantedHeight = baseVal.valueInSpecifiedUnits;
-                    }
-                }   break;
-                case BackingMediaSourceType.VideoFrame:
-                    wantedHeight = (this._media as VideoFrame).codedHeight;
-                    break;
-                default:
-                    wantedHeight = (this._media as Exclude<BackingMediaSource, HTMLImageElement | SVGImageElement | HTMLVideoElement | VideoFrame>).height;
-                }
+                wantedHeight = this._media.height;
             } else {
                 wantedHeight = this.viewBox[3];
             }
@@ -355,7 +226,7 @@ export class Icon extends Widget {
         case IconFit.Contain:
         case IconFit.Cover:
         {
-            if (this._media === null || (this._mediaType === BackingMediaSourceType.HTMLImageElement && !(this._media as HTMLImageElement).complete)) {
+            if (this._media === null || !this._media.loaded) {
                 // XXX fallback for no media or not-yet-loaded images
                 this.actualWidth = idealWidthNoPad;
                 this.actualHeight = idealHeightNoPad;
@@ -397,22 +268,7 @@ export class Icon extends Widget {
     }
 
     protected override handlePainting(_dirtyRects: Array<Rect>): void {
-        let actualImage: CanvasImageSource | null;
-        if (this._mediaType === BackingMediaSourceType.AsyncImageBitmap) {
-            const aib = this._media as AsyncImageBitmap;
-            const bitmap = aib.bitmap;
-            if (!bitmap) {
-                return;
-            }
-
-            actualImage = bitmap;
-            this.lastPHash = aib.presentationHash;
-        } else if(this._mediaType === BackingMediaSourceType.HTMLImageElement && !(this._media as HTMLImageElement).complete) {
-            this.lastSrc = null;
-            actualImage = null;
-        } else {
-            actualImage = this._media as CanvasImageSource | null;
-        }
+        let actualImage = this._media ? this._media.canvasImageSource : null;
 
         // Translate, rotate and clip if rotation is not 0
         let tdx = this.x + this.offsetX, tdy = this.y + this.offsetY;

@@ -4,7 +4,7 @@
         <script type='module'>
             import {
                 DOMRoot, Label, Column, Icon, TextAlignMode, Background,
-                TextImageBitmap
+                TextMedia
             } from '../dist/index.js';
 
             // Load icon font
@@ -15,7 +15,7 @@
 
                 // Create the root
                 const icon = new Icon(
-                    new TextImageBitmap(
+                    new TextMedia(
                         '\uf52e',
                         '128px fa-solid-900',
                         'lime'

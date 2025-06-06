@@ -1,9 +1,11 @@
 import { Msg } from '../core/Strings.js';
 import { type FillStyle } from '../theme/FillStyle.js';
-import { AsyncImageBitmap } from './AsyncImageBitmap.js';
+import { AsyncMedia, FastCanvasImageSource } from './AsyncMedia.js';
+import { BackingMediaEventType } from './BackingMediaEventType.js';
+import { incrementUint31 } from './incrementUint31.js';
 import { measureTextDims } from './measureTextDims.js';
 
-export interface TextImageBitmapOptions {
+export interface TextMediaOptions {
     resolution?: number;
 }
 
@@ -23,14 +25,14 @@ export interface TextImageBitmapOptions {
  *
  * Throws if a scratch canvas can't be created.
  */
-export class TextImageBitmap extends AsyncImageBitmap {
+export class TextMedia extends AsyncMedia {
     private _bitmap: ImageBitmap | null = null;
-    private _presentationHash = -1;
+    private _presentationHash = 0;
     override readonly width: number;
     override readonly height: number;
     readonly resolution: number;
 
-    constructor(readonly text: string, readonly font: string, readonly fillStyle: FillStyle, options?: Readonly<TextImageBitmapOptions>) {
+    constructor(readonly text: string, readonly font: string, readonly fillStyle: FillStyle, options?: Readonly<TextMediaOptions>) {
         super();
 
         const metrics = measureTextDims(text, font);
@@ -57,12 +59,14 @@ export class TextImageBitmap extends AsyncImageBitmap {
         context.fillText(text, Math.trunc(this.width * 0.5), this.height - pad);
 
         createImageBitmap(canvas).then((bitmap) => {
-            this._presentationHash++;
+            this._presentationHash = incrementUint31(this._presentationHash);
             this._bitmap = bitmap;
+            this.dispatchEvent(BackingMediaEventType.Loaded);
+            this.dispatchEvent(BackingMediaEventType.Dirty);
         });
     }
 
-    override get bitmap() {
+    override get currentFrame(): FastCanvasImageSource | null {
         return this._bitmap;
     }
 
