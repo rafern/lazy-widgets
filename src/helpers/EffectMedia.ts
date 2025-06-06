@@ -37,6 +37,7 @@ export class EffectMedia extends AsyncMedia {
             this.dispatchEvent(ev);
             break;
         case BackingMediaEventType.Dirty:
+        case BackingMediaEventType.Loaded:
             this.dirty = true;
             this.evaluateEffect();
             break;
@@ -151,6 +152,11 @@ export class EffectMedia extends AsyncMedia {
                     this.waiting = false;
                 }
             }
+            return;
+        }
+
+        if (!this.wrapper.loaded) {
+            this.waiting = false;
             return;
         }
 
