@@ -226,8 +226,8 @@ export class Icon extends Widget {
         case IconFit.Contain:
         case IconFit.Cover:
         {
-            if (this._media === null || !this._media.loaded) {
-                // XXX fallback for no media or not-yet-loaded images
+            if (this._media === null) {
+                // XXX fallback for no media
                 this.actualWidth = idealWidthNoPad;
                 this.actualHeight = idealHeightNoPad;
             } else {

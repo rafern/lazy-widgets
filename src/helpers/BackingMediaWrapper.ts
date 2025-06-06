@@ -14,13 +14,14 @@ export class BackingMediaWrapper extends Notifier<BackingMediaEventType> {
     readonly sourceType: BackingMediaSourceType;
     private rvf = 0;
     private _presentationHash = 0;
+    private videoLoaded = false;
 
     constructor(readonly source: BackingMediaSource) {
         super();
         this.sourceType = getBackingMediaSourceType(source);
     }
 
-    private readonly dispatchResize = () => {
+    private readonly dispatchResized = () => {
         this.dispatchEvent(BackingMediaEventType.Resized);
     };
 
@@ -29,9 +30,26 @@ export class BackingMediaWrapper extends Notifier<BackingMediaEventType> {
         this.dispatchEvent(BackingMediaEventType.Dirty);
     };
 
-    private readonly dispatchResizeDirty = () => {
-        this.dispatchResize();
+    private readonly dispatchLoaded = () => {
+        this.dispatchEvent(BackingMediaEventType.Loaded);
+    };
+
+    private readonly onImageLoaded = () => {
+        this.dispatchResized();
+        this.dispatchLoaded();
         this.dispatchDirty();
+    };
+
+    private readonly onReadyStateChanged = () => {
+        const video = this.source as HTMLVideoElement;
+        if (this.videoLoaded) {
+            if (video.readyState < 2) {
+                this.videoLoaded = false;
+            }
+        } else if (video.readyState >= 2) {
+            this.videoLoaded = true;
+            this.dispatchLoaded();
+        }
     };
 
     private readonly dispatchDirtyAndRVF = () => {
@@ -51,12 +69,18 @@ export class BackingMediaWrapper extends Notifier<BackingMediaEventType> {
             this._presentationHash = incrementUint31(this._presentationHash);
             // falls through
         case BackingMediaSourceType.SVGImageElement:
-            (this.source as HTMLImageElement | SVGImageElement).addEventListener('load', this.dispatchResizeDirty);
+            (this.source as HTMLImageElement | SVGImageElement).addEventListener('load', this.onImageLoaded);
             break;
         case BackingMediaSourceType.HTMLVideoElement:
             {
                 const video = this.source as HTMLVideoElement;
-                video.addEventListener('resize', this.dispatchResize);
+                video.addEventListener('resize', this.dispatchResized);
+                video.addEventListener('loadeddata', this.onReadyStateChanged);
+                video.addEventListener('loadedmetadata', this.onReadyStateChanged);
+                video.addEventListener('canplay', this.onReadyStateChanged);
+                video.addEventListener('canplaythrough', this.onReadyStateChanged);
+                video.addEventListener('waiting', this.onReadyStateChanged);
+                this.onReadyStateChanged();
 
                 if('requestVideoFrameCallback' in video) {
                     console.warn(Msg.VIDEO_API_AVAILABLE);
@@ -76,12 +100,17 @@ export class BackingMediaWrapper extends Notifier<BackingMediaEventType> {
         switch (this.sourceType) {
         case BackingMediaSourceType.HTMLImageElement:
         case BackingMediaSourceType.SVGImageElement:
-            (this.source as HTMLImageElement | SVGImageElement).removeEventListener('load', this.dispatchResizeDirty);
+            (this.source as HTMLImageElement | SVGImageElement).removeEventListener('load', this.onImageLoaded);
             break;
         case BackingMediaSourceType.HTMLVideoElement:
             {
                 const video = this.source as HTMLVideoElement;
-                video.removeEventListener('resize', this.dispatchResize);
+                video.removeEventListener('resize', this.dispatchResized);
+                video.removeEventListener('loadeddata', this.onReadyStateChanged);
+                video.removeEventListener('loadedmetadata', this.onReadyStateChanged);
+                video.removeEventListener('canplay', this.onReadyStateChanged);
+                video.removeEventListener('canplaythrough', this.onReadyStateChanged);
+                video.removeEventListener('waiting', this.onReadyStateChanged);
 
                 if('requestVideoFrameCallback' in video) {
                     video.cancelVideoFrameCallback(this.rvf);
