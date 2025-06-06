@@ -162,10 +162,8 @@ export class Icon extends Widget {
     }
 
     /**
-     * The image or video used by this Icon.
-     *
-     * Sets {@link Icon#_media} if changed and sets {@link Icon#lastSrc} to null
-     * to mark the image as loading so that flickers are minimised.
+     * The image or video used by this Icon. Sets {@link Icon#_media} if
+     * changed.
      *
      * If getting, returns {@link Icon#_media}.
      */

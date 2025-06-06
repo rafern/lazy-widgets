@@ -64,6 +64,7 @@ export * from './events/WidgetEventEmitter.js';
 // helpers
 export * from './helpers/AsyncMedia.js';
 export * from './helpers/BackingCanvas.js';
+export * from './helpers/BackingMediaEventType.js';
 export * from './helpers/BackingMediaSource.js';
 export * from './helpers/BackingMediaSourceType.js';
 export * from './helpers/BackingMediaWrapper.js';
