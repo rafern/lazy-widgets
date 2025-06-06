@@ -2,6 +2,7 @@ import { AsyncMedia, type FastCanvasImageSource } from './AsyncMedia.js';
 import { createBackingCanvas, type BackingCanvasContext } from './BackingCanvas.js';
 import { BackingMediaEventType } from './BackingMediaEventType.js';
 import { type BackingMediaSource, urlToBackingMediaSource } from './BackingMediaSource.js';
+import { BackingMediaSourceType } from './BackingMediaSourceType.js';
 import { BackingMediaWrapper } from './BackingMediaWrapper.js';
 import { incrementUint31 } from './incrementUint31.js';
 import { type Listener } from './Notifier.js';
@@ -72,7 +73,15 @@ export class EffectMedia extends AsyncMedia {
     }
 
     static fromURL(url: string, options?: EffectMediaOptions) {
-        return new EffectMedia(urlToBackingMediaSource(url)[0], options);
+        const [source, type] = urlToBackingMediaSource(url);
+        if (type === BackingMediaSourceType.HTMLVideoElement) {
+            const video = source as HTMLVideoElement;
+            video.muted = true;
+            video.loop = true;
+            video.play();
+        }
+
+        return new EffectMedia(source, options);
     }
 
     override get width(): number {
