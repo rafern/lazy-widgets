@@ -116,6 +116,20 @@ export class DOMKeyboardDriver extends KeyboardDriver<DOMKeyboardDriverGroup, DO
         }
 
         for (const group of this.groups) {
+            for (const root of group.enabledRoots) {
+                const inputHandler = root.currentTextInputHandler;
+                if (!inputHandler) {
+                    continue;
+                }
+
+                if ((inputHandler.domElems as readonly Element[]).indexOf(newTarget) >= 0) {
+                    // HACK prevent VK from stealing focus of root, preventing
+                    //      TextInput widgets from losing focus whenever the VK
+                    //      is opened, causing the VK to break
+                    return false;
+                }
+            }
+
             // XXX even if the group is not selectable, the focus should still
             // not be cleared when a non-selectable group's DOM element is
             // focused, since it can be focused by clicking with the mouse

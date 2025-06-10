@@ -9,10 +9,6 @@ import type { Root } from '../core/Root.js';
 import type { CaptureList } from '../core/CaptureList.js';
 import { insertValueIntoOrderedSubsetList } from '../index.js';
 
-// TODO should enabledRoots be deprecated/removed? it was only needed for
-//      tab-focusing, but we have tabbableRoots now and nothing in the core or
-//      WLE integration libraries is using it
-
 /**
  * A group of Roots. When a {@link TabSelectEvent} is not captured by a
  * {@link Root} in a group, the TabSelectEvent is carried over to the next (or
