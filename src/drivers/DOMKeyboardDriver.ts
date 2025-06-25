@@ -58,7 +58,7 @@ export interface DOMKeyboardDriverGroupOptions extends KeyboardDriverGroupOption
      */
     listenToKeys?: boolean;
     /** See {@link DOMKeyboardDriverGroup#selectable}. */
-    selectable?: true;
+    selectable?: boolean;
 }
 
 /**

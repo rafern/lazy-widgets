@@ -160,7 +160,7 @@ export class TextInput extends Widget {
     tabModeEnabled = false;
     /**
      * Current text input handler. Make sure to call
-     * {@link TextInputHandler#dismiss} if you want to get rid of it; don't just
+     * {@link TextInputHandler#unfocus} if you want to get rid of it; don't just
      * set this to null.
      */
     protected currentTextInputHandler: TextInputHandler | null = null;
@@ -234,7 +234,7 @@ export class TextInput extends Widget {
 
     protected override deactivate(): void {
         if (this.currentTextInputHandler) {
-            this.currentTextInputHandler.dismiss();
+            this.currentTextInputHandler.unfocus();
         }
 
         super.deactivate();
@@ -714,7 +714,7 @@ export class TextInput extends Widget {
                     this.blinkStart = 0;
 
                     if (this.currentTextInputHandler) {
-                        this.currentTextInputHandler.dismiss();
+                        this.currentTextInputHandler.unfocus();
                     }
                 }
 

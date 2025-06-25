@@ -22,6 +22,7 @@ import type { WidgetEventEmitter, WidgetEventListener, WidgetEventTypedListenerM
 import { LeaveRootEvent } from '../events/LeaveRootEvent.js';
 import { type Rect } from '../helpers/Rect.js';
 import { type BackingCanvas } from '../helpers/BackingCanvas.js';
+import { PointerPressEvent } from '../events/PointerPressEvent.js';
 /**
  * Allowed cursor styles and in order of priority; lower indices have higher
  * priority
@@ -513,6 +514,13 @@ export class Root implements WidgetEventEmitter {
         // Cancel if an event listener destroyed this root
         if (!this.child.attached) {
             return captureList;
+        }
+
+        if (event.isa(PointerPressEvent)) {
+            const keyboardFocus = this._foci.get(FocusType.Keyboard);
+            if (keyboardFocus && keyboardFocus !== captured) {
+                this.clearFocus(FocusType.Keyboard);
+            }
         }
 
         if(captured === null) {

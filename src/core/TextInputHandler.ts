@@ -27,4 +27,8 @@ export abstract class TextInputHandler {
     dismiss(): void {
         this.listener(TextInputHandlerEventType.Dismiss);
     }
+    /** Unfocus the input handler. May cause a dismiss; does so by default. */
+    unfocus(): void {
+        this.dismiss();
+    }
 }

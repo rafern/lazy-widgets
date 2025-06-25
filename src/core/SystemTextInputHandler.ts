@@ -20,17 +20,18 @@ export class SystemTextInputHandler extends TextInputHandler {
 
     constructor(listener: TextInputHandlerListener) {
         const input = document.createElement('input');
-        input.style.position = 'fixed';
-        input.style.left = '0';
-        input.style.top = '0';
+        const style = input.style;
+        style.position = 'fixed';
+        style.left = '0';
+        style.top = '0';
         // XXX can't set width to 0, otherwise selection becomes glitchy
-        // input.style.width = '0px';
-        input.style.height = '0px';
-        input.style.margin = '0';
-        input.style.padding = '0';
-        input.style.borderStyle = 'none';
-        input.style.outlineStyle = 'none';
-        input.style.opacity = '0';
+        // style.width = '0px';
+        style.height = '0px';
+        style.margin = '0';
+        style.padding = '0';
+        style.borderStyle = 'none';
+        style.outlineStyle = 'none';
+        style.opacity = '0';
         input.tabIndex = -1;
 
         document.body.appendChild(input);
@@ -91,10 +92,7 @@ export class SystemTextInputHandler extends TextInputHandler {
     override askInput(currentText: string, selectStart: number, selectEnd: number): void {
         this.textInputElem.value = currentText;
         this.select(selectStart, selectEnd);
-        // HACK delay focus otherwise it doesn't work
-        setTimeout(() => {
-            this.textInputElem.focus({ preventScroll: true });
-        }, 10);
+        this.textInputElem.focus({ preventScroll: true });
     }
 
     override select(selectStart: number, selectEnd: number): void {
@@ -124,6 +122,10 @@ export class SystemTextInputHandler extends TextInputHandler {
             parent.removeChild(this.textInputElem);
         }
 
-        this.listener(TextInputHandlerEventType.Dismiss);
+        super.dismiss();
+    }
+
+    override unfocus(): void {
+        this.handleBlur();
     }
 }
