@@ -5,6 +5,7 @@
  */
 export interface ConcurrentCollectionIterator {
     nextIndex: number;
+    endIndex: number;
 }
 
 /**
@@ -23,10 +24,13 @@ export class ConcurrentCollection<V> {
     }
 
     forEach(callback: (value: V) => void) {
-        const iterator = <ConcurrentCollectionIterator>{ nextIndex: 0 };
+        const iterator = <ConcurrentCollectionIterator>{
+            nextIndex: 0,
+            endIndex: this.size,
+        };
         this.iterators.add(iterator);
         try {
-            while (iterator.nextIndex < this.size) {
+            while (iterator.nextIndex < iterator.endIndex) {
                 callback(this.values[iterator.nextIndex++]);
             }
         } finally {
@@ -38,15 +42,20 @@ export class ConcurrentCollection<V> {
         return this.values.push(value) - 1;
     }
 
-    remove(index: number): boolean {
-        const removed = this.values.splice(index, 1).length > 0;
-
+    private shiftBackIterators(index: number) {
         for (const iterator of this.iterators) {
             if (iterator.nextIndex < index) {
                 iterator.nextIndex--;
             }
+            if (index < iterator.endIndex) {
+                iterator.endIndex--;
+            }
         }
+    }
 
+    remove(index: number): boolean {
+        const removed = this.values.splice(index, 1).length > 0;
+        this.shiftBackIterators(index);
         return removed;
     }
 
@@ -57,12 +66,7 @@ export class ConcurrentCollection<V> {
         }
 
         this.values.splice(index, 1);
-
-        for (const iterator of this.iterators) {
-            if (iterator.nextIndex < index) {
-                iterator.nextIndex--;
-            }
-        }
+        this.shiftBackIterators(index);
 
         return true;
     }
