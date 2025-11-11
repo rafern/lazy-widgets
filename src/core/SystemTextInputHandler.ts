@@ -91,10 +91,7 @@ export class SystemTextInputHandler extends TextInputHandler {
     override askInput(currentText: string, selectStart: number, selectEnd: number): void {
         this.textInputElem.value = currentText;
         this.select(selectStart, selectEnd);
-        // HACK delay focus otherwise it doesn't work
-        setTimeout(() => {
-            this.textInputElem.focus({ preventScroll: true });
-        }, 10);
+        this.textInputElem.focus({ preventScroll: true });
     }
 
     override select(selectStart: number, selectEnd: number): void {
